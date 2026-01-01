@@ -1,9 +1,23 @@
 $max-width: 1200px;
 
+/* בסיס */
 $color-text: #111;
 $color-bg: #fff;
 
-$color-primary: #8b1c2d; // אדום "רשמי"
+/* מותג */
+$color-primary: #8b1c2d; // אדום רשמי
 $color-secondary: #f3e6c9; // זהב עדין
 
+/* נגזרות שימושיות */
+$color-text-muted: rgba(17, 17, 17, 0.75);
+$color-border-soft: rgba(17, 17, 17, 0.08);
+$color-border-strong: rgba(17, 17, 17, 0.14);
+
+$color-card-shadow: rgba(0, 0, 0, 0.12);
+$color-card-shadow-hover: rgba(0, 0, 0, 0.18);
+
+$color-cta-bg: $color-primary;
+$color-cta-text: #fff;
+
 $radius: 14px;
+$radius-sm: 10px;
