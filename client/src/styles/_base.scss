@@ -1,0 +1,33 @@
+@use "./variables" as *;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    direction: rtl;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Heebo", sans-serif;
+    background: $color-bg;
+    color: $color-text;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+}
+
+.container {
+    max-width: $max-width;
+    margin: 0 auto;
+    padding: 0 16px;
+}

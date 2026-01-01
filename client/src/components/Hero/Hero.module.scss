@@ -1,0 +1,49 @@
+// src/components/Hero/Hero.module.scss
+
+@use "../../styles/variables" as *;
+
+.hero {
+    padding: 56px 0 40px;
+    margin-bottom: 64px;
+}
+
+.inner {
+    background: linear-gradient(135deg, rgba(243, 230, 201, 0.65), rgba(255, 255, 255, 0.85));
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: $radius;
+    padding: 28px 18px;
+}
+
+.h1 {
+    margin: 0 0 10px;
+    font-size: 28px;
+    line-height: 1.15;
+}
+
+.p {
+    margin: 0 0 18px;
+    opacity: 0.85;
+    max-width: 760px;
+}
+
+.cta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.primary {
+    background: $color-primary;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.secondary {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+}

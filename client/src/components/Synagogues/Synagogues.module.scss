@@ -1,0 +1,38 @@
+@use "../../styles/variables" as *;
+
+.section {
+    padding: 64px 0 40px;
+}
+
+.title {
+    margin-bottom: 24px;
+    font-size: 24px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: $radius;
+    padding: 18px;
+    background: white;
+}
+
+.card h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+}
+
+.card p {
+    margin: 0 0 12px;
+    opacity: 0.8;
+}
+
+.link {
+    font-weight: 600;
+    color: $color-primary;
+}
