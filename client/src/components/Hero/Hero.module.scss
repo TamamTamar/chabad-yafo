@@ -1,49 +1,104 @@
-// src/components/Hero/Hero.module.scss
-
-@use "../../styles/variables" as *;
-
 .hero {
-    padding: 56px 0 40px;
-    margin-bottom: 64px;
+    position: relative;
+    padding: 34px 0 24px;
+    min-height: 440px;
+    display: flex;
+    align-items: center;
+}
+
+.bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("../../assets/hero.jpeg");
+    background-size: cover;
+    background-position: center;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.35),
+            rgba(0, 0, 0, 0.55));
 }
 
 .inner {
-    background: linear-gradient(135deg, rgba(243, 230, 201, 0.65), rgba(255, 255, 255, 0.85));
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: $radius;
-    padding: 28px 18px;
+    position: relative;
+    z-index: 1;
 }
 
-.h1 {
+.card {
+    max-width: 820px;
+    margin-inline-start: auto;
+    /* RTL: מיישר לימין */
+    border-radius: 18px;
+    padding: 28px 24px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(6px);
+}
+
+.title {
     margin: 0 0 10px;
-    font-size: 28px;
-    line-height: 1.15;
+    font-size: clamp(26px, 3.2vw, 42px);
+    line-height: 1.12;
+    font-weight: 900;
 }
 
-.p {
-    margin: 0 0 18px;
-    opacity: 0.85;
-    max-width: 760px;
+.subtitle {
+    margin: 0 0 16px;
+    line-height: 1.65;
+    font-size: 16px;
+    opacity: 0.9;
 }
 
-.cta {
+.actions {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+    margin: 0 0 14px;
+}
+
+.primary,
+.secondary {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 900;
+    border-radius: 12px;
+    padding: 12px 16px;
+    min-width: 190px;
 }
 
 .primary {
-    background: $color-primary;
-    color: white;
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: 700;
+    background: #8a1d2c;
+    /* בורדו */
+    color: #fff;
 }
 
 .secondary {
-    background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.14);
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: 700;
+    background: #d7b46a;
+    /* זהב */
+    color: #1b1b1b;
+}
+
+
+@media (max-width: 640px) {
+    .hero {
+        padding: 22px 0 18px;
+        min-height: 360px;
+    }
+
+    .card {
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+
+    .primary,
+    .secondary {
+        width: 100%;
+        min-width: unset;
+    }
 }

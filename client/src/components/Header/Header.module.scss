@@ -1,34 +1,44 @@
-// src/components/Header/Header.module.scss
-
 @use "../../styles/variables" as *;
 
 .header {
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: 50;
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+.skip {
+    position: absolute;
+    left: -999px;
+    top: 8px;
+    background: #000;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.skip:focus {
+    left: 12px;
+}
+
 .inner {
-    height: 72px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    height: 72px;
 }
 
 .brand {
     display: flex;
+    gap: 10px;
     align-items: center;
-    gap: 12px;
-    min-width: 220px;
 }
 
 .logo {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 12px;
     display: grid;
     place-items: center;
@@ -41,52 +51,78 @@
     display: flex;
     flex-direction: column;
     line-height: 1.1;
-}
 
-.title {
-    font-size: 16px;
-}
-
-.sub {
-    font-size: 12px;
-    opacity: 0.7;
+    span {
+        font-size: 12px;
+        opacity: 0.7;
+        margin-top: 2px;
+    }
 }
 
 .nav {
     display: flex;
-    gap: 14px;
-    font-size: 14px;
+    align-items: center;
+    gap: 16px;
 
     a {
-        padding: 8px 10px;
-        border-radius: 10px;
-        opacity: 0.9;
-    }
-
-    a:hover {
-        background: rgba(0, 0, 0, 0.05);
-        opacity: 1;
+        opacity: 0.85;
     }
 }
 
-.actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.lang {
-    background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.14);
-    padding: 8px 12px;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-.donate {
+.cta {
     background: $color-primary;
-    color: white;
+    color: #fff !important;
     padding: 10px 14px;
-    border-radius: 12px;
+    border-radius: 14px;
     font-weight: 700;
+}
+
+.burger {
+    display: none;
+    border: 0;
+    background: transparent;
+    padding: 10px;
+    border-radius: 12px;
+
+    span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: #111;
+        margin: 5px 0;
+    }
+}
+
+@media (max-width: 860px) {
+    .burger {
+        display: block;
+    }
+
+    .nav {
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background: #fff;
+        padding: 14px 16px 18px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+
+        a {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.03);
+        }
+    }
+
+    .open {
+        display: flex;
+    }
+
+    .cta {
+        text-align: center;
+    }
 }

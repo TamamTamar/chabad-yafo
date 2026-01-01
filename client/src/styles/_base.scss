@@ -8,8 +8,9 @@
 
 html {
     direction: rtl;
+    scroll-behavior: smooth;
+    scroll-padding-top: 84px; // גובה ה-header בערך
 }
-
 body {
     margin: 0;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Heebo", sans-serif;

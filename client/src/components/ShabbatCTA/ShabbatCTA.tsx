@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./ShabbatCTA.module.scss";
 
 const ShabbatCTA = () => {
@@ -11,9 +12,10 @@ const ShabbatCTA = () => {
                         נשמח לארח אתכם בבית חב״ד יפו.
                     </p>
 
-                    <a href="#register" className={styles.button}>
+                    <Link to="/shabbat" className={styles.button}>
                         לרישום לסעודת שבת
-                    </a>
+                    </Link>
+
                 </div>
             </div>
         </section>

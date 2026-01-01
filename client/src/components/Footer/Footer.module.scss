@@ -1,0 +1,81 @@
+@use "../../styles/variables" as *;
+
+.footer {
+    padding: 56px 0 28px;
+    background: #0f0f10;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.top {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: $color-secondary;
+    color: $color-primary;
+    font-weight: 800;
+}
+
+.title {
+    display: block;
+    font-size: 16px;
+}
+
+.sub {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 2px;
+}
+
+.cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.col h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+.col p {
+    margin: 8px 0;
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+.col a {
+    color: white;
+    opacity: 0.9;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.35);
+}
+
+.bottom {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.dot {
+    opacity: 0.6;
+}
