@@ -1,5 +1,8 @@
 @use "../../styles/variables" as *;
 
+/* =========================
+   Layout
+========================= */
 .page {
     padding: 36px 0 64px;
 }
@@ -8,32 +11,51 @@
     display: inline-block;
     margin-bottom: 14px;
     opacity: 0.85;
+    color: $brand-text;
 }
 
+/* =========================
+   Typography
+========================= */
 .h1 {
     margin: 0 0 8px;
     font-size: 28px;
+    color: $brand-text;
 }
 
 .p {
     margin-bottom: 20px;
     opacity: 0.85;
     max-width: 720px;
+    color: $ui-text-muted;
 }
 
+/* =========================
+   Form wrapper
+========================= */
 .form {
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: $brand-bg;
+    border: 1px solid $ui-border-soft;
     border-radius: $radius;
     padding: 20px;
 }
 
+/* =========================
+   Grid
+========================= */
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 14px;
 }
 
+.full {
+    grid-column: 1 / -1;
+}
+
+/* =========================
+   Fields
+========================= */
 .field {
     display: flex;
     flex-direction: column;
@@ -41,41 +63,45 @@
 
     span {
         font-size: 13px;
+        color: $ui-text-muted;
     }
 
     input,
     select,
     textarea {
         padding: 10px 12px;
-        border-radius: 12px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: $radius-sm;
+        border: 1px solid $ui-border-strong;
         outline: none;
+        color: $brand-text;
+        background: $brand-bg;
+
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 }
 
-.full {
-    grid-column: 1 / -1;
-}
-
-/* ❌ שדה לא תקין */
+/* =========================
+   Validation states
+========================= */
 .invalid {
-    border-color: #b00020 !important;
-    box-shadow: 0 0 0 2px rgba(176, 0, 32, 0.12);
+    border-color: $ui-error !important;
+    box-shadow: 0 0 0 2px $ui-error-soft;
 }
 
-/* ✅ שדה תקין */
 .valid {
-    border-color: #2e7d32 !important;
-    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.12);
+    border-color: $ui-success !important;
+    box-shadow: 0 0 0 2px $ui-success-soft;
 }
 
 .error {
     font-size: 12px;
-    color: #b00020;
     font-weight: 600;
+    color: $ui-error;
 }
 
+/* =========================
+   Actions
+========================= */
 .actions {
     margin-top: 18px;
     display: flex;
@@ -84,10 +110,10 @@
 }
 
 .primary {
-    background: $color-primary;
-    color: white;
+    background: $ui-btn-primary-bg;
+    color: $ui-btn-primary-text;
     padding: 12px 18px;
-    border-radius: 14px;
+    border-radius: $radius;
     border: none;
     font-weight: 700;
     cursor: pointer;
@@ -99,17 +125,22 @@
 }
 
 .secondary {
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    padding: 12px 18px;
-    border-radius: 14px;
-    font-weight: 700;
     background: transparent;
+    border: 1px solid $ui-border-strong;
+    padding: 12px 18px;
+    border-radius: $radius;
+    font-weight: 700;
+    color: $brand-text;
 }
 
+/* =========================
+   Notes & states
+========================= */
 .note {
     margin-top: 12px;
     font-size: 12px;
     opacity: 0.7;
+    color: $ui-text-muted;
 }
 
 .success {
@@ -118,14 +149,19 @@
     h1 {
         font-size: 28px;
         margin-bottom: 10px;
+        color: $brand-text;
     }
 
     p {
         opacity: 0.85;
         margin-bottom: 18px;
+        color: $ui-text-muted;
     }
 }
 
+/* =========================
+   Responsive
+========================= */
 @media (max-width: 720px) {
     .grid {
         grid-template-columns: 1fr;

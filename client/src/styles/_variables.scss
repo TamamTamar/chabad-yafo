@@ -1,31 +1,101 @@
+/* =========================
+   Layout
+========================= */
 $max-width: 1200px;
-
-/* בסיס */
-$color-text: #111;
-$color-bg: #fff;
-
-/* מותג */
-$color-primary: #8b1c2d; // אדום רשמי
-$color-secondary: #f3e6c9; // זהב עדין
-
-/* נגזרות שימושיות */
-$color-text-muted: rgba(17, 17, 17, 0.75);
-$color-border-soft: rgba(17, 17, 17, 0.08);
-$color-border-strong: rgba(17, 17, 17, 0.14);
-
-$color-card-shadow: rgba(0, 0, 0, 0.12);
-$color-card-shadow-hover: rgba(0, 0, 0, 0.18);
-
-$color-cta-bg: $color-primary;
-$color-cta-text: #fff;
+$header-height: 56px;
 
 $radius: 14px;
 $radius-sm: 10px;
 
+/* =========================
+   Brand (זהות צבעונית)
+========================= */
+$brand-primary: #1f4e79; // כחול ימי עמוק
+$brand-secondary: #e6c98b; // זהב חם (אבן יפו)
 
-// Header
-$header-height: 56px; // או 60px אם את רוצה
-$header-bg-top: #4a0e18;
-$header-bg-bottom: #2f0910;
-$header-border: rgba(255, 255, 255, 0.12);
-$header-nav-text: rgba(255, 255, 255, 0.92);
+$brand-bg: #ffffff;
+$brand-text: #0e1a22; // כחול-אפור כהה (לא שחור)
+
+/* =========================
+   UI (נגזרות כלליות לשימוש חוזר)
+========================= */
+$ui-text-muted: rgba(14, 26, 34, 0.75);
+
+$ui-border-soft: rgba(14, 26, 34, 0.08);
+$ui-border-strong: rgba(14, 26, 34, 0.14);
+
+$ui-shadow-card: rgba(0, 0, 0, 0.12);
+$ui-shadow-card-hover: rgba(0, 0, 0, 0.18);
+
+/* Buttons */
+$ui-btn-primary-bg: $brand-primary;
+$ui-btn-primary-text: #ffffff;
+
+$ui-btn-secondary-bg: $brand-secondary;
+$ui-btn-secondary-text: #1b1b1b;
+
+/* =========================
+   Hero (ממוקד לסקשן פתיח)
+========================= */
+$hero-overlay-top: rgba(10, 30, 50, 0.55);
+$hero-overlay-mid: rgba(10, 30, 50, 0.65);
+$hero-overlay-bottom: rgba(10, 30, 50, 0.75);
+
+$hero-title-color: #ffffff;
+$hero-subtitle-color: rgba(255, 255, 255, 0.92);
+
+$hero-title-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+$hero-subtitle-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+
+/* אופציונלי: מידה אחידה לכפתורים בהירו */
+$hero-cta-min-width: 190px;
+
+/* =========================
+   Header (Dark)
+========================= */
+$header-bg-top: rgba(20, 60, 95, 0.92);
+$header-bg-bottom: rgba(14, 42, 68, 0.92);
+
+$header-border: rgba(255, 255, 255, 0.14);
+$header-nav-text: rgba(255, 255, 255, 0.95);
+$header-nav-text-hover: #ffffff;
+
+$header-separator: rgba(255, 255, 255, 0.14);
+
+$header-underline: rgba(255, 255, 255, 0.9);
+
+$header-surface: rgba(255, 255, 255, 0.06);
+$header-surface-border: rgba(255, 255, 255, 0.18);
+
+$header-surface-hover: rgba(255, 255, 255, 0.08);
+
+$header-icon: #ffffff;
+
+/* CTA בתוך ה-Header */
+$header-cta-top: rgba(31, 78, 121, 1); // כחול
+$header-cta-bottom: rgba(14, 42, 68, 1); // כחול כהה
+$header-cta-text: #ffffff;
+$header-cta-border: rgba(255, 255, 255, 0.14);
+$header-cta-shadow: rgba(0, 0, 0, 0.26);
+$header-cta-inset: rgba(255, 255, 255, 0.12);
+$header-cta-shadow-hover: rgba(0, 0, 0, 0.30);
+$header-cta-inset-hover: rgba(255, 255, 255, 0.14);
+
+/* Backdrop + Mobile panel */
+$header-backdrop: rgba(0, 0, 0, 0.45);
+
+$header-mobile-panel-bg: rgba(14, 42, 68, 0.98);
+$header-mobile-panel-border: rgba(255, 255, 255, 0.14);
+
+/* =========================
+   Footer
+========================= */
+$footer-bg: #0f0f10;
+
+$footer-text: rgba(255, 255, 255, 0.92);
+$footer-text-muted: rgba(255, 255, 255, 0.75);
+
+$footer-border: rgba(255, 255, 255, 0.12);
+
+$footer-link: rgba(255, 255, 255, 0.95);
+$footer-link-underline: rgba(255, 255, 255, 0.35);

@@ -4,7 +4,7 @@
 .section {
     padding: 44px 16px;
     direction: rtl;
-    background: $color-bg;
+    background: $brand-bg;
 }
 
 .inner {
@@ -22,7 +22,7 @@
 .title {
     font-weight: 800;
     font-size: 26px;
-    color: $color-primary;
+    color: $brand-primary;
     position: relative;
     padding: 0 14px;
     text-align: center;
@@ -34,7 +34,7 @@
         top: 58%;
         width: 64px;
         height: 1px;
-        background: rgba(17, 17, 17, 0.18);
+        background: $ui-border-strong;
     }
 
     &::before {
@@ -63,12 +63,12 @@
 
 /* ===== Card ===== */
 .card {
-    background: $color-bg;
+    background: $brand-bg;
     border-radius: $radius;
     overflow: hidden;
 
-    border: 1px solid $color-border-soft;
-    box-shadow: 0 10px 26px $color-card-shadow;
+    border: 1px solid $ui-border-soft;
+    box-shadow: 0 10px 26px $ui-shadow-card;
 
     transition:
         transform 180ms ease,
@@ -77,12 +77,12 @@
 
     &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 14px 34px $color-card-shadow-hover;
-        background: $color-secondary;
+        box-shadow: 0 14px 34px $ui-shadow-card-hover;
+        background: $brand-secondary;
     }
 
     &:hover .body {
-        background: $color-secondary;
+        background: $brand-secondary;
     }
 }
 
@@ -112,7 +112,7 @@
 .body {
     padding: 14px 14px 18px;
     text-align: center;
-    background: $color-bg;
+    background: $brand-bg;
     transition: background-color 180ms ease;
 }
 
@@ -120,13 +120,13 @@
     margin: 6px 0;
     font-size: 18px;
     font-weight: 800;
-    color: $color-text;
+    color: $brand-text;
 }
 
 .subtitle {
     margin: 0 0 14px;
     font-size: 14px;
-    color: $color-text-muted;
+    color: $ui-text-muted;
 }
 
 /* ===== CTA ===== */
@@ -139,8 +139,8 @@
     padding: 10px 16px;
     border-radius: $radius-sm;
 
-    background: $color-cta-bg;
-    color: $color-cta-text;
+    background: $ui-btn-primary-bg;
+    color: $ui-btn-primary-text;
 
     font-weight: 700;
     font-size: 14px;
@@ -149,7 +149,7 @@
 
     .card:hover & {
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px $color-card-shadow-hover;
+        box-shadow: 0 6px 16px $ui-shadow-card-hover;
     }
 }
 

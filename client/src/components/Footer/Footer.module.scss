@@ -1,17 +1,20 @@
 @use "../../styles/variables" as *;
 
+/* ===== Footer ===== */
 .footer {
     padding: 56px 0 28px;
-    background: #0f0f10;
-    color: rgba(255, 255, 255, 0.92);
+    background: $footer-bg;
+    color: $footer-text;
 }
 
+/* ===== Top ===== */
 .top {
     display: grid;
     grid-template-columns: 1fr;
     gap: 28px;
 }
 
+/* ===== Brand ===== */
 .brand {
     display: flex;
     align-items: center;
@@ -21,25 +24,29 @@
 .logo {
     width: 44px;
     height: 44px;
-    border-radius: 12px;
+    border-radius: $radius-sm;
     display: grid;
     place-items: center;
-    background: $color-secondary;
-    color: $color-primary;
+
+    background: $brand-secondary;
+    color: $brand-primary;
     font-weight: 800;
 }
 
 .title {
     display: block;
     font-size: 16px;
+    color: $footer-text;
 }
 
 .sub {
     font-size: 12px;
-    opacity: 0.75;
     margin-top: 2px;
+    opacity: 0.75;
+    color: $footer-text-muted;
 }
 
+/* ===== Columns ===== */
 .cols {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -50,30 +57,34 @@
     margin: 0 0 10px;
     font-size: 14px;
     opacity: 0.95;
+    color: $footer-text;
 }
 
 .col p {
     margin: 8px 0;
     font-size: 14px;
     opacity: 0.85;
+    color: $footer-text-muted;
 }
 
 .col a {
-    color: white;
+    color: $footer-link;
     opacity: 0.9;
     text-decoration: underline;
-    text-decoration-color: rgba(255, 255, 255, 0.35);
+    text-decoration-color: $footer-link-underline;
 }
 
+/* ===== Bottom ===== */
 .bottom {
     margin-top: 28px;
     padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid $footer-border;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     font-size: 13px;
     opacity: 0.85;
+    color: $footer-text-muted;
 }
 
 .dot {
