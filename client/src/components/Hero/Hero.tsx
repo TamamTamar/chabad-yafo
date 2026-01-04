@@ -1,36 +1,42 @@
 import { Link } from "react-router-dom";
 import Container from "../Container/Container";
 import styles from "./Hero.module.scss";
+import { useLang } from "../../hooks/useLang";
 
 const Hero = () => {
-  return (
-    <section className={styles.hero} aria-label="פתיח בית חב״ד יפו">
-      <div className={styles.bg} aria-hidden="true" />
-      <div className={styles.overlay} aria-hidden="true" />
+    const { t } = useLang();
 
-      <Container className={styles.inner}>
-        <div className={styles.card}>
-          <h1 className={styles.title}>בית חב״ד יפו — בית יהודי פתוח, פעיל וחי</h1>
+    return (
+        <section className={styles.hero} aria-label={t.heroAria}>
+            <div className={styles.bg} aria-hidden="true" />
+            <div className={styles.overlay} aria-hidden="true" />
 
-          <p className={styles.subtitle}>
-            תפילות · סעודות שבת וחג · חגים · פעילות קהילתית — מקום מסודר, מזמין ורשמי בלב יפו.
-          </p>
+            <Container className={styles.inner}>
+                <div className={styles.card}>
+                    <h1 className={styles.title}>
+                        {t.heroTitle}
+                        <br />
+                        {t.heroSubtitle}
+                    </h1>
 
-          <div className={styles.actions}>
-            <Link to="/shabbat" className={styles.primary}>
-              רישום לסעודת שבת
-            </Link>
+                    <div className={styles.actions}>
+                        <Link to="/shabbat" className={styles.primary}>
+                            {t.heroShabbat}
+                        </Link>
 
-            <a href="#activity" className={styles.secondary}>
-              תרומה לפעילות
-            </a>
-          </div>
-
-         
-        </div>
-      </Container>
-    </section>
-  );
+                        <a
+                            href="https://www.matara.pro/nedarimplus/online/?S=aVIw"
+                            className={styles.secondary}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {t.heroDonate}
+                        </a>
+                    </div>
+                </div>
+            </Container>
+        </section>
+    );
 };
 
 export default Hero;

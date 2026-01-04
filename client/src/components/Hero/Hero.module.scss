@@ -31,7 +31,7 @@
 }
 
 .card {
-    max-width: 620px;
+    max-width: 600px;
     margin-inline-start: auto;
 
     background: none;
@@ -44,23 +44,15 @@
 
 .title {
     margin: 0 0 10px;
-    font-size: clamp(26px, 3.2vw, 42px);
+    font-size: clamp(32px, 3.8vw, 50px);
     line-height: 1.12;
     font-weight: 900;
+    margin-bottom: 30px;
 
     color: $hero-title-color;
     text-shadow: $hero-title-shadow;
 }
 
-.subtitle {
-    margin: 0 0 16px;
-    line-height: 1.65;
-    font-size: 16px;
-    opacity: 0.9;
-
-    color: $hero-subtitle-color;
-    text-shadow: $hero-subtitle-shadow;
-}
 
 .actions {
     display: flex;
