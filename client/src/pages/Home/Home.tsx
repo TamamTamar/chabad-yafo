@@ -10,7 +10,7 @@ const Home = () => {
         <div className={styles.page}>
             <main>
                 <Hero />
-                <ChabadHousesCards title="בתי חב״ד ביפו" cards={chabadCards} />
+                <ChabadHousesCards cards={chabadCards} />
                 <ShabbatCTA />
                 <Gallery />
 

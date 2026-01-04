@@ -1,34 +1,37 @@
-import type { ChabadHouseCard } from "../../components/ChabadHousesCards/ChabadHousesCards";
+import type { ChabadHouseCard } from "../../types/chabad";
 
-import shuk from "../../assets/chabad-houses/shuk.jpeg";
-import leyafo from "../../assets/chabad-houses/leyafo.jpeg";
-import jerusalem from "../../assets/chabad-houses/jerusalem.jpeg";
+import tzahalon from "../../assets/chabad-houses/tzahalon.jpeg";
+import center from "../../assets/chabad-houses/center.jpeg";
+import kampus from "../../assets/chabad-houses/kampus.jpeg";
+
 
 export const chabadCards: ChabadHouseCard[] = [
-   
     {
-        id: "main",
-        title: "בית כנסת חב״ד נמל יפו",
-        subtitle: "רח׳ מרגוזה 123, יפו",
-        href: "/chabad/port",
-        imageSrc: leyafo,
-        imageAlt: "אירוע בבית כנסת חב״ד נמל יפו",
+        id: "tzahalon",
+        title: "בית חב״ד שכונת צהלון",
+        shaliach: "הרב מענדי חבקין",
+        address: "מיכאלאנגלו 3, יפו",
+        phone: "053-123-4567",
+        imageSrc: tzahalon,
+        imageAlt: "פעילות קהילתית בבית חב״ד שכונת צהלון",
     },
     {
-        id: "shuk",
-        title: "בית חב״ד שוק הפשפשים",
-        subtitle: "חוזה 13, יפו",
-        href: "/chabad/shuk",
-        imageSrc: shuk,
-        imageAlt: "סעודת שבת בבית חב״ד שוק הפשפשים",
-        featured: true, // ← זה המרכזי
+        id: "center",
+        title: "בית חב״ד המרכזי",
+        shaliach: "הרב לוי יצחק תמם",
+        address: "עולי ציון 30, שוק הפשפשים",
+        phone: "053-770-0339",
+        imageSrc: center,
+        imageAlt: "בית חב״ד המרכזי בשוק הפשפשים יפו",
+        featured: true,
     },
     {
-        id: "events",
-        title: "בית חב״ד אירועים וקהילה",
-        subtitle: "מרכזי בעיר",
-        href: "/chabad/events",
-        imageSrc: jerusalem,
-        imageAlt: "אירוע קהילתי בשעות ערב",
+        id: "kampus",
+        title: "חב״ד בקמפוס",
+        shaliach: "הרב שמוליק קפלן",
+        address: "המכללה האקדמית יפו",
+        phone: "052-987-6543",
+        imageSrc: kampus,
+        imageAlt: "פעילות חב״ד בקמפוס המכללה האקדמית יפו",
     },
 ];

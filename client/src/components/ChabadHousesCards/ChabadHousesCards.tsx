@@ -1,63 +1,36 @@
 import styles from "./ChabadHousesCards.module.scss";
-
-export type ChabadHouseCard = {
-    id: string;
-    title: string;
-    subtitle?: string;
-    href: string;
-    imageSrc: string;
-    imageAlt: string;
-    featured?: boolean; // לוגי בלבד, לא משפיע על העיצוב כרגע
-};
+import type { ChabadHouseCard } from "../../types/chabad";
 
 type Props = {
-    title?: string;
     cards: ChabadHouseCard[];
 };
 
-const ChabadHousesCards = ({ title = "בתי חב״ד ביפו", cards }: Props) => {
+const ChabadHousesCards = ({ cards }: Props) => {
     return (
-        <section className={styles.section} aria-label={title}>
+        <section className={styles.section} aria-label="חב״ד ביפו">
             <div className={styles.inner}>
                 <header className={styles.header}>
-                    <h2 className={styles.title}>{title}</h2>
+                    <h2 className={styles.title}>חב״ד ביפו</h2>
                 </header>
 
                 <ul className={styles.grid}>
                     {cards.map((card) => (
                         <li key={card.id} className={styles.card}>
-                            <a className={styles.cardLink} href={card.href}>
-                                <div className={styles.media}>
-                                    <img
-                                        className={styles.image}
-                                        src={card.imageSrc}
-                                        alt={card.imageAlt}
-                                        loading="lazy"
-                                    />
-                                </div>
+                            <div className={styles.media}>
+                                <img
+                                    className={styles.image}
+                                    src={card.imageSrc}
+                                    alt={card.imageAlt}
+                                    loading="lazy"
+                                />
+                            </div>
 
-                                <div className={styles.body}>
-                                    <h3 className={styles.cardTitle}>
-                                        {card.title}
-                                    </h3>
-
-                                    {card.subtitle && (
-                                        <p className={styles.subtitle}>
-                                            {card.subtitle}
-                                        </p>
-                                    )}
-
-                                    <div className={styles.cta}>
-                                        <span>פרטים</span>
-                                        <span
-                                            className={styles.arrow}
-                                            aria-hidden="true"
-                                        >
-                                            ›
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
+                            <div className={styles.cardBody}>
+                                <h3 className={styles.cardTitle}>{card.title}</h3>
+                                <p className={styles.shaliach}>{card.shaliach}</p>
+                                <p className={styles.address}>{card.address}</p>
+                                <p className={styles.phone}>{card.phone}</p>
+                            </div>
                         </li>
                     ))}
                 </ul>
