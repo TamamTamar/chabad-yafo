@@ -1,72 +1,42 @@
+// client/src/components/Footer/Footer.tsx
+import Container from "../Container/Container";
 import styles from "./Footer.module.scss";
 
 const Footer = () => {
+    const year = new Date().getFullYear();
+
     return (
-        <footer id="contact" className={styles.footer}>
-            <div className="container">
-                <div className={styles.top}>
-                    <div className={styles.brand}>
-                        <div className={styles.logo} aria-hidden="true">
-                            חב״ד
-                        </div>
-                        <div>
-                            <strong className={styles.title}>בית חב״ד יפו</strong>
-                            <div className={styles.sub}>Chabad Jaffa</div>
-                        </div>
-                    </div>
+        <footer className={styles.footer} role="contentinfo">
+            <Container className={styles.inner}>
+                <div className={styles.content}>
+                    <h2 className={styles.title}>בית חב״ד יפו</h2>
 
-                    <div className={styles.cols}>
-                        <div className={styles.col}>
-                            <h3>יצירת קשר</h3>
-                            <p>
-                                טלפון: <a href="tel:+972000000000">03-000-0000</a>
-                            </p>
-                            <p>
-                                וואטסאפ:{" "}
-                                <a href="https://wa.me/972000000000" target="_blank" rel="noreferrer">
-                                    שליחת הודעה
-                                </a>
-                            </p>
-                            <p>
-                                אימייל: <a href="mailto:info@chabadyafo.org">info@chabadyafo.org</a>
-                            </p>
-                        </div>
+                    <ul className={styles.details} aria-label="פרטי יצירת קשר">
+                        <li className={styles.item}>
+                            <span className={styles.label}>כתובת</span>
+                            <span className={styles.value}>עולי ציון 30, יפו</span>
+                        </li>
 
-                        <div className={styles.col}>
-                            <h3>כתובת</h3>
-                            <p>יפו, תל אביב</p>
-                            <p>
-                                <a href="https://maps.google.com" target="_blank" rel="noreferrer">
-                                    ניווט ב-Google Maps
-                                </a>
-                            </p>
-                        </div>
+                        <li className={styles.item}>
+                            <span className={styles.label}>טלפון / וואטסאפ</span>
+                            <a className={styles.valueLink} href="tel:0537700339">
+                                053-770-0339
+                            </a>
+                        </li>
 
-                        <div className={styles.col}>
-                            <h3>קישורים</h3>
-                            <p>
-                                <a href="#synagogues">בתי כנסת</a>
-                            </p>
-                            <p>
-                                <a href="#shabbat">רישום לשבת</a>
-                            </p>
-                            <p>
-                                <a href="#activity">פעילות</a>
-                            </p>
-                            <p>
-                                <a href="#about">אודות</a>
-                            </p>
-                        </div>
-                    </div>
+                        <li className={styles.item}>
+                            <span className={styles.label}>שעות פעילות</span>
+                            <span className={styles.value}>
+                                א׳–ה׳: 10:00–16:00 · ו׳: 9:00–14:00
+                            </span>
+                        </li>
+                    </ul>
                 </div>
 
                 <div className={styles.bottom}>
-                    <span>© {new Date().getFullYear()} Tamar Tamam</span>
-                    <span className={styles.dot}>•</span>
-                    <a href="#privacy">מדיניות פרטיות</a>
+                    <p className={styles.credit}>© {year} Tamar Tamam</p>
                 </div>
-
-            </div>
+            </Container>
         </footer>
     );
 };

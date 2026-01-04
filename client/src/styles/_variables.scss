@@ -96,17 +96,19 @@ $header-mobile-panel-border: rgba(255, 255, 255, 0.14);
 /* =========================
    Footer
 ========================= */
-$footer-bg: #0f0f10;
+/* =========================
+   Footer – כחול רגוע
+========================= */
 
-$footer-text: rgba(255, 255, 255, 0.92);
-$footer-text-muted: rgba(255, 255, 255, 0.75);
+$footer-bg: #143c5f; // כחול עמוק, רגוע (קרוב ל-header אבל רך יותר)
 
-$footer-border: rgba(255, 255, 255, 0.12);
+$footer-text: rgba(255, 255, 255, 0.94);
+$footer-text-muted: rgba(255, 255, 255, 0.78);
 
-$footer-link: rgba(255, 255, 255, 0.95);
-$footer-link-underline: rgba(255, 255, 255, 0.35);
+$footer-border: rgba(255, 255, 255, 0.14);
 
-
+$footer-link: rgba(255, 255, 255, 0.96);
+$footer-link-underline: rgba(255, 255, 255, 0.4);
 /* =========================
 Validation
 ========================= */
