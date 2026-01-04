@@ -32,7 +32,8 @@ const Header = () => {
         close();
     };
 
-    const langButtonLabel = lang === "he" ? t.english : t.hebrew;
+    const langButtonLabel = lang === "he" ? "EN" : "HE";
+
 
     return (
         <header className={styles.header}>

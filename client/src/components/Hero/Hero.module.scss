@@ -1,5 +1,8 @@
 @use "../../styles/variables" as *;
 
+/* =========================
+   HERO WRAPPER
+========================= */
 .hero {
     position: relative;
     padding: 34px 0 24px;
@@ -8,6 +11,9 @@
     align-items: center;
 }
 
+/* =========================
+   BACKGROUND
+========================= */
 .bg {
     position: absolute;
     inset: 0;
@@ -30,35 +36,43 @@
     z-index: 1;
 }
 
+/* =========================
+   CONTENT CARD
+   תמיד בצד שמאל
+========================= */
 .card {
     max-width: 600px;
-    margin-inline-start: auto;
+    margin-right: auto;
+    margin-left: 0;
 
     background: none;
     border: none;
     box-shadow: none;
     backdrop-filter: none;
-
     padding: 0;
 }
 
+/* =========================
+   TITLE
+========================= */
 .title {
-    margin: 0 0 10px;
-    font-size: clamp(32px, 3.8vw, 50px);
+    margin: 0 0 30px;
+    font-size: clamp(30px, 3.2vw, 46px);
     line-height: 1.12;
     font-weight: 900;
-    margin-bottom: 30px;
-
     color: $hero-title-color;
     text-shadow: $hero-title-shadow;
 }
 
-
+/* =========================
+   ACTIONS / BUTTONS
+========================= */
 .actions {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
     margin: 0 0 14px;
+    justify-content: flex-start;
 }
 
 .primary,
@@ -68,7 +82,6 @@
     align-items: center;
     text-decoration: none;
     font-weight: 900;
-
     border-radius: $radius-sm;
     padding: 12px 16px;
     min-width: $hero-cta-min-width;
@@ -84,6 +97,31 @@
     color: $ui-btn-secondary-text;
 }
 
+/* =========================
+   ENGLISH OVERRIDES
+   ⚠️ חשוב: global בגלל CSS Modules
+========================= */
+:global(html.lang-en) .hero {
+    text-align: left;
+}
+:global(html.lang-en) .card {
+    max-width: 800px;
+}
+
+:global(html.lang-en) .hero .title {
+    font-size: clamp(30px, 3.2vw, 46px);
+    line-height: 1.08;
+    letter-spacing: 0.2px;
+    text-wrap: balance;
+}
+
+:global(html.lang-en) .hero .actions {
+    justify-content: flex-end;
+}
+
+/* =========================
+   MOBILE
+========================= */
 @media (max-width: 640px) {
     .hero {
         padding: 22px 0 18px;
