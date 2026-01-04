@@ -1,0 +1,71 @@
+@use "../../styles/variables" as *;
+
+/* ===== Desktop / Tablet ===== */
+.wrapper {
+    position: fixed;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 60;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fab {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.9);
+        outline-offset: 3px;
+    }
+}
+
+.whatsapp {
+    background: #25d366;
+}
+
+.facebook {
+    background: #1877f2;
+    
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+    .wrapper {
+        left: auto;
+        right: 16px;
+        top: auto;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        transform: none;
+
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fab {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+    .facebook {
+        display: none;
+    }
