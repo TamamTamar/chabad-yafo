@@ -2,7 +2,7 @@ import ChabadHousesCards from "../../components/ChabadHousesCards/ChabadHousesCa
 import Gallery from "../../components/Gallery/Gallery";
 import Hero from "../../components/Hero/Hero";
 import ShabbatCTA from "../../components/ShabbatCTA/ShabbatCTA";
-import { chabadCards } from "./chabadCardsData";
+import { chabadCards } from "../../data/chabadCardsData";
 import styles from "./Home.module.scss";
 
 const Home = () => {

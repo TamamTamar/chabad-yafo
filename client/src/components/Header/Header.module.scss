@@ -4,7 +4,13 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    background: linear-gradient(180deg, $header-bg-top, $header-bg-bottom);
+
+    /* כחול חזק כמו שביקשת */
+    background: $header-bg-bottom;
+    /* אם זה כחול חזק אצלך */
+    /* אם $header-bg-bottom לא מספיק כחול: החליפי לשורה הבאה */
+    /* background: #082a4a; */
+
     border-bottom: 1px solid $header-border;
 }
 
@@ -90,7 +96,6 @@
     }
 }
 
-/* links = pure text */
 .links {
     display: flex;
     align-items: center;
@@ -100,6 +105,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+        width: 100%;
     }
 }
 
@@ -123,12 +129,12 @@
 
         padding-top: 10px;
         border-top: 1px solid $header-separator;
+        width: 100%;
     }
 }
 
-/* Base link style */
-.nav a,
-.donateLink {
+/* Base link style (שקט, בלי underline animation) */
+.nav a {
     position: relative;
     text-decoration: none;
     color: $header-nav-text;
@@ -140,46 +146,55 @@
     }
 
     &::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: -7px;
-        height: 2px;
-        background: $header-underline;
-        border-radius: 999px;
-        opacity: 0;
-        transform: scaleX(0);
-        transform-origin: center;
-        transition: transform 160ms ease, opacity 160ms ease;
-    }
-
-    &:hover::after {
-        opacity: 1;
-        transform: scaleX(1);
+        display: none;
     }
 
     @media (max-width: 860px) {
+        width: 100%;
+        text-align: center;
         padding: 12px 12px;
         border-radius: $radius;
-        // background: $header-surface-hover;
-
-        &::after {
-            display: none;
-        }
     }
 }
 
-/* CTA */
+/* Button that looks like text link (for modal opener) */
+.textBtn {
+    border: 0;
+    background: transparent;
+    color: $header-nav-text;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+
+    &:hover {
+        color: $header-nav-text-hover;
+    }
+
+    @media (max-width: 860px) {
+        width: 100%;
+        text-align: center;
+        padding: 12px 12px;
+        border-radius: $radius;
+    }
+}
+
+/* Donate link — stays a normal link, not a CTA */
+.donate {
+    font-weight: 800;
+    opacity: 0.95;
+}
+
+/* CTA (רישום לשבת) — כמו קודם, רק טיפה יותר "כפתור" */
 .cta {
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    height: 24px;
-    padding: 0 3px;
-    border-radius: 8px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 10px;
 
     background: linear-gradient(180deg, $header-cta-top, $header-cta-bottom);
     color: $header-cta-text !important;
@@ -197,6 +212,7 @@
     @media (max-width: 860px) {
         text-align: center;
         width: 100%;
+        height: 44px;
         padding: 12px 14px;
     }
 }
@@ -214,43 +230,6 @@
     filter: brightness(0.98);
 }
 
-/* language */
-.lang {
-    border: 0;
-    background: transparent;
-    color: $header-nav-text;
-    padding: 8px 8px;
-    border-radius: $radius-sm;
-    font-weight: 800;
-    cursor: pointer;
-
-    &:hover {
-        // background: $header-surface-hover;
-        color: $header-nav-text-hover;
-    }
-}
-
-/* hidden on desktop */
-.langInMenu {
-    display: none;
-
-    @media (max-width: 860px) {
-        display: block;
-        width: 100%;
-        text-align: center;
-        border: 0;
-        background: transparent;
-        color: $header-nav-text;
-        padding: 12px 12px;
-        border-radius: $radius;
-        font-weight: 800;
-        cursor: pointer;
-
-        &:hover {
-            color: $header-nav-text-hover;
-        }
-    }
-}
 
 /* burger */
 .burger {
@@ -312,5 +291,104 @@
             opacity: 1;
             pointer-events: auto;
         }
+    }
+}
+
+/* ===== Dialog styles (תפילין ומזוזות) ===== */
+
+.dialog {
+    border: 0;
+    padding: 0;
+    background: transparent;
+
+    &::backdrop {
+        background: rgba(0, 0, 0, 0.45);
+    }
+}
+
+.dialogCard {
+    width: min(520px, calc(100vw - 24px));
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: #0b2742;
+    color: #fff;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    padding: 16px;
+}
+
+.dialogHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.dialogTitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.dialogClose {
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 10px;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.dialogBody {
+    display: grid;
+    gap: 14px;
+}
+
+.dialogText {
+    margin: 0;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.dialogActions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dialogCta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 900;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: #0b2236;
+}
+
+.dialogGhost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 800;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.08);
     }
 }

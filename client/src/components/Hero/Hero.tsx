@@ -1,27 +1,24 @@
 import { Link } from "react-router-dom";
 import Container from "../Container/Container";
 import styles from "./Hero.module.scss";
-import { useLang } from "../../hooks/useLang";
 
 const Hero = () => {
-    const { t } = useLang();
-
     return (
-        <section className={styles.hero} aria-label={t.heroAria}>
+        <section className={styles.hero} aria-label="פתיח בית חב״ד יפו">
             <div className={styles.bg} aria-hidden="true" />
             <div className={styles.overlay} aria-hidden="true" />
 
             <Container className={styles.inner}>
                 <div className={styles.card}>
                     <h1 className={styles.title}>
-                        {t.heroTitle}
+                        בית חב״ד יפו
                         <br />
-                        {t.heroSubtitle}
+                        הכתובת שלך לכל עניין יהודי
                     </h1>
 
                     <div className={styles.actions}>
                         <Link to="/shabbat" className={styles.primary}>
-                            {t.heroShabbat}
+                            רישום לסעודת שבת
                         </Link>
 
                         <a
@@ -30,7 +27,7 @@ const Hero = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            {t.heroDonate}
+                            תרומה לפעילות
                         </a>
                     </div>
                 </div>

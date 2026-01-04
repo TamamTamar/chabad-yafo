@@ -97,27 +97,7 @@
     color: $ui-btn-secondary-text;
 }
 
-/* =========================
-   ENGLISH OVERRIDES
-   ⚠️ חשוב: global בגלל CSS Modules
-========================= */
-:global(html.lang-en) .hero {
-    text-align: left;
-}
-:global(html.lang-en) .card {
-    max-width: 800px;
-}
 
-:global(html.lang-en) .hero .title {
-    font-size: clamp(30px, 3.2vw, 46px);
-    line-height: 1.08;
-    letter-spacing: 0.2px;
-    text-wrap: balance;
-}
-
-:global(html.lang-en) .hero .actions {
-    justify-content: flex-end;
-}
 
 /* =========================
    MOBILE
