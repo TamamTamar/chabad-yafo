@@ -36,4 +36,5 @@ router.post("/api/shabbat-registrations", async (req, res) => {
     }
 });
 
-export default router;
+export { router as shabbatRoutes };
+
