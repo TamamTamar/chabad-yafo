@@ -26,3 +26,7 @@ pnpm-debug.log*
 # Editor
 .vscode
 .idea
+
+# Server build output
+server/dist
+dist

@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import styles from "./Shabbat.module.scss";
+import { createShabbatRegistration } from "../../services/shabbatRegistrations.ts";
 
 type FormState = {
     fullName: string;
@@ -53,6 +55,7 @@ const Shabbat = () => {
         if (errors[key]) return styles.invalid;
         return styles.valid;
     };
+
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -67,30 +70,24 @@ const Shabbat = () => {
         }
 
         try {
-            const res = await fetch("http://localhost:4000/api/shabbat-registrations", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    fullName: form.fullName,
-                    phone: form.phone,
-                    email: form.email,
-                    adults: form.adults,
-                    children: form.children,
-                    notes: form.notes,
-                }),
+            await createShabbatRegistration({
+                fullName: form.fullName,
+                phone: form.phone,
+                email: form.email,
+                adults: form.adults,
+                children: form.children,
+                notes: form.notes,
             });
-
-            if (!res.ok) {
-                alert("אירעה שגיאה בשליחת הרישום. נסו שוב.");
-                return;
-            }
 
             setSubmitted(true);
         } catch (err) {
-            alert("אין תקשורת עם השרת. ודאו שהוא רץ על פורט 4000.");
+            if (axios.isAxiosError(err)) {
+                alert(err.response?.data?.message ?? "אירעה שגיאה בשליחת הרישום. נסו שוב.");
+            } else {
+                alert("אין תקשורת עם השרת.");
+            }
         }
     };
-
 
     if (submitted) {
         return (
@@ -127,9 +124,7 @@ const Shabbat = () => {
                 </Link>
 
                 <h1 className={styles.h1}>רישום לסעודת שבת וחג</h1>
-                <p className={styles.p}>
-                    נשמח לארח אתכם בבית חב״ד יפו. אנא מלאו את הפרטים ונחזור אליכם.
-                </p>
+                <p className={styles.p}>נשמח לארח אתכם בבית חב״ד יפו. אנא מלאו את הפרטים ונחזור אליכם.</p>
 
                 <form className={styles.form} onSubmit={onSubmit} noValidate>
                     <div className={styles.grid}>
@@ -208,11 +203,7 @@ const Shabbat = () => {
                         {/* הערות */}
                         <label className={`${styles.field} ${styles.full}`}>
                             <span>הערות</span>
-                            <textarea
-                                value={form.notes}
-                                onChange={onChange("notes")}
-                                rows={4}
-                            />
+                            <textarea value={form.notes} onChange={onChange("notes")} rows={4} />
                         </label>
                     </div>
 
