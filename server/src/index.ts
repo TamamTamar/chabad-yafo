@@ -1,50 +1,31 @@
 import express from "express";
 import cors from "cors";
-import { env } from "./config/env";
 import { healthRoutes } from "./routes/health";
 import { shabbatRoutes } from "./routes/shabbat";
 
 
 const app = express();
 
-/**
- * CORS
- */
-const allowedOrigins = [
-    env.CLIENT_ORIGIN,          // פרודקשן
-    "http://localhost:5173",    // פיתוח
-].filter(Boolean);
-
+// CORS הכי פשוט (ל־API בודד)
+// אם את לא משתמשת ב-cookies/credentials אפשר להשאיר origin: "*"
 app.use(
     cors({
-        origin: allowedOrigins,
-        methods: ["GET", "POST", "OPTIONS"],
+        origin: [
+            "https://www.chabadyafo.org",
+            "https://chabadyafo.org",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ],
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     })
 );
 
-/**
- * Body parser
- */
 app.use(express.json());
 
-/**
- * Routes
- */
-app.use("/health", healthRoutes);              // למשל /health
-app.use("/api", shabbatRoutes);     // למשל /api/shabbat-registrations
+// Routes
+app.get("/", (_req, res) => res.send("OK"));
+app.use("/api/health", healthRoutes);
+app.use("/api/shabbat", shabbatRoutes);
 
-/**
- * Fallback (אופציונלי אבל מומלץ)
- */
-app.use((_req, res) => {
-    res.status(404).json({ error: "Not found" });
-});
-
-/**
- * Start server
- */
-const port = Number(env.PORT) || 4000;
-
-app.listen(port, () => {
-    console.log(`✅ Server listening on port ${port}`);
-});
+const port = Number(process.env.PORT) || 4000;
+app.listen(port, () => console.log(`✅ Server listening on ${port}`));

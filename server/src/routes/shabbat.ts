@@ -3,7 +3,7 @@ import { sendShabbatRegistrationMail } from "../services/mail";
 
 const router = Router();
 
-router.post("/api/shabbat-registrations", async (req, res) => {
+router.post("/ֿ", async (req, res) => {
     try {
         const { fullName, phone, email, adults, children, notes } = req.body;
 
