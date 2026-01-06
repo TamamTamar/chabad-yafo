@@ -1,27 +1,18 @@
 import nodemailer from "nodemailer";
 import { env } from "../config/env";
 
+const assertMailConfigured = () => {
+    const missing = [];
+    if (!env.SMTP_HOST) missing.push("SMTP_HOST");
+    if (!env.SMTP_PORT) missing.push("SMTP_PORT");
+    if (!env.SMTP_USER) missing.push("SMTP_USER");
+    if (!env.SMTP_PASS) missing.push("SMTP_PASS");
+    if (!env.ADMIN_EMAIL) missing.push("ADMIN_EMAIL");
 
-console.log("📧 SMTP CONFIG CHECK", {
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_SECURE,
-    user: env.SMTP_USER,
-    passExists: !!env.SMTP_PASS,
-    admin: env.ADMIN_EMAIL,
-});
-
-
-
-export const transporter = nodemailer.createTransport({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_SECURE,
-    auth: {
-        user: env.SMTP_USER,
-        pass: env.SMTP_PASS,
-    },
-});
+    if (missing.length) {
+        throw new Error(`SMTP is not configured. Missing: ${missing.join(", ")}`);
+    }
+};
 
 export const sendShabbatRegistrationMail = async (args: {
     fullName: string;
@@ -31,37 +22,36 @@ export const sendShabbatRegistrationMail = async (args: {
     children?: string;
     notes?: string;
 }) => {
-    try {
-        const { fullName, phone, email, adults, children, notes } = args;
+    assertMailConfigured();
 
-        const subject = `רישום חדש לסעודת שבת – ${fullName}`;
+    const transporter = nodemailer.createTransport({
+        host: env.SMTP_HOST!,
+        port: env.SMTP_PORT!,
+        secure: env.SMTP_SECURE,
+        auth: {
+            user: env.SMTP_USER!,
+            pass: env.SMTP_PASS!,
+        },
+    });
 
-        const text =
-            `📥 רישום חדש לסעודת שבת\n\n` +
-            `שם מלא: ${fullName}\n` +
-            `טלפון: ${phone}\n` +
-            `אימייל: ${email}\n` +
-            `מבוגרים: ${adults}\n` +
-            `ילדים: ${children || "0"}\n` +
-            `הערות: ${notes || "—"}\n`;
+    const { fullName, phone, email, adults, children, notes } = args;
 
-        await transporter.sendMail({
-            from: `Chabad Yafo <${env.SMTP_USER}>`,
-            to: env.ADMIN_EMAIL,
-            replyTo: email,
-            subject,
-            text,
-        });
+    const subject = `רישום חדש לסעודת שבת – ${fullName}`;
 
-    } catch (err: any) {
-        console.error("❌ MAIL SEND ERROR", {
-            message: err?.message,
-            code: err?.code,
-            response: err?.response,
-            command: err?.command,
-        });
+    const text =
+        `📥 רישום חדש לסעודת שבת\n\n` +
+        `שם מלא: ${fullName}\n` +
+        `טלפון: ${phone}\n` +
+        `אימייל: ${email}\n` +
+        `מבוגרים: ${adults}\n` +
+        `ילדים: ${children || "0"}\n` +
+        `הערות: ${notes || "—"}\n`;
 
-        throw err; // חשוב – כדי שה־router יחזיר 500
-    }
+    await transporter.sendMail({
+        from: `Chabad Yafo <${env.SMTP_USER!}>`,
+        to: env.ADMIN_EMAIL!,
+        replyTo: email,
+        subject,
+        text,
+    });
 };
-

@@ -11,15 +11,15 @@ export const env = {
     PORT: Number(process.env.PORT ?? "4000"),
     CLIENT_ORIGIN: process.env.CLIENT_ORIGIN ?? "",
 
-    // נשאיר SMTP אם את רוצה, אבל לא נחייב אם עוברים לוואטסאפ:
-    // SMTP_HOST: required("SMTP_HOST"),
-    // SMTP_PORT: Number(required("SMTP_PORT")),
-    // SMTP_SECURE: process.env.SMTP_SECURE === "true",
-    // SMTP_USER: required("SMTP_USER"),
-    // SMTP_PASS: required("SMTP_PASS"),
-    // ADMIN_EMAIL: required("ADMIN_EMAIL"),
+    // ✅ SMTP (optional)
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_PORT: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
+    SMTP_SECURE: process.env.SMTP_SECURE === "true",
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PASS: process.env.SMTP_PASS,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
 
-    // ✅ Twilio WhatsApp
+    // ✅ Twilio WhatsApp (required)
     TWILIO_ACCOUNT_SID: required("TWILIO_ACCOUNT_SID"),
     TWILIO_AUTH_TOKEN: required("TWILIO_AUTH_TOKEN"),
     TWILIO_WHATSAPP_FROM: required("TWILIO_WHATSAPP_FROM"),
