@@ -211,7 +211,7 @@ const Shabbat = () => {
                         <button className={styles.primary} disabled={!isValid}>
                             שליחת רישום
                         </button>
-                        <a href="#donate" className={styles.secondary}>
+                        <a href="https://www.matara.pro/nedarimplus/online/?S=aVIw" className={styles.secondary}>
                             תרומה לפעילות
                         </a>
                     </div>

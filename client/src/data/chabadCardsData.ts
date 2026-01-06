@@ -10,7 +10,7 @@ export const chabadCards: ChabadHouseCard[] = [
         id: "tzahalon",
         title: "בית חב״ד שכונת צהלון",
         shaliach: "הרב מענדי חבקין",
-        address: "מיכאלאנגלו 3, יפו",
+        address: "מיכאלאנגלו 31, יפו",
         phone: "054-626-4195",
         imageSrc: tzahalon,
         imageAlt: "בית חב״ד שכונת צהלון יפו",
