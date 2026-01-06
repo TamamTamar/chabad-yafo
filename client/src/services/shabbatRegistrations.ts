@@ -12,6 +12,6 @@ export type ShabbatRegistrationPayload = {
 export const createShabbatRegistration = async (
     payload: ShabbatRegistrationPayload
 ) => {
-    const { data } = await http.post("/api/shabbat-registrations", payload);
+    const { data } = await http.post("/api/shabbat", payload);
     return data;
 };

@@ -17,8 +17,10 @@ app.use(
             "http://127.0.0.1:5173",
         ],
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
+
 
 app.use(express.json());
 
@@ -26,6 +28,8 @@ app.use(express.json());
 app.get("/", (_req, res) => res.send("OK"));
 app.use("/api/health", healthRoutes);
 app.use("/api/shabbat", shabbatRoutes);
+
+
 
 const port = Number(process.env.PORT) || 4000;
 app.listen(port, () => console.log(`✅ Server listening on ${port}`));
