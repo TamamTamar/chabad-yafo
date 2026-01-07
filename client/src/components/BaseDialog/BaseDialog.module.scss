@@ -1,0 +1,162 @@
+/* BaseDialog.module.scss */
+
+.dialog {
+    border: 0;
+    padding: 0;
+    background: transparent;
+
+    direction: rtl;
+
+    /* חשוב: משאיר את ההתנהגות הטבעית של <dialog> כולל מרכוז */
+    margin: auto;
+
+    /* לא להגביל את הדיאלוג עצמו */
+    max-width: none;
+    max-height: none;
+
+    &::backdrop {
+        background: rgba(0, 0, 0, 0.45);
+    }
+}
+
+/* “הכרטיס” הפנימי */
+.card {
+    width: min(520px, calc(100vw - 24px));
+    margin: 0 auto;
+
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+
+    background: #0b2742;
+    color: #fff;
+
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    padding: 16px;
+
+    @media (max-width: 420px) {
+        padding: 14px;
+        border-radius: 14px;
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+}
+
+.close {
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    cursor: pointer;
+
+    padding: 6px 10px;
+    border-radius: 10px;
+    line-height: 1;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.35);
+        outline-offset: 2px;
+    }
+}
+
+.body {
+    display: grid;
+    gap: 14px;
+}
+
+/* ====== תוכן כללי לשימוש בתוך children ====== */
+
+.text {
+    margin: 0;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 15px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+
+    text-decoration: none;
+    font-weight: 900;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: #0b2236;
+
+    border: 0;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(1.02);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.35);
+        outline-offset: 2px;
+    }
+}
+
+.ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.92);
+
+    font-weight: 800;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.35);
+        outline-offset: 2px;
+    }
+}

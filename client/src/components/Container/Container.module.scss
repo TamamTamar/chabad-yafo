@@ -1,6 +1,10 @@
 @use "../../styles/variables" as *;
 
 .container {
-    width: min(1120px, calc(100% - 32px));
+    width: min(1300px, calc(100% - 32px));
     margin: 0 auto;
+
+    @media (max-width: 600px) {
+        width: calc(100% - 16px);
+    }
 }
