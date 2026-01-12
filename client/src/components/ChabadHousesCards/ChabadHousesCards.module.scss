@@ -2,8 +2,11 @@
 
 /* ===== Section ===== */
 .section {
-    padding: 32px 16px;
+    padding: 28px 14px;
 
+    @media (min-width: 720px) {
+        padding: 32px 16px;
+    }
 }
 
 .inner {
@@ -15,25 +18,38 @@
 .header {
     display: flex;
     justify-content: center;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
+
+    @media (min-width: 720px) {
+        margin-bottom: 22px;
+    }
 }
 
 .title {
     font-weight: 800;
-    font-size: 26px;
+    font-size: 24px;
     color: $brand-primary;
     position: relative;
-    padding: 0 14px;
+    padding: 0 12px;
     text-align: center;
+
+    @media (min-width: 720px) {
+        font-size: 26px;
+        padding: 0 14px;
+    }
 
     &::before,
     &::after {
         content: "";
         position: absolute;
         top: 58%;
-        width: 64px;
+        width: 44px;
         height: 1px;
         background: $ui-border-strong;
+
+        @media (min-width: 720px) {
+            width: 64px;
+        }
     }
 
     &::before {
@@ -52,10 +68,11 @@
     margin: 0;
 
     display: grid;
-    gap: 16px;
+    gap: 14px;
     grid-template-columns: 1fr;
 
     @media (min-width: 720px) {
+        gap: 16px;
         grid-template-columns: repeat(2, 1fr);
     }
 
@@ -74,11 +91,19 @@
     box-shadow: 0 10px 26px $ui-shadow-card;
 
     transition: transform 180ms ease, box-shadow 180ms ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 34px $ui-shadow-card-hover;
+/* Hover רק לדסקטופ */
+@media (hover: hover) and (pointer: fine) {
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 34px $ui-shadow-card-hover;
+    }
+
+    .card:hover .image {
+        transform: scale(1.04);
+    }
 }
 
 /* ===== Media ===== */
@@ -99,10 +124,6 @@
     transition: transform 260ms ease;
 }
 
-.card:hover .image {
-    transform: scale(1.04);
-}
-
 /* ===== Content ===== */
 .cardBody {
     padding: 14px 14px 18px;
@@ -117,7 +138,6 @@
     font-weight: 800;
     color: $brand-text;
     line-height: 1.25;
-    text-align: center;
     position: relative;
     padding-bottom: 10px;
 
@@ -157,4 +177,3 @@
     font-size: 14px;
     font-weight: 600;
 }
-

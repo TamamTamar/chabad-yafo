@@ -1,5 +1,5 @@
-import styles from "./ChabadHousesCards.module.scss";
 import type { ChabadHouseCard } from "../../types/chabad";
+import styles from "./ChabadHousesCards.module.scss";
 
 type Props = {
     cards: ChabadHouseCard[];
@@ -14,25 +14,35 @@ const ChabadHousesCards = ({ cards }: Props) => {
                 </header>
 
                 <ul className={styles.grid}>
-                    {cards.map((card) => (
-                        <li key={card.id} className={styles.card}>
-                            <div className={styles.media}>
-                                <img
-                                    className={styles.image}
-                                    src={card.imageSrc}
-                                    alt={card.imageAlt}
-                                    loading="lazy"
-                                />
-                            </div>
+                    {cards.map(
+                        ({
+                            id,
+                            imageSrc,
+                            imageAlt,
+                            title,
+                            shaliach,
+                            address,
+                            phone,
+                        }) => (
+                            <li key={id} className={styles.card}>
+                                <div className={styles.media}>
+                                    <img
+                                        className={styles.image}
+                                        src={imageSrc}
+                                        alt={imageAlt}
+                                        loading="lazy"
+                                    />
+                                </div>
 
-                            <div className={styles.cardBody}>
-                                <h3 className={styles.cardTitle}>{card.title}</h3>
-                                <p className={styles.shaliach}>{card.shaliach}</p>
-                                <p className={styles.address}>{card.address}</p>
-                                <p className={styles.phone}>{card.phone}</p>
-                            </div>
-                        </li>
-                    ))}
+                                <div className={styles.cardBody}>
+                                    <h3 className={styles.cardTitle}>{title}</h3>
+                                    <p className={styles.shaliach}>{shaliach}</p>
+                                    <p className={styles.address}>{address}</p>
+                                    <p className={styles.phone}>{phone}</p>
+                                </div>
+                            </li>
+                        )
+                    )}
                 </ul>
             </div>
         </section>
