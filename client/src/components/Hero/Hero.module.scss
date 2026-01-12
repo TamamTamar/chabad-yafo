@@ -9,19 +9,35 @@
     min-height: 440px;
     display: flex;
     align-items: center;
+    overflow: hidden;
 }
 
 /* =========================
-   BACKGROUND
+   BACKGROUND (MOBILE FIRST)
 ========================= */
 .bg {
     position: absolute;
     inset: 0;
-    background-image: url("../../assets/hero.jpeg");
+
+    /* מובייל כברירת מחדל */
+    background-image: url("../../assets/hero-mobile.webp");
     background-size: cover;
     background-position: center;
+
+    /* למניעת הבהוב */
+    background-repeat: no-repeat;
 }
 
+/* דסקטופ */
+@media (min-width: 768px) {
+    .bg {
+        background-image: url("../../assets/hero-desktop.webp");
+    }
+}
+
+/* =========================
+   OVERLAY
+========================= */
 .overlay {
     position: absolute;
     inset: 0;
@@ -31,6 +47,9 @@
             $hero-overlay-bottom );
 }
 
+/* =========================
+   INNER
+========================= */
 .inner {
     position: relative;
     z-index: 1;
@@ -97,8 +116,6 @@
     color: $ui-btn-secondary-text;
 }
 
-
-
 /* =========================
    MOBILE
 ========================= */
@@ -113,9 +130,18 @@
         border-radius: $radius;
     }
 
+    .actions {
+        flex-direction: column;
+    }
+
     .primary,
     .secondary {
         width: 100%;
         min-width: unset;
+    }
+
+    /* מוקד מעט גבוה יותר במובייל */
+    .bg {
+        background-position: center top;
     }
 }
