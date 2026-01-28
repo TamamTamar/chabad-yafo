@@ -94,14 +94,33 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* NEW: link wrapper for full-card click */
+.cardLink {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* NEW: keyboard focus (accessible) */
+.cardLink:focus-visible {
+    outline: 2px solid $brand-primary;
+    outline-offset: 3px;
+    border-radius: $radius;
+}
+
 /* Hover רק לדסקטופ */
 @media (hover: hover) and (pointer: fine) {
-    .card:hover {
+
+    .card:hover,
+    .card:focus-within {
         transform: translateY(-3px);
         box-shadow: 0 14px 34px $ui-shadow-card-hover;
     }
 
-    .card:hover .image {
+    .card:hover .image,
+    .card:focus-within .image {
         transform: scale(1.04);
     }
 }
@@ -176,4 +195,12 @@
     border-top: 1px solid $ui-border-soft;
     font-size: 14px;
     font-weight: 600;
+}
+/* ===== Mobile tap feedback ===== */
+.cardLink:active .card {
+    transform: scale(0.985);
+    box-shadow: 0 6px 18px $ui-shadow-card-hover;
+}
+.cardLink:active .image {
+    transform: scale(1.02);
 }
