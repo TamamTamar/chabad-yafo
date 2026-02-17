@@ -1,0 +1,104 @@
+import React from "react";
+import styles from "./OurService.module.scss";
+
+import babyIcon from "../../assets/services/baby.png";
+import homeIcon from "../../assets/services/home.png";
+import kashrutIcon from "../../assets/services/kashrut.png";
+import menoraIcon from "../../assets/services/menora.png";
+import mezuzahIcon from "../../assets/services/mezuza.png";
+import barIcon from "../../assets/services/13.png";
+
+type ServiceItem = {
+  id: string;
+  title: string;
+  message: string;
+  icon: string;
+};
+
+type Props = {
+  title?: string;
+  items?: ServiceItem[];
+};
+
+const PHONE = "972537700339";
+
+const buildWhatsAppLink = (message: string) => {
+  const cleanPhone = PHONE.replace(/[^\d]/g, "");
+  const text = encodeURIComponent(message);
+  return `https://wa.me/${cleanPhone}?text=${text}`;
+};
+
+const DEFAULT_ITEMS: ServiceItem[] = [
+  {
+    id: "judaica",
+    title: "חנות יודאיקה",
+    message: "שלום! אשמח לקבל פרטים על חנות היודאיקה (מלאי/מחירים/שעות). תודה 🙏",
+    icon: menoraIcon,
+  },
+  {
+    id: "mothers",
+    title: "תמיכה ביולדות",
+    message: "שלום! אשמח לשמוע על תמיכה ביולדות (מה כולל, זמינות, איך מתאמים). תודה 🙏",
+    icon: babyIcon,
+  },
+  {
+    id: "home-store",
+    title: "חנות הבית",
+    message: "שלום! אשמח לקבל פרטים על חנות הבית (מה ניתן להזמין ואיך). תודה 🙏",
+    icon: homeIcon,
+  },
+  {
+    id: "tefillin-mezuzot",
+    title: "תפילין ומזוזות",
+    message: "שלום! אשמח לתאם בדיקה/רכישה של תפילין ומזוזות. אפשר פרטים? תודה 🙏",
+    icon: mezuzahIcon,
+  },
+  {
+    id: "kosher-kitchen",
+    title: "הכשרת מטבח",
+    message: "שלום! אשמח לקבל פרטים לגבי הכשרת מטבח (תהליך, עלות, זמינות). תודה 🙏",
+    icon: kashrutIcon,
+  },
+  {
+    id: "bar-mitzvah",
+    title: "הכנה לבר מצווה",
+    message: "שלום! אשמח לקבל פרטים על הכנה לבר מצווה (לימוד, תפילין, עלייה לתורה). תודה 🙏",
+    icon: barIcon,
+  },
+];
+
+const OurService: React.FC<Props> = ({
+  title = "השירותים שלנו",
+  items = DEFAULT_ITEMS,
+}) => {
+  return (
+    <section className={styles.section} aria-label={title}>
+      <div className={`container ${styles.inner}`}>
+        <header className={styles.header}>
+          <h2 className={styles.title}>{title}</h2>
+        </header>
+
+        <div className={styles.grid}>
+          {items.map((item) => (
+            <a
+              key={item.id}
+              className={styles.card}
+              href={buildWhatsAppLink(item.message)}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${item.title} - פתיחה בוואטסאפ`}
+            >
+              <span className={styles.circle} aria-hidden="true">
+                <img className={styles.icon} src={item.icon} alt="" />
+              </span>
+
+              <span className={styles.label}>{item.title}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default OurService;
