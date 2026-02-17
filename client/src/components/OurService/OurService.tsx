@@ -68,7 +68,7 @@ const DEFAULT_ITEMS: ServiceItem[] = [
 ];
 
 const OurService: React.FC<Props> = ({
-  title = "השירותים שלנו",
+  title = "איך אנחנו יכולים לעזור לך",
   items = DEFAULT_ITEMS,
 }) => {
   return (

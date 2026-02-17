@@ -1,26 +1,58 @@
+
+
 @use "../../styles/variables" as *;
 
+/* ===== Section ===== */
 .section {
-  padding: 56px 0;
+  padding: 20px 0;
 }
 
 .inner {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  max-width: $max-width;
+  margin: 0 auto;
 }
 
+/* ===== Title ===== */
 .header {
-  display: grid;
-  gap: 8px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
 }
 
 .title {
-  margin: 0;
-  font-size: clamp(22px, 2.2vw, 30px);
-  letter-spacing: 0.2px;
-  color: $brand-text;
+  font-weight: 800;
+  font-size: 24px;
+  color: $brand-primary;
+  position: relative;
+  padding: 0 14px;
+  text-align: center;
+
+  @media (min-width: 720px) {
+    font-size: 26px;
+    padding: 0 18px;
+  }
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 58%;
+    width: 48px;
+    height: 1px;
+    background: $ui-border-strong;
+
+    @media (min-width: 720px) {
+      width: 70px;
+    }
+  }
+
+  &::before {
+    right: 100%;
+  }
+
+  &::after {
+    left: 100%;
+  }
 }
 
 .grid {
