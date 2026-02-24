@@ -43,6 +43,7 @@ export type DonationCampaignConfig = {
     Mosad: string;
     ApiValid: string;
     Currency: "1" | "2";
+    Comment:string
   };
 };
 

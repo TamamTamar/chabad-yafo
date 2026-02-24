@@ -59,6 +59,7 @@ const config: DonationCampaignConfig = {
         Mosad: "PUT_YOUR_MOSAD_HERE",
         ApiValid: "PUT_YOUR_API_VALID_HERE",
         Currency: "1",
+        Comment: "מחצית השקל"
     },
 };
 
