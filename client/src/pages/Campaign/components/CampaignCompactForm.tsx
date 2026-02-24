@@ -41,7 +41,8 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
   };
 
   return (
-    <form className={styles.compactForm} onSubmit={handleSubmit(onFormSubmit)} noValidate>
+    <form id="donation-form-section"
+     className={styles.compactForm} onSubmit={handleSubmit(onFormSubmit)} noValidate>
       <div className={styles.compactInputSection}>
         <label className={styles.compactLabel}>סכום לתרומה</label>
         <div className={styles.amountInputWrapper}>

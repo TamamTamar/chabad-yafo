@@ -51,12 +51,15 @@ const CampaignCarousel: React.FC = () => {
                 </div>
             ))}
             
+            {/* הנקודות המעודכנות */}
             <div className={styles.dots}>
                 {slides.map((_, i) => (
                     <button 
                         key={i} 
                         className={`${styles.dot} ${i === activeSlide ? styles.activeDot : ""}`} 
                         onClick={() => setActiveSlide(i)}
+                        title={`עבור לסלייד ${i + 1}`}
+                        aria-label={`עבור לסלייד ${i + 1}`}
                     />
                 ))}
             </div>
