@@ -134,6 +134,12 @@ const CampaignDonationModal: React.FC<Props> = ({
       lastName: donor.lastName.trim(),
       phone: donor.phone.trim(),
       email: donor.email.trim(),
+      Comment: nedarim.Comment,
+      PaymentType: nedarim.PaymentType
+
+
+
+      
     });
   }, [nedarim, selectedAmount, parsedCustom, amountMode, step, currency, description, donor]);
 

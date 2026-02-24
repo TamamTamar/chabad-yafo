@@ -12,6 +12,9 @@ export type BuildNedarimPayloadArgs = {
   lastName?: string;
   phone?: string;
   email?: string;
+  PaymentType: string
+  Comment: string
+
 };
 
 export const buildNedarimPayload = (args: BuildNedarimPayloadArgs) => {
@@ -28,5 +31,7 @@ export const buildNedarimPayload = (args: BuildNedarimPayloadArgs) => {
     LastName: args.lastName ?? "",
     Phone: args.phone ?? "",
     Email: args.email ?? "",
+    Comment: args.Comment ?? "",
+    PaymentType: args.PaymentType ?? ""
   };
 };
