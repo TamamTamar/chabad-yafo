@@ -1,0 +1,456 @@
+@use "../../../styles/Variables" as *;
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+
+  @media (max-width: 480px) {
+    padding: 10px; // פחות רווח מסביב במובייל
+  }
+}
+
+.modalBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba($brand-primary, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  position: relative;
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  border-radius: $radius;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  animation: modalEnter 0.3s ease-out;
+
+  @media (max-width: 480px) {
+    max-height: 90vh; // גובה מקסימלי מעט גדול יותר לנייד
+  }
+}
+
+.modalHeader {
+  background: $brand-primary;
+  padding: 16px 24px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    padding: 12px 16px; // הידוק ההדר במובייל
+  }
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 900;
+
+  .modalMuted {
+    color: $brand-secondary;
+    margin-right: 8px;
+  }
+}
+
+.modalClose {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.modalSteps {
+  display: flex;
+  background: #f8f9fa;
+  padding: 10px 24px;
+  gap: 20px;
+  border-bottom: 1px solid $ui-border-soft;
+  flex-shrink: 0;
+  justify-content: center;
+
+  @media (max-width: 480px) {
+    gap: 12px;
+    padding: 10px 16px;
+  }
+}
+
+.stepChip {
+  font-size: 13px;
+  font-weight: 800;
+  color: $ui-text-muted;
+  padding-bottom: 4px;
+
+  &Active {
+    color: $brand-primary;
+    border-bottom: 2px solid $brand-secondary;
+  }
+}
+
+.modalBody {
+  padding: 20px 24px;
+  flex: 0 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flow-root;
+  -webkit-overflow-scrolling: touch; // גלילה חלקה ל-iOS
+
+  @media (max-width: 480px) {
+    padding: 16px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 10px;
+  }
+}
+
+.modalAmountBox {
+  padding: 12px 16px;
+  background: rgba($brand-secondary, 0.08);
+  border: 1px dashed $brand-secondary;
+  border-radius: $radius-sm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .modalAmountLabel {
+    font-weight: 700;
+    color: $brand-primary;
+    font-size: 14px;
+  }
+
+  .modalAmountValue {
+    font-size: 20px;
+    font-weight: 900;
+    color: $brand-primary;
+  }
+}
+
+.customAmountRow {
+  position: relative;
+  width: 100%;
+  max-width: 180px;
+  margin: 0 auto 16px;
+
+  .customAmountInput {
+    width: 100%;
+    padding: 8px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 900;
+    color: $brand-primary;
+    border: 2px solid $brand-secondary;
+    border-radius: $radius-sm;
+    appearance: none; // מניעת עיצוב דפדפן ברירת מחדל
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba($brand-secondary, 0.2);
+    }
+  }
+
+  &::before {
+    content: "₪";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    font-weight: 900;
+    color: $brand-secondary;
+    pointer-events: none;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr; // במובייל שדות אחד מתחת לשני
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .label {
+    font-size: 12px;
+    font-weight: 800;
+    color: $brand-primary;
+  }
+
+  .input {
+    padding: 9px 12px;
+    border: 1px solid $ui-border-soft;
+    border-radius: 6px;
+    font-size: 16px; // פונט 16px מונע זום אוטומטי מעצבן באייפון
+    appearance: none;
+
+    &:focus {
+      border-color: $brand-secondary;
+      outline: none;
+    }
+
+    &Error {
+      border-color: #ff4d4d;
+    }
+  }
+
+  .error {
+    color: #ff4d4d;
+    font-size: 10px;
+    font-weight: 600;
+  }
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  background: #fff;
+  border-top: 1px solid $ui-border-soft;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    padding: 12px 16px;
+  }
+}
+
+.modalActions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, $brand-secondary, darken($brand-secondary, 10%));
+  color: $brand-primary;
+  border: none;
+  padding: 11px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnSecondary {
+  background: #f8f9fa;
+  border: 1px solid $ui-border-soft;
+  padding: 11px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.micro {
+  text-align: center;
+  font-size: 10px;
+  color: $ui-text-muted;
+}
+
+.amountOnly {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: $brand-primary;
+  margin-bottom: 12px;
+}
+
+.iframeCard {
+  border: 1px solid $ui-border-soft;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.iframe {
+  width: 100%;
+  height: 350px;
+  border: none;
+  display: block;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.compactForm {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: $radius; // משתמש ברדיוס של המודאל
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  border: 1px solid $ui-border-soft;
+
+  @media (max-width: 480px) {
+    padding: 20px 16px;
+  }
+
+  .compactInputSection {
+    text-align: center;
+    margin-bottom: 24px;
+
+    .compactLabel {
+      display: block;
+      font-size: 16px;
+      font-weight: 800;
+      color: $brand-primary;
+      margin-bottom: 12px;
+    }
+
+    .amountInputWrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 200px;
+      
+      .compactAmountInput {
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        font-size: 32px;
+        font-weight: 900;
+        color: $brand-primary;
+        border: 2px solid $brand-secondary; // צהוב/זהב כמו במודאל
+        border-radius: $radius-sm;
+        outline: none;
+        transition: box-shadow 0.2s;
+
+        &:focus {
+          box-shadow: 0 0 10px rgba($brand-secondary, 0.2);
+        }
+      }
+      
+      &::before {
+        content: "₪";
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        font-weight: 900;
+        color: $brand-secondary;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .calcLinkBtn {
+    display: inline-block;
+    margin-top: 12px;
+    background: rgba($brand-secondary, 0.15);
+    color: darken($brand-secondary, 20%);
+    border: 1px dashed $brand-secondary;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $brand-secondary;
+      color: $brand-primary;
+    }
+  }
+
+  .compactDetailsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+
+    .compactField {
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid $ui-border-soft;
+        border-radius: 6px;
+        font-size: 16px;
+        color: $brand-primary;
+        appearance: none;
+
+        &:focus {
+          border-color: $brand-secondary;
+          outline: none;
+        }
+
+        &::placeholder {
+          color: $ui-text-muted;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .compactSubmitBtn {
+    width: 100%;
+    background: linear-gradient(135deg, $brand-secondary, darken($brand-secondary, 10%));
+    color: $brand-primary;
+    padding: 16px;
+    border: none;
+    border-radius: 999px; // כפתור עגול כמו במודאל
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba($brand-secondary, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($brand-secondary, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}

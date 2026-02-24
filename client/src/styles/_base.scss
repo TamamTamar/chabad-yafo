@@ -1,5 +1,8 @@
 @use "./variables" as *;
 
+/* ייבוא פונטים מ-Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;700;800&display=swap');
+
 *,
 *::before,
 *::after {
@@ -9,14 +12,17 @@
 html {
     direction: rtl;
     scroll-behavior: smooth;
-    scroll-padding-top: $header-height; // במקום מספר קשיח
+    scroll-padding-top: $header-height;
 }
 
 body {
     margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Heebo", sans-serif;
-    background:$body-bg;
+    /* החלפת הפונט למשהו מעוצב יותר */
+    font-family: "Assistant", -apple-system, sans-serif;
+    background: $body-bg;
     color: $brand-text;
+    -webkit-font-smoothing: antialiased; /* עוזר לפונט להיראות חד יותר */
+    -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -25,7 +31,8 @@ a {
 }
 
 button {
-    font: inherit;
+    font-family: "Assistant", sans-serif; /* חשוב כדי שגם כפתורים יקבלו את הפונט */
+    cursor: pointer;
 }
 
 .container {

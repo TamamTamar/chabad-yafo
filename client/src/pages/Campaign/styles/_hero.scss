@@ -1,0 +1,20 @@
+.heroImg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  
+  /* דסקטופ: מילוי מלא וחיתוך חכם */
+  object-fit: cover; 
+  object-position: center 20%; 
+
+  @media (max-width: 768px) {
+    /* מובייל: מניעת חיתוך (רואים את כל התמונה הרחבה בתוך המלבן האנכי) */
+    object-fit: contain; 
+        
+    /* צבע הרקע שמשלים את התמונה (תואם לכחול של היד והלב) */
+    background-color: #0a1931; 
+    
+    /* ממרכז את התמונה בתוך המכולה */
+    object-position: center center;
+  }
+}

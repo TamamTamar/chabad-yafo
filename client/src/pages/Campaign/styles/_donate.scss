@@ -1,0 +1,86 @@
+@use "../../../styles/Variables" as *;
+
+.donateSection {
+  width: 100%;
+  background: #ffffff;
+  padding: clamp(16px, 5vw, 32px); // פדינג גמיש שקטן במובייל
+  border-radius: $radius;
+  border: 1px solid $ui-border-soft;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+.donateTitle {
+  margin: 0;
+  font-weight: 900;
+  font-size: clamp(20px, 4vw, 24px); // כותרת שקטינה מעט במובייל
+  color: $brand-primary;
+}
+
+.donateSub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: $ui-text-muted;
+  padding: 0 10px; // מניעת היצמדות טקסט לקצוות
+}
+
+.amountRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 24px;
+
+  /* במובייל קטן מאוד נעבור לטור אחד כדי שהכפתורים יהיו קריאים */
+  @media (max-width: 350px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.amountChip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  border: 1.5px solid $brand-secondary;
+  background: #ffffff;
+  color: $brand-primary;
+  font-weight: 800;
+  font-size: clamp(16px, 3.5vw, 18px);
+  padding: 14px 10px; // צמצום קל של הפדינג
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent; // ביטול הבהוב כחול בלחיצה בנייד
+
+  &:hover {
+    background: $brand-secondary;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba($brand-secondary, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0); // משוב לחיצה למובייל
+  }
+}
+
+.amountChipAlt {
+  background: $brand-secondary;
+  color: $brand-primary;
+  border-color: $brand-secondary;
+
+  &:hover {
+    background: darken($brand-secondary, 5%);
+    box-shadow: 0 6px 15px rgba($brand-secondary, 0.4);
+  }
+}
+
+/* התאמה כללית למובייל */
+@media (max-width: 600px) {
+  .donateSection {
+    border-radius: 12px; // פינות מעט פחות עגולות למראה מהודק
+    padding: 20px 16px;
+  }
+
+  .amountRow {
+    gap: 8px; // צמצום רווחים בין כפתורי הסכומים
+  }
+}

@@ -1,0 +1,181 @@
+@use "../../../styles/Variables" as *;
+
+.calculatorCard {
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 40px;
+  max-width: 550px;
+  margin: 40px auto;
+  text-align: center;
+  border: 1px solid #eef0f2;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+
+  // התאמה למובייל
+  @media (max-width: 480px) {
+    padding: 24px 16px; // צמצום פדינג בנייד
+    margin: 20px auto;
+    border-radius: 20px;
+  }
+
+  .calcTitle {
+    font-size: 24px;
+    font-weight: 900;
+    color: $brand-primary;
+    margin-bottom: 8px;
+
+    @media (max-width: 480px) {
+      font-size: 20px; // כותרת מעט קטנה יותר בנייד
+    }
+  }
+
+  .calcSubtitle {
+    font-size: 15px;
+    color: $ui-text-muted;
+    margin-bottom: 30px;
+
+    @media (max-width: 480px) {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+  }
+
+  .inputGroup {
+    margin-bottom: 30px;
+
+    .inputLabel {
+      display: block;
+      font-weight: 800;
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: $brand-primary;
+    }
+
+    .numberInputWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+
+      .calcInput {
+        width: 80px; // מעט קטן יותר כדי שיהיה מקום לכפתורים בנייד
+        padding: 10px;
+        border: 2px solid #e0e6ed;
+        border-radius: 12px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 900;
+        color: $brand-primary;
+        outline: none;
+        appearance: none; // מונע חיצים של דפדפן
+
+        &:focus {
+          border-color: $brand-secondary;
+        }
+
+        @media (max-width: 480px) {
+          width: 70px;
+          font-size: 20px;
+        }
+      }
+
+      .stepBtn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 1px solid #e0e6ed;
+        background: #f8f9fa;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        -webkit-tap-highlight-color: transparent; // מונע ריבוע כחול בלחיצה בנייד
+
+        &:hover {
+          background: #eee;
+        }
+
+        @media (max-width: 480px) {
+          width: 40px;
+          height: 40px;
+        }
+      }
+    }
+
+    .rateInfo {
+      font-size: 13px;
+      color: $ui-text-muted;
+      font-weight: 600;
+    }
+  }
+
+  .resultSection {
+    background: rgba($brand-secondary, 0.05);
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    border: 1px dashed $brand-secondary;
+
+    @media (max-width: 480px) {
+      padding: 20px 15px;
+    }
+
+    .resultLabel {
+      font-size: 14px;
+      font-weight: 700;
+      color: $brand-primary;
+    }
+
+    .totalDisplay {
+      font-size: 42px;
+      font-weight: 900;
+      color: $brand-primary;
+      margin-top: 5px;
+
+      @media (max-width: 480px) {
+        font-size: 32px; // סכום ברור אבל לא ענק מדי למובייל
+      }
+    }
+  }
+
+  .calcFooterText {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.6;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+    }
+  }
+}
+
+.applyAmountBtn {
+  margin-top: 15px;
+  background: $brand-primary;
+  color: white;
+  border: none;
+  padding: 12px 24px; // הגדלת שטח הלחיצה (Touch Target)
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  width: 100%; // כפתור רחב יותר למובייל
+  max-width: 280px;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: lighten($brand-primary, 10%);
+    transform: scale(1.02);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+    padding: 14px 20px;
+  }
+}
