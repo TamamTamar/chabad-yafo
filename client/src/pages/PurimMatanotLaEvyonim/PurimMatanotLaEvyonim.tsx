@@ -64,7 +64,8 @@ paragraphs: [
     Mosad: "7013920",
     ApiValid: "zidFYCLaNi",
     Currency: "1",
-    Comment:"מתנות לאביונים"
+    Comment:"מתנות לאביונים",
+    PaymentType: "Ragil" 
   },
 };
 
