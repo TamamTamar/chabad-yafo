@@ -1,106 +1,139 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import styles from "../DonationCampaignPage.module.scss";
 import type { DonorForm } from "../types";
+import { useForm } from "react-hook-form";
 
 type Props = {
-    externalAmount?: number;
-    onSubmit: (amount: number, donor: DonorForm) => void;
+  externalAmount?: number;
+  onSubmit: (amount: number, donor: DonorForm) => void;
 };
 
+interface FormInputs extends DonorForm {
+  amount: string;
+}
+
 const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
-    const [amount, setAmount] = useState<string>("");
-    const [donor, setDonor] = useState<DonorForm>({
-        firstName: "",
-        lastName: "",
-        phone: "",
-        email: "",
-    });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    trigger, // הוספנו trigger כדי לעדכן את isValid ידנית
+    formState: { errors, isValid },
+  } = useForm<FormInputs>({
+    mode: "onChange", // שינוי ל-onChange גורם לכפתור להשתחרר בזמן אמת
+  });
 
-    // מאזין לשינויים מהמחשבון ומעדכן את שדה הסכום בטופס
-    useEffect(() => {
-        if (externalAmount !== undefined && externalAmount > 0) {
-            setAmount(externalAmount.toString());
-        }
-    }, [externalAmount]);
+  useEffect(() => {
+    if (externalAmount !== undefined && externalAmount > 0) {
+      setValue("amount", externalAmount.toString(), { shouldValidate: true });
+      trigger(); // מוודא שהטופס בודק את עצמו מחדש כשהסכום מגיע מהמחשבון
+    }
+  }, [externalAmount, setValue, trigger]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const numAmount = Number(amount);
-        if (numAmount > 0) {
-            onSubmit(numAmount, donor);
-        }
-    };
+  const onFormSubmit = (data: FormInputs) => {
+    const { amount, ...donorData } = data;
+    onSubmit(Number(amount), donorData);
+  };
 
-    const scrollToCalculator = () => {
-        const el = document.getElementById("calculator-section");
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-    };
+  const scrollToCalculator = () => {
+    const el = document.getElementById("calculator-section");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
 
-    return (
-        <form
-            id="donation-form-section"
-            className={styles.compactForm} onSubmit={handleSubmit}>
-            <div className={styles.compactInputSection}>
-                <label className={styles.compactLabel}>סכום לתרומה</label>
-                <div className={styles.amountInputWrapper}>
-                    <input
-                        type="number"
-                        className={styles.compactAmountInput}
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="0"
-                        required
-                    />
-                </div>
-                <button type="button" className={styles.calcLinkBtn} onClick={scrollToCalculator}>
-                    לא יודעים כמה לתרום? נסו את המחשבון שלנו
-                </button>
-            </div>
+  return (
+    <form className={styles.compactForm} onSubmit={handleSubmit(onFormSubmit)} noValidate>
+      <div className={styles.compactInputSection}>
+        <label className={styles.compactLabel}>סכום לתרומה</label>
+        <div className={styles.amountInputWrapper}>
+          <input
+            type="number"
+            className={`${styles.compactAmountInput} ${errors.amount ? styles.inputError : ""}`}
+            placeholder="0"
+            {...register("amount", {
+              required: "חובה",
+              min: { value: 1, message: "מינימום תרומה: ₪1" },
+            })}
+          />
+        </div>
+        {/* שימוש באותו Class של שאר השדות */}
+        {errors.amount && <div className={styles.error}>{errors.amount.message}</div>}
 
-            <div className={styles.compactDetailsGrid}>
-                <div className={styles.compactField}>
-                    <input
-                        type="text"
-                        placeholder="שם פרטי"
-                        value={donor.firstName}
-                        onChange={(e) => setDonor({ ...donor, firstName: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className={styles.compactField}>
-                    <input
-                        type="text"
-                        placeholder="שם משפחה"
-                        value={donor.lastName}
-                        onChange={(e) => setDonor({ ...donor, lastName: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className={styles.compactField}>
-                    <input
-                        type="tel"
-                        placeholder="טלפון"
-                        value={donor.phone}
-                        onChange={(e) => setDonor({ ...donor, phone: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className={styles.compactField}>
-                    <input
-                        type="email"
-                        placeholder="אימייל"
-                        value={donor.email}
-                        onChange={(e) => setDonor({ ...donor, email: e.target.value })}
-                        required
-                    />
-                </div>
-            </div>
+        <button type="button" className={styles.calcLinkBtn} onClick={scrollToCalculator}>
+          לא יודעים כמה לתרום? נסו את המחשבון שלנו
+        </button>
+      </div>
 
-            <button type="submit" className={styles.compactSubmitBtn}>
-                אני רוצה לתרום
-            </button>
-        </form>
-    );
+      <div className={styles.compactDetailsGrid}>
+        <div className={styles.field}>
+          <label className={styles.label}>שם פרטי</label>
+          <input
+            className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
+            {...register("firstName", {
+              required: "חובה",
+              validate: (v) => {
+                const value = String(v || "").trim();
+                return value.length >= 2 || "לפחות 2 אותיות";
+              },
+              pattern: { value: /^[a-zA-Zא-ת\s\-]+$/, message: "שם לא תקין" }
+            })}
+          />
+          {errors.firstName && <div className={styles.error}>{errors.firstName.message}</div>}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>שם משפחה</label>
+          <input
+            className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
+            {...register("lastName", {
+              required: "חובה",
+              validate: (v) => {
+                const value = String(v || "").trim();
+                return value.length >= 2 || "לפחות 2 אותיות";
+              },
+              pattern: { value: /^[a-zA-Zא-ת\s\-]+$/, message: "שם לא תקין" }
+            })}
+          />
+          {errors.lastName && <div className={styles.error}>{errors.lastName.message}</div>}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>טלפון</label>
+          <input
+            type="tel"
+            className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
+            {...register("phone", {
+              required: "חובה",
+              pattern: { 
+                value: /^0(?:[23489]|[57]\d)\d{7}$/, 
+                message: "טלפון לא תקין" 
+              }
+            })}
+          />
+          {errors.phone && <div className={styles.error}>{errors.phone.message}</div>}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>אימייל</label>
+          <input
+            type="email"
+            className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
+            {...register("email", {
+              required: "חובה",
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                message: "אימייל לא תקין",
+              },
+            })}
+          />
+          {errors.email && <div className={styles.error}>{errors.email.message}</div>}
+        </div>
+      </div>
+
+      <button type="submit" className={styles.compactSubmitBtn} disabled={!isValid}>
+        אני רוצה לתרום
+      </button>
+    </form>
+  );
 };
 
 export default CampaignCompactForm;

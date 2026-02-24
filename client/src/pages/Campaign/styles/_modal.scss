@@ -10,7 +10,7 @@
   padding: 20px;
 
   @media (max-width: 480px) {
-    padding: 10px; // פחות רווח מסביב במובייל
+    padding: 10px;
   }
 }
 
@@ -36,7 +36,7 @@
   animation: modalEnter 0.3s ease-out;
 
   @media (max-width: 480px) {
-    max-height: 90vh; // גובה מקסימלי מעט גדול יותר לנייד
+    max-height: 90vh;
   }
 }
 
@@ -50,7 +50,7 @@
   flex-shrink: 0;
 
   @media (max-width: 480px) {
-    padding: 12px 16px; // הידוק ההדר במובייל
+    padding: 12px 16px;
   }
 }
 
@@ -86,11 +86,6 @@
   border-bottom: 1px solid $ui-border-soft;
   flex-shrink: 0;
   justify-content: center;
-
-  @media (max-width: 480px) {
-    gap: 12px;
-    padding: 10px 16px;
-  }
 }
 
 .stepChip {
@@ -109,21 +104,10 @@
   padding: 20px 24px;
   flex: 0 1 auto;
   overflow-y: auto;
-  overflow-x: hidden;
   display: flow-root;
-  -webkit-overflow-scrolling: touch; // גלילה חלקה ל-iOS
 
   @media (max-width: 480px) {
     padding: 16px;
-  }
-
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #eee;
-    border-radius: 10px;
   }
 }
 
@@ -165,7 +149,6 @@
     color: $brand-primary;
     border: 2px solid $brand-secondary;
     border-radius: $radius-sm;
-    appearance: none; // מניעת עיצוב דפדפן ברירת מחדל
 
     &:focus {
       outline: none;
@@ -192,7 +175,7 @@
   gap: 12px;
 
   @media (max-width: 480px) {
-    grid-template-columns: 1fr; // במובייל שדות אחד מתחת לשני
+    grid-template-columns: 1fr;
   }
 }
 
@@ -200,6 +183,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-height: 70px; // שומר מקום לשגיאה כדי למנוע קפיצות
 
   .label {
     font-size: 12px;
@@ -211,16 +195,18 @@
     padding: 9px 12px;
     border: 1px solid $ui-border-soft;
     border-radius: 6px;
-    font-size: 16px; // פונט 16px מונע זום אוטומטי מעצבן באייפון
-    appearance: none;
+    font-size: 16px;
+    transition: border-color 0.2s;
 
     &:focus {
       border-color: $brand-secondary;
       outline: none;
     }
 
-    &Error {
+    // קלאס שגיאה ייעודי
+    &.inputError {
       border-color: #ff4d4d;
+      background-color: rgba(#ff4d4d, 0.02);
     }
   }
 
@@ -228,6 +214,7 @@
     color: #ff4d4d;
     font-size: 10px;
     font-weight: 600;
+    margin-top: 2px;
   }
 }
 
@@ -236,10 +223,6 @@
   background: #fff;
   border-top: 1px solid $ui-border-soft;
   flex-shrink: 0;
-
-  @media (max-width: 480px) {
-    padding: 12px 16px;
-  }
 }
 
 .modalActions {
@@ -258,7 +241,6 @@
   font-weight: 900;
   font-size: 15px;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 
   &:disabled {
     opacity: 0.5;
@@ -273,7 +255,6 @@
   border-radius: 999px;
   font-weight: 700;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .micro {
@@ -316,10 +297,11 @@
   }
 }
 
+// Compact Form Section
 .compactForm {
   background: #ffffff;
   padding: 30px;
-  border-radius: $radius; // משתמש ברדיוס של המודאל
+  border-radius: $radius;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 450px;
@@ -347,7 +329,7 @@
       display: inline-block;
       width: 100%;
       max-width: 200px;
-      
+
       .compactAmountInput {
         width: 100%;
         padding: 12px;
@@ -355,16 +337,15 @@
         font-size: 32px;
         font-weight: 900;
         color: $brand-primary;
-        border: 2px solid $brand-secondary; // צהוב/זהב כמו במודאל
+        border: 2px solid $brand-secondary;
         border-radius: $radius-sm;
         outline: none;
-        transition: box-shadow 0.2s;
 
-        &:focus {
-          box-shadow: 0 0 10px rgba($brand-secondary, 0.2);
+        &.inputError {
+          border-color: #ff4d4d;
         }
       }
-      
+
       &::before {
         content: "₪";
         position: absolute;
@@ -379,6 +360,17 @@
     }
   }
 
+.compactDetailsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
   .calcLinkBtn {
     display: inline-block;
     margin-top: 12px;
@@ -390,44 +382,10 @@
     font-size: 13px;
     font-weight: 800;
     cursor: pointer;
-    transition: all 0.2s;
 
     &:hover {
       background: $brand-secondary;
       color: $brand-primary;
-    }
-  }
-
-  .compactDetailsGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
-
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-    }
-
-    .compactField {
-      input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid $ui-border-soft;
-        border-radius: 6px;
-        font-size: 16px;
-        color: $brand-primary;
-        appearance: none;
-
-        &:focus {
-          border-color: $brand-secondary;
-          outline: none;
-        }
-
-        &::placeholder {
-          color: $ui-text-muted;
-          font-size: 14px;
-        }
-      }
     }
   }
 
@@ -437,20 +395,48 @@
     color: $brand-primary;
     padding: 16px;
     border: none;
-    border-radius: 999px; // כפתור עגול כמו במודאל
+    border-radius: 999px;
     font-size: 18px;
     font-weight: 900;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba($brand-secondary, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba($brand-secondary, 0.4);
     }
 
-    &:active {
-      transform: translateY(0);
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
+
   }
+    /* ===== Compact: override modal field defaults + tighter inputs ===== */
+  .field {
+    min-height: auto; // לא 70px כמו במודאל
+    gap: 6px;
+  }
+
+  .label {
+    text-align: right;
+    font-size: 13px;
+    line-height: 1.1;
+  }
+
+  /* גורם לשדות להיות "קטנים יותר" בתוך כל תא */
+  .input {
+    width: 100%;
+    max-width: 280px;     // ✅ מקטין רוחב השדות
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-inline-start: auto; // ✅ ב-RTL זה מיישר לימין
+  }
+
+  .error {
+    font-size: 11px;
+    margin-top: 0;
+    text-align: right;
+  }
+  
 }
