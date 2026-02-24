@@ -3,17 +3,15 @@
 /* ===== Burger (מובייל בלבד) ===== */
 .burger {
     display: none;
-    /* בדסקטופ לא רואים */
     border: 1px solid $header-surface-border;
     background: $header-surface;
     border-radius: $radius;
-
     width: 44px;
     height: 44px;
-
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    cursor: pointer;
 
     span {
         display: block;
@@ -48,27 +46,21 @@
         z-index: 60;
     }
 
-    /* Drawer panel */
     .drawer {
         display: flex;
         flex-direction: column;
-
         position: fixed;
         top: 0;
         bottom: 0;
         right: 0;
-
         width: min(75vw, 340px);
         background: $header-mobile-panel-bg;
         border-left: 1px solid $header-mobile-panel-border;
-
         padding: 20px 16px;
         gap: 14px;
-
         transform: translateX(100%);
         transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
         pointer-events: none;
-
         z-index: 55;
     }
 
@@ -85,6 +77,12 @@
     }
 
     .drawerItem {
+        /* איפוס אלמנטים */
+        appearance: none;
+        font-family: inherit;
+        font-size: 1rem;
+        display: block;
+        
         width: 100%;
         text-align: center;
         padding: 14px 14px;
@@ -96,36 +94,42 @@
         color: $header-nav-text;
         font-weight: 800;
         text-decoration: none;
-
         cursor: pointer;
+        transition: background 0.2s ease;
+
+        &:active {
+            background: rgba(255, 255, 255, 0.12);
+        }
     }
 
-
     .drawerActions {
-      //  margin-top: auto;
         padding-top: 14px;
         border-top: 1px solid $header-separator;
+        margin-top: 10px; // רווח קטן מהקישורים שלמעלה
     }
 
     .drawerCta {
         display: flex;
         align-items: center;
         justify-content: center;
-
         width: 100%;
         height: 48px;
         border-radius: 16px;
 
+        /* עיצוב גרדיאנט לפי התמונה */
         background: linear-gradient(180deg, $header-cta-top, $header-cta-bottom);
         color: $header-cta-text !important;
-
         font-weight: 900;
         text-decoration: none;
-
         border: 1px solid $header-cta-border;
+        cursor: pointer;
+        
+        &:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
     }
 
-    /* Backdrop */
     .backdrop {
         display: block;
         position: fixed;
@@ -135,7 +139,6 @@
         pointer-events: none;
         transition: opacity 160ms ease;
         z-index: 40;
-
         border: 0;
         padding: 0;
     }

@@ -14,39 +14,43 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink, donateLink }
         <>
             <nav className={`${m.drawer} ${open ? m.open : ""}`} aria-label="ניווט ראשי">
                 <div className={m.drawerLinks}>
+                    {/* כפתור לפעולת UI (פתיחת מידע) */}
                     <button type="button" className={m.drawerItem} onClick={onOpenInfo}>
                         תפילין ומזוזות
                     </button>
 
-                    <a
-                        className={m.drawerItem}
-                        href={whatsappLink}
-                        onClick={onClose}
-                        target="_blank"
+                    {/* קישור חיצוני לוואטסאפ - מעולה ל-SEO */}
+                    <a 
+                        href={whatsappLink} 
+                        className={m.drawerItem} 
+                        target="_blank" 
                         rel="noopener noreferrer"
+                        onClick={onClose}
                     >
                         צור קשר
                     </a>
 
-                    <a
-                        className={m.drawerItem}
-                        href={donateLink}
-                        target="_blank"
+                    {/* קישור חיצוני לתרומה */}
+                    <a 
+                        href={donateLink} 
+                        className={m.drawerItem} 
+                        target="_blank" 
                         rel="noopener noreferrer"
                         onClick={onClose}
                     >
                         תרומה
                     </a>
-
                 </div>
 
                 <div className={m.drawerActions}>
+                    {/* Link של React Router - הכי טוב ל-SEO לניווט בתוך האתר */}
                     <Link to="/shabbat" className={m.drawerCta} onClick={onClose}>
                         רישום לשבת
                     </Link>
                 </div>
             </nav>
 
+            {/* רקע כהה לסגירה */}
             <button
                 type="button"
                 className={`${m.backdrop} ${open ? m.backdropOpen : ""}`}
