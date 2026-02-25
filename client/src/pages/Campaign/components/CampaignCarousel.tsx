@@ -39,7 +39,6 @@ const CampaignCarousel: React.FC = () => {
                     className={`${styles.slide} ${index === activeSlide ? styles.active : ""}`}
                 >
                     <div className={styles.slideContent}>
-                        <span className={styles.slideIcon}>{slide.icon}</span>
                         <div className={styles.slideText}>
                             <h2>{slide.title}</h2>
                             <p>{slide.subtitle}</p>
