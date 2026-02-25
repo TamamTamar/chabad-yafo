@@ -1,0 +1,57 @@
+@use "../../styles/Variables" as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  width: 100%;
+  border-radius: $radius-sm;
+  color: $brand-text;
+}
+
+/* ===== VARIANTS ===== */
+
+.topbar {
+  padding: 10px 14px;
+  background: rgba($brand-secondary, 0.18);
+  border: 1px solid rgba($brand-secondary, 0.4);
+}
+
+.card {
+  padding: 16px;
+  background: #fff;
+  border: 1px solid rgba($brand-primary, 0.15);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== TEXT ===== */
+
+.title {
+  font-weight: 700;
+  font-size: 16px;
+  color: $brand-primary;
+}
+
+.times {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.date {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+/* ===== STATES ===== */
+
+.loading {
+  opacity: 0.75;
+}
+
+.error {
+  color: #b00020;
+  font-weight: 600;
+}
