@@ -159,7 +159,7 @@ const CampaignDonationModal: React.FC<Props> = ({
                     ref={customInputRef}
                     className={styles.customAmountInput}
                     inputMode="numeric"
-                    placeholder="הכנס סכום..."
+                    placeholder="0"
                     value={customRaw}
                     onChange={(e) => setCustomRaw(e.target.value.replace(/[^0-9]/g, ""))}
                   />
