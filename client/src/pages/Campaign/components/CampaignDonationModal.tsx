@@ -20,7 +20,7 @@ type Props = {
   campaignTitle: string;
   nedarim: DonationCampaignConfig["nedarim"];
   prefilledDonor?: DonorForm;
-  initialStep?: 1 | 2
+  initialStep?: 1 | 2;
 };
 
 const CampaignDonationModal: React.FC<Props> = ({
@@ -51,7 +51,7 @@ const CampaignDonationModal: React.FC<Props> = ({
     formState: { errors, isValid },
   } = useForm<DonorForm>({
     mode: "onChange",
-    defaultValues: prefilledDonor || { firstName: "", lastName: "", phone: "", email: "" }
+    defaultValues: prefilledDonor || { firstName: "", lastName: "", phone: "", email: "" },
   });
 
   const watchedDonor = watch();
@@ -63,13 +63,18 @@ const CampaignDonationModal: React.FC<Props> = ({
     setErrorText,
     startPayment,
     resetPaymentUi,
+    ok, // משתנה המציין הצלחה
   } = useNedarimIframe({
+    // ה-enabled מוודא שה-iframe לא רץ "ברקע" כשלא צריך
     enabled: open && step === 2,
     iframeRef,
+    onSuccess: onClose, // סגירת המודל אוטומטית אחרי ההצלחה
   });
 
   useEffect(() => {
     if (!open) return;
+    
+    // איפוס מצב המודל בפתיחה מחדש
     setStep(initialStep ?? 1);
     setErrorText("");
     resetPaymentUi();
@@ -108,7 +113,7 @@ const CampaignDonationModal: React.FC<Props> = ({
       phone: (watchedDonor.phone || "").trim(),
       email: (watchedDonor.email || "").trim(),
       Comment: nedarim.Comment,
-      PaymentType: nedarim.PaymentType
+      PaymentType: nedarim.PaymentType,
     });
   }, [nedarim, amountToShowStep1, currency, campaignTitle, yearLabel, shaliachName, watchedDonor]);
 
@@ -154,6 +159,7 @@ const CampaignDonationModal: React.FC<Props> = ({
                     ref={customInputRef}
                     className={styles.customAmountInput}
                     inputMode="numeric"
+                    placeholder="הכנס סכום..."
                     value={customRaw}
                     onChange={(e) => setCustomRaw(e.target.value.replace(/[^0-9]/g, ""))}
                   />
@@ -215,10 +221,28 @@ const CampaignDonationModal: React.FC<Props> = ({
             </>
           ) : (
             <div className={styles.iframeStep}>
-              <div className={styles.amountOnly}>₪{selectedAmount}</div>
-              <div className={styles.iframeCard}>
-                <iframe ref={iframeRef} title="Nedarim Plus" src="https://matara.pro/nedarimplus/iframe?language=he" className={styles.iframe} scrolling="no" />
-              </div>
+              {/* מסך הצלחה חגיגי */}
+              {ok ? (
+                <div className={styles.successMessage} style={{textAlign:'center', padding: '40px 20px'}}>
+                   <div style={{fontSize: '50px', marginBottom: '10px'}}>🎉</div>
+                   <h2 style={{color: '#28a745'}}>תודה רבה, {watchedDonor.firstName}!</h2>
+                   <p>התרומה על סך ₪{selectedAmount} התקבלה בהצלחה.</p>
+                   <p style={{fontSize: '0.9em', color: '#666'}}>החלון יסגר בעוד רגע...</p>
+                </div>
+              ) : (
+                <>
+                  <div className={styles.amountOnly}>₪{selectedAmount}</div>
+                  <div className={styles.iframeCard}>
+                    <iframe
+                      ref={iframeRef}
+                      title="Nedarim Plus"
+                      src="https://matara.pro/nedarimplus/iframe?language=he"
+                      className={styles.iframe}
+                      scrolling="no"
+                    />
+                  </div>
+                </>
+              )}
             </div>
           )}
           {errorText && <div className={styles.errorBox} style={{textAlign:'center', color:'red', marginTop:'10px'}}>{errorText}</div>}
@@ -226,12 +250,21 @@ const CampaignDonationModal: React.FC<Props> = ({
 
         <div className={styles.modalFooter}>
           <div className={styles.modalActions}>
-            <button className={styles.btnSecondary} onClick={step === 2 ? () => setStep(1) : onClose}>
-              {step === 2 ? "חזרה" : "ביטול"}
-            </button>
-            <button className={styles.btnPrimary} onClick={step === 1 ? handleSubmit(goNext) : () => startPayment(payload)} disabled={isPaying || (step === 1 && !isValid)}>
-              {step === 1 ? "המשך לתשלום" : "בצע תשלום"}
-            </button>
+            {/* מסתירים את הכפתורים ברגע שהתשלום הצליח */}
+            {!ok && (
+              <>
+                <button className={styles.btnSecondary} onClick={step === 2 ? () => setStep(1) : onClose}>
+                  {step === 2 ? "חזרה" : "ביטול"}
+                </button>
+                <button
+                  className={styles.btnPrimary}
+                  onClick={step === 1 ? handleSubmit(goNext) : () => startPayment(payload)}
+                  disabled={isPaying || (step === 1 && !isValid)}
+                >
+                  {step === 1 ? "המשך לתשלום" : "בצע תשלום"}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
