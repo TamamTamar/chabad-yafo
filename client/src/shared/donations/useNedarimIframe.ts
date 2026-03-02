@@ -7,9 +7,15 @@ type UseNedarimIframeArgs = {
   enabled: boolean;
   iframeRef: RefObject<HTMLIFrameElement | null>;
   onSuccess?: () => void;
+  successDelay?: number; // הוספנו אפשרות לשלוט בזמן הסגירה
 };
 
-export const useNedarimIframe = ({ enabled, iframeRef, onSuccess }: UseNedarimIframeArgs) => {
+export const useNedarimIframe = ({ 
+  enabled, 
+  iframeRef, 
+  onSuccess, 
+  successDelay = 4000 // ברירת מחדל של 4 שניות במקום 1.2
+}: UseNedarimIframeArgs) => {
   const [isReady, setIsReady] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
   const [ok, setOk] = useState(false);
@@ -60,7 +66,12 @@ export const useNedarimIframe = ({ enabled, iframeRef, onSuccess }: UseNedarimIf
           } else {
             setErrorText("");
             setOk(true);
-            if (onSuccess) window.setTimeout(() => onSuccess(), 1200);
+            // כאן השינוי המרכזי: שימוש ב-successDelay שניתן לשליטה
+            if (onSuccess) {
+              window.setTimeout(() => {
+                onSuccess();
+              }, successDelay);
+            }
           }
           break;
         }
@@ -81,7 +92,7 @@ export const useNedarimIframe = ({ enabled, iframeRef, onSuccess }: UseNedarimIf
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     };
-  }, [enabled, iframeRef, onSuccess, postToIframe]);
+  }, [enabled, iframeRef, onSuccess, postToIframe, successDelay]);
 
   const startPayment = useCallback(
     (payload: object) => {
@@ -102,7 +113,7 @@ export const useNedarimIframe = ({ enabled, iframeRef, onSuccess }: UseNedarimIf
       timeoutRef.current = window.setTimeout(() => {
         setIsPaying(false);
         setErrorText("לא התקבלה תשובה מהשרת. נסי שוב או פני לתמיכה.");
-      }, 20000);
+      }, 25000); // הגדלתי מעט ל-25 שניות לביטחון
     },
     [iframeRef]
   );
