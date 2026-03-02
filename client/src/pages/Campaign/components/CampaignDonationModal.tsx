@@ -38,7 +38,7 @@ const CampaignDonationModal: React.FC<Props> = ({
   const customInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<Step>(1);
-  const [amountMode, setAmountMode] = useState<"preset" | "custom" | string>("preset");
+  const [amountMode, setAmountMode] = useState<"preset" | "custom">("preset");
   const [selectedAmount, setSelectedAmount] = useState<number>(presetAmount);
   const [customRaw, setCustomRaw] = useState<string>("");
 
@@ -56,14 +56,7 @@ const CampaignDonationModal: React.FC<Props> = ({
   const watchedDonor = watch();
   const currency: Currency = nedarim.Currency;
 
-  const {
-    isPaying,
-    errorText,
-    setErrorText,
-    startPayment,
-    resetPaymentUi,
-    ok,
-  } = useNedarimIframe({
+  const { isPaying, errorText, setErrorText, startPayment, resetPaymentUi, ok } = useNedarimIframe({
     enabled: open && step === 2,
     iframeRef,
     onSuccess: onClose,
@@ -72,15 +65,17 @@ const CampaignDonationModal: React.FC<Props> = ({
 
   useEffect(() => {
     if (!open) return;
+
     setStep(initialStep ?? 1);
     setErrorText("");
     resetPaymentUi();
+
     setSelectedAmount(presetAmount);
+    setCustomRaw("");
     reset(prefilledDonor || { firstName: "", lastName: "", phone: "", email: "" });
 
     if (startWithCustom) {
       setAmountMode("custom");
-      setCustomRaw("");
       window.setTimeout(() => customInputRef.current?.focus(), 0);
     } else {
       setAmountMode("preset");
@@ -88,8 +83,11 @@ const CampaignDonationModal: React.FC<Props> = ({
   }, [open, presetAmount, startWithCustom, resetPaymentUi, setErrorText, prefilledDonor, initialStep, reset]);
 
   const amountToShow = useMemo(() => {
-    const parsed = Number(customRaw.replace(/[^\d]/g, ""));
-    return amountMode === "custom" ? (parsed > 0 ? parsed : 0) : selectedAmount;
+    if (amountMode === "custom") {
+      const parsed = Number(customRaw.replace(/[^\d]/g, ""));
+      return parsed > 0 ? parsed : 0;
+    }
+    return selectedAmount;
   }, [amountMode, customRaw, selectedAmount]);
 
   const payload = useMemo(() => {
@@ -107,7 +105,9 @@ const CampaignDonationModal: React.FC<Props> = ({
       Comment: nedarim.Comment,
       PaymentType: nedarim.PaymentType,
     });
-    return { ...base, ForceUpdateMatching: "1", ThirdPartyReceipt: "1" };
+
+    // ✅ חשוב: בלי ThirdPartyReceipt כדי שנדרים יפיקו קבלה אוטומטית
+    return { ...base, ForceUpdateMatching: "1" };
   }, [nedarim, amountToShow, currency, campaignTitle, yearLabel, shaliachName, watchedDonor]);
 
   const goNext = () => {
@@ -127,12 +127,15 @@ const CampaignDonationModal: React.FC<Props> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalBackdrop} onClick={onClose} />
+
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <div className={styles.modalTitle}>
             {campaignTitle} <span className={styles.modalMuted}>{yearLabel}</span>
           </div>
-          <button className={styles.modalClose} onClick={onClose}>✕</button>
+          <button className={styles.modalClose} onClick={onClose} type="button">
+            ✕
+          </button>
         </div>
 
         {!ok && (
@@ -144,11 +147,13 @@ const CampaignDonationModal: React.FC<Props> = ({
 
         <div className={styles.modalBody}>
           {ok ? (
-            <div className={styles.successMessage} style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <div style={{ fontSize: '60px', marginBottom: '20px' }}>🎉</div>
-              <h2 style={{ color: '#28a745', fontSize: '24px' }}>תודה רבה, {watchedDonor.firstName}!</h2>
-              <p style={{ fontSize: '18px' }}>התרומה על סך <b>₪{selectedAmount}</b> התקבלה בהצלחה.</p>
-              <p style={{ color: '#888', marginTop: '20px', fontSize: '0.9em' }}>החלון יסגר כעת...</p>
+            <div className={styles.successMessage} style={{ textAlign: "center", padding: "40px 20px" }}>
+              <div style={{ fontSize: "60px", marginBottom: "20px" }}>🎉</div>
+              <h2 style={{ color: "#28a745", fontSize: "24px" }}>תודה רבה, {watchedDonor.firstName}!</h2>
+              <p style={{ fontSize: "18px" }}>
+                התרומה על סך <b>₪{selectedAmount}</b> התקבלה בהצלחה.
+              </p>
+              <p style={{ color: "#888", marginTop: "20px", fontSize: "0.9em" }}>החלון יסגר כעת...</p>
             </div>
           ) : step === 1 ? (
             <div className={styles.formContainer}>
@@ -171,49 +176,42 @@ const CampaignDonationModal: React.FC<Props> = ({
               )}
 
               <div className={styles.formGrid}>
-                {/* שם פרטי */}
                 <div className={styles.field}>
                   <label className={styles.label}>שם פרטי</label>
                   <input
                     className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
                     {...register("firstName", {
                       required: "שדה חובה",
-                      minLength: { value: 2, message: "מינימום 2 תווים" }
+                      minLength: { value: 2, message: "מינימום 2 תווים" },
                     })}
                   />
                   {errors.firstName && <span className={styles.errorText}>{errors.firstName.message}</span>}
                 </div>
 
-                {/* שם משפחה */}
                 <div className={styles.field}>
                   <label className={styles.label}>שם משפחה</label>
                   <input
                     className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
                     {...register("lastName", {
                       required: "שדה חובה",
-                      minLength: { value: 2, message: "מינימום 2 תווים" }
+                      minLength: { value: 2, message: "מינימום 2 תווים" },
                     })}
                   />
                   {errors.lastName && <span className={styles.errorText}>{errors.lastName.message}</span>}
                 </div>
 
-                {/* טלפון */}
                 <div className={styles.field}>
                   <label className={styles.label}>טלפון</label>
                   <input
                     className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
                     {...register("phone", {
                       required: "שדה חובה",
-                      pattern: {
-                        value: /^[0-9]{9,10}$/,
-                        message: "מספר טלפון לא תקין"
-                      }
+                      pattern: { value: /^[0-9]{9,10}$/, message: "מספר טלפון לא תקין" },
                     })}
                   />
                   {errors.phone && <span className={styles.errorText}>{errors.phone.message}</span>}
                 </div>
 
-                {/* אימייל */}
                 <div className={styles.field}>
                   <label className={styles.label}>אימייל</label>
                   <input
@@ -222,8 +220,8 @@ const CampaignDonationModal: React.FC<Props> = ({
                       required: "שדה חובה",
                       pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: "כתובת אימייל לא תקינה"
-                      }
+                        message: "כתובת אימייל לא תקינה",
+                      },
                     })}
                   />
                   {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
@@ -233,6 +231,7 @@ const CampaignDonationModal: React.FC<Props> = ({
           ) : (
             <div className={styles.iframeStep}>
               <div className={styles.amountOnly}>₪{selectedAmount}</div>
+
               <div className={styles.iframeCard}>
                 <iframe
                   ref={iframeRef}
@@ -244,19 +243,31 @@ const CampaignDonationModal: React.FC<Props> = ({
               </div>
             </div>
           )}
-          {errorText && <div className={styles.errorBox} style={{ textAlign: 'center', color: 'red', marginTop: '10px' }}>{errorText}</div>}
+
+          {errorText && (
+            <div className={styles.errorBox} style={{ textAlign: "center", color: "red", marginTop: "10px" }}>
+              {errorText}
+            </div>
+          )}
         </div>
 
         {!ok && (
           <div className={styles.modalFooter}>
             <div className={styles.modalActions}>
-              <button className={styles.btnSecondary} onClick={step === 2 ? () => setStep(1) : onClose} disabled={isPaying}>
+              <button
+                className={styles.btnSecondary}
+                onClick={step === 2 ? () => setStep(1) : onClose}
+                disabled={isPaying}
+                type="button"
+              >
                 {step === 2 ? "חזרה" : "ביטול"}
               </button>
+
               <button
                 className={styles.btnPrimary}
                 onClick={step === 1 ? handleSubmit(goNext) : () => startPayment(payload)}
                 disabled={isPaying || (step === 1 && !isValid)}
+                type="button"
               >
                 {step === 1 ? "המשך לתשלום" : isPaying ? "מעבד..." : "בצע תשלום"}
               </button>
