@@ -144,11 +144,11 @@ const CampaignDonationModal: React.FC<Props> = ({
 
         <div className={styles.modalBody}>
           {ok ? (
-            <div className={styles.successMessage} style={{textAlign:'center', padding: '40px 20px'}}>
-               <div style={{fontSize: '60px', marginBottom: '20px'}}>🎉</div>
-               <h2 style={{color: '#28a745', fontSize: '24px'}}>תודה רבה, {watchedDonor.firstName}!</h2>
-               <p style={{fontSize: '18px'}}>התרומה על סך <b>₪{selectedAmount}</b> התקבלה בהצלחה.</p>
-               <p style={{color: '#888', marginTop: '20px', fontSize: '0.9em'}}>החלון יסגר כעת...</p>
+            <div className={styles.successMessage} style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <div style={{ fontSize: '60px', marginBottom: '20px' }}>🎉</div>
+              <h2 style={{ color: '#28a745', fontSize: '24px' }}>תודה רבה, {watchedDonor.firstName}!</h2>
+              <p style={{ fontSize: '18px' }}>התרומה על סך <b>₪{selectedAmount}</b> התקבלה בהצלחה.</p>
+              <p style={{ color: '#888', marginTop: '20px', fontSize: '0.9em' }}>החלון יסגר כעת...</p>
             </div>
           ) : step === 1 ? (
             <div className={styles.formContainer}>
@@ -156,14 +156,14 @@ const CampaignDonationModal: React.FC<Props> = ({
                 <span className={styles.modalAmountLabel}>סכום התרומה</span>
                 <span className={styles.modalAmountValue}>₪{amountToShow}</span>
               </div>
-              
+
               {amountMode === "custom" && (
                 <div className={styles.customAmountRow}>
                   <input
                     ref={customInputRef}
                     className={styles.customAmountInput}
                     inputMode="numeric"
-                    placeholder="הזן סכום"
+                    placeholder="0"
                     value={customRaw}
                     onChange={(e) => setCustomRaw(e.target.value.replace(/[^0-9]/g, ""))}
                   />
@@ -174,12 +174,12 @@ const CampaignDonationModal: React.FC<Props> = ({
                 {/* שם פרטי */}
                 <div className={styles.field}>
                   <label className={styles.label}>שם פרטי</label>
-                  <input 
-                    className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`} 
-                    {...register("firstName", { 
-                      required: "שדה חובה", 
-                      minLength: { value: 2, message: "מינימום 2 תווים" } 
-                    })} 
+                  <input
+                    className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
+                    {...register("firstName", {
+                      required: "שדה חובה",
+                      minLength: { value: 2, message: "מינימום 2 תווים" }
+                    })}
                   />
                   {errors.firstName && <span className={styles.errorText}>{errors.firstName.message}</span>}
                 </div>
@@ -187,12 +187,12 @@ const CampaignDonationModal: React.FC<Props> = ({
                 {/* שם משפחה */}
                 <div className={styles.field}>
                   <label className={styles.label}>שם משפחה</label>
-                  <input 
-                    className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`} 
-                    {...register("lastName", { 
-                      required: "שדה חובה", 
-                      minLength: { value: 2, message: "מינימום 2 תווים" } 
-                    })} 
+                  <input
+                    className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
+                    {...register("lastName", {
+                      required: "שדה חובה",
+                      minLength: { value: 2, message: "מינימום 2 תווים" }
+                    })}
                   />
                   {errors.lastName && <span className={styles.errorText}>{errors.lastName.message}</span>}
                 </div>
@@ -200,15 +200,15 @@ const CampaignDonationModal: React.FC<Props> = ({
                 {/* טלפון */}
                 <div className={styles.field}>
                   <label className={styles.label}>טלפון</label>
-                  <input 
-                    className={`${styles.input} ${errors.phone ? styles.inputError : ""}`} 
-                    {...register("phone", { 
+                  <input
+                    className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
+                    {...register("phone", {
                       required: "שדה חובה",
                       pattern: {
                         value: /^[0-9]{9,10}$/,
                         message: "מספר טלפון לא תקין"
                       }
-                    })} 
+                    })}
                   />
                   {errors.phone && <span className={styles.errorText}>{errors.phone.message}</span>}
                 </div>
@@ -216,15 +216,15 @@ const CampaignDonationModal: React.FC<Props> = ({
                 {/* אימייל */}
                 <div className={styles.field}>
                   <label className={styles.label}>אימייל</label>
-                  <input 
-                    className={`${styles.input} ${errors.email ? styles.inputError : ""}`} 
-                    {...register("email", { 
+                  <input
+                    className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
+                    {...register("email", {
                       required: "שדה חובה",
                       pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                         message: "כתובת אימייל לא תקינה"
                       }
-                    })} 
+                    })}
                   />
                   {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
                 </div>
@@ -234,17 +234,17 @@ const CampaignDonationModal: React.FC<Props> = ({
             <div className={styles.iframeStep}>
               <div className={styles.amountOnly}>₪{selectedAmount}</div>
               <div className={styles.iframeCard}>
-                <iframe 
-                   ref={iframeRef} 
-                   title="Nedarim Plus" 
-                   src="https://matara.pro/nedarimplus/iframe?language=he" 
-                   className={styles.iframe} 
-                   scrolling="no" 
+                <iframe
+                  ref={iframeRef}
+                  title="Nedarim Plus"
+                  src="https://matara.pro/nedarimplus/iframe?language=he"
+                  className={styles.iframe}
+                  scrolling="no"
                 />
               </div>
             </div>
           )}
-          {errorText && <div className={styles.errorBox} style={{textAlign:'center', color:'red', marginTop:'10px'}}>{errorText}</div>}
+          {errorText && <div className={styles.errorBox} style={{ textAlign: 'center', color: 'red', marginTop: '10px' }}>{errorText}</div>}
         </div>
 
         {!ok && (
@@ -253,9 +253,9 @@ const CampaignDonationModal: React.FC<Props> = ({
               <button className={styles.btnSecondary} onClick={step === 2 ? () => setStep(1) : onClose} disabled={isPaying}>
                 {step === 2 ? "חזרה" : "ביטול"}
               </button>
-              <button 
-                className={styles.btnPrimary} 
-                onClick={step === 1 ? handleSubmit(goNext) : () => startPayment(payload)} 
+              <button
+                className={styles.btnPrimary}
+                onClick={step === 1 ? handleSubmit(goNext) : () => startPayment(payload)}
                 disabled={isPaying || (step === 1 && !isValid)}
               >
                 {step === 1 ? "המשך לתשלום" : isPaying ? "מעבד..." : "בצע תשלום"}
