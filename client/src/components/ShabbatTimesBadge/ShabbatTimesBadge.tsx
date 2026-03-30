@@ -16,9 +16,13 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
 
     const run = async () => {
       try {
+        console.log("Fetching shabbat times...");
         const res = await fetchShabbatTimes();
+        console.log("Shabbat times response:", res);
+
         if (mounted) setData(res);
       } catch (e: unknown) {
+        console.error("Shabbat times error:", e);
         const message = e instanceof Error ? e.message : "שגיאה בטעינת זמני שבת";
         if (mounted) setError(message);
       }
@@ -38,7 +42,7 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
   if (error) {
     return (
       <div className={cls} dir="rtl" aria-label="זמני שבת ביפו">
-        <span className={styles.error}>שבת: לא נטען</span>
+        <span className={styles.error}>שבת: {error}</span>
       </div>
     );
   }
