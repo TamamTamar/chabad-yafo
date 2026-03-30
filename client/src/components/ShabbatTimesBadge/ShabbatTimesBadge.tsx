@@ -29,6 +29,7 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
     };
 
     run();
+
     return () => {
       mounted = false;
     };
@@ -55,13 +56,15 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
     );
   }
 
-  // מכאן data בטוח לא null
-  const parashaClean = data.parasha.replace(/^פרשת\s+/, "");
+  const parashaClean = data.parasha?.replace(/^פרשת\s+/, "") ?? "";
   const dateLine = `${data.hebrewDate} · ${data.gregorianDate}`;
+  const titleText = parashaClean
+    ? `שבת פרשת ${parashaClean} ביפו`
+    : "זמני שבת וחג ביפו";
 
   return (
     <div className={cls} dir="rtl" aria-label="זמני שבת ביפו">
-      <span className={styles.title}>שבת פרשת {parashaClean} ביפו</span>
+      <span className={styles.title}>{titleText}</span>
 
       <span className={styles.times}>
         כניסה <strong>{data.candles}</strong> · יציאה{" "}

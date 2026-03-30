@@ -1,13 +1,23 @@
 import axios from "axios";
 import type { HebcalResponse, ShabbatTimes } from "../types/chabad";
 
+/* ================================
+   API
+================================ */
+
 const HEB_CAL_URL =
     "https://www.hebcal.com/shabbat?cfg=json&geonameid=293397&M=on";
+
+/* ================================
+   Helpers
+================================ */
 
 const getTimeFromTitle = (title: string): string => {
     const parts = title.split(": ");
     return parts.length > 1 ? parts[1] : title;
 };
+
+/* ---------- Gregorian ---------- */
 
 const formatGregorian = (d: Date): string => {
     const day = String(d.getDate()).padStart(2, "0");
@@ -16,6 +26,8 @@ const formatGregorian = (d: Date): string => {
 
     return `${day}/${month}/${year}`;
 };
+
+/* ---------- Hebrew Numbers (גימטריה עם גרשיים) ---------- */
 
 const GERESH = "׳";
 const GERSHAYIM = "״";
@@ -66,14 +78,14 @@ const hebrewGematria = (num: number): string => {
     return `${rest}${GERSHAYIM}${last}`;
 };
 
+/* ---------- Hebrew Date ---------- */
+
 const formatHebrewDate = (d: Date): string => {
     const parts = new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
         day: "numeric",
         month: "long",
         year: "numeric",
     }).formatToParts(d);
-
-    console.log("Hebrew date parts:", parts);
 
     const dayNum = Number(parts.find((p) => p.type === "day")?.value);
     const month = parts.find((p) => p.type === "month")?.value ?? "";
@@ -86,6 +98,10 @@ const formatHebrewDate = (d: Date): string => {
     return `${dayHeb} ב${month} ${yearHeb}`;
 };
 
+/* ================================
+   Main Fetch
+================================ */
+
 export const fetchShabbatTimes = async (): Promise<ShabbatTimes> => {
     try {
         const { data } = await axios.get<HebcalResponse>(HEB_CAL_URL, {
@@ -93,44 +109,33 @@ export const fetchShabbatTimes = async (): Promise<ShabbatTimes> => {
             headers: { Accept: "application/json" },
         });
 
-        console.log("Hebcal full response:", data);
-
         if (!data || !Array.isArray(data.items)) {
-            throw new Error("Hebcal לא החזיר items תקין");
+            throw new Error("Hebcal לא החזיר נתונים תקינים");
         }
 
         const candles = data.items.find((i) => i.category === "candles");
         const havdalah = data.items.find((i) => i.category === "havdalah");
         const parasha = data.items.find((i) => i.category === "parashat");
 
-        console.log("candles:", candles);
-        console.log("havdalah:", havdalah);
-        console.log("parasha:", parasha);
-
-        if (!candles || !havdalah || !parasha) {
-            throw new Error("חסרים נתונים מ-Hebcal");
+        if (!candles || !havdalah) {
+            throw new Error("חסרים זמני כניסה או יציאה");
         }
 
         const candleDate = new Date(candles.date);
 
         return {
-            parasha: parasha.hebrew ?? parasha.title,
+            parasha: parasha?.hebrew ?? parasha?.title ?? "",
             candles: getTimeFromTitle(candles.title),
             havdalah: getTimeFromTitle(havdalah.title),
             hebrewDate: formatHebrewDate(candleDate),
             gregorianDate: formatGregorian(candleDate),
         };
     } catch (error: unknown) {
-        console.error("fetchShabbatTimes raw error:", error);
+        console.error("fetchShabbatTimes error:", error);
 
         if (axios.isAxiosError(error)) {
-            console.error("Axios status:", error.response?.status);
-            console.error("Axios data:", error.response?.data);
-            throw new Error(
-                error.response?.status
-                    ? `שגיאה מהשרת (${error.response.status})`
-                    : error.message
-            );
+            const status = error.response?.status;
+            throw new Error(status ? `שגיאה מהשרת (${status})` : error.message);
         }
 
         if (error instanceof Error) {
