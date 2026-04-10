@@ -18,7 +18,6 @@ const Home = () => {
                 <Hero />
                 <OurService />
                 <ChabadHousesCards cards={chabadCards} />
-                <ShabbatCTA />
             </main>
         </div>
     );

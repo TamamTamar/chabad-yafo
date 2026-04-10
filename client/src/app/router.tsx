@@ -11,7 +11,6 @@ export const router = createBrowserRouter([
         element: <Root />,
         children: [
             { index: true, element: <Home /> },
-            { path: "shabbat", element: <Shabbat /> },
             { path: "purim", element: <PurimMatanotLaEvyonim /> },
             { path: "machatzit-hashekel", element: <MachatzitHashekel /> },
         ],
