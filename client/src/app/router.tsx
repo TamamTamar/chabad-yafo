@@ -4,6 +4,7 @@ import Home from "../pages/Home/Home";
 import Shabbat from "../pages/Shabbat/Shabbat";
 import PurimMatanotLaEvyonim from "../pages/PurimMatanotLaEvyonim/PurimMatanotLaEvyonim";
 import MachatzitHashekel from "../pages/MachatzitHashekel/MachatzitHashekel";
+import ErrorPage from "../pages/ErrorPage/ErrorPage";
 
 export const router = createBrowserRouter([
     {
@@ -13,6 +14,8 @@ export const router = createBrowserRouter([
             { index: true, element: <Home /> },
             { path: "purim", element: <PurimMatanotLaEvyonim /> },
             { path: "machatzit-hashekel", element: <MachatzitHashekel /> },
+            { path: "*", element: <ErrorPage /> },
+            
         ],
     },
 ]);
