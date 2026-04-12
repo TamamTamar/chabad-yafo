@@ -1,10 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
-import Root from "./Root";
-import Home from "../pages/Home/Home";
-import Shabbat from "../pages/Shabbat/Shabbat";
-import PurimMatanotLaEvyonim from "../pages/PurimMatanotLaEvyonim/PurimMatanotLaEvyonim";
-import MachatzitHashekel from "../pages/MachatzitHashekel/MachatzitHashekel";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
+import Home from "../pages/Home/Home";
+import MachatzitHashekel from "../pages/MachatzitHashekel/MachatzitHashekel";
+import PurimMatanotLaEvyonim from "../pages/PurimMatanotLaEvyonim/PurimMatanotLaEvyonim";
+import Root from "./Root";
 
 export const router = createBrowserRouter([
     {
