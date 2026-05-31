@@ -1,12 +1,13 @@
-import BenefitsSection from "./components/BenefitsSection";
-import HeroSection from "./components/HeroSection";
-import SurveyForm from "./components/SurveyForm";
+
+import BenefitsSection from "./components/BenefitsSection/BenefitsSection";
+import FamiliesHero from "./components/FamiliesHero/FamiliesHero";
+import SurveyForm from "./components/SurveyForm/SurveyForm";
 import styles from "./Families.module.scss";
 
 const Families = () => {
     return (
         <main className={styles.page}>
-            <HeroSection />
+            <FamiliesHero />
             <BenefitsSection />
             <SurveyForm />
         </main>

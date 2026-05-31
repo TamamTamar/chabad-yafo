@@ -1,6 +1,7 @@
-import styles from "../Families.module.scss";
+import styles from "./FamiliesHero.module.scss";
 
-const HeroSection = () => {
+
+const FamiliesHero = () => {
     return (
         <section className={styles.hero} aria-label="משפחות צעירות ביפו">
             <div className={styles.bg} aria-hidden="true" />
@@ -14,8 +15,7 @@ const HeroSection = () => {
                 </h1>
 
                 <p className={styles.heroDescription}>
-                    בית חב״ד יפו מרחיב את הפעילות למשפחות וילדים בעיר —
-                    חוגים, קייטנות, פעילויות קהילתיות ומסגרות חינוך עתידיות.
+                    בית חב”ד יפו מרחיב את הפעילות לילדים ומשפחות. נשמח להכיר אתכם כדי לבנות מענה קהילתי וחינוכי מותאם
                 </p>
 
                 <a href="#form" className={styles.heroButton}>
@@ -26,4 +26,4 @@ const HeroSection = () => {
     );
 };
 
-export default HeroSection;
+export default FamiliesHero;

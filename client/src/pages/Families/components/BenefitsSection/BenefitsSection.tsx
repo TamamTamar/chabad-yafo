@@ -1,5 +1,5 @@
-import styles from "../Families.module.scss";
-import { benefits } from "../data";
+import { benefits } from "../../data";
+import styles from "./BenefitsSection.module.scss";
 
 const BenefitsSection = () => {
     return (

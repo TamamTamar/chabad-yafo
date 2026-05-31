@@ -1,0 +1,47 @@
+@use "../../../../styles/variables" as *;
+
+.box {
+    overflow: hidden;
+    background: linear-gradient(180deg, $header-bg-top, $header-bg-bottom);
+    color: $header-nav-text;
+    border-radius: $radius;
+    box-shadow: 0 18px 44px $ui-shadow-card-hover;
+}
+
+.image {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+}
+
+.content {
+    padding: 32px;
+
+    h2 {
+        margin: 0 0 18px;
+        color: #ffffff;
+        font-size: 1.75rem;
+        line-height: 1.3;
+    }
+
+    p {
+        margin: 0 0 16px;
+        color: $hero-subtitle-color;
+        line-height: 1.8;
+    }
+}
+
+@media (max-width: 768px) {
+    .image {
+        height: 220px;
+    }
+
+    .content {
+        padding: 22px;
+
+        h2 {
+            font-size: 1.45rem;
+        }
+    }
+}

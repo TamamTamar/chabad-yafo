@@ -1,0 +1,91 @@
+@use "../../../../styles/variables" as *;
+
+.vision {
+    padding: 70px 8%;
+    text-align: center;
+
+    h2 {
+        margin-bottom: 36px;
+        color: $brand-primary;
+        font-size: 2rem;
+    }
+}
+
+.cards {
+    max-width: $max-width;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.card {
+    padding: 32px 24px;
+
+    background: $brand-bg;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    box-shadow: 0 12px 28px $ui-shadow-card;
+
+    span {
+        font-size: 2.5rem;
+    }
+
+    h3 {
+        margin: 16px 0 8px;
+        color: $brand-primary;
+    }
+
+    p {
+        color: $ui-text-muted;
+        line-height: 1.7;
+    }
+}
+
+@media (max-width: 1024px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .vision {
+        padding: 20px;
+
+        h2 {
+            margin-bottom: 18px;
+            font-size: 1.45rem;
+        }
+    }
+
+    .cards {
+        gap: 12px;
+    }
+
+    .card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        padding: 14px 12px;
+        border-radius: $radius-sm;
+        text-align: right;
+
+        span {
+            flex-shrink: 0;
+            font-size: 1.55rem;
+        }
+
+        h3 {
+            margin: 0 0 3px;
+            font-size: 0.92rem;
+        }
+
+        p {
+            margin: 0;
+            font-size: 0.78rem;
+            line-height: 1.35;
+        }
+    }
+}

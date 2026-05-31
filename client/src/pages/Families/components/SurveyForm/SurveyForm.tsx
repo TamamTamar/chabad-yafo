@@ -1,19 +1,12 @@
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import styles from "../Families.module.scss";
-import { ages, areas, interests } from "../data";
-import { createFamily } from "../../../services/familyService";
-import SuccessModal from "./SuccessModal";
+import styles from "./SurveyForm.module.scss";
+import type { FormValues } from "../../../../types/family";
+import { createFamily } from "../../../../services/familyService";
+import SuccessModal from "./SuccessModal/SuccessModal";
+import { ages, areas, interests } from "../../data";
+import CommunityBox from "../CommunityBox/CommunityBox";
 
-type FormValues = {
-    parentName: string;
-    phone: string;
-    area: string;
-    ages: string[];
-    interests: string[];
-    missing: string;
-    updates: boolean;
-};
 
 const SurveyForm = () => {
     const [isSuccess, setIsSuccess] = useState(false);
@@ -183,18 +176,7 @@ const SurveyForm = () => {
                 </form>
             </div>
 
-            <aside className={styles.sideBox}>
-                <h2>הצטרפו לקהילת ההורים של יפו 💛</h2>
-                <p>קבוצה שקטה ועדכונים על פעילויות, אירועים ותוכניות חדשות למשפחות.</p>
-
-                <ul>
-                    <li>מידע אמין ועדכונים ראשונים</li>
-                    <li>פעילויות מותאמות למשפחות</li>
-                    <li>יחד יוצרים קהילה חזקה ביפו</li>
-                </ul>
-
-                <strong>ביוזמת הרב לוי יצחק תמם — בית חב״ד יפו</strong>
-            </aside>
+            <CommunityBox />
         </section>
     );
 };

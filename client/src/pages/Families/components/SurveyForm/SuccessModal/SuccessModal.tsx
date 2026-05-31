@@ -1,4 +1,4 @@
-import styles from "../Families.module.scss";
+import styles from "./SuccessModal.module.scss";
 
 type Props = {
     onClose: () => void;
