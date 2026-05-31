@@ -5,14 +5,23 @@ const router = Router();
 
 router.post("/", async (req, res) => {
     try {
+        console.log("📩 New family form submitted:", req.body);
+
         const family = await Family.create(req.body);
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             data: family,
         });
     } catch (error) {
-        console.error(error);
+        console.error("❌ Failed to create family");
+
+        if (error instanceof Error) {
+            console.error("Error name:", error.name);
+            console.error("Error message:", error.message);
+        } else {
+            console.error("Unknown error:", error);
+        }
 
         if ((error as any).code === 11000) {
             return res.status(409).json({
@@ -21,7 +30,7 @@ router.post("/", async (req, res) => {
             });
         }
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "אירעה שגיאה בשמירת הפרטים",
         });
