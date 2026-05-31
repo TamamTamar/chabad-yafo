@@ -42,9 +42,13 @@
     background: #25d366;
 }
 
-/* הוספת אינסטגרם עם גרדיאנט */
 .instagram {
-    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    background: radial-gradient(circle at 30% 107%,
+            #fdf497 0%,
+            #fdf497 5%,
+            #fd5949 45%,
+            #d6249f 60%,
+            #285aeb 90%);
 }
 
 .facebook {
@@ -60,12 +64,11 @@
         bottom: calc(16px + env(safe-area-inset-bottom));
         transform: none;
 
-        flex-direction: column;
-        gap: 10px;
+        gap: 8px;
     }
 
     .fab {
-        width: 48px;
-        height: 48px;
+        width: 30px;
+        height: 30px;
     }
 }

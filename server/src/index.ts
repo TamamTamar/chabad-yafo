@@ -1,13 +1,18 @@
 import express from "express";
 import cors from "cors";
-import { healthRoutes } from "./routes/health";
-import { shabbatRoutes } from "./routes/shabbat";
+import dotenv from "dotenv";
 
+import { healthRoutes } from "./routes/healthRoutes";
+import { shabbatRoutes } from "./routes/shabbatRoutes";
+import { connectDB } from "./config/connectDB";
+import { familyRoutes } from "./routes/familyRoutes";
+
+dotenv.config();
 
 const app = express();
 
-// CORS הכי פשוט (ל־API בודד)
-// אם את לא משתמשת ב-cookies/credentials אפשר להשאיר origin: "*"
+console.log("SERVER STARTING");
+
 app.use(
     cors({
         origin: [
@@ -21,15 +26,29 @@ app.use(
     })
 );
 
-
 app.use(express.json());
 
-// Routes
 app.get("/", (_req, res) => res.send("OK"));
+
 app.use("/api/health", healthRoutes);
 app.use("/api/shabbat", shabbatRoutes);
-
-
+app.use("/api/families", familyRoutes);
 
 const port = Number(process.env.PORT) || 4000;
-app.listen(port, () => console.log(`✅ Server listening on ${port}`));
+
+const startServer = async () => {
+    try {
+        console.log("Connecting to Mongo...");
+        await connectDB();
+        console.log("Mongo finished");
+
+        app.listen(port, () => {
+            console.log(`✅ Server listening on ${port}`);
+        });
+    } catch (error) {
+        console.error("Server failed to start:", error);
+    }
+};
+
+startServer();
+

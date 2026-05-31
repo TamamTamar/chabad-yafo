@@ -1,4 +1,4 @@
-import { Facebook, MessageCircle, Instagram } from "lucide-react"; // הוספנו את Instagram
+import { Facebook, MessageCircle, Instagram } from "lucide-react";
 import styles from "./FloatingSocials.module.scss";
 
 const FloatingSocials = () => {
@@ -11,27 +11,27 @@ const FloatingSocials = () => {
                 className={`${styles.fab} ${styles.whatsapp}`}
                 aria-label="שליחת הודעה בוואטסאפ"
             >
-                <MessageCircle size={22} strokeWidth={1.8} />
+                <MessageCircle size={20} strokeWidth={1.8} />
             </a>
 
-            {/* כפתור אינסטגרם חדש */}
             <a
-                href="https://www.instagram.com/chabad_yaffo" // שנה ליוזר שלך
+                href="https://www.instagram.com/chabad_yaffo"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${styles.fab} ${styles.instagram}`}
                 aria-label="מעבר לעמוד אינסטגרם"
             >
-                <Instagram size={22} strokeWidth={1.8} />
+                <Instagram size={20} strokeWidth={1.8} />
             </a>
 
             <a
-                href="https://www.facebook.com/profile.php?id=61551949830199" target="_blank"
+                href="https://www.facebook.com/profile.php?id=61551949830199"
+                target="_blank"
                 rel="noopener noreferrer"
                 className={`${styles.fab} ${styles.facebook}`}
                 aria-label="מעבר לעמוד פייסבוק"
             >
-                <Facebook size={22} strokeWidth={1.8} />
+                <Facebook size={20} strokeWidth={1.8} />
             </a>
         </div>
     );
