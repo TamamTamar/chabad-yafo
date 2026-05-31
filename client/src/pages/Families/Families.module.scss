@@ -17,7 +17,8 @@
 .bg {
     position: absolute;
     inset: 0;
-    background-image: url("../../assets/families-hero.webp");
+    background-image: url("../../assets/families-hero-mobile.webp");
+
     background-size: cover;
     background-position: center top;
     background-repeat: no-repeat;
@@ -25,7 +26,7 @@
 
 @media (min-width: 768px) {
     .bg {
-        background-image: url("../../assets/families-hero-mobile.webp");
+        background-image: url("../../assets/families-hero.webp");
         background-position: center;
     }
 }
@@ -411,6 +412,7 @@
         border-radius: 999px;
     }
 }
+
 .modalOverlay {
     position: fixed;
     inset: 0;
