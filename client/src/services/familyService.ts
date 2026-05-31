@@ -3,7 +3,7 @@ import http from "./http";
 
 
 export const createFamily = async (data: FormValues) => {
-    const response = await http.post("/families", data);
+    const response = await http.post("/api/families", data);
 
     return response.data;
 };
