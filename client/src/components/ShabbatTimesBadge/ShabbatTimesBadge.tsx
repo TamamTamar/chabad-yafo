@@ -16,9 +16,7 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
 
     const run = async () => {
       try {
-        console.log("Fetching shabbat times...");
         const res = await fetchShabbatTimes();
-        console.log("Shabbat times response:", res);
 
         if (mounted) setData(res);
       } catch (e: unknown) {

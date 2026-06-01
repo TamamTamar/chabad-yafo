@@ -21,7 +21,7 @@ const FamiliesPromo = () => {
                     to="/families"
                     className={styles.button}
                 >
-                    ספרו לנו על המשפחה שלכם
+                    ספרו לנו על המשפחה שלכם 
                 </Link>
             </div>
         </section>

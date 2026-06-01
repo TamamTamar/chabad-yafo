@@ -7,7 +7,7 @@
     max-width: $max-width;
     margin: 40px auto;
 
-    min-height: 420px;
+    min-height: 470px;
 
     border-radius: 32px;
 
@@ -94,6 +94,7 @@
     font-weight: 800;
 
     transition: transform 0.2s ease;
+    
 }
 
 .button:hover {
@@ -145,5 +146,6 @@
         min-height: 46px;
         padding: 0 20px;
         font-size: 0.95rem;
+        
     }
 }
