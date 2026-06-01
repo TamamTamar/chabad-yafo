@@ -3,9 +3,12 @@
 .section {
     position: relative;
     overflow: hidden;
+
     max-width: $max-width;
     margin: 40px auto;
+
     min-height: 420px;
+
     border-radius: 32px;
 
     background-image: url("../../../assets/families-hero.webp");
@@ -23,39 +26,50 @@
     inset: 0;
 
     background: linear-gradient(90deg,
-            rgba(40, 18, 12, 0.45) 0%,
-            rgba(40, 18, 12, 0.25) 45%,
-            rgba(40, 18, 12, 0.05) 100%);
+            rgba(20, 45, 75, 0.15) 0%,
+            rgba(20, 45, 75, 0.08) 45%,
+            rgba(20, 45, 75, 0.03) 100%);
 }
 
 .content {
     position: relative;
     z-index: 2;
-margin-right: 3%;
-    max-width: 450px;
-    padding: 10px;
+
+    max-width: 480px;
+
+    margin-right: 48px;
+
+    padding: 32px;
 
     color: $brand-primary;
 
-background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.12);
 
-    border-radius: 32px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+
+    border-radius: 28px;
 }
 
-
 .content h2 {
+    margin: 0 0 16px;
+
     text-align: center;
-    font-size: clamp(2rem, 5vw, 3.5rem);
+
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
     line-height: 1.1;
-    margin-bottom: 18px;
+    font-weight: 800;
 }
 
 .content p {
-    font-size: 1.1rem;
-    line-height: 1.9;
-    margin-bottom: 28px;
+    margin: 0 0 24px;
+
+    text-align: center;
+
+    font-size: 1.05rem;
+    line-height: 1.8;
 }
 
 .button {
@@ -64,19 +78,22 @@ background: rgba(255, 255, 255, 0.08);
     justify-content: center;
 
     width: fit-content;
+
     margin: 0 auto;
 
     min-height: 52px;
+
     padding: 0 28px;
 
     border-radius: 999px;
+
     background: $brand-primary;
     color: #fff;
 
     text-decoration: none;
     font-weight: 800;
 
-    transition: 0.25s;
+    transition: transform 0.2s ease;
 }
 
 .button:hover {
@@ -85,27 +102,48 @@ background: rgba(255, 255, 255, 0.08);
 
 @media (max-width: 768px) {
     .section {
-        margin: 40px 16px;
-        min-height: 500px;
+        margin: 24px 16px;
+        min-height: 450px;
+        padding: 16px;
+        justify-content: center;
 
+        background-image: url("../../../assets/families-hero-mobile.webp");
         background-position: center;
     }
 
     .overlay {
         background: linear-gradient(180deg,
-                rgba(40, 18, 12, 0.55) 0%,
-                rgba(40, 18, 12, 0.8) 100%);
+                rgba(20, 45, 75, 0.12) 0%,
+                rgba(20, 45, 75, 0.22) 100%);
     }
 
     .content {
-        padding: 32px 24px;
+        width: 88%;
+        max-width: 320px;
+        margin: 0;
+        padding: 22px 18px;
+        background: rgba(89, 134, 178, 0.22);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, .15);
+        border-radius: 24px;
+        color: white;
     }
 
     .content h2 {
-        font-size: 2.2rem;
+        font-size: 1.85rem;
+        margin-bottom: 10px;
+    }
+
+    .content p {
+        font-size: 0.95rem;
+        line-height: 1.65;
+        margin-bottom: 18px;
     }
 
     .button {
-        width: 100%;
+        width: fit-content;
+        min-height: 46px;
+        padding: 0 20px;
+        font-size: 0.95rem;
     }
 }
