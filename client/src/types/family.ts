@@ -7,3 +7,9 @@ export type FormValues = {
     missing: string;
     updates: boolean;
 };
+
+export type FamilyAdmin = FormValues & {
+    _id: string;
+    createdAt?: string;
+    updatedAt?: string;
+};

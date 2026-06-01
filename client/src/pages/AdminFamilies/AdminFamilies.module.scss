@@ -1,0 +1,132 @@
+@use "../../styles/variables" as *;
+
+.page {
+    padding: 48px 24px 80px;
+    background: $body-bg;
+    min-height: 100vh;
+    direction: rtl;
+}
+
+.header {
+    max-width: $max-width;
+    margin: 0 auto 28px;
+
+    h1 {
+        margin: 0 0 8px;
+        color: $brand-primary;
+        font-size: 2rem;
+    }
+
+    p {
+        margin: 0;
+        color: $ui-text-muted;
+    }
+}
+
+.card {
+    max-width: $max-width;
+    margin: 0 auto;
+    background: $brand-bg;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    box-shadow: 0 16px 40px $ui-shadow-card;
+    overflow: hidden;
+}
+
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+
+    th,
+    td {
+        padding: 16px 18px;
+        text-align: right;
+        border-bottom: 1px solid $ui-border-soft;
+        vertical-align: top;
+    }
+
+    th {
+        background: rgba($brand-primary, 0.06);
+        color: $brand-primary;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    td {
+        color: $brand-text;
+        line-height: 1.6;
+    }
+
+    tr:hover td {
+        background: rgba($brand-primary, 0.025);
+    }
+}
+
+.phone {
+    direction: ltr;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tagList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag {
+    background: rgba($brand-primary, 0.08);
+    color: $brand-primary;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.yes {
+    color: #1f7a4d;
+    font-weight: 800;
+}
+
+.no {
+    color: $ui-text-muted;
+}
+
+.empty {
+    padding: 40px;
+    text-align: center;
+    color: $ui-text-muted;
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 32px 16px 64px;
+    }
+
+    .header {
+        h1 {
+            font-size: 1.6rem;
+        }
+    }
+
+    .card {
+        border-radius: 18px;
+    }
+
+    .table {
+        min-width: 860px;
+
+        th,
+        td {
+            padding: 13px 14px;
+            font-size: 0.92rem;
+        }
+    }
+}

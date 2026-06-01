@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { Family } from "../models/Family";
+import { requireAdmin } from "../middleware/adminAuth";
 
 const router = Router();
 
+// Create a new family form submission
 router.post("/", async (req, res) => {
     try {
         console.log("📩 New family form submitted:", req.body);
@@ -36,5 +38,6 @@ router.post("/", async (req, res) => {
         });
     }
 });
+
 
 export { router as familyRoutes };

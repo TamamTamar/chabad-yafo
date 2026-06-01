@@ -6,6 +6,8 @@ import { healthRoutes } from "./routes/healthRoutes";
 import { shabbatRoutes } from "./routes/shabbatRoutes";
 import { connectDB } from "./config/connectDB";
 import { familyRoutes } from "./routes/familyRoutes";
+import { adminRoutes } from "./routes/adminRoutes";
+import { adminAuthRoutes } from "./routes/adminAuth";
 
 dotenv.config();
 
@@ -33,6 +35,8 @@ app.get("/", (_req, res) => res.send("OK"));
 app.use("/api/health", healthRoutes);
 app.use("/api/shabbat", shabbatRoutes);
 app.use("/api/families", familyRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/auth", adminAuthRoutes);
 
 const port = Number(process.env.PORT) || 4000;
 
