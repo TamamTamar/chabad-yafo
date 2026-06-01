@@ -1,34 +1,45 @@
 import styles from "./CommunityBox.module.scss";
-import rabbiTamam from "../../../../assets/chabad-houses/center.jpeg";
+import levyTamam from "../../../../assets/levyTamam.png";
 
 const CommunityBox = () => {
     return (
         <aside className={styles.box}>
-            <img
-                src={rabbiTamam}
-                alt="הרב לוי יצחק תמם"
-                className={styles.image}
-            />
-
             <div className={styles.content}>
-                <h2>חזון מרכז חב״ד יפו: להרבות אור, יחד</h2>
+                <h2>
+                    חזון מרכז חב״ד יפו:
+                    <br />
+                    להרבות אור, יחד
+                </h2>
 
                 <p>
-                    מרכז חב״ד יפו מאחד את פעילות שלוחי חב״ד בעיר מתוך אהבת
-                    ישראל, אחריות משותפת ושליחות.
+                    מרכז חב״ד יפו פועל לחיזוק החיים היהודיים בעיר באמצעות תורה,
+                    חסד ואהבת ישראל.
                 </p>
 
                 <p>
-                    שאיפתנו היא לבנות ביפו קהילה יהודית חמה ותוססת, שבה כל
-                    אדם מרגיש רצוי, שייך ואהוב.
+                    אנו שואפים לבנות קהילה חמה ומשפחתית, שבה כל אדם מרגיש
+                    רצוי, שייך ואהוב.
                 </p>
 
-                <p>
-                    אנו פועלים להוסיף אור ביפו באמצעות תורה, חסד ואהבת ישראל,
-                    מתוך אמונה שכל יהודי הוא עולם מלא ושכל מעשה טוב מקרב את
-                    הגאולה.
-                </p>
+                <ul className={styles.list}>
+                    <li>פעילויות למשפחות וילדים</li>
+                    <li>שיעורים, חגים ואירועים קהילתיים</li>
+                    <li>מסגרות חינוך ויוזמות קהילתיות</li>
+                    <li>הוספת אור ביפו — מתוך שליחות</li>
+                </ul>
+
+                <div className={styles.signature}>
+                    <span>בברכה,</span>
+                    <strong>הרב לוי יצחק תמם</strong>
+                    <small>בית חב״ד יפו</small>
+                </div>
             </div>
+
+            <img
+                src={levyTamam}
+                alt="הרב לוי יצחק תמם"
+                className={styles.rabbiImage}
+            />
         </aside>
     );
 };
