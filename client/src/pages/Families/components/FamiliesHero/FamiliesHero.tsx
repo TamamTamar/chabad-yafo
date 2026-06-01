@@ -19,8 +19,8 @@ const FamiliesHero = () => {
                 </p>
 
                 <a href="#form" className={styles.heroButton}>
-                    למילוי הפרטים
-                </a>
+                    ספרו לנו על המשפחה שלכם    
+                                </a>
             </div>
         </section>
     );
