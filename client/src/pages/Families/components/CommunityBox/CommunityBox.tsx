@@ -1,37 +1,44 @@
 import styles from "./CommunityBox.module.scss";
-import levyTamam from "../../../../assets/levyTamam.png";
+import levyTamam from "../../../../assets/levyTamam.webp";
 
 const CommunityBox = () => {
     return (
         <aside className={styles.box}>
             <div className={styles.content}>
-                <h2>
+                <div className={styles.title}>
                     חזון מרכז חב״ד יפו:
                     <br />
                     להרבות אור, יחד
-                </h2>
+                </div>
 
-                <p>
-                    מרכז חב״ד יפו פועל לחיזוק החיים היהודיים בעיר באמצעות תורה,
-                    חסד ואהבת ישראל.
-                </p>
+                <div className={styles.text}>
+                    מרכז חב״ד יפו מאחד את פעילות שלוחי חב״ד בעיר מתוך אהבת
+                    ישראל, אחריות משותפת ושליחות.
+                </div>
 
-                <p>
-                    אנו שואפים לבנות קהילה חמה ומשפחתית, שבה כל אדם מרגיש
-                    רצוי, שייך ואהוב.
-                </p>
+                <div className={styles.text}>
+                    שאיפתנו היא לבנות ביפו קהילה יהודית חמה ותוססת, שבה כל אדם
+                    מרגיש רצוי, שייך ואהוב.
+                </div>
 
-                <ul className={styles.list}>
-                    <li>פעילויות למשפחות וילדים</li>
-                    <li>שיעורים, חגים ואירועים קהילתיים</li>
-                    <li>מסגרות חינוך ויוזמות קהילתיות</li>
-                    <li>הוספת אור ביפו — מתוך שליחות</li>
-                </ul>
+                <div className={styles.text}>
+                    אנו פועלים להוסיף אור ביפו באמצעות תורה, חסד ואהבת ישראל,
+                    מתוך אמונה שכל יהודי הוא עולם מלא ושכל מעשה טוב מקרב את
+                    הגאולה.
+                </div>
 
                 <div className={styles.signature}>
-                    <span>בברכה,</span>
-                    <strong>הרב לוי יצחק תמם</strong>
-                    <small>בית חב״ד יפו</small>
+                    <div className={styles.signatureGreeting}>
+                        בברכה,
+                    </div>
+
+                    <div className={styles.signatureName}>
+                        הרב לוי יצחק תמם
+                    </div>
+
+                    <div className={styles.signatureRole}>
+                        בית חב״ד יפו
+                    </div>
                 </div>
             </div>
 

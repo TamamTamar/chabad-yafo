@@ -1,6 +1,5 @@
 import styles from "./FamiliesHero.module.scss";
 
-
 const FamiliesHero = () => {
     return (
         <section className={styles.hero} aria-label="משפחות צעירות ביפו">
@@ -15,12 +14,16 @@ const FamiliesHero = () => {
                 </h1>
 
                 <p className={styles.heroDescription}>
-                    בית חב”ד יפו מרחיב את הפעילות לילדים ומשפחות. נשמח להכיר אתכם כדי לבנות מענה קהילתי וחינוכי מותאם
+                    בית חב״ד יפו מרחיב את הפעילות לילדים ומשפחות.
+                    נשמח להכיר אתכם כדי לבנות מענה קהילתי וחינוכי מותאם
                 </p>
 
                 <a href="#form" className={styles.heroButton}>
-                    ספרו לנו על המשפחה שלכם    
-                                </a>
+                    <span>ספרו לנו על המשפחה שלכם</span>
+                    <span className={styles.arrow} aria-hidden="true">
+                        ←
+                    </span>
+                </a>
             </div>
         </section>
     );

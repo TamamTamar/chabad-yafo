@@ -1,57 +1,200 @@
+@use "../../../../../styles/variables" as *;
+
 .modalOverlay {
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: rgba(20, 25, 35, 0.55);
-    backdrop-filter: blur(6px);
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     padding: 20px;
+
+    background: rgba(20, 25, 35, 0.52);
+    backdrop-filter: blur(7px);
+
+    animation: overlayFade 0.25s ease both;
 }
 
 .successModal {
     position: relative;
-    width: min(520px, 100%);
-    background: #fffaf0;
-    border-radius: 28px;
-    padding: 34px 28px 28px;
+
+    width: min(500px, 100%);
+    padding: 34px 30px 28px;
+
     text-align: center;
-    color: #2f3f4f;
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
-    border: 1px solid rgba(218, 177, 86, 0.4);
+
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(230, 201, 139, 0.9);
+    border-radius: 26px;
+
+    color: $brand-text;
+
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.22),
+        0 0 0 8px rgba(255, 255, 255, 0.18);
+
+    animation: modalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 
     h3 {
-        margin: 0 0 14px;
-        font-size: 1.8rem;
+        margin: 0 0 12px;
+        color: $brand-primary;
+        font-size: 1.75rem;
+        line-height: 1.2;
     }
 
     p {
-        margin: 10px 0;
-        line-height: 1.8;
-        font-size: 1.05rem;
+        max-width: 390px;
+        margin: 0 auto 10px;
+
+        color: $ui-text-muted;
+        font-size: 1rem;
+        line-height: 1.75;
     }
+}
+
+.iconCircle {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 16px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, #f3bf3d, #ffd76a);
+    box-shadow: 0 12px 28px rgba(243, 191, 61, 0.28);
+
+    font-size: 1.6rem;
+}
+
+.smallText {
+    font-weight: 700;
+    color: $brand-primary !important;
 }
 
 .closeModal {
     position: absolute;
     top: 14px;
     left: 16px;
+
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
     border: 0;
-    background: transparent;
-    font-size: 30px;
+    border-radius: 50%;
+
+    background: rgba(23, 58, 99, 0.06);
+    color: $brand-primary;
+
+    font-size: 26px;
     line-height: 1;
+
     cursor: pointer;
-    color: #6b5b45;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        background: rgba(23, 58, 99, 0.12);
+        transform: rotate(90deg);
+    }
 }
 
 .modalButton {
-    margin-top: 18px;
+    margin-top: 14px;
+    padding: 13px 32px;
+
     border: 0;
     border-radius: 999px;
-    padding: 12px 28px;
-    background: #d8ad4c;
-    color: #fff;
-    font-weight: 700;
+
+    background: linear-gradient(135deg, #173a63, #214c7f);
+    color: white;
+
+    font: inherit;
+    font-weight: 900;
+
     cursor: pointer;
+
+    box-shadow: 0 14px 28px rgba(23, 58, 99, 0.22);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease;
+
+    &:hover {
+        background: linear-gradient(135deg, #f3bf3d, #ffd76a);
+        color: #173a63;
+        transform: translateY(-3px);
+        box-shadow: 0 18px 36px rgba(243, 191, 61, 0.32);
+    }
+}
+
+@keyframes overlayFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    .successModal {
+        padding: 30px 22px 24px;
+        border-radius: 22px;
+
+        h3 {
+            font-size: 1.45rem;
+        }
+
+        p {
+            font-size: 0.92rem;
+            line-height: 1.65;
+        }
+    }
+
+    .iconCircle {
+        width: 52px;
+        height: 52px;
+        font-size: 1.4rem;
+    }
+
+    .modalButton {
+        width: 100%;
+        padding: 13px 24px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .modalOverlay,
+    .successModal,
+    .closeModal,
+    .modalButton {
+        animation: none;
+        transition: none;
+    }
 }

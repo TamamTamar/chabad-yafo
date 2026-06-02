@@ -7,7 +7,6 @@ import SuccessModal from "./SuccessModal/SuccessModal";
 import { ages, areas, interests } from "../../data";
 import CommunityBox from "../CommunityBox/CommunityBox";
 
-
 const SurveyForm = () => {
     const [isSuccess, setIsSuccess] = useState(false);
 
@@ -19,8 +18,12 @@ const SurveyForm = () => {
         register,
         handleSubmit,
         reset,
+        setError,
         formState: { errors, isSubmitting },
     } = useForm<FormValues>({
+        mode: "onChange",
+        reValidateMode: "onChange",
+
         defaultValues: {
             ages: [],
             interests: [],
@@ -39,53 +42,109 @@ const SurveyForm = () => {
                 top: 0,
                 behavior: "smooth",
             });
-        } catch (error) {
+        } catch (error: any) {
+            if (error?.response?.status === 409) {
+                setError("phone", {
+                    type: "server",
+                    message: "הטלפון הזה כבר רשום במערכת",
+                });
+
+                const phoneInput = document.getElementById("phone");
+
+                phoneInput?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
+                (phoneInput as HTMLInputElement)?.focus();
+
+                return;
+            }
+
             console.error("Failed to submit form:", error);
         }
     };
 
     return (
         <section className={styles.formSection} id="form">
+            {isSuccess && <SuccessModal onClose={closeModal} />}
             <div className={styles.formBox}>
-                <h2>נשמח להכיר אתכם 💛</h2>
-                <p>כמה שאלות קצרות שיעזרו לנו להבין מה משפחות ביפו באמת צריכות.</p>
-                {isSuccess && (
-                    <SuccessModal onClose={closeModal} />
-                )}
+                <h2 className={styles.formTitle}>ספרו לנו על המשפחה שלכם 💛</h2>
+
+                <p className={styles.formIntro}>
+                    כמה פרטים קצרים שיעזרו לנו לבנות פעילות מתאימה למשפחות ביפו.
+                </p>
+
+
+
                 <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-                    <label>
-                        איך קוראים לכם?
-                        <input
-                            type="text"
-                            placeholder="שם ההורה"
-                            {...register("parentName", {
-                                required: "נשמח לדעת איך קוראים לכם",
-                            })}
-                        />
-                        {errors.parentName && (
-                            <span className={styles.error}>{errors.parentName.message}</span>
-                        )}
-                    </label>
+                    <div className={styles.row}>
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel} htmlFor="parentName">
+                                איך קוראים לכם?
+                                <span className={styles.required}>(חובה)</span>
+                            </label>
 
-                    <label>
-                        איך נוכל ליצור קשר?
-                        <input
-                            type="tel"
-                            dir="ltr"
-                            inputMode="numeric"
-                            placeholder="050-1234567"
-                            {...register("phone", {
-                                required: "צריך מספר טלפון",
-                            })}
-                        />
-                        {errors.phone && (
-                            <span className={styles.error}>{errors.phone.message}</span>
-                        )}
-                    </label>
+                            <input
+                                id="parentName"
+                                className={styles.fieldInput}
+                                type="text"
+                                placeholder="שם ההורה"
+                                {...register("parentName", {
+                                    required: "נשמח לדעת איך קוראים לכם",
+                                    minLength: {
+                                        value: 2,
+                                        message: "השם קצר מדי",
+                                    },
+                                    pattern: {
+                                        value: /^[א-תA-Za-z]+(?:[\s'-][א-תA-Za-z]+)*$/,
+                                        message: "שם יכול להכיל אותיות בלבד",
+                                    },
+                                })}
+                            />
 
-                    <label>
-                        איפה אתם גרים?
+                            <span className={styles.errorText}>
+                                {errors.parentName?.message || ""}
+                            </span>
+                        </div>
+
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel} htmlFor="phone">
+                                איך נוכל ליצור קשר?
+                                <span className={styles.required}>(חובה)</span>
+                            </label>
+
+                            <input
+                                id="phone"
+                                className={styles.fieldInput}
+                                type="tel"
+                                dir="ltr"
+                                inputMode="numeric"
+                                placeholder="0501234567"
+                                {...register("phone", {
+                                    required: "צריך מספר טלפון",
+                                    pattern: {
+                                        value: /^05\d{8}$/,
+                                        message: "מספר טלפון לא תקין",
+                                    },
+                                })}
+                            />
+
+                            <span className={styles.errorText}>
+                                {errors.phone?.message || ""}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.fieldLabel} htmlFor="area">
+                            איפה אתם גרים?
+                            <span className={styles.required}>(חובה)</span>
+                        </label>
+
                         <select
+                            id="area"
+                            className={styles.fieldSelect}
                             defaultValue=""
                             {...register("area", {
                                 required: "בחרו אזור מגורים",
@@ -94,77 +153,112 @@ const SurveyForm = () => {
                             <option value="" disabled>
                                 בחרו אזור
                             </option>
+
                             {areas.map((area) => (
                                 <option key={area} value={area}>
                                     {area}
                                 </option>
                             ))}
                         </select>
-                        {errors.area && (
-                            <span className={styles.error}>{errors.area.message}</span>
-                        )}
-                    </label>
+
+                        <span className={styles.errorText}>
+                            {errors.area?.message || ""}
+                        </span>
+                    </div>
 
                     <div className={styles.group}>
-                        <h3>באיזה גילאים הילדים?</h3>
+                        <h3 className={styles.groupTitle}>
+                            באיזה גילאים הילדים?
+                            <span className={styles.optionalNote}>
+                                (ניתן לבחור יותר מאחת)
+                            </span>
+                        </h3>
 
                         <div className={styles.options}>
                             {ages.map((age) => (
                                 <label key={age} className={styles.checkbox}>
                                     <input
+                                        className={styles.checkboxInput}
                                         type="checkbox"
                                         value={age}
                                         {...register("ages", {
                                             validate: (value) =>
-                                                value.length > 0 || "בחרו לפחות קבוצת גיל אחת",
+                                                value.length > 0 ||
+                                                "בחרו לפחות קבוצת גיל אחת",
                                         })}
                                     />
-                                    {age}
+                                    <span className={styles.checkboxText}>{age}</span>
                                 </label>
                             ))}
                         </div>
 
-                        {errors.ages && (
-                            <span className={styles.error}>{errors.ages.message}</span>
-                        )}
+                        <span className={styles.errorText}>
+                            {errors.ages?.message || ""}
+                        </span>
                     </div>
 
                     <div className={styles.group}>
-                        <h3>מה הכי מעניין אתכם?</h3>
+                        <h3 className={styles.groupTitle}>
+                            איזה פעילויות מעניינות אתכם? *
+                            <span className={styles.optionalNote}>
+                                (ניתן לבחור יותר מאחת)
+                            </span>
+                        </h3>
 
                         <div className={styles.options}>
                             {interests.map((interest) => (
                                 <label key={interest} className={styles.checkbox}>
                                     <input
+                                        className={styles.checkboxInput}
                                         type="checkbox"
                                         value={interest}
                                         {...register("interests", {
                                             validate: (value) =>
-                                                value.length > 0 || "בחרו לפחות תחום עניין אחד",
+                                                value.length > 0 ||
+                                                "בחרו לפחות תחום עניין אחד",
                                         })}
                                     />
-                                    {interest}
+                                    <span className={styles.checkboxText}>{interest}</span>
                                 </label>
                             ))}
                         </div>
 
-                        {errors.interests && (
-                            <span className={styles.error}>{errors.interests.message}</span>
-                        )}
+                        <span className={styles.errorText}>
+                            {errors.interests?.message || ""}
+                        </span>
                     </div>
 
-                    <label>
-                        מה הכי חסר לכם באזור?
+                    <div className={styles.group}>
+                        <h3 className={styles.groupTitle}>מה הכי חסר לכם באזור?</h3>
+
                         <textarea
+                            className={styles.fieldTextarea}
                             placeholder="אפשר לכתוב ממש בקצרה..."
-                            {...register("missing")}
+                            {...register("missing", {
+                                maxLength: {
+                                    value: 300,
+                                    message: "עד 300 תווים",
+                                },
+                            })}
                         />
+
+                        <span className={styles.errorText}>
+                            {errors.missing?.message || ""}
+                        </span>
+                    </div>
+
+                    <label className={styles.updatesCheckbox}>
+                        <input
+                            className={styles.checkboxInput}
+                            type="checkbox"
+                            {...register("updates")}
+                        />
+                        <span>אשמח לקבל עדכונים על פעילויות ומסגרות חדשות</span>
                     </label>
 
-                    <label className={styles.checkbox}>
-                        <input type="checkbox" {...register("updates")} />
-                        אשמח לקבל עדכונים על פעילויות ומסגרות חדשות
-                    </label>
+                    <span className={styles.errorText}>
+                        {errors.root?.message || ""}
+                    </span>
 
                     <button
                         type="submit"

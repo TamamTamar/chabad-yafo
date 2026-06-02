@@ -28,8 +28,8 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+        background: lighten($brand-primary, 8%);
+        border-color: $brand-secondary;
     }
 
     &:focus-visible {
@@ -38,21 +38,12 @@
     }
 }
 
-.whatsapp {
-    background: #25d366;
-}
-
-.instagram {
-    background: radial-gradient(circle at 30% 107%,
-            #fdf497 0%,
-            #fdf497 5%,
-            #fd5949 45%,
-            #d6249f 60%,
-            #285aeb 90%);
-}
-
+.whatsapp,
+.instagram,
 .facebook {
-    background: #1877f2;
+    background: $brand-primary;
+    border: 1px solid rgba($brand-secondary, 0.5);
+    color: white;
 }
 
 /* ===== Mobile ===== */

@@ -1,20 +1,22 @@
-//family-hero.module.scss
+// FamiliesHero.module.scss
 
 @use "../../../../styles/variables" as *;
 
 .hero {
     position: relative;
-    min-height: 750px;
+    min-height: 500px;
     display: flex;
     align-items: center;
-    padding: 80px 8%;
+    padding: 60px 4%;
     overflow: hidden;
 }
 
 .bg {
     position: absolute;
     inset: 0;
-    background: url("../../../../assets/families-hero.webp") center / cover no-repeat;
+    background: url("../../../../assets/families-hero.webp") bottom / cover no-repeat;
+    animation: slowZoom 18s ease-in-out infinite alternate;
+    transform-origin: center top;
 }
 
 .overlay {
@@ -30,6 +32,7 @@
     position: relative;
     z-index: 1;
     max-width: 620px;
+    animation: heroReveal 1s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .heroTitle {
@@ -38,56 +41,128 @@
     font-size: clamp(2.8rem, 6vw, 5.8rem);
     line-height: 1.05;
     font-weight: 900;
+    animation: titlePop 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .heroDescription {
     width: fit-content;
     max-width: 560px;
-
     padding: 12px 18px;
     margin-bottom: 32px;
-
     border-radius: $radius-sm;
-
     color: $brand-text;
     font-size: 1.28rem;
     line-height: 1.85;
     font-weight: 600;
-
     background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(6px);
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+    animation: fadeUp 0.9s ease 0.25s both;
 }
 
 .heroButton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
 
     min-width: $hero-cta-min-width;
     padding: 18px 38px;
-
     border-radius: 999px;
 
-    background: linear-gradient(135deg,
-            $ui-btn-primary-bg,
-            $header-bg-bottom );
-
-    color: $ui-btn-primary-text;
+    background: linear-gradient(135deg, #f3bf3d, #ffd76a);
+    color: #173a63;
     text-decoration: none;
     font-size: 1.08rem;
     font-weight: 900;
 
-    box-shadow: 0 14px 34px rgba(104, 0, 31, 0.24);
-    transition: all 0.25s ease;
+    box-shadow:
+        0 14px 34px rgba(243, 191, 61, 0.28),
+        0 0 20px rgba(255, 215, 106, 0.18);
+
+    animation: buttonReveal 0.8s ease 0.45s both;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease,
+        color 0.3s ease;
 
     &:hover {
-        background: linear-gradient(135deg,
-                $header-bg-bottom,
-                $ui-btn-primary-bg );
+        background: linear-gradient(135deg, #173a63, #29578f);
+        color: white;
+        transform: translateY(-6px) scale(1.06);
 
-        transform: translateY(-3px);
-        box-shadow: 0 18px 42px rgba(104, 0, 31, 0.32);
+        box-shadow:
+            0 24px 60px rgba(23, 58, 99, 0.42),
+            0 0 28px rgba(41, 87, 143, 0.32);
+    }
+
+    &:hover .arrow {
+        transform: translateX(-6px);
+    }
+}
+
+.arrow {
+    display: inline-block;
+    transition: transform 0.25s ease;
+}
+
+@keyframes heroReveal {
+    from {
+        opacity: 0;
+        transform: translateY(36px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes titlePop {
+    from {
+        opacity: 0;
+        transform: translateY(34px) scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(26px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes buttonReveal {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slowZoom {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.2);
     }
 }
 
@@ -95,36 +170,41 @@
     .hero {
         min-height: 680px;
         align-items: flex-start;
-        padding: 28px 18px 32px;
+        padding: 24px 18px 32px;
     }
 
     .bg {
         background-image: url("../../../../assets/families-hero-mobile.webp");
         background-position: center top;
+        animation: none;
+        transform: none;
     }
 
     .overlay {
         background: linear-gradient(180deg,
-                rgba(255, 255, 255, 0.9) 0%,
-                rgba(255, 255, 255, 0.72) 25%,
-                rgba(255, 255, 255, 0.18) 52%,
-                rgba(249, 253, 255, 0.88) 100%);
+                rgba(255, 255, 255, 0.92) 0%,
+                rgba(255, 255, 255, 0.76) 28%,
+                rgba(255, 255, 255, 0.16) 54%,
+                rgba(249, 253, 255, 0.9) 100%);
     }
 
     .heroContent {
         width: 100%;
         max-width: 100%;
+        min-height: 550px;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        padding-top: 8px;
+        padding-top: 4px;
+        animation: fadeUp 0.65s ease both;
     }
 
     .heroTitle {
         margin: 0 0 12px;
-        font-size: clamp(2.3rem, 10vw, 3.3rem);
+        font-size: clamp(2.25rem, 10vw, 3.2rem);
         line-height: 1.02;
+        animation: fadeUp 0.6s ease both;
     }
 
     .heroDescription {
@@ -132,13 +212,12 @@
         max-width: 340px;
         margin: 0 0 16px;
         padding: 12px 14px;
-
         font-size: 0.98rem;
         line-height: 1.65;
         font-weight: 700;
-
-        background: rgba(255, 255, 255, 0.78);
+        background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(8px);
+        animation: fadeUp 0.6s ease 0.15s both;
     }
 
     .heroButton {
@@ -147,6 +226,20 @@
         min-height: 56px;
         padding: 15px 24px;
         font-size: 1rem;
-        margin-top: 270px;
+        margin-top: auto;
+        animation: fadeUp 0.6s ease 0.3s both;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .bg,
+    .heroContent,
+    .heroTitle,
+    .heroDescription,
+    .heroButton,
+    .arrow {
+        animation: none;
+        transition: none;
     }
 }

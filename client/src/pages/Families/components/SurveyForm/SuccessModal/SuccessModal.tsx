@@ -9,7 +9,10 @@ const SuccessModal = ({ onClose }: Props) => {
         <div className={styles.modalOverlay} onClick={onClose}>
             <div
                 className={styles.successModal}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(event) => event.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="success-title"
             >
                 <button
                     type="button"
@@ -20,15 +23,18 @@ const SuccessModal = ({ onClose }: Props) => {
                     ×
                 </button>
 
-                <h3>תודה 💛</h3>
+                <div className={styles.iconCircle} aria-hidden="true">
+                    💛
+                </div>
 
-                <p>
-                    אנחנו בונים משהו חדש למשפחות הצעירות של יפו —
-                    שמחבר חינוך, קהילה וערכים יהודיים באווירה נעימה ומקרבת.
-                </p>
+                <h3 id="success-title">תודה</h3>
 
-                <p>
-                    בקרוב נעדכן בפעילויות הראשונות.
+                <p>תודה שהקדשתם רגע למלא את הטופס.
+
+                    המידע יעזור לנו לבנות פעילויות, מסגרות ומפגשים שיתאימו באמת למשפחות הצעירות ביפו.</p>
+
+                <p className={styles.smallText}>
+                    נעדכן בקרוב על הפעילויות הראשונות.
                 </p>
 
                 <button
