@@ -199,7 +199,7 @@ const SurveyForm = () => {
 
                     <div className={styles.group}>
                         <h3 className={styles.groupTitle}>
-                            איזה פעילויות מעניינות אתכם? *
+                            איזה פעילויות מעניינות אתכם?
                             <span className={styles.optionalNote}>
                                 (ניתן לבחור יותר מאחת)
                             </span>
