@@ -10,13 +10,14 @@ const Home = () => {
     return (
         <div className={styles.page}>
 
-            <div className={styles.shabbatTop}>
-                <ShabbatTimesBadge variant="topbar" />
-            </div>
+         
 
             <main>
                 <Hero />
                 <FamiliesPromo />
+                <div className={styles.shabbatTop}>
+                    <ShabbatTimesBadge variant="topbar" />
+                </div>
                 <OurService />
                 <ChabadHousesCards cards={chabadCards} />
             </main>
