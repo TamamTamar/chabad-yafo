@@ -62,26 +62,26 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
     : "זמני שבת וחג ביפו";
 
   return (
-    <section className={cls} dir="rtl" aria-label="זמני שבת ביפו">
+    <div className={cls} dir="rtl" aria-label="זמני שבת ביפו">
       <div className={styles.content}>
-        <h2 className={styles.title}>{titleText}</h2>
-        <span className={styles.date}>{dateLine}</span>
+        <div className={styles.title}>{titleText}</div>
+        <div className={styles.date}>{dateLine}</div>
       </div>
 
       <div className={styles.timesBox}>
-        <div>
-          <span>כניסה</span>
-          <strong>{data.candles}</strong>
+        <div className={styles.timeItem}>
+          <div className={styles.timeLabel}>כניסה</div>
+          <div className={styles.timeValue}>{data.candles}</div>
         </div>
 
         <div className={styles.divider} />
 
-        <div>
-          <span>יציאה</span>
-          <strong>{data.havdalah}</strong>
+        <div className={styles.timeItem}>
+          <div className={styles.timeLabel}>יציאה</div>
+          <div className={styles.timeValue}>{data.havdalah}</div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
