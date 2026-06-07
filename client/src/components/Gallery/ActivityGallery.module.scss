@@ -1,0 +1,145 @@
+@use "../../styles/variables" as *;
+
+.section {
+    padding: 8px 0 36px;
+}
+
+.inner {
+    max-width: $max-width;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.eyebrow {
+    color: $brand-secondary;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.title {
+    margin-top: 6px;
+    color: $brand-primary;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.description {
+    max-width: 560px;
+    margin: 10px auto 0;
+    color: rgba($brand-text, 0.72);
+    line-height: 1.7;
+}
+
+.sliderWrapper {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.swiper {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 2px 16px;
+}
+
+.sideArrow {
+    flex-shrink: 0;
+
+    width: 46px;
+    height: 46px;
+
+    border: 1px solid rgba($brand-secondary, 0.35);
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.96);
+    color: $brand-primary;
+
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    box-shadow: 0 8px 20px rgba(20, 60, 95, 0.12);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+    &:hover {
+        transform: scale(1.05);
+        background: white;
+        box-shadow: 0 12px 26px rgba(20, 60, 95, 0.16);
+    }
+}
+
+.card {
+    overflow: hidden;
+    height: 230px;
+    border-radius: 24px;
+    background: white;
+    border: 1px solid rgba($brand-secondary, 0.28);
+    box-shadow: 0 10px 24px rgba(20, 60, 95, 0.08);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 34px rgba(20, 60, 95, 0.12);
+    }
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+@media (max-width: 1024px) {
+    .card {
+        height: 210px;
+    }
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 0 0 28px;
+    }
+
+    .header {
+        margin-bottom: 16px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+
+    .description {
+        padding: 0 16px;
+        font-size: 15px;
+    }
+
+    .sliderWrapper {
+        display: block;
+    }
+
+    .sideArrow {
+        display: none;
+    }
+
+    .card {
+        height: 180px;
+        border-radius: 18px;
+    }
+}

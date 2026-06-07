@@ -9,7 +9,6 @@ import holiday5 from "../assets/gallery/holidays/h5.jpg";
 import holiday6 from "../assets/gallery/holidays/h6.jpg";
 import holiday7 from "../assets/gallery/holidays/h7.jpg";
 import holiday8 from "../assets/gallery/holidays/h8.jpg";
-import holiday9 from "../assets/gallery/holidays/h9.jpg";
 import holiday10 from "../assets/gallery/holidays/h10.jpg";
 import holiday11 from "../assets/gallery/holidays/h11.jpg";
 import holiday12 from "../assets/gallery/holidays/h12.jpg";
@@ -61,20 +60,11 @@ import light8 from "../assets/gallery/light/l8.jpg";
 import light9 from "../assets/gallery/light/l9.jpg";
 import light10 from "../assets/gallery/light/l10.jpg";
 import light11 from "../assets/gallery/light/l11.jpg";
-import light12 from "../assets/gallery/light/l12.jpg";
-import light13 from "../assets/gallery/light/l13.jpg";
-import light14 from "../assets/gallery/light/l14.jpg";
-import light15 from "../assets/gallery/light/l15.jpg";
-import light16 from "../assets/gallery/light/l16.jpg";
-import light17 from "../assets/gallery/light/l17.jpg";
 import light18 from "../assets/gallery/light/l18.jpg";
 import light19 from "../assets/gallery/light/l19.jpg";
 import light20 from "../assets/gallery/light/l20.jpg";
-import light21 from "../assets/gallery/light/l21.jpg";
 import light22 from "../assets/gallery/light/l22.jpg";
 import light23 from "../assets/gallery/light/l23.jpg";
-import light24 from "../assets/gallery/light/l24.jpg";
-import light25 from "../assets/gallery/light/l25.jpg";
 import light26 from "../assets/gallery/light/l26.jpg";
 import light27 from "../assets/gallery/light/l27.jpg";
 
@@ -106,7 +96,7 @@ export const galleryItems: GalleryItem[] = [
   {
     id: "holidays",
     title: "החגים שחיים כל השנה",
-    images: [holiday1, holiday2, holiday3, holiday4, holiday5, holiday6, holiday7, holiday8, holiday9, holiday10, holiday11, holiday12, holiday13, holiday14, holiday15, holiday16, holiday17, holiday18, holiday19],
+    images: [holiday1, holiday2, holiday3, holiday4, holiday5, holiday6, holiday7, holiday8, holiday10, holiday11, holiday12, holiday13, holiday14, holiday15, holiday16, holiday17, holiday18, holiday19],
   },
   {
     id: "community",
@@ -118,15 +108,18 @@ export const galleryItems: GalleryItem[] = [
     title: "נוכחות שמרגישים ברחוב",
     images: [street1, street2, street3, street4, street5, street6, street7, street8, street9, street10, street11, street12, street13, street14, street15, street16, street17, street18],
   },
-    {id: "light",
+  {
+    id: "light",
     title: "אור יהודי בלב יפו",
-    images: [light1, light2, light3, light4, light5, light6, light7, light8, light9, light10, light11, light12, light13, light14, light15, light16, light17, light18, light19, light20, light21, light22, light23, light24, light25, light26, light27],
+    images: [light1, light2, light3, light4, light5, light6, light7, light8, light9, light10, light11, light18, light19, light20, light22, light23, light26, light27],
   },
-    {id: "partnerships",
+  {
+    id: "partnerships",
     title: "שותפות שבונה עתיד",
     images: [partnership1, partnership2, partnership3],
   },
-    {id: "support",
+  {
+    id: "support",
     title: "ליווי אישי ברגעים החשובים",
     images: [support1, support2, support3, support4, support5, support6, support7, support8],
   },

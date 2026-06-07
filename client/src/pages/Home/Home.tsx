@@ -1,4 +1,6 @@
+
 import ChabadHousesCards from "../../components/ChabadHousesCards/ChabadHousesCards";
+import ActivityGallery from "../../components/Gallery/ActivityGallery";
 import Hero from "../../components/Hero/Hero";
 import OurService from "../../components/OurService/OurService";
 import ShabbatTimesBadge from "../../components/ShabbatTimesBadge/ShabbatTimesBadge";
@@ -11,11 +13,10 @@ const Home = () => {
         <div className={styles.page}>
             <main>
                 <Hero />
-
                 <div className={styles.shabbatWrapper}>
                     <ShabbatTimesBadge variant="card" />
                 </div>
-
+                <ActivityGallery />
                 <FamiliesPromo />
                 <OurService />
                 <ChabadHousesCards cards={chabadCards} />

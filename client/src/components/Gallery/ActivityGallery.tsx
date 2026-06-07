@@ -1,0 +1,97 @@
+import { useMemo, useRef } from "react";
+import type { Swiper as SwiperType } from "swiper";
+import { Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import "swiper/css";
+
+import { homepageGalleryImages } from "../../data/homepageGalleryData";
+
+import styles from "./ActivityGallery.module.scss";
+
+const ActivityGallery = () => {
+    const swiperRef = useRef<SwiperType | null>(null);
+
+    const randomImages = useMemo(() => {
+        return [...homepageGalleryImages].sort(() => Math.random() - 0.5);
+    }, []);
+
+    return (
+        <div className={styles.section}>
+            <div className={styles.inner}>
+                <div className={styles.header}>
+                    <div className={styles.eyebrow}>מהשטח</div>
+
+                    <div className={styles.title}>בית חב״ד יפו בפעילות</div>
+
+                    <div className={styles.description}>
+                        רגעים של קהילה, חגים, חסד ושליחות לאורך השנה.
+                    </div>
+                </div>
+
+                <div className={styles.sliderWrapper}>
+                    <button
+                        type="button"
+                        className={styles.sideArrow}
+                        onClick={() => swiperRef.current?.slidePrev()}
+                        aria-label="תמונה קודמת"
+                    >
+                        ‹
+                    </button>
+
+                    <Swiper
+                        modules={[Autoplay]}
+                        loop
+                        autoplay={{
+                            delay: 2500,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        }}
+                        speed={800}
+                        spaceBetween={20}
+                        slidesPerView={1}
+                        breakpoints={{
+                            640: {
+                                slidesPerView: 2,
+                            },
+                            1024: {
+                                slidesPerView: 3,
+                            },
+                        }}
+                        onSwiper={(swiper) => {
+                            swiperRef.current = swiper;
+                        }}
+                        className={styles.swiper}
+                    >
+                        {randomImages.map((image, index) => (
+                            <SwiperSlide key={index}>
+                                <div className={styles.card}>
+                                    <img
+                                        src={image}
+                                        alt=""
+                                        className={styles.image}
+                                        loading="lazy"
+                                        onError={() => {
+                                            console.log("Broken image:", image);
+                                        }}
+                                    />
+                                </div>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+
+                    <button
+                        type="button"
+                        className={styles.sideArrow}
+                        onClick={() => swiperRef.current?.slideNext()}
+                        aria-label="תמונה הבאה"
+                    >
+                        ›
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ActivityGallery;
