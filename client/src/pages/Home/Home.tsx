@@ -9,15 +9,14 @@ import styles from "./Home.module.scss";
 const Home = () => {
     return (
         <div className={styles.page}>
-
-         
-
             <main>
                 <Hero />
-                <FamiliesPromo />
-                <div className={styles.shabbatTop}>
-                    <ShabbatTimesBadge variant="topbar" />
+
+                <div className={styles.shabbatWrapper}>
+                    <ShabbatTimesBadge variant="card" />
                 </div>
+
+                <FamiliesPromo />
                 <OurService />
                 <ChabadHousesCards cards={chabadCards} />
             </main>

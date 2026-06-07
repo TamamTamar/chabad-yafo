@@ -1,51 +1,112 @@
 @use "../../styles/variables" as *;
 
 .wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  text-align: center;
+  direction: rtl;
   width: 100%;
-  border-radius: $radius-sm;
   color: $brand-text;
 }
 
 /* ===== VARIANTS ===== */
 
+.card {
+  position: relative;
+  padding: 14px 24px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba($brand-secondary, 0.45);
+  border-top: 3px solid $brand-secondary;
+  box-shadow: 0 12px 28px rgba(20, 60, 95, 0.1);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+
+  @media (max-width: 700px) {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding: 16px;
+  }
+}
+
 .topbar {
   padding: 10px 14px;
+  border-radius: $radius-sm;
   background: rgba($brand-secondary, 0.18);
   border: 1px solid rgba($brand-secondary, 0.4);
+  text-align: center;
 }
 
-.card {
-  padding: 16px;
-  background: #fff;
-  border: 1px solid rgba($brand-primary, 0.15);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-}
+/* ===== CONTENT ===== */
 
-/* ===== TEXT ===== */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
 .title {
-  font-weight: 700;
+  margin: 0;
   font-size: 16px;
+  font-weight: 700;
   color: $brand-primary;
-}
-
-.times {
-  font-size: 15px;
-  font-weight: 500;
 }
 
 .date {
   font-size: 13px;
-  opacity: 0.75;
+  color: rgba($brand-text, 0.6);
+}
+
+/* ===== TIMES ===== */
+
+.timesBox {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-inline-start: 22px;
+  border-inline-start: 1px solid rgba($brand-primary, 0.14);
+
+  >div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba($brand-text, 0.55);
+  }
+
+  strong {
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 850;
+    color: $brand-primary;
+  }
+
+  @media (max-width: 700px) {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 30px;
+  background: rgba($brand-primary, 0.14);
 }
 
 /* ===== STATES ===== */
+
+.loading,
+.error {
+  display: block;
+  text-align: center;
+  padding: 12px;
+}
 
 .loading {
   opacity: 0.75;
@@ -53,5 +114,5 @@
 
 .error {
   color: #b00020;
-  font-weight: 600;
+  font-weight: 700;
 }

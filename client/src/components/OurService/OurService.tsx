@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./OurService.module.scss";
 
 import babyIcon from "../../assets/services/baby.png";
@@ -15,7 +14,7 @@ type ServiceItem = {
   icon: string;
 };
 
-type Props = {
+type OurServiceProps = {
   title?: string;
   items?: ServiceItem[];
 };
@@ -25,6 +24,7 @@ const PHONE = "972537700339";
 const buildWhatsAppLink = (message: string) => {
   const cleanPhone = PHONE.replace(/[^\d]/g, "");
   const text = encodeURIComponent(message);
+
   return `https://wa.me/${cleanPhone}?text=${text}`;
 };
 
@@ -32,45 +32,45 @@ const DEFAULT_ITEMS: ServiceItem[] = [
   {
     id: "judaica",
     title: "חנות יודאיקה",
-    message: "שלום! אשמח לקבל פרטים על חנות היודאיקה (מלאי/מחירים/שעות). תודה 🙏",
+    message: "שלום! אשמח לקבל פרטים על חנות היודאיקה. תודה",
     icon: menoraIcon,
   },
   {
     id: "mothers",
     title: "תמיכה ביולדות",
-    message: "שלום! אשמח לשמוע על תמיכה ביולדות (מה כולל, זמינות, איך מתאמים). תודה 🙏",
+    message: "שלום! אשמח לשמוע על תמיכה ביולדות. תודה",
     icon: babyIcon,
   },
   {
     id: "home-store",
     title: "חנות הבית",
-    message: "שלום! אשמח לקבל פרטים על חנות הבית (מה ניתן להזמין ואיך). תודה 🙏",
+    message: "שלום! אשמח לקבל פרטים על חנות הבית. תודה",
     icon: homeIcon,
   },
   {
     id: "tefillin-mezuzot",
     title: "תפילין ומזוזות",
-    message: "שלום! אשמח לתאם בדיקה/רכישה של תפילין ומזוזות. אפשר פרטים? תודה 🙏",
+    message: "שלום! אשמח לתאם בדיקה או רכישה של תפילין ומזוזות. תודה",
     icon: mezuzahIcon,
   },
   {
     id: "kosher-kitchen",
     title: "הכשרת מטבח",
-    message: "שלום! אשמח לקבל פרטים לגבי הכשרת מטבח (תהליך, עלות, זמינות). תודה 🙏",
+    message: "שלום! אשמח לקבל פרטים לגבי הכשרת מטבח. תודה",
     icon: kashrutIcon,
   },
   {
     id: "bar-mitzvah",
     title: "הכנה לבר מצווה",
-    message: "שלום! אשמח לקבל פרטים על הכנה לבר מצווה (לימוד, תפילין, עלייה לתורה). תודה 🙏",
+    message: "שלום! אשמח לקבל פרטים על הכנה לבר מצווה. תודה",
     icon: barIcon,
   },
 ];
 
-const OurService: React.FC<Props> = ({
-  title = "איך אנחנו יכולים לעזור לך",
+const OurService = ({
+  title = "איך אפשר לעזור?",
   items = DEFAULT_ITEMS,
-}) => {
+}: OurServiceProps) => {
   return (
     <section className={styles.section} aria-label={title}>
       <div className={`container ${styles.inner}`}>

@@ -17,11 +17,12 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
     const run = async () => {
       try {
         const res = await fetchShabbatTimes();
-
         if (mounted) setData(res);
       } catch (e: unknown) {
         console.error("Shabbat times error:", e);
-        const message = e instanceof Error ? e.message : "שגיאה בטעינת זמני שבת";
+        const message =
+          e instanceof Error ? e.message : "שגיאה בטעינת זמני שבת";
+
         if (mounted) setError(message);
       }
     };
@@ -61,16 +62,26 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
     : "זמני שבת וחג ביפו";
 
   return (
-    <div className={cls} dir="rtl" aria-label="זמני שבת ביפו">
-      <span className={styles.title}>{titleText}</span>
+    <section className={cls} dir="rtl" aria-label="זמני שבת ביפו">
+      <div className={styles.content}>
+        <h2 className={styles.title}>{titleText}</h2>
+        <span className={styles.date}>{dateLine}</span>
+      </div>
 
-      <span className={styles.times}>
-        כניסה <strong>{data.candles}</strong> · יציאה{" "}
-        <strong>{data.havdalah}</strong>
-      </span>
+      <div className={styles.timesBox}>
+        <div>
+          <span>כניסה</span>
+          <strong>{data.candles}</strong>
+        </div>
 
-      <span className={styles.date}>{dateLine}</span>
-    </div>
+        <div className={styles.divider} />
+
+        <div>
+          <span>יציאה</span>
+          <strong>{data.havdalah}</strong>
+        </div>
+      </div>
+    </section>
   );
 };
 

@@ -1,8 +1,9 @@
-
-
 @use "../../styles/variables" as *;
 
-/* ===== Section ===== */
+/* =========================
+   Section
+========================= */
+
 .section {
   padding: 20px 0;
 }
@@ -12,7 +13,10 @@
   margin: 0 auto;
 }
 
-/* ===== Title ===== */
+/* =========================
+   Title
+========================= */
+
 .header {
   display: flex;
   justify-content: center;
@@ -20,11 +24,12 @@
 }
 
 .title {
-  font-weight: 800;
-  font-size: 24px;
-  color: $brand-primary;
   position: relative;
   padding: 0 14px;
+
+  color: $brand-primary;
+  font-size: 24px;
+  font-weight: 800;
   text-align: center;
 
   @media (min-width: 720px) {
@@ -38,8 +43,9 @@
     position: absolute;
     top: 58%;
     width: 48px;
-    height: 1px;
-    background: $ui-border-strong;
+    height: 2px;
+    border-radius: 999px;
+    background: rgba(31, 78, 121, 0.12);
 
     @media (min-width: 720px) {
       width: 70px;
@@ -55,10 +61,14 @@
   }
 }
 
+/* =========================
+   Grid
+========================= */
+
 .grid {
   display: grid;
-  gap: 16px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 
   @media (min-width: 720px) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -70,57 +80,116 @@
   }
 }
 
+/* =========================
+   Card
+========================= */
+
 .card {
-  background: $brand-bg;
-  border: 1px solid $ui-border-soft;
-  border-radius: $radius;
-  padding: 18px 14px;
-  box-shadow: 0 10px 24px $ui-shadow-card;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  gap: 10px;
 
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px $ui-shadow-card-hover;
-    border-color: $brand-secondary; // זהב עדין בהובר
-  }
+  padding: 14px 14px;
 
-  &:focus-visible {
-    outline: 3px solid rgba(31, 78, 121, 0.25);
-    outline-offset: 4px;
+  background: $brand-bg;
+  border: 1px solid $ui-border-soft;
+  border-radius: $radius;
+
+  text-decoration: none;
+  color: inherit;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease,
+    border-color 250ms ease;
+
+&:hover {
+    transform: translateY(-4px);
+    border-color: rgba(230, 201, 139, 0.75);
+
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.12),
+      0 0 0 1px rgba(230, 201, 139, 0.18);
   }
 
   &:hover .circle {
-    transform: translateY(-2px);
     border-color: $brand-secondary;
+    transform: translateY(-2px);
+  }
+
+  &:hover .icon {
+    transform: scale(1.08);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(31, 78, 121, 0.22);
+    outline-offset: 4px;
   }
 }
+
+
+/* =========================
+   Icon Circle
+========================= */
 
 .circle {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid $brand-secondary; // מסגרת זהב עדינה
+
   display: grid;
   place-items: center;
-  transition: transform 180ms ease, border-color 180ms ease;
+
+  background: #fff;
+  border: 2px solid $brand-secondary;
+  border-radius: 50%;
+
+  transition:
+    transform 250ms ease,
+    border-color 250ms ease;
 }
 
 .icon {
-  width: 60%;
-  height: 60%;
+  width: 66%;
+  height: 66%;
+
   object-fit: contain;
   display: block;
+
+  transition: transform 250ms ease;
 }
 
+/* =========================
+   Label
+========================= */
+
 .label {
+  color: $brand-text;
+
   font-size: 15px;
   font-weight: 600;
-  color: $brand-text;
+  line-height: 1.25;
+
   text-align: center;
-  line-height: 1.2;
+}
+
+/* =========================
+   Reduced Motion
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+  .circle,
+  .icon {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:hover .circle,
+  .card:hover .icon {
+    transform: none;
+  }
 }
