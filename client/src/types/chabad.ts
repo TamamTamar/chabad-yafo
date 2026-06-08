@@ -29,3 +29,9 @@ export type ShabbatTimes = {
   hebrewDate: string;     // בעברית
   gregorianDate: string;  // 27.02.2026
 };
+export type GalleryItem = {
+  id: string;
+  title: string;
+  coverImage: string;
+  images: string[];
+};

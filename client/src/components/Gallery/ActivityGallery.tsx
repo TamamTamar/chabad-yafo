@@ -1,4 +1,5 @@
 import { useMemo, useRef } from "react";
+import { Link } from "react-router-dom";
 import type { Swiper as SwiperType } from "swiper";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -68,12 +69,9 @@ const ActivityGallery = () => {
                                 <div className={styles.card}>
                                     <img
                                         src={image}
-                                        alt=""
+                                        alt="פעילות בית חב״ד יפו"
                                         className={styles.image}
                                         loading="lazy"
-                                        onError={() => {
-                                            console.log("Broken image:", image);
-                                        }}
                                     />
                                 </div>
                             </SwiperSlide>
@@ -88,6 +86,12 @@ const ActivityGallery = () => {
                     >
                         ›
                     </button>
+                </div>
+
+                <div className={styles.footer}>
+                    <Link to="/gallery" className={styles.galleryLink}>
+                        צפו בעוד רגעים מהשטח
+                    </Link>
                 </div>
             </div>
         </div>

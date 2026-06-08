@@ -8,6 +8,8 @@ import Families from "../pages/Families/Families";
 import AdminFamilies from "../pages/AdminFamilies/AdminFamilies";
 import AdminLogin from "../pages/AdminLogin/AdminLogin";
 import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRouteAdmin";
+import GalleryPage from "../pages/Gallery/GalleryPage";
+import GalleryCategoryPage from "../pages/Gallery/GalleryCategoryPage";
 
 export const router = createBrowserRouter([
     {
@@ -30,7 +32,15 @@ export const router = createBrowserRouter([
                 ),
             },
             {
-                path:"admin/login", element:< AdminLogin />
+                path: "admin/login", element: < AdminLogin />
+            },
+            {
+                path: "gallery",
+                element: <GalleryPage />,
+            },
+            {
+                path: "gallery/:categoryId",
+                element: <GalleryCategoryPage />,
             },
         ],
     },

@@ -9,6 +9,7 @@ import holiday5 from "../assets/gallery/holidays/h5.jpg";
 import holiday6 from "../assets/gallery/holidays/h6.jpg";
 import holiday7 from "../assets/gallery/holidays/h7.jpg";
 import holiday8 from "../assets/gallery/holidays/h8.jpg";
+import holiday9 from "../assets/gallery/holidays/h9.jpg";
 import holiday10 from "../assets/gallery/holidays/h10.jpg";
 import holiday11 from "../assets/gallery/holidays/h11.jpg";
 import holiday12 from "../assets/gallery/holidays/h12.jpg";
@@ -17,8 +18,7 @@ import holiday14 from "../assets/gallery/holidays/h14.jpg";
 import holiday15 from "../assets/gallery/holidays/h15.jpg";
 import holiday16 from "../assets/gallery/holidays/h16.jpg";
 import holiday17 from "../assets/gallery/holidays/h17.jpg";
-import holiday18 from "../assets/gallery/holidays/h18.jpg";
-import holiday19 from "../assets/gallery/holidays/h19.jpg";
+
 
 // === Community 1-5 ===
 import community1 from "../assets/gallery/community/c1.jpg";
@@ -27,7 +27,7 @@ import community3 from "../assets/gallery/community/c3.jpg";
 import community4 from "../assets/gallery/community/c4.jpg";
 import community5 from "../assets/gallery/community/c5.jpg";
 
-// === Street 1-18 ===
+// === Street 1-17 ===
 import street1 from "../assets/gallery/street/s1.jpg";
 import street2 from "../assets/gallery/street/s2.jpg";
 import street3 from "../assets/gallery/street/s3.jpg";
@@ -45,9 +45,10 @@ import street14 from "../assets/gallery/street/s14.jpg";
 import street15 from "../assets/gallery/street/s15.jpg";
 import street16 from "../assets/gallery/street/s16.jpg";
 import street17 from "../assets/gallery/street/s17.jpg";
-import street18 from "../assets/gallery/street/s18.jpg";
 
-// === light 1-28 ===
+
+
+// === light 1-27 ===
 
 import light1 from "../assets/gallery/light/l1.jpg";
 import light2 from "../assets/gallery/light/l2.jpg";
@@ -60,13 +61,26 @@ import light8 from "../assets/gallery/light/l8.jpg";
 import light9 from "../assets/gallery/light/l9.jpg";
 import light10 from "../assets/gallery/light/l10.jpg";
 import light11 from "../assets/gallery/light/l11.jpg";
+import light12 from "../assets/gallery/light/l12.jpg";
+import light13 from "../assets/gallery/light/l18.jpg";
+import light14 from "../assets/gallery/light/l14.jpg";
+import light15 from "../assets/gallery/light/l15.jpg";
+import light16 from "../assets/gallery/light/l16.jpg";
+import light17 from "../assets/gallery/light/l17.jpg";
 import light18 from "../assets/gallery/light/l18.jpg";
 import light19 from "../assets/gallery/light/l19.jpg";
 import light20 from "../assets/gallery/light/l20.jpg";
+import light21 from "../assets/gallery/light/l21.jpg";
 import light22 from "../assets/gallery/light/l22.jpg";
 import light23 from "../assets/gallery/light/l23.jpg";
+import light24 from "../assets/gallery/light/l24.jpg";
+import light25 from "../assets/gallery/light/l25.jpg";
 import light26 from "../assets/gallery/light/l26.jpg";
-import light27 from "../assets/gallery/light/l27.jpg";
+
+
+
+
+
 
 
 // === partnerships 1-3 ===
@@ -84,43 +98,46 @@ import support5 from "../assets/gallery/support/su5.jpg";
 import support6 from "../assets/gallery/support/su6.jpg";
 import support7 from "../assets/gallery/support/su7.jpg";
 import support8 from "../assets/gallery/support/su8.jpg";
+import type { GalleryItem } from "../types/chabad";
 
 
-export type GalleryItem = {
-  id: string;
-  title: string;
-  images: string[];
-};
+
 
 export const galleryItems: GalleryItem[] = [
   {
     id: "holidays",
-    title: "החגים שחיים כל השנה",
-    images: [holiday1, holiday2, holiday3, holiday4, holiday5, holiday6, holiday7, holiday8, holiday10, holiday11, holiday12, holiday13, holiday14, holiday15, holiday16, holiday17, holiday18, holiday19],
+    coverImage: holiday11,
+    title: "חגים ומועדים",
+    images: [holiday1, holiday2, holiday3, holiday4, holiday5, holiday6, holiday7, holiday8, holiday9, holiday10, holiday11, holiday12, holiday13, holiday14, holiday15, holiday16, holiday17],
   },
   {
     id: "community",
-    title: "קהילה נפגשת – פנים אל פנים",
+    coverImage: community1,
+    title: "קהילה וחיבורים",
     images: [community1, community2, community3, community4, community5],
   },
   {
     id: "street",
-    title: "נוכחות שמרגישים ברחוב",
-    images: [street1, street2, street3, street4, street5, street6, street7, street8, street9, street10, street11, street12, street13, street14, street15, street16, street17, street18],
+    coverImage: street4,
+    title: "פעילות ברחבי יפו",
+    images: [street1, street2, street3, street4, street5, street6, street7, street8, street9, street10, street11, street12, street13, street14, street15, street16, street17],
   },
   {
     id: "light",
-    title: "אור יהודי בלב יפו",
-    images: [light1, light2, light3, light4, light5, light6, light7, light8, light9, light10, light11, light18, light19, light20, light22, light23, light26, light27],
+    coverImage: light18,
+    title: "תפילין ומבצעים",
+    images: [light1, light2, light3, light4, light5, light6, light7, light8, light9, light10, light11, light12,light13, light14, light15, light16, light17, light18, light19, light20,light21, light22, light23, light24, light25, light26],
   },
   {
     id: "partnerships",
-    title: "שותפות שבונה עתיד",
+    coverImage: partnership2,
+    title: "שותפים לדרך",
     images: [partnership1, partnership2, partnership3],
   },
   {
     id: "support",
-    title: "ליווי אישי ברגעים החשובים",
+    coverImage: support3,
+    title: "ליווי אישי",
     images: [support1, support2, support3, support4, support5, support6, support7, support8],
   },
 ];
