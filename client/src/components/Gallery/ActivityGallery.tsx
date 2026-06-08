@@ -90,7 +90,7 @@ const ActivityGallery = () => {
 
                 <div className={styles.footer}>
                     <Link to="/gallery" className={styles.galleryLink}>
-                        צפו בעוד רגעים מהשטח
+                        עוד רגעים של עשייה
                     </Link>
                 </div>
             </div>
