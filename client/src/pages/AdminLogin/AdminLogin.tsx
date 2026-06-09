@@ -24,14 +24,17 @@ const AdminLogin = () => {
 
     return (
         <main className={styles.page}>
-            <div className={styles.card}>
-                <h1>מערכת ניהול</h1>
+            <section className={styles.card}>
+                <h1 className={styles.title}>
+                    מערכת ניהול
+                </h1>
 
-                <p>
+                <p className={styles.description}>
                     הזדהות מנהל מערכת
                 </p>
 
                 <input
+                    className={styles.input}
                     type="password"
                     placeholder="הקלד סיסמה"
                     value={password}
@@ -49,10 +52,13 @@ const AdminLogin = () => {
                     </span>
                 )}
 
-                <button onClick={handleLogin}>
+                <button
+                    className={styles.button}
+                    onClick={handleLogin}
+                >
                     כניסה למערכת
                 </button>
-            </div>
+            </section>
         </main>
     );
 };

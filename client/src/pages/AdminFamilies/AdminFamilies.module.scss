@@ -1,36 +1,43 @@
 @use "../../styles/variables" as *;
 
 .page {
-    padding: 48px 24px 80px;
-    background: $body-bg;
     min-height: 100vh;
+    padding: 48px 24px 80px;
+
     direction: rtl;
+
+    background: $body-bg;
 }
 
 .header {
-    max-width: $max-width;
-    margin: 0 auto 28px;
+    margin-bottom: 28px;
+}
 
-    h1 {
-        margin: 0 0 8px;
-        color: $brand-primary;
-        font-size: 2rem;
-    }
+.title {
+    margin: 0 0 8px;
 
-    p {
-        margin: 0;
-        color: $ui-text-muted;
-    }
+    color: $brand-primary;
+
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.description {
+    margin: 0;
+
+    color: $ui-text-muted;
+    line-height: 1.7;
 }
 
 .card {
-    max-width: $max-width;
-    margin: 0 auto;
-    background: $brand-bg;
+    overflow: hidden;
+
     border: 1px solid $ui-border-soft;
     border-radius: $radius;
+
+    background: $brand-bg;
+
     box-shadow: 0 16px 40px $ui-shadow-card;
-    overflow: hidden;
 }
 
 .tableWrapper {
@@ -40,32 +47,37 @@
 
 .table {
     width: 100%;
-    border-collapse: collapse;
     min-width: 980px;
 
-    th,
-    td {
-        padding: 16px 18px;
-        text-align: right;
-        border-bottom: 1px solid $ui-border-soft;
-        vertical-align: top;
-    }
+    border-collapse: collapse;
+}
 
-    th {
-        background: rgba($brand-primary, 0.06);
-        color: $brand-primary;
-        font-weight: 800;
-        white-space: nowrap;
-    }
+.table th,
+.table td {
+    padding: 16px 18px;
 
-    td {
-        color: $brand-text;
-        line-height: 1.6;
-    }
+    text-align: right;
+    vertical-align: top;
 
-    tr:hover td {
-        background: rgba($brand-primary, 0.025);
-    }
+    border-bottom: 1px solid $ui-border-soft;
+}
+
+.table th {
+    white-space: nowrap;
+
+    background: rgba($brand-primary, 0.06);
+
+    color: $brand-primary;
+    font-weight: 800;
+}
+
+.table td {
+    color: $brand-text;
+    line-height: 1.6;
+}
+
+.table tr:hover td {
+    background: rgba($brand-primary, 0.025);
 }
 
 .phone {
@@ -81,12 +93,17 @@
 }
 
 .tag {
-    background: rgba($brand-primary, 0.08);
-    color: $brand-primary;
-    border-radius: 999px;
     padding: 4px 10px;
+
+    border-radius: 999px;
+
+    background: rgba($brand-primary, 0.08);
+
+    color: $brand-primary;
+
     font-size: 0.85rem;
     font-weight: 700;
+
     white-space: nowrap;
 }
 
@@ -101,7 +118,9 @@
 
 .empty {
     padding: 40px;
+
     text-align: center;
+
     color: $ui-text-muted;
 }
 
@@ -110,10 +129,8 @@
         padding: 32px 16px 64px;
     }
 
-    .header {
-        h1 {
-            font-size: 1.6rem;
-        }
+    .title {
+        font-size: 1.6rem;
     }
 
     .card {
@@ -122,11 +139,11 @@
 
     .table {
         min-width: 860px;
+    }
 
-        th,
-        td {
-            padding: 13px 14px;
-            font-size: 0.92rem;
-        }
+    .table th,
+    .table td {
+        padding: 13px 14px;
+        font-size: 0.92rem;
     }
 }

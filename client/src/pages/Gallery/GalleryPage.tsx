@@ -1,26 +1,25 @@
 import { Link } from "react-router-dom";
 
+import Container from "../../components/Container/Container";
 import { galleryItems } from "../../data/galleryData";
 
 import styles from "./GalleryPage.module.scss";
-import Container from "../../components/Container/Container";
 
 const GalleryPage = () => {
-
     return (
-        <div className={styles.page}>
+        <main className={styles.page}>
             <Container>
-                <div className={styles.header}>
+                <header className={styles.header}>
                     <div className={styles.eyebrow}>גלריה</div>
 
-                    <div className={styles.title}>רגעים מהפעילות שלנו</div>
+                    <h1 className={styles.title}>רגעים מהפעילות שלנו</h1>
 
-                    <div className={styles.description}>
+                    <p className={styles.description}>
                         בחרו קטגוריה וצפו ברגעים מהחגים, הקהילה, הפעילות ברחבי יפו והשליחות שלנו.
-                    </div>
-                </div>
+                    </p>
+                </header>
 
-                <div className={styles.categories}>
+                <section className={styles.categories} aria-label="קטגוריות גלריה">
                     {galleryItems.map((item) => (
                         <Link
                             key={item.id}
@@ -40,17 +39,15 @@ const GalleryPage = () => {
                             </div>
 
                             <div className={styles.categoryContent}>
-                                <div className={styles.categoryTitle}>
+                                <h2 className={styles.categoryTitle}>
                                     {item.title}
-                                </div>
+                                </h2>
                             </div>
                         </Link>
                     ))}
-                </div>
-
-               
+                </section>
             </Container>
-        </div>
+        </main>
     );
 };
 

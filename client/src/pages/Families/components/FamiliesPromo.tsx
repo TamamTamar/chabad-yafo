@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
+
 import styles from "./FamiliesPromo.module.scss";
 
 const FamiliesPromo = () => {
     return (
         <section className={styles.section}>
-            <div className={styles.overlay} />
+            <div className={styles.overlay} aria-hidden="true" />
 
             <div className={styles.content}>
-           
-                <h2>
+                <h2 className={styles.title}>
                     משפחות צעירות ביפו?
                 </h2>
 
-                <p>
+                <p className={styles.description}>
                     בית חב״ד יפו מקדם פעילויות, חוגים ומסגרות חינוך לילדים.
                     נשמח להכיר את המשפחה שלכם ולבנות יחד קהילה משפחתית חמה ביפו.
                 </p>
@@ -21,7 +21,7 @@ const FamiliesPromo = () => {
                     to="/families"
                     className={styles.button}
                 >
-                    ספרו לנו על המשפחה שלכם 
+                    ספרו לנו על המשפחה שלכם
                 </Link>
             </div>
         </section>

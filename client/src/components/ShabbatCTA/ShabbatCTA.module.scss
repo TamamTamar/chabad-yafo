@@ -15,14 +15,16 @@
     box-shadow: 0 18px 60px $ui-shadow-card;
 }
 
-.box h2 {
-    margin: 0 0 12px;
+.title {
+    margin-bottom: 12px;
     font-size: 24px;
+    font-weight: 800;
 }
 
-.box p {
-    margin: 0 0 20px;
-    opacity: 0.95;
+.description {
+    margin-bottom: 20px;
+    opacity: .95;
+    line-height: 1.7;
 }
 
 /* CTA Button – בהיר על רקע כהה */

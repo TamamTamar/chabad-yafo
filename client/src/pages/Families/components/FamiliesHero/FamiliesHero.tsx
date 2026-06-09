@@ -2,7 +2,7 @@ import styles from "./FamiliesHero.module.scss";
 
 const FamiliesHero = () => {
     return (
-        <section className={styles.hero} aria-label="משפחות צעירות ביפו">
+        <section className={styles.hero}>
             <div className={styles.bg} aria-hidden="true" />
             <div className={styles.overlay} aria-hidden="true" />
 
@@ -15,11 +15,18 @@ const FamiliesHero = () => {
 
                 <p className={styles.heroDescription}>
                     בית חב״ד יפו מרחיב את הפעילות לילדים ומשפחות.
-                    נשמח להכיר אתכם כדי לבנות מענה קהילתי וחינוכי מותאם
+                    נשמח להכיר אתכם כדי לבנות מענה קהילתי וחינוכי מותאם.
                 </p>
 
-                <a href="#form" className={styles.heroButton}>
-                    <span>ספרו לנו על המשפחה שלכם</span>
+                <a
+                    href="#form"
+                    className={styles.heroButton}
+                    aria-label="מעבר לטופס משפחות"
+                >
+                    <span className={styles.heroButtonText}>
+                        ספרו לנו על המשפחה שלכם
+                    </span>
+
                     <span className={styles.arrow} aria-hidden="true">
                         ←
                     </span>

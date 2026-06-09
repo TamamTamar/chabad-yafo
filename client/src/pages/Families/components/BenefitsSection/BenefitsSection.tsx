@@ -1,20 +1,31 @@
 import { benefits } from "../../data";
+
 import styles from "./BenefitsSection.module.scss";
 
 const BenefitsSection = () => {
     return (
         <section className={styles.vision}>
-            <h2>בונים יחד עתיד טוב יותר למשפחות ביפו</h2>
+            <h2 className={styles.title}>
+                בונים יחד עתיד טוב יותר למשפחות ביפו
+            </h2>
 
             <div className={styles.cards}>
                 {benefits.map((item) => (
-                    <div className={styles.card} key={item.title}>
-                        <span>{item.icon}</span>
-                        <div>
-                            <h3>{item.title}</h3>
-                            <p>{item.text}</p>
+                    <article className={styles.card} key={item.title}>
+                        <span className={styles.icon} aria-hidden="true">
+                            {item.icon}
+                        </span>
+
+                        <div className={styles.cardContent}>
+                            <h3 className={styles.cardTitle}>
+                                {item.title}
+                            </h3>
+
+                            <p className={styles.cardText}>
+                                {item.text}
+                            </p>
                         </div>
-                    </div>
+                    </article>
                 ))}
             </div>
         </section>

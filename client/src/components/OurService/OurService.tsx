@@ -6,6 +6,7 @@ import kashrutIcon from "../../assets/services/kashrut.png";
 import menoraIcon from "../../assets/services/menora.png";
 import mezuzahIcon from "../../assets/services/mezuza.png";
 import barIcon from "../../assets/services/13.png";
+import Container from "../Container/Container";
 
 type ServiceItem = {
   id: string;
@@ -73,7 +74,7 @@ const OurService = ({
 }: OurServiceProps) => {
   return (
     <section className={styles.section} aria-label={title}>
-      <div className={`container ${styles.inner}`}>
+      <Container>
         <header className={styles.header}>
           <h2 className={styles.title}>{title}</h2>
         </header>
@@ -96,7 +97,7 @@ const OurService = ({
             </a>
           ))}
         </div>
-      </div>
+      </Container>
     </section>
   );
 };

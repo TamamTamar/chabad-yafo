@@ -253,8 +253,10 @@ const SurveyForm = () => {
                             type="checkbox"
                             {...register("updates")}
                         />
-                        <span>אשמח לקבל עדכונים על פעילויות ומסגרות חדשות</span>
-                    </label>
+                        <span className={styles.updatesText}>
+                            אשמח לקבל עדכונים על פעילויות ומסגרות חדשות
+                        </span>
+                                            </label>
 
                     <span className={styles.errorText}>
                         {errors.root?.message || ""}
