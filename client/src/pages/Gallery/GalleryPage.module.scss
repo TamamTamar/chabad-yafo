@@ -7,12 +7,6 @@
             rgba($brand-secondary, 0.06));
 }
 
-.inner {
-    max-width: $max-width;
-    margin: 0 auto;
-    padding: 0 100px;
-}
-
 .header {
     max-width: 680px;
     margin: 0 auto 30px;
@@ -57,7 +51,7 @@
 }
 
 .categoryCard {
-        display: block;
+    display: block;
     position: relative;
     overflow: hidden;
     height: 170px;
@@ -155,9 +149,11 @@
 
     .categories {
         grid-template-columns: 1fr;
-        gap: 14px;
-        max-width: 340px;
-        margin: 0 auto;
+            gap: 14px;
+            width: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+            padding: 18px;
     }
 
     .categoryCard {

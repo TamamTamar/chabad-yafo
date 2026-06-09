@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { galleryItems } from "../../data/galleryData";
 
 import styles from "./GalleryPage.module.scss";
+import Container from "../../components/Container/Container";
 
 const GalleryPage = () => {
 
     return (
         <div className={styles.page}>
-            <div className={styles.inner}>
+            <Container>
                 <div className={styles.header}>
                     <div className={styles.eyebrow}>גלריה</div>
 
@@ -48,7 +49,7 @@ const GalleryPage = () => {
                 </div>
 
                
-            </div>
+            </Container>
         </div>
     );
 };

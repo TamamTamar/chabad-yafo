@@ -9,11 +9,7 @@
         linear-gradient(180deg, #f9fdff 0%, rgba($brand-secondary, 0.06) 100%);
 }
 
-.inner {
-    max-width: $max-width;
-    margin: 0 auto;
-    padding: 0 18px;
-}
+
 
 .header {
     max-width: 700px;
@@ -91,7 +87,7 @@
 
 .cloud {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 18px;
 }
 

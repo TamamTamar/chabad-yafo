@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { galleryItems } from "../../data/galleryData";
 import styles from "./GalleryCategoryPage.module.scss";
+import Container from "../../components/Container/Container";
 
 const GalleryCategoryPage = () => {
     
@@ -37,7 +38,7 @@ const GalleryCategoryPage = () => {
 
     return (
         <main className={styles.page}>
-            <div className={styles.inner}>
+            <Container>
                 <section className={styles.header}>
                     <Link to="/gallery" className={styles.backLink}>
                         ← חזרה לגלריה
@@ -68,7 +69,7 @@ const GalleryCategoryPage = () => {
                         </button>
                     ))}
                 </section>
-            </div>
+            </Container>
 
             {selectedImage && (
                 <div

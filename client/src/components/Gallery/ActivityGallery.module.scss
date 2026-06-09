@@ -1,16 +1,25 @@
 @use "../../styles/variables" as *;
 
 .section {
-    padding: 16px 0 44px;
-    background: transparent;
+    position: relative;
 
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        background:
+            radial-gradient(circle at center,
+                rgba($brand-secondary, 0.08),
+                transparent 70%);
+
+        pointer-events: none;
+    }
 }
 
 .inner {
-    max-width: $max-width;
+    width: min(1100px, calc(100% - 32px));
     margin: 0 auto;
-    padding: 0 16px;
-
 }
 
 .header {

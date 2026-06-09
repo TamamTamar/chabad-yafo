@@ -9,6 +9,7 @@ import "swiper/css";
 import { homepageGalleryImages } from "../../data/homepageGalleryData";
 
 import styles from "./ActivityGallery.module.scss";
+import Container from "../Container/Container";
 
 const ActivityGallery = () => {
     const swiperRef = useRef<SwiperType | null>(null);
@@ -19,7 +20,7 @@ const ActivityGallery = () => {
 
     return (
         <div className={styles.section}>
-            <div className={styles.inner}>
+            <Container className={styles.inner}>
                 <div className={styles.header}>
                     <div className={styles.eyebrow}>מהשטח</div>
 
@@ -93,7 +94,7 @@ const ActivityGallery = () => {
                         עוד רגעים של עשייה
                     </Link>
                 </div>
-            </div>
+            </Container>
         </div>
     );
 };
