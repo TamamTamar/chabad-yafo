@@ -1,11 +1,10 @@
 import styles from "./OurService.module.scss";
-
+import barIcon from "../../assets/services/13.png";
 import babyIcon from "../../assets/services/baby.png";
 import homeIcon from "../../assets/services/home.png";
 import kashrutIcon from "../../assets/services/kashrut.png";
 import menoraIcon from "../../assets/services/menora.png";
 import mezuzahIcon from "../../assets/services/mezuza.png";
-import barIcon from "../../assets/services/13.png";
 import Container from "../Container/Container";
 
 type ServiceItem = {

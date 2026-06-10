@@ -8,6 +8,7 @@ import { connectDB } from "./config/connectDB";
 import { familyRoutes } from "./routes/familyRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 import { adminAuthRoutes } from "./routes/adminAuth";
+import { paymentRoutes } from "./routes/paymentRoutes";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/api/shabbat", shabbatRoutes);
 app.use("/api/families", familyRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", adminAuthRoutes);
+app.use("/api/payment", paymentRoutes);
 
 const port = Number(process.env.PORT) || 4000;
 

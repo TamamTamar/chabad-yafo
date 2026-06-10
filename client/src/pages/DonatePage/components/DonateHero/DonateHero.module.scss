@@ -1,0 +1,134 @@
+@use "../../../../styles/variables" as *;
+
+.hero {
+    position: relative;
+    min-height: 520px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 32px;
+
+    background-image: url("../../../../assets/gallery/street/s8.jpg");
+    background-size: cover;
+background-position: 40% 20%;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg,
+            rgba(0, 0, 0, 0.78) 0%,
+            rgba(0, 0, 0, 0.55) 45%,
+            rgba(0, 0, 0, 0.2) 100%);
+}
+
+.content {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    max-width: 760px;
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.eyebrow {
+    color: $brand-secondary;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    letter-spacing: .08em;
+}
+
+.title {
+    margin-top: 12px;
+
+    color: white;
+
+    font-size: clamp(42px, 7vw, 72px);
+    font-weight: 900;
+
+    line-height: 1.05;
+}
+
+.description {
+    margin: 20px auto 0;
+
+    max-width: 620px;
+
+    color: rgba(255, 255, 255, .92);
+
+    font-size: 20px;
+    line-height: 1.8;
+}
+
+.button {
+    display: inline-flex;
+
+    margin-top: 32px;
+
+    padding: 16px 32px;
+
+    border-radius: 999px;
+
+    background: $brand-secondary;
+
+    color: $brand-primary;
+
+    font-weight: 800;
+
+    text-decoration: none;
+
+    transition: .25s;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+}
+@media (max-width: 640px) {
+    .hero {
+        min-height: 620px;
+
+        background-position: 10% top;
+
+        border-radius: 0 0 28px 28px;
+    }
+
+    .overlay {
+        background:
+            linear-gradient(180deg,
+                rgba(0, 0, 0, 0.15) 0%,
+                rgba(0, 0, 0, 0.3) 40%,
+                rgba(0, 0, 0, 0.78) 100%);
+    }
+
+    .content {
+        
+padding: 230px 22px 50px;    }
+
+    .title {
+        font-size: 38px;
+        line-height: 1.05;
+    }
+
+    .description {
+        margin-top: 14px;
+
+        font-size: 17px;
+        line-height: 1.7;
+    }
+
+    .button {
+        margin-top: 24px;
+    }
+}

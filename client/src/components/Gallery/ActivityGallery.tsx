@@ -8,8 +8,8 @@ import "swiper/css";
 
 import { homepageGalleryImages } from "../../data/homepageGalleryData";
 
-import styles from "./ActivityGallery.module.scss";
 import Container from "../Container/Container";
+import styles from "./ActivityGallery.module.scss";
 
 const ActivityGallery = () => {
     const swiperRef = useRef<SwiperType | null>(null);
@@ -22,12 +22,12 @@ const ActivityGallery = () => {
         <div className={styles.section}>
             <Container className={styles.inner}>
                 <div className={styles.header}>
-                    <span className={styles.eyebrow}>רגעים מהשטח</span>
+                    <p className={styles.eyebrow}>רגעים מהשטח</p>
 
-                    <h2 className={styles.title}>בית חב״ד יפו בפעילות</h2>
+                    <h2 className={styles.title}>ככה נראית שליחות ביפו</h2>
 
                     <p className={styles.description}>
-                        רגעים של קהילה, חגים, חסד ושליחות לאורך השנה.
+                        מחגים ושבתות ועד פעילות רחוב, חסד וחיבור יהודי בלב יפו.
                     </p>
                 </div>
 

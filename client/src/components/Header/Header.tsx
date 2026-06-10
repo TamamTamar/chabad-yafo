@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Container from "../Container/Container";
 import BaseDialog from "../BaseDialog/BaseDialog";
-import styles from "./Header.module.scss";
-import m from "./HeaderMobile.module.scss";
 import dialogStyles from "../BaseDialog/BaseDialog.module.scss";
-import HeaderMobileNav from "./HeaderMobileNav";
+import Container from "../Container/Container";
+import styles from "./Header.module.scss";
 import HeaderDesktopNav from "./HeaderDesktopNav";
-
+import m from "./HeaderMobile.module.scss";
+import HeaderMobileNav from "./HeaderMobileNav";
 const WHATSAPP_PHONE = "972537700339";
 const WHATSAPP_TEXT = "שלום, הגעתי מהאתר של בית חב״ד יפו ורציתי ליצור קשר.";
-const DONATE_LINK = "https://www.matara.pro/nedarimplus/online/?S=aVIw";
+
 
 const Header = () => {
     const [open, setOpen] = useState(false);
@@ -52,7 +51,6 @@ const Header = () => {
                             onOpenInfo={openInfo}
                             onCloseMenu={closeMenu}
                             whatsappLink={whatsappLink}
-                            donateLink={DONATE_LINK}
                         />
                     </div>
 
@@ -77,7 +75,7 @@ const Header = () => {
                     onClose={closeMenu}
                     onOpenInfo={openInfo}
                     whatsappLink={whatsappLink}
-                    donateLink={DONATE_LINK}
+
                 />
             </header>
 

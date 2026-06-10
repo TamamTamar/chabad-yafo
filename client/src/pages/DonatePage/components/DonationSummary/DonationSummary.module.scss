@@ -1,0 +1,246 @@
+//donationSummary.module.scss
+
+@use "../../../../styles/variables" as *;
+
+.card {
+    position: sticky;
+    top: 100px;
+    overflow: hidden;
+    display: grid;
+
+    border: 1px solid rgba($brand-primary, 0.08);
+    border-radius: 24px;
+
+    background: #ffffff;
+    box-shadow: 0 14px 34px rgba(20, 60, 95, 0.08);
+}
+
+.header {
+    padding: 26px 24px 22px;
+    text-align: center;
+
+    background:
+        linear-gradient(135deg,
+            rgba($brand-primary, 0.04),
+            rgba($brand-secondary, 0.12));
+
+    border-bottom: 1px solid rgba($brand-primary, 0.06);
+}
+
+.eyebrow {
+    margin: 0;
+
+    color: $brand-secondary;
+
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+}
+
+.amount {
+    display: block;
+    margin-top: 8px;
+
+    color: $brand-primary;
+
+    font-size: 44px;
+    font-weight: 900;
+    line-height: 1.05;
+}
+
+.type {
+    margin: 10px 0 0;
+
+    color: $brand-text;
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.summary {
+    padding: 20px 24px;
+
+    display: grid;
+    gap: 14px;
+}
+
+.note {
+    margin: 0;
+
+    color: rgba($brand-text, 0.65);
+
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding-top: 14px;
+
+    border-top: 1px dashed rgba($brand-primary, 0.16);
+}
+
+.totalLabel {
+    color: $brand-text;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.totalAmount {
+    color: $brand-primary;
+
+    font-size: 32px;
+    font-weight: 900;
+}
+
+.footer {
+    padding: 0 20px 22px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.benefit {
+    margin: 0;
+    padding: 9px 10px;
+
+    border-radius: 12px;
+
+    background: rgba($brand-primary, 0.04);
+    color: $brand-primary;
+
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+}
+
+@media (max-width: 980px) {
+    .card {
+        position: static;
+
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 12px;
+
+        padding: 14px 16px;
+
+        border-radius: 18px;
+
+        background:
+            linear-gradient(135deg,
+                rgba($brand-primary, 0.035),
+                rgba($brand-secondary, 0.11)),
+            #ffffff;
+
+        box-shadow: 0 10px 24px rgba(20, 60, 95, 0.08);
+    }
+
+    .header {
+        min-width: 0;
+        padding: 0;
+
+        display: grid;
+        gap: 3px;
+
+        text-align: right;
+
+        background: transparent;
+        border-bottom: 0;
+    }
+
+    .eyebrow {
+        font-size: 0.72rem;
+        letter-spacing: 0;
+    }
+
+    .amount {
+        margin: 0;
+
+        font-size: 1.7rem;
+        line-height: 1;
+    }
+
+    .type {
+        margin: 0;
+
+        color: rgba($brand-text, 0.66);
+
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    .summary {
+        padding: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .note {
+        display: none;
+    }
+
+    .total {
+        padding: 0;
+
+        border-top: 0;
+
+        display: grid;
+        gap: 2px;
+
+        text-align: left;
+    }
+
+    .totalLabel {
+        color: rgba($brand-text, 0.58);
+
+        font-size: 0.7rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .totalAmount {
+        color: $brand-primary;
+
+        font-size: 1.25rem;
+        font-weight: 900;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .footer {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .card {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .summary {
+        justify-content: stretch;
+    }
+
+    .total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding-top: 10px;
+
+        border-top: 1px dashed rgba($brand-primary, 0.14);
+
+        text-align: right;
+    }
+}

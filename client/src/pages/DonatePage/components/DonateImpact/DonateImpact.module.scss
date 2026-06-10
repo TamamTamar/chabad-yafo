@@ -1,0 +1,90 @@
+@use "../../../../styles/variables" as *;
+
+.section {
+    padding: 25px 0;
+    max-width: $max-width;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.eyebrow {
+    color: $brand-secondary;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.title {
+    margin:0 0 25px 0;
+    color: $brand-primary;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 800;
+        line-height: 1;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.card {
+    padding: 32px 24px;
+
+    background: white;
+
+    border-radius: 24px;
+
+    text-align: center;
+
+    border: 1px solid rgba($brand-primary, .08);
+    box-shadow: 0 12px 32px rgba(20, 60, 95, .06);
+
+    transition: .25s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 20px 44px rgba(20, 60, 95, .12);
+}
+
+.icon {
+    color: $brand-secondary;
+    margin-bottom: 18px;
+}
+
+.cardTitle {
+    color: $brand-primary;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.cardDescription {
+    margin-top: 12px;
+
+    color: rgba($brand-text, .75);
+
+    line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .section {
+        padding:20px 0;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

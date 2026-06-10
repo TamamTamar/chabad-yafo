@@ -1,0 +1,8 @@
+@use "../../styles/variables" as *;
+
+.page {
+    direction: rtl;
+    color: $brand-text;
+    background: $body-bg;
+}
+

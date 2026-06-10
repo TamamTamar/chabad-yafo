@@ -10,6 +10,8 @@ import AdminLogin from "../pages/AdminLogin/AdminLogin";
 import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRouteAdmin";
 import GalleryPage from "../pages/Gallery/GalleryPage";
 import GalleryCategoryPage from "../pages/Gallery/GalleryCategoryPage";
+import DonatePage from "../pages/DonatePage/DonatePage";
+
 
 export const router = createBrowserRouter([
     {
@@ -42,6 +44,13 @@ export const router = createBrowserRouter([
                 path: "gallery/:categoryId",
                 element: <GalleryCategoryPage />,
             },
+            {
+                path: "donate",
+                element: <DonatePage/>,
+            },
+           
+
+     
         ],
     },
 ]);

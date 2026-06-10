@@ -6,10 +6,9 @@ type Props = {
     onClose: () => void;
     onOpenInfo: () => void;
     whatsappLink: string;
-    donateLink: string;
 };
 
-const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink, donateLink }: Props) => {
+const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink }: Props) => {
     return (
         <>
             <nav className={`${m.drawer} ${open ? m.open : ""}`} aria-label="ניווט ראשי">
@@ -31,15 +30,13 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink, donateLink }
                     </a>
 
                     {/* קישור חיצוני לתרומה */}
-                    <a 
-                        href={donateLink} 
-                        className={m.drawerItem} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
+                    <Link
+                        to="/donate"
+                        className={m.drawerItem}
                         onClick={onClose}
                     >
                         תרומה
-                    </a>
+                    </Link>
                 </div>
 
                 <div className={m.drawerActions}>

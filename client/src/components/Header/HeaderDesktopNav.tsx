@@ -5,10 +5,9 @@ type Props = {
     onOpenInfo: () => void;
     onCloseMenu: () => void;
     whatsappLink: string;
-    donateLink: string;
 };
 
-const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink, donateLink }: Props) => {
+const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink }: Props) => {
     return (
         <nav className={styles.navDesktop} aria-label="ניווט ראשי">
             {/* כפתור טקסט - תפילין ומזוזות */}
@@ -28,15 +27,13 @@ const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink, donateLink }:
             </a>
 
             {/* לינק תרומה - משלב navLink ועיצוב ספציפי */}
-            <a
-                href={donateLink}
+            <Link
+                to="/donate"
                 className={`${styles.navLink} ${styles.donate}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 onClick={onCloseMenu}
             >
                 תרומה
-            </a>
+            </Link>
 
             {/* כפתור ה-CTA - רישום לשבת */}
             <Link to="/shabbat" className={styles.cta} onClick={onCloseMenu}>

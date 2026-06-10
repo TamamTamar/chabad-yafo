@@ -1,4 +1,4 @@
-import { Facebook, MessageCircle, Instagram } from "lucide-react";
+import { Facebook, Instagram, MessageCircle } from "lucide-react";
 import styles from "./FloatingSocials.module.scss";
 
 const FloatingSocials = () => {
