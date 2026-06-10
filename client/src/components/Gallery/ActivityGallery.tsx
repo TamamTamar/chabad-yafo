@@ -22,13 +22,13 @@ const ActivityGallery = () => {
         <div className={styles.section}>
             <Container className={styles.inner}>
                 <div className={styles.header}>
-                    <div className={styles.eyebrow}>מהשטח</div>
+                    <span className={styles.eyebrow}>רגעים מהשטח</span>
 
-                    <div className={styles.title}>בית חב״ד יפו בפעילות</div>
+                    <h2 className={styles.title}>בית חב״ד יפו בפעילות</h2>
 
-                    <div className={styles.description}>
+                    <p className={styles.description}>
                         רגעים של קהילה, חגים, חסד ושליחות לאורך השנה.
-                    </div>
+                    </p>
                 </div>
 
                 <div className={styles.sliderWrapper}>
