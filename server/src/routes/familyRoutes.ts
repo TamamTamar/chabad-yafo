@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Family } from "../models/Family";
 import { requireAdmin } from "../middleware/adminAuth";
+import { logger } from "../utils/logger";
 
 const router = Router();
 

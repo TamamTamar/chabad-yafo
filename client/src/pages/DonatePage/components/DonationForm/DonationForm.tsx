@@ -97,8 +97,7 @@ const DonationForm = () => {
             Currency: 1,
             Groupe: "",
             Comment: data.dedication || "",
-            CallBack:
-                "https://node-beit-chabad-yaffo-production.up.railway.app/api/payment/payment-callback",
+            CallBack: import.meta.env.VITE_NEDARIM_CALLBACK,
             CallBackMailError: "lchabadyaffo@gmail.com",
         };
     };
