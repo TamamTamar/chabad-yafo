@@ -10,5 +10,5 @@ export const connectDB = async () => {
 
     await mongoose.connect(mongoUri);
 
-    console.log("✅ MongoDB Connected");
+    logger.log("✅ MongoDB Connected");
 };

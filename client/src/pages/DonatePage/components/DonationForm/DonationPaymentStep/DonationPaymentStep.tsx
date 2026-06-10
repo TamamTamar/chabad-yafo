@@ -2,6 +2,7 @@ import type { RefObject } from "react";
 import { useEffect, useState } from "react";
 import type { PaymentData } from "../../../../../types/chabad";
 import styles from "./DonationPaymentStep.module.scss";
+import { logger } from "../../../../../utils/logger";
 
 type DonationPaymentStepProps = {
     iframeRef: RefObject<HTMLIFrameElement | null>;
@@ -39,7 +40,7 @@ const DonationPaymentStep = ({
         setIsPaying(true);
         setErrorMessage("");
 
-        console.log("Sending to Nedarim:", paymentData);
+        logger.log("Sending to Nedarim:", paymentData);
 
         postNedarim({
             Name: "FinishTransaction2",
@@ -54,7 +55,7 @@ const DonationPaymentStep = ({
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
 
-            console.log("Nedarim message:", event.data);
+            logger.log("Nedarim message:", event.data);
             if (!event.data?.Name) return;
 
             if (event.data.Name === "Height") {
@@ -123,7 +124,7 @@ const DonationPaymentStep = ({
                 <p className={styles.errorMessage}>{errorMessage}</p>
             )}
 
-         
+
             {isPaying && (
                 <p className={styles.loadingMessage}>מעבד תשלום...</p>
             )}

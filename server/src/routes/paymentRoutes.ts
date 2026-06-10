@@ -2,6 +2,7 @@ import express, { Router } from "express";
 
 import { Payment } from "../models/PaymentModel";
 import type { PaymentDataToSave } from "../types/payment";
+import { logger } from "../utils/logger";
 
 const router = Router();
 
@@ -26,13 +27,13 @@ router.post("/payment-callback", express.json(), async (req, res) => {
     try {
         const body = req.body ?? {};
 
-        console.log("Nedarim callback:", JSON.stringify(body, null, 2));
+        logger.log("Nedarim callback:", JSON.stringify(body, null, 2));
 
         const statusOk =
             String(body.Status ?? "").trim().toUpperCase() === "OK";
 
         if (!statusOk) {
-            console.log("Nedarim payment declined:", body);
+            logger.log("Nedarim payment declined:", body);
             return res.status(200).send("OK");
         }
 
@@ -71,7 +72,7 @@ router.post("/payment-callback", express.json(), async (req, res) => {
 
         await Payment.create(paymentToSave);
 
-        console.log("Payment saved:", paymentToSave);
+        logger.log("Payment saved:", paymentToSave);
 
         return res.status(200).send("OK");
     } catch (error) {

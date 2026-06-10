@@ -9,12 +9,13 @@ import { familyRoutes } from "./routes/familyRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 import { adminAuthRoutes } from "./routes/adminAuth";
 import { paymentRoutes } from "./routes/paymentRoutes";
+import { logger } from "./utils/logger";
 
 dotenv.config();
 
 const app = express();
 
-console.log("SERVER STARTING");
+logger.log("SERVER STARTING");
 
 app.use(
     cors({
@@ -44,12 +45,12 @@ const port = Number(process.env.PORT) || 4000;
 
 const startServer = async () => {
     try {
-        console.log("Connecting to Mongo...");
+        logger.log("Connecting to Mongo...");
         await connectDB();
-        console.log("Mongo finished");
+        logger.log("Mongo finished");
 
         app.listen(port, () => {
-            console.log(`✅ Server listening on ${port}`);
+            logger.log(`✅ Server listening on ${port}`);
         });
     } catch (error) {
         console.error("❌ Server failed to start");
