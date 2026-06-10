@@ -146,12 +146,6 @@ const DonationForm = () => {
     return (
         <section className={styles.section} id="donate-form">
             <Container>
-                <button
-                    type="button"
-                    onClick={() => setStep(4)}
-                >
-                    Test Success
-                </button>
                 <div className={styles.grid}>
                     <article className={styles.formCard}>
                         <div className={styles.formInner}>
