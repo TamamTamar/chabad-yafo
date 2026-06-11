@@ -19,7 +19,7 @@ const ActivityGallery = () => {
     }, []);
 
     return (
-        <div className={styles.section}>
+        <section className={styles.section}>
             <Container className={styles.inner}>
                 <div className={styles.header}>
                     <p className={styles.eyebrow}>רגעים מהשטח</p>
@@ -73,6 +73,7 @@ const ActivityGallery = () => {
                                         alt="פעילות בית חב״ד יפו"
                                         className={styles.image}
                                         loading="lazy"
+                                        decoding="async"
                                     />
                                 </div>
                             </SwiperSlide>
@@ -95,7 +96,7 @@ const ActivityGallery = () => {
                     </Link>
                 </div>
             </Container>
-        </div>
+        </section> 
     );
 };
 
