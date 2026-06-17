@@ -55,7 +55,7 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
                 <h2 className={styles.title}>המכתב שלכם</h2>
 
                 <p className={styles.subtitle}>
-                    כתבו את אשר על ליבכם – בקשה, תפילה, הודיה או שם לברכה.
+                    כתבו את אשר על ליבכם - בקשה, תפילה, הודיה או שם לברכה.
                 </p>
             </div>
 

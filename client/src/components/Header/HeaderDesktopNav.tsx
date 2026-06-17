@@ -15,6 +15,14 @@ const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink }: Props) => {
                 תפילין ומזוזות
             </button>
 
+            <Link
+                to="/write-to-rebbe"
+                className={styles.navLink}
+                onClick={onCloseMenu}
+            >
+                כתבו לרבי
+            </Link>
+
             {/* לינק רגיל - צור קשר */}
             <a 
                 href={whatsappLink} 

@@ -36,7 +36,7 @@ export const sendShabbatRegistrationMail = async (args: {
 
     const { fullName, phone, email, adults, children, notes } = args;
 
-    const subject = `רישום חדש לסעודת שבת – ${fullName}`;
+    const subject = `רישום חדש לסעודת שבת - ${fullName}`;
 
     const text =
         `📥 רישום חדש לסעודת שבת\n\n` +

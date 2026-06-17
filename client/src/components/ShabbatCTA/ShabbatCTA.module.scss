@@ -27,7 +27,7 @@
     line-height: 1.7;
 }
 
-/* CTA Button – בהיר על רקע כהה */
+/* CTA Button - בהיר על רקע כהה */
 .button {
     display: inline-block;
     background: $brand-bg; // היה white
@@ -39,7 +39,7 @@
     border: 1px solid $ui-border-soft;
 }
 
-/* אופציונלי – hover קטן */
+/* אופציונלי - hover קטן */
 .button:hover {
     box-shadow: 0 10px 28px $ui-shadow-card-hover;
 }

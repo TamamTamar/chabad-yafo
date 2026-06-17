@@ -18,11 +18,18 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink }: Props) => 
                         תפילין ומזוזות
                     </button>
 
+                    <Link
+                        to="/write-to-rebbe"
+                        className={m.drawerItem}
+                        onClick={onClose}
+                    >
+                        כתבו לרבי
+                    </Link>
                     {/* קישור חיצוני לוואטסאפ - מעולה ל-SEO */}
-                    <a 
-                        href={whatsappLink} 
-                        className={m.drawerItem} 
-                        target="_blank" 
+                    <a
+                        href={whatsappLink}
+                        className={m.drawerItem}
+                        target="_blank"
                         rel="noopener noreferrer"
                         onClick={onClose}
                     >

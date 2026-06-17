@@ -19,7 +19,7 @@ export type BuildNedarimPayloadArgs = {
 
 export const buildNedarimPayload = (args: BuildNedarimPayloadArgs) => {
   // מבנה payload תואם למה שאת כבר עובדת איתו ב-Nedarim (FinishTransaction2)
-  // אם בנדרים אצלך יש שדות נוספים (City וכו') – אפשר להרחיב כאן פעם אחת לכל הקמפיינים.
+  // אם בנדרים אצלך יש שדות נוספים (City וכו') - אפשר להרחיב כאן פעם אחת לכל הקמפיינים.
   return {
     Mosad: args.Mosad,
     ApiValid: args.ApiValid,
