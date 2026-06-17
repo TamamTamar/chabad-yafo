@@ -28,3 +28,41 @@ export const sendShabbatRegistrationWhatsApp = async (args: {
         body: text,
     });
 };
+export const sendRebbeLetterWhatsApp = async (args: {
+    fullName: string;
+    motherName?: string;
+    phone?: string;
+    email?: string;
+    letter: string;
+    occasion: string;
+}) => {
+    const {
+        fullName,
+        motherName,
+        phone,
+        email,
+        letter,
+        occasion,
+    } = args;
+
+    const occasionLabels: Record<string, string> = {
+        general: "כללי",
+        gimmel_tammuz: "ג׳ תמוז",
+        yud_shevat: "י׳ שבט",
+    };
+
+    const text =
+        `✍️ מכתב חדש לרבי\n\n` +
+        `🎯 סיבת כתיבה: ${occasionLabels[occasion] || "כללי"}\n\n` +
+        `👤 שם: ${fullName}\n` +
+        `👩 שם האם: ${motherName || "—"}\n` +
+        `📞 טלפון: ${phone || "—"}\n` +
+        `📧 אימייל: ${email || "—"}\n\n` +
+        `📝 תוכן המכתב:\n${letter}`;
+
+    await client.messages.create({
+        from: env.TWILIO_WHATSAPP_FROM,
+        to: env.ADMIN_WHATSAPP_TO,
+        body: text,
+    });
+};

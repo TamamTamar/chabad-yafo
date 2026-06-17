@@ -1,0 +1,220 @@
+@use "../../../../styles/variables" as *;
+
+.overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+}
+
+.modal {
+    position: relative;
+
+    width: 100%;
+    max-width: 500px;
+
+    padding: 40px 32px;
+
+    border-radius: 32px;
+
+    background: $brand-bg;
+
+    text-align: center;
+
+    box-shadow: 0 20px 60px rgba($ui-shadow-card, 0.25);
+}
+
+.closeButton {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: $brand-primary;
+
+    font-size: 1.8rem;
+
+    cursor: pointer;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 72px;
+    height: 72px;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    background: $ui-success-soft;
+
+    color: $ui-success;
+
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.title {
+    margin: 0 0 16px;
+
+    color: $brand-primary;
+
+    font-size: 1.9rem;
+    font-weight: 900;
+}
+
+.text {
+    margin: 0;
+
+    color: $ui-text-muted;
+
+    line-height: 1.8;
+}
+
+.blessingText {
+    margin: 18px 0 0;
+
+    color: $brand-primary;
+
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.9;
+}
+
+.donationBox {
+    margin-top: 28px;
+    padding: 14px 18px;
+
+    border-radius: 18px;
+
+    background: rgba($brand-secondary, 0.18);
+
+    color: $brand-primary;
+
+    font-weight: 900;
+}
+
+.donationText {
+    margin: 12px 0 0;
+
+    color: $ui-text-muted;
+
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    margin-top: 28px;
+}
+
+.primaryButton,
+.secondaryButton {
+    min-width: 170px;
+
+    padding: 14px 24px;
+
+    border-radius: 999px;
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+
+    text-decoration: none;
+    text-align: center;
+
+    transition: all 0.2s ease;
+
+    cursor: pointer;
+}
+
+.primaryButton {
+    border: none;
+
+    background: linear-gradient(135deg,
+            $brand-primary,
+            #143c5f);
+
+    color: #ffffff;
+}
+
+.primaryButton:hover {
+    transform: translateY(-2px);
+}
+
+.secondaryButton {
+    border: 1px solid $ui-border-strong;
+
+    background: #ffffff;
+
+    color: $brand-primary;
+}
+
+.secondaryButton:hover {
+    background: rgba($brand-primary, 0.04);
+}
+
+.actionButton {
+    margin-top: 24px;
+
+    min-width: 160px;
+
+    padding: 14px 24px;
+
+    border: none;
+    border-radius: 999px;
+
+    background: linear-gradient(135deg,
+            $brand-primary,
+            #143c5f);
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .modal {
+        padding: 32px 24px;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .primaryButton,
+    .secondaryButton {
+        width: 100%;
+        min-width: unset;
+    }
+}

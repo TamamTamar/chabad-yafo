@@ -54,3 +54,26 @@ export type PaymentData = {
   CallBack: string; // כתובת קריאה חוזרת
   CallBackMailError: string; // כתובת דוא"ל לשגיאות
 };
+export interface RebbeLetterFormData {
+  fullName: string;
+  motherName: string;
+  phone: string;
+  email: string;
+  letter: string;
+  occasion: string;
+  wantsUpdates: boolean;
+}
+
+export type RebbeLetterStatus =
+  | "new"
+  | "printed"
+  | "sentToOhel"
+  | "handled";
+
+export interface RebbeLetterAdmin extends RebbeLetterFormData {
+  _id: string;
+  status: RebbeLetterStatus;
+  createdAt: string;
+  updatedAt: string;
+  updatedStatusAt?: string;
+}

@@ -1,0 +1,87 @@
+@use "../../../../styles/variables" as *;
+
+.hero {
+    position: relative;
+
+    min-height: 430px;
+    padding: 80px 0;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+
+    background-image: url("../../../../assets/hero-desktop.webp");
+    background-size: cover;
+    background-position: center;
+}
+
+.imageOverlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(90deg,
+            rgba($brand-primary, 0.82),
+            rgba($brand-primary, 0.55),
+            rgba($brand-primary, 0.18));
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+
+    max-width: 680px;
+}
+
+.eyebrow {
+    margin-bottom: 12px;
+
+    color: $brand-secondary;
+
+    font-size: 0.95rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.title {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: clamp(2.7rem, 6vw, 5rem);
+    font-weight: 900;
+    line-height: 1.05;
+}
+
+.subtitle {
+    max-width: 560px;
+    margin: 22px 0 0;
+
+    color: rgba(255, 255, 255, 0.92);
+
+    font-size: 1.15rem;
+    line-height: 1.9;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        min-height: 360px;
+        padding: 58px 0;
+
+        background-position: center;
+    }
+
+    .imageOverlay {
+        background: rgba($brand-primary, 0.72);
+    }
+
+    .content {
+        text-align: center;
+    }
+
+    .subtitle {
+        margin-right: auto;
+        margin-left: auto;
+    }
+}

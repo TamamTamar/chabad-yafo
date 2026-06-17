@@ -1,0 +1,83 @@
+@use "../../styles/variables" as *;
+
+.page {
+    min-height: 100vh;
+    padding: 56px 0 90px;
+
+    direction: rtl;
+
+    background: $body-bg;
+}
+
+.header {
+    margin-bottom: 28px;
+}
+
+.title {
+    margin: 0 0 8px;
+
+    color: $brand-primary;
+
+    font-size: 2.4rem;
+    font-weight: 900;
+}
+
+.description {
+    margin: 0;
+
+    color: $ui-text-muted;
+
+    line-height: 1.7;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+
+    margin-bottom: 22px;
+}
+
+.tab,
+.tabActive {
+    padding: 10px 18px;
+
+    border-radius: 999px;
+
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.tab {
+    border: 1px solid $ui-border-strong;
+
+    background: #ffffff;
+
+    color: $brand-primary;
+}
+
+.tabActive {
+    border: 1px solid $brand-primary;
+
+    background: $brand-primary;
+
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 36px 0 70px;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+}

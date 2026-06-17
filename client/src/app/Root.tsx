@@ -4,11 +4,25 @@ import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 
 const Root = () => {
-    const { pathname } = useLocation();
+    const location = useLocation();
+    const { pathname, hash } = location;
 
     useEffect(() => {
+        if (hash) {
+            const timer = setTimeout(() => {
+                const element = document.querySelector(hash);
+
+                element?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }, 100);
+
+            return () => clearTimeout(timer);
+        }
+
         window.scrollTo(0, 0);
-    }, [pathname]);
+    }, [pathname, hash]);
 
     return (
         <div className="app-root">

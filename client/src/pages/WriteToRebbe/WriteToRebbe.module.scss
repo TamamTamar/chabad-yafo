@@ -1,0 +1,24 @@
+@use "../../styles/variables" as *;
+
+.page {
+    min-height: 100vh;
+    direction: rtl;
+}
+
+.section {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 760px);
+    justify-content: center;
+    align-items: start;
+    gap: 28px;
+
+    margin-top: 40px;
+    margin-bottom: 70px;
+}
+
+@media (max-width: 900px) {
+    .section {
+        grid-template-columns: 1fr;
+        margin-top: 28px;
+    }
+}

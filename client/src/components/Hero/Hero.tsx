@@ -21,14 +21,10 @@ const Hero = () => {
                             רישום לסעודת שבת
                         </Link>
 
-                        <a
-                            href="https://www.matara.pro/nedarimplus/online/?S=aVIw"
-                            className={styles.secondary}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
+                        <Link to="/donate#donate-form"
+                        className={styles.secondary}>
                             תרומה לפעילות
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </Container>

@@ -1,0 +1,87 @@
+@use "../../../../styles/variables" as *;
+
+.card {
+    position: sticky;
+    top: 90px;
+
+    padding: 32px 24px;
+
+    border-radius: 32px;
+
+    background: $brand-bg;
+
+    box-shadow: 0 12px 40px $ui-shadow-card;
+
+    text-align: right;
+}
+
+.title {
+    margin: 0 0 18px;
+
+    color: $brand-primary;
+
+    font-size: 2rem;
+    font-weight: 900;
+
+    line-height: 1.15;
+}
+
+.description {
+    margin: 0 0 22px;
+
+    color: $ui-text-muted;
+
+    line-height: 1.9;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    margin: 0 0 24px;
+    padding: 0;
+
+    list-style: none;
+}
+
+.listItem {
+    color: $brand-text;
+
+    font-weight: 700;
+
+    line-height: 1.7;
+}
+
+.listItem::before {
+    content: "✓";
+
+    margin-left: 8px;
+
+    color: $brand-secondary;
+
+    font-weight: 900;
+}
+
+.note {
+    margin: 0 0 16px;
+
+    color: $brand-primary;
+
+    font-weight: 800;
+    text-align: center;
+}
+
+.footerText {
+    margin: 0;
+
+    color: $ui-text-muted;
+
+    line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+    .card {
+        position: static;
+    }
+}

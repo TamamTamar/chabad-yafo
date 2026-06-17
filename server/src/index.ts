@@ -10,6 +10,7 @@ import { adminRoutes } from "./routes/adminRoutes";
 import { adminAuthRoutes } from "./routes/adminAuth";
 import { paymentRoutes } from "./routes/paymentRoutes";
 import { logger } from "./utils/logger";
+import { rebbeLetterRoutes } from "./routes/rebbeLetterRoutes";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use("/api/families", familyRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", adminAuthRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/rebbe-letters", rebbeLetterRoutes);
 
 const port = Number(process.env.PORT) || 4000;
 

@@ -1,9 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
 import Container from "../../../../components/Container/Container";
 import DonationSummary from "../DonationSummary/DonationSummary";
-
 import DonationAmountStep from "./DonationAmountStep/DonationAmountStep";
 import DonationDetailsStep from "./DonationDetailsStep/DonationDetailsStep";
 import DonationPaymentStep from "./DonationPaymentStep/DonationPaymentStep";
@@ -71,6 +69,7 @@ const DonationForm = () => {
 
     const amountNumber = useMemo(() => Number(amount) || 0, [amount]);
     const isMonthly = donationType === "monthly";
+
 
     const buildPaymentData = (data: DonationFormValues): PaymentData => {
         const cleanFullName = data.fullName.trim();
