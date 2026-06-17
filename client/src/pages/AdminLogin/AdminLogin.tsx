@@ -16,7 +16,7 @@ const AdminLogin = () => {
 
             localStorage.setItem("adminToken", data.token);
 
-            navigate("/admin/families");
+            navigate("/admin/dashboard");
         } catch {
             setError("סיסמה שגויה");
         }
