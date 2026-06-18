@@ -60,7 +60,7 @@ const RebbeLetterSuccessModal = ({
                         to="/donate#donate-form"
                         className={styles.primaryButton}
                     >
-                        לשותפות ותרומה
+                        לקחת חלק בפעילות
                     </Link>
                     <button
                         type="button"

@@ -25,6 +25,15 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink }: Props) => 
                     >
                         כתבו לרבי
                     </Link>
+
+                    <Link
+                        to="/about"
+                        className={m.drawerItem}
+                        onClick={onClose}
+                    >
+                        אודות
+                    </Link>
+
                     {/* קישור חיצוני לוואטסאפ - מעולה ל-SEO */}
                     <a
                         href={whatsappLink}
@@ -36,20 +45,15 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink }: Props) => 
                         צור קשר
                     </a>
 
-                    {/* קישור חיצוני לתרומה */}
-                    <Link
-                        to="/donate"
-                        className={m.drawerItem}
-                        onClick={onClose}
-                    >
-                        תרומה
-                    </Link>
                 </div>
 
                 <div className={m.drawerActions}>
-                    {/* Link של React Router - הכי טוב ל-SEO לניווט בתוך האתר */}
-                    <Link to="/shabbat" className={m.drawerCta} onClick={onClose}>
-                        רישום לשבת
+                    <Link
+                        to="/donate"
+                        className={m.drawerCta}
+                        onClick={onClose}
+                    >
+                        לקחת חלק
                     </Link>
                 </div>
             </nav>

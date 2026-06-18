@@ -12,3 +12,8 @@
             transparent 30%),
         $body-bg;
 }
+
+.content {
+    display: grid;
+    gap: 18px;
+}

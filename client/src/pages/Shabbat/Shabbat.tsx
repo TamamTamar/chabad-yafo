@@ -212,7 +212,7 @@ const Shabbat = () => {
                             שליחת רישום
                         </button>
                         <a href="https://www.matara.pro/nedarimplus/online/?S=aVIw" className={styles.secondary}>
-                            תרומה לפעילות
+                            לקחת חלק בפעילות
                         </a>
                     </div>
 

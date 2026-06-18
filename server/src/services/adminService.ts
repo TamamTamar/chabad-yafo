@@ -1,4 +1,5 @@
 import { Family } from "../models/Family";
+import { Payment } from "../models/PaymentModel";
 import { rebbeLetter } from "../models/RebbeLetterModel";
 
 const allowedRebbeLetterStatuses = [
@@ -17,6 +18,10 @@ export const getAllFamilies = async () => {
 
 export const getAllRebbeLetters = async () => {
     return rebbeLetter.find().sort({ createdAt: -1 });
+};
+
+export const getAllPayments = async () => {
+    return Payment.find().sort({ createdAt: -1 });
 };
 
 export const isValidRebbeLetterStatus = (

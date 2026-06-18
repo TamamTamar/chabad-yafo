@@ -23,6 +23,14 @@ const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink }: Props) => {
                 כתבו לרבי
             </Link>
 
+            <Link
+                to="/about"
+                className={styles.navLink}
+                onClick={onCloseMenu}
+            >
+                אודות
+            </Link>
+
             {/* לינק רגיל - צור קשר */}
             <a 
                 href={whatsappLink} 
@@ -34,19 +42,15 @@ const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink }: Props) => {
                 צור קשר
             </a>
 
-            {/* לינק תרומה - משלב navLink ועיצוב ספציפי */}
+            {/* לינק שותפות - משלב navLink ועיצוב ספציפי */}
             <Link
                 to="/donate"
-                className={`${styles.navLink} ${styles.donate}`}
+                className={styles.cta}
                 onClick={onCloseMenu}
             >
-                תרומה
+                לקחת חלק
             </Link>
 
-            {/* כפתור ה-CTA - רישום לשבת */}
-            <Link to="/shabbat" className={styles.cta} onClick={onCloseMenu}>
-                רישום לשבת
-            </Link>
         </nav>
     );
 };

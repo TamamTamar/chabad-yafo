@@ -1,10 +1,11 @@
 import { useState } from "react";
 import Container from "../../components/Container/Container";
 import AdminFamiliesTab from "./components/AdminFamiliesTab/AdminFamiliesTab";
+import AdminPaymentsTab from "./components/AdminPaymentsTab/AdminPaymentsTab";
 import AdminRebbeLettersTab from "./components/AdminRebbeLettersTab/AdminRebbeLettersTab";
 import styles from "./AdminDashboard.module.scss";
 
-type AdminTab = "families" | "rebbeLetters";
+type AdminTab = "families" | "rebbeLetters" | "payments";
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState<AdminTab>("families");
@@ -46,10 +47,23 @@ const AdminDashboard = () => {
                     >
                         מכתבים לרבי
                     </button>
+
+                    <button
+                        type="button"
+                        className={
+                            activeTab === "payments"
+                                ? styles.tabActive
+                                : styles.tab
+                        }
+                        onClick={() => setActiveTab("payments")}
+                    >
+                        תרומות
+                    </button>
                 </nav>
 
                 {activeTab === "families" && <AdminFamiliesTab />}
                 {activeTab === "rebbeLetters" && <AdminRebbeLettersTab />}
+                {activeTab === "payments" && <AdminPaymentsTab />}
             </Container>
         </main>
     );

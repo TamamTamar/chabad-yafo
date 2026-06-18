@@ -1,0 +1,182 @@
+@use "../../../../styles/variables" as *;
+
+.section {
+    padding: 32px 0;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+    gap: 48px;
+    align-items: center;
+}
+
+.media {
+    position: relative;
+    min-height: 430px;
+}
+
+.image {
+    width: 100%;
+    min-height: 430px;
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(180deg, rgba($brand-primary, 0.08), rgba($brand-primary, 0.2)),
+        url("../../../../assets/gallery/community/c3.jpg");
+    background-size: cover;
+    background-position: center;
+
+    box-shadow: 0 24px 60px rgba($ui-shadow-card, 0.16);
+}
+
+.badge {
+    position: absolute;
+    right: 28px;
+    bottom: -22px;
+
+    display: grid;
+    gap: 4px;
+
+    min-width: 190px;
+    padding: 18px 22px;
+
+    border: 1px solid rgba($brand-secondary, 0.5);
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    box-shadow: 0 16px 36px rgba($ui-shadow-card, 0.14);
+}
+
+.badgeValue {
+    color: $brand-primary;
+
+    font-size: 1.45rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.badgeText {
+    color: $ui-text-muted;
+
+    font-weight: 800;
+}
+
+.content {
+    max-width: 650px;
+}
+
+.eyebrow {
+    margin-bottom: 12px;
+
+    color: $brand-secondary;
+
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.title {
+    margin: 0;
+
+    color: $brand-primary;
+
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.text {
+    margin: 18px 0 0;
+
+    color: $ui-text-muted;
+
+    font-size: 1.06rem;
+    line-height: 1.9;
+}
+
+.list {
+    display: grid;
+    gap: 12px;
+
+    margin: 26px 0 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.list li {
+    position: relative;
+
+    padding: 14px 46px 14px 18px;
+
+    border: 1px solid rgba($brand-primary, 0.08);
+    border-radius: 14px;
+
+    color: $brand-text;
+    font-weight: 800;
+
+    background: rgba(#ffffff, 0.82);
+}
+
+.list li::before {
+    content: "";
+
+    position: absolute;
+    top: 50%;
+    right: 18px;
+
+    width: 12px;
+    height: 12px;
+
+    border-radius: 50%;
+
+    background: $brand-secondary;
+
+    transform: translateY(-50%);
+}
+
+@media (max-width: 900px) {
+    .layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .media,
+    .image {
+        min-height: 360px;
+    }
+
+    .content {
+        max-width: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .section {
+        padding: 22px 0;
+    }
+
+    .media,
+    .image {
+        min-height: 280px;
+    }
+
+    .image {
+        border-radius: 18px;
+    }
+
+    .badge {
+        right: 16px;
+        bottom: -18px;
+
+        min-width: 160px;
+        padding: 14px 16px;
+    }
+
+    .list li {
+        padding-left: 12px;
+    }
+}

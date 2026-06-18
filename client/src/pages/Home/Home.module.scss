@@ -21,3 +21,116 @@
     padding: 0;
   }
 }
+
+.aboutBridge {
+  padding: 4px 0 26px;
+}
+
+.aboutBridgeBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+
+  padding: 28px 32px;
+
+  border: 1px solid rgba($brand-primary, 0.08);
+  border-radius: 22px;
+
+  background:
+    linear-gradient(135deg, rgba(#ffffff, 0.96), rgba($brand-secondary, 0.12)),
+    #ffffff;
+
+  box-shadow: 0 14px 36px rgba($ui-shadow-card, 0.08);
+}
+
+.aboutBridgeContent {
+  max-width: 760px;
+}
+
+.aboutBridgeEyebrow {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: $brand-secondary;
+
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.aboutBridgeTitle {
+  margin: 0;
+
+  color: $brand-primary;
+
+  font-size: clamp(1.45rem, 2.7vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1.22;
+}
+
+.aboutBridgeText {
+  max-width: 680px;
+  margin: 12px 0 0;
+
+  color: $ui-text-muted;
+
+  font-size: 1.04rem;
+  line-height: 1.8;
+}
+
+.aboutBridgeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+
+  min-width: 136px;
+  min-height: 46px;
+  padding: 0 22px;
+
+  border-radius: 999px;
+
+  color: #ffffff;
+  background: $brand-primary;
+
+  font-weight: 900;
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.aboutBridgeButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba($brand-primary, 0.22);
+}
+
+@media (max-width: 760px) {
+  .aboutBridge {
+    padding: 0 0 20px;
+  }
+
+  .aboutBridgeBox {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding: 24px 20px;
+  }
+
+  .aboutBridgeButton {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aboutBridgeButton {
+    transition: none;
+  }
+
+  .aboutBridgeButton:hover {
+    transform: none;
+  }
+}

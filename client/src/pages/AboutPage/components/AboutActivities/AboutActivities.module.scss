@@ -1,0 +1,134 @@
+@use "../../../../styles/variables" as *;
+
+.section {
+    padding: 42px 0;
+}
+
+.header {
+    max-width: 720px;
+    margin: 0 auto 30px;
+
+    text-align: center;
+}
+
+.eyebrow {
+    margin-bottom: 10px;
+
+    color: $brand-secondary;
+
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.title {
+    margin: 0;
+
+    color: $brand-primary;
+
+    font-size: clamp(1.9rem, 3.4vw, 2.8rem);
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.subtitle {
+    margin: 14px 0 0;
+
+    color: $ui-text-muted;
+
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.card {
+    min-height: 220px;
+    padding: 26px 24px;
+
+    border: 1px solid rgba($brand-primary, 0.08);
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    box-shadow: 0 12px 32px rgba($ui-shadow-card, 0.07);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: rgba($brand-secondary, 0.48);
+    box-shadow: 0 18px 42px rgba($ui-shadow-card, 0.11);
+}
+
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+
+    border-radius: 16px;
+
+    color: $brand-primary;
+
+    background: rgba($brand-secondary, 0.18);
+}
+
+.cardTitle {
+    margin: 0;
+
+    color: $brand-primary;
+
+    font-size: 1.22rem;
+    font-weight: 900;
+}
+
+.cardText {
+    margin: 12px 0 0;
+
+    color: $ui-text-muted;
+
+    line-height: 1.75;
+}
+
+@media (max-width: 960px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .section {
+        padding: 28px 0;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        min-height: 0;
+        padding: 22px 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        transition: none;
+    }
+
+    .card:hover {
+        transform: none;
+    }
+}

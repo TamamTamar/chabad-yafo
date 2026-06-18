@@ -77,3 +77,18 @@ export interface RebbeLetterAdmin extends RebbeLetterFormData {
   updatedAt: string;
   updatedStatusAt?: string;
 }
+
+export interface PaymentAdmin {
+  _id: string;
+  FirstName: string;
+  LastName: string;
+  Phone?: string;
+  Mail?: string;
+  PaymentType: "HK" | "Ragil";
+  Amount: number;
+  Tashlumim: number;
+  NormalizedTotal: number;
+  lizchut?: string;
+  createdAt: string;
+  updatedAt: string;
+}

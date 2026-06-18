@@ -2,9 +2,11 @@ import { Router } from "express";
 import { Family } from "../models/Family";
 import { requireAdmin } from "../middleware/adminAuth";
 import {
-
-} from "../services/rebbeLetterService";
-import { getAllRebbeLetters, isValidRebbeLetterStatus, updateRebbeLetterStatus } from "../services/adminService";
+    getAllPayments,
+    getAllRebbeLetters,
+    isValidRebbeLetterStatus,
+    updateRebbeLetterStatus,
+} from "../services/adminService";
 
 const router = Router();
 
@@ -36,6 +38,22 @@ router.get("/rebbe-letters", requireAdmin, async (_req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to get rebbe letters",
+        });
+    }
+});
+
+router.get("/payments", requireAdmin, async (_req, res) => {
+    try {
+        const payments = await getAllPayments();
+
+        return res.json({
+            success: true,
+            data: payments,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get payments",
         });
     }
 });

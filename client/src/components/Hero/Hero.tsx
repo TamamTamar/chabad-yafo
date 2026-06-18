@@ -23,7 +23,7 @@ const Hero = () => {
 
                         <Link to="/donate#donate-form"
                         className={styles.secondary}>
-                            תרומה לפעילות
+                            לקחת חלק בפעילות
                         </Link>
                     </div>
                 </div>

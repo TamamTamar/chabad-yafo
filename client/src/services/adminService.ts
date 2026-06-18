@@ -1,5 +1,6 @@
 import http from "./http";
 import type {
+    PaymentAdmin,
     RebbeLetterAdmin,
     RebbeLetterStatus,
 } from "../types/chabad";
@@ -19,6 +20,14 @@ export const getAllFamilies = async () => {
 export const getAllRebbeLetters = async () => {
     const response = await http.get<ApiResponse<RebbeLetterAdmin[]>>(
         "/admin/rebbe-letters"
+    );
+
+    return response.data.data;
+};
+
+export const getAllPayments = async () => {
+    const response = await http.get<ApiResponse<PaymentAdmin[]>>(
+        "/admin/payments"
     );
 
     return response.data.data;

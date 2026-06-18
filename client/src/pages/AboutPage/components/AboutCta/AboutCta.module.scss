@@ -1,0 +1,151 @@
+@use "../../../../styles/variables" as *;
+
+.section {
+    padding: 28px 0 72px;
+}
+
+.box {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 40px;
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(135deg, rgba($brand-primary, 0.96), rgba(#143c5f, 0.95)),
+        url("../../../../assets/hero-desktop.webp");
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
+
+    box-shadow: 0 20px 54px rgba($brand-primary, 0.22);
+}
+
+.content {
+    max-width: 660px;
+}
+
+.eyebrow {
+    margin-bottom: 10px;
+
+    color: $brand-secondary;
+
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.title {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: clamp(1.75rem, 3vw, 2.6rem);
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.text {
+    margin: 14px 0 0;
+
+    color: rgba(255, 255, 255, 0.86);
+
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+
+    min-width: 300px;
+}
+
+.primaryButton,
+.secondaryButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 150px;
+    padding: 13px 20px;
+
+    border-radius: 999px;
+
+    font-weight: 900;
+    text-decoration: none;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+.primaryButton {
+    color: $ui-btn-secondary-text;
+
+    background: $brand-secondary;
+
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.secondaryButton {
+    border: 1px solid rgba(255, 255, 255, 0.34);
+
+    color: #ffffff;
+
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover {
+    transform: translateY(-2px);
+}
+
+.secondaryButton:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+@media (max-width: 820px) {
+    .box {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 30px 24px;
+    }
+
+    .actions {
+        justify-content: flex-start;
+
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .section {
+        padding-bottom: 48px;
+    }
+
+    .actions,
+    .primaryButton,
+    .secondaryButton {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .primaryButton,
+    .secondaryButton {
+        transition: none;
+    }
+
+    .primaryButton:hover,
+    .secondaryButton:hover {
+        transform: none;
+    }
+}
