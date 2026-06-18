@@ -1,7 +1,8 @@
 import Container from "../../../../components/Container/Container";
 import rebbeImage from "../../../../assets/rebbe.png";
-import { writeToRebbeConfig } from "../../writeToRebbeConfig";
+
 import styles from "./RebbeLetterHero.module.scss";
+import { writeToRebbeConfigs } from "../../writeToRebbeConfig";
 
 const RebbeLetterHero = () => {
     return (
@@ -17,15 +18,15 @@ const RebbeLetterHero = () => {
             <Container>
                 <div className={styles.content}>
                     <p className={styles.eyebrow}>
-                        {writeToRebbeConfig.eyebrow}
+                        {writeToRebbeConfigs.gimmelTammuz.eyebrow}
                     </p>
 
                     <h1 className={styles.title}>
-                        {writeToRebbeConfig.title}
+                        {writeToRebbeConfigs.gimmelTammuz.title}
                     </h1>
 
                     <p className={styles.subtitle}>
-                        {writeToRebbeConfig.subtitle}
+                        {writeToRebbeConfigs.gimmelTammuz.subtitle}
                     </p>
                 </div>
             </Container>

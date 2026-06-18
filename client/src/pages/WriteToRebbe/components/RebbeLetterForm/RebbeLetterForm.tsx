@@ -1,7 +1,8 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { writeToRebbeConfig } from "../../writeToRebbeConfig";
+
 import styles from "./RebbeLetterForm.module.scss";
 import { createRebbeLetter } from "../../../../services/rebbeLetterService";
+import { writeToRebbeConfigs } from "../../writeToRebbeConfig";
 
 type RebbeLetterFormValues = {
     fullName: string;
@@ -39,7 +40,7 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
         try {
             await createRebbeLetter({
                 ...data,
-                occasion: writeToRebbeConfig.occasion,
+                occasion: writeToRebbeConfigs.gimmelTammuz.occasion,
             });
 
             reset();
