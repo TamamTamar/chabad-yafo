@@ -5,6 +5,37 @@ import { sendRebbeLetterMail } from "../services/mail";
 
 const router = express.Router();
 
+const sendRebbeLetterNotifications = async (
+    savedLetter: Awaited<ReturnType<typeof createRebbeLetter>>
+) => {
+    const notificationData = {
+        fullName: savedLetter.fullName,
+        motherName: savedLetter.motherName,
+        phone: savedLetter.phone,
+        email: savedLetter.email,
+        letter: savedLetter.letter || "",
+        occasion: savedLetter.occasion,
+    };
+
+    const results = await Promise.allSettled([
+        sendRebbeLetterWhatsApp(notificationData),
+        sendRebbeLetterMail({
+            ...notificationData,
+            wantsUpdates: savedLetter.wantsUpdates,
+        }),
+    ]);
+
+    const [whatsAppResult, mailResult] = results;
+
+    if (whatsAppResult.status === "rejected") {
+        console.error("WHATSAPP ERROR:", whatsAppResult.reason);
+    }
+
+    if (mailResult.status === "rejected") {
+        console.error("MAIL ERROR:", mailResult.reason);
+    }
+};
+
 router.post("/", async (req, res) => {
     try {
         const {
@@ -33,32 +64,7 @@ router.post("/", async (req, res) => {
             wantsUpdates,
         });
 
-        try {
-            await sendRebbeLetterWhatsApp({
-                fullName: savedLetter.fullName,
-                motherName: savedLetter.motherName,
-                phone: savedLetter.phone,
-                email: savedLetter.email,
-                letter: savedLetter.letter || "",
-                occasion: savedLetter.occasion,
-            });
-        } catch (error) {
-            console.error("WHATSAPP ERROR:", error);
-        }
-
-        try {
-            await sendRebbeLetterMail({
-                fullName: savedLetter.fullName,
-                motherName: savedLetter.motherName,
-                phone: savedLetter.phone,
-                email: savedLetter.email,
-                letter: savedLetter.letter || "",
-                occasion: savedLetter.occasion,
-                wantsUpdates: savedLetter.wantsUpdates,
-            });
-        } catch (error) {
-            console.error("MAIL ERROR:", error);
-        }
+        void sendRebbeLetterNotifications(savedLetter);
 
         return res.status(201).json({
             success: true,
