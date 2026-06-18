@@ -14,7 +14,18 @@ export type BuildNedarimPayloadArgs = {
   email?: string;
   PaymentType: string
   Comment: string
+  CallBack?: string;
+  CallBackMailError?: string;
 
+};
+
+export const getNedarimCallbackUrl = () => {
+  if (import.meta.env.VITE_NEDARIM_CALLBACK) {
+    return import.meta.env.VITE_NEDARIM_CALLBACK;
+  }
+
+  const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api";
+  return `${apiUrl.replace(/\/$/, "")}/payment/payment-callback`;
 };
 
 export const buildNedarimPayload = (args: BuildNedarimPayloadArgs) => {
@@ -32,6 +43,8 @@ export const buildNedarimPayload = (args: BuildNedarimPayloadArgs) => {
     Phone: args.phone ?? "",
     Email: args.email ?? "",
     Comment: args.Comment ?? "",
-    PaymentType: args.PaymentType ?? ""
+    PaymentType: args.PaymentType ?? "",
+    CallBack: args.CallBack ?? getNedarimCallbackUrl(),
+    CallBackMailError: args.CallBackMailError ?? "lchabadyaffo@gmail.com",
   };
 };

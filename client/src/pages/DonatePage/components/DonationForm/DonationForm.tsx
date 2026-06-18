@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Container from "../../../../components/Container/Container";
+import { getNedarimCallbackUrl } from "../../../../shared/donations/nedarimPayload";
 import DonationSummary from "../DonationSummary/DonationSummary";
 import DonationAmountStep from "./DonationAmountStep/DonationAmountStep";
 import DonationDetailsStep from "./DonationDetailsStep/DonationDetailsStep";
@@ -96,7 +97,7 @@ const DonationForm = () => {
             Currency: 1,
             Groupe: "",
             Comment: data.dedication || "",
-            CallBack: import.meta.env.VITE_NEDARIM_CALLBACK,
+            CallBack: getNedarimCallbackUrl(),
             CallBackMailError: "lchabadyaffo@gmail.com",
         };
     };

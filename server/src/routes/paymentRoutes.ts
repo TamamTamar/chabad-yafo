@@ -40,7 +40,7 @@ router.post("/payment-callback", express.json(), async (req, res) => {
         const amount = toNum(body.Amount);
         const tashlumim = toInt(body.Tashlumim ?? body.Tashloumim ?? 1) || 1;
         const transactionType = String(body.TransactionType ?? "").trim();
-        const comments = String(body.Comments ?? "").trim();
+        const comments = String(body.Comments ?? body.Comment ?? "").trim();
 
         const isHK =
             /HK|הקמ|הו.?ק/i.test(transactionType) ||
@@ -57,11 +57,16 @@ router.post("/payment-callback", express.json(), async (req, res) => {
         const [firstName = "", ...lastNameParts] = clientName.split(/\s+/);
         const lastName = lastNameParts.join(" ");
 
+        const resolvedFirstName =
+            String(body.FirstName ?? "").trim() || firstName;
+        const resolvedLastName =
+            String(body.LastName ?? "").trim() || lastName || resolvedFirstName;
+
         const paymentToSave: PaymentDataToSave = {
-            FirstName: firstName,
-            LastName: lastName,
+            FirstName: resolvedFirstName,
+            LastName: resolvedLastName,
             Phone: String(body.Phone ?? "").trim(),
-            Mail: String(body.Mail ?? "").trim(),
+            Mail: String(body.Mail ?? body.Email ?? "").trim(),
             PaymentType: paymentType,
             Amount: amount,
             Tashlumim: tashlumim,

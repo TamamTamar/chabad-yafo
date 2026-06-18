@@ -20,7 +20,17 @@ http.interceptors.request.use((config) => {
 
 http.interceptors.response.use(
     (response) => response,
-    (error) => Promise.reject(error)
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem("adminToken");
+
+            if (window.location.pathname.startsWith("/admin")) {
+                window.location.href = "/admin/login";
+            }
+        }
+
+        return Promise.reject(error);
+    }
 );
 
 export default http;
