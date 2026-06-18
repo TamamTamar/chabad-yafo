@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Swiper as SwiperType } from "swiper";
 import { Autoplay } from "swiper/modules";
@@ -14,9 +14,9 @@ import styles from "./ActivityGallery.module.scss";
 const ActivityGallery = () => {
     const swiperRef = useRef<SwiperType | null>(null);
 
-    const randomImages = useMemo(() => {
+    const [randomImages] = useState(() => {
         return [...homepageGalleryImages].sort(() => Math.random() - 0.5);
-    }, []);
+    });
 
     return (
         <section className={styles.section}>
