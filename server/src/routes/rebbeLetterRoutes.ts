@@ -1,6 +1,7 @@
 import express from "express";
 import { sendRebbeLetterWhatsApp } from "../services/whatsapp";
 import { createRebbeLetter } from "../services/rebbeLetterService";
+import { sendRebbeLetterMail } from "../services/mail";
 
 const router = express.Router();
 
@@ -43,6 +44,20 @@ router.post("/", async (req, res) => {
             });
         } catch (error) {
             console.error("WHATSAPP ERROR:", error);
+        }
+
+        try {
+            await sendRebbeLetterMail({
+                fullName: savedLetter.fullName,
+                motherName: savedLetter.motherName,
+                phone: savedLetter.phone,
+                email: savedLetter.email,
+                letter: savedLetter.letter || "",
+                occasion: savedLetter.occasion,
+                wantsUpdates: savedLetter.wantsUpdates,
+            });
+        } catch (error) {
+            console.error("MAIL ERROR:", error);
         }
 
         return res.status(201).json({
