@@ -19,7 +19,7 @@
         height: 2px;
         background: $header-icon;
         margin: 4px 0;
-        border-radius: 999px;
+        border-radius: $radius-pill;
     }
 
     outline: none;
@@ -57,7 +57,7 @@
         overflow-y: auto;
         background: rgba(255, 253, 247, 0.98);
         border: 1px solid rgba($brand-primary, 0.12);
-        border-radius: 22px;
+        border-radius: $radius-lg;
         padding: 14px;
         gap: 12px;
         transform: translateX(calc(100% + 24px));

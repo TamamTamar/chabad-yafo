@@ -12,7 +12,7 @@
 
     padding: 40px;
 
-    border-radius: 24px;
+    border-radius: $radius-card;
 
     background:
         linear-gradient(135deg, rgba($brand-primary, 0.96), rgba(#143c5f, 0.95)),
@@ -41,7 +41,7 @@
 .title {
     margin: 0;
 
-    color: #ffffff;
+    color: $color-white;
 
     font-size: $type-section-title;
     font-weight: 900;
@@ -75,7 +75,7 @@
     min-width: 150px;
     padding: 13px 20px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     font-weight: 900;
     text-decoration: none;
@@ -97,7 +97,7 @@
 .secondaryButton {
     border: 1px solid rgba(255, 255, 255, 0.34);
 
-    color: #ffffff;
+    color: $color-white;
 
     background: rgba(255, 255, 255, 0.1);
 }

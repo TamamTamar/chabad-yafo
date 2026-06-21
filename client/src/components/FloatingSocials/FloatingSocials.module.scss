@@ -17,13 +17,13 @@
 .fab {
     width: 34px;
     height: 34px;
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    color: #ffffff;
+    color: $color-white;
 
     box-shadow: 0 6px 16px rgba(14, 42, 68, 0.18);
     transition:
@@ -48,7 +48,7 @@
 .facebook {
     background: $brand-primary;
     border: 1px solid rgba($brand-secondary, 0.5);
-    color: white;
+    color: $color-white;
 }
 
 .whatsapp {

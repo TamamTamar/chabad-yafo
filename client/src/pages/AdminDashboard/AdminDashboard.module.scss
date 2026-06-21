@@ -41,9 +41,9 @@
     padding: 9px 16px;
 
     border: 1px solid $ui-border-strong;
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
-    background: #ffffff;
+    background: $brand-bg;
 
     color: $brand-primary;
 
@@ -60,7 +60,7 @@
 
         background: $brand-primary;
 
-        color: #ffffff;
+        color: $color-white;
     }
 }
 
@@ -75,7 +75,7 @@
 .tabActive {
     padding: 10px 18px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     font-family: inherit;
     font-size: $type-body-sm;
@@ -89,7 +89,7 @@
 .tab {
     border: 1px solid $ui-border-strong;
 
-    background: #ffffff;
+    background: $brand-bg;
 
     color: $brand-primary;
 }
@@ -99,7 +99,7 @@
 
     background: $brand-primary;
 
-    color: #ffffff;
+    color: $color-white;
 }
 
 @media (max-width: 768px) {

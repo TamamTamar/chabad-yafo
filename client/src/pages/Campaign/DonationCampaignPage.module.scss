@@ -37,7 +37,7 @@
 
 /* תוכן הכרטיס */
 .headerInner {
-  background: #ffffff;
+  background: $brand-bg;
   border-radius: $radius;
   padding: 40px;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
@@ -108,7 +108,7 @@
   padding: 16px 40px; // צמצום קל של הפדינג למובייל
   width: 100%; // ברירת מחדל למובייל
   max-width: 550px; 
-  border-radius: 999px;
+  border-radius: $radius-pill;
   border: 1px solid $header-cta-border;
   box-shadow: 0 10px 25px $header-cta-shadow;
   transition: all 0.3s ease;
@@ -130,7 +130,7 @@
 }
 
 .machatzitText {
-  color: #fff;
+  color: $color-white;
   font-size: $type-card-title;
   font-weight: 900;
   text-align: center;

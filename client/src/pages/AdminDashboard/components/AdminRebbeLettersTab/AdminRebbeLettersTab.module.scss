@@ -4,7 +4,7 @@
     overflow: hidden;
 
     border: 1px solid $ui-border-soft;
-    border-radius: 22px;
+    border-radius: $radius-lg;
 
     background: $brand-bg;
 
@@ -71,9 +71,9 @@
     padding: 9px 12px;
 
     border: 1px solid $ui-border-strong;
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
-    background: #ffffff;
+    background: $brand-bg;
 
     color: $brand-primary;
 

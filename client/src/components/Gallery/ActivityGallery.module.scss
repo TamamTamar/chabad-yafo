@@ -64,7 +64,7 @@
     flex: 1;
     min-width: 0;
     padding: 4px 2px 16px;
-    background: #fff;
+    background: $brand-bg;
 }
 
 .sideArrow {
@@ -74,9 +74,9 @@
     height: 46px;
 
     border: 1px solid rgba($brand-secondary, 0.35);
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
-    background: rgba(255, 255, 255, 0.96);
+    background: $ui-surface-glass;
     color: $brand-primary;
 
     font-size: $type-section-title-sm;
@@ -85,7 +85,7 @@
 
     cursor: pointer;
 
-    box-shadow: 0 8px 20px rgba(20, 60, 95, 0.12);
+    box-shadow: 0 8px 20px $ui-shadow-blue;
 
     transition:
         transform 0.2s ease,
@@ -94,7 +94,7 @@
 
     &:hover {
         transform: scale(1.05);
-        background: white;
+        background: $brand-bg;
         box-shadow: 0 12px 26px rgba(20, 60, 95, 0.16);
     }
 }
@@ -103,11 +103,11 @@
     overflow: hidden;
     height: 260px;
 
-    border-radius: 24px;
-    background: white;
+    border-radius: $radius-card;
+    background: $brand-bg;
 
     border: 1px solid rgba($brand-secondary, 0.28);
-    box-shadow: 0 10px 24px rgba(20, 60, 95, 0.08);
+    box-shadow: 0 10px 24px $ui-shadow-blue-soft;
 
     transition:
         transform 0.25s ease,
@@ -116,7 +116,7 @@
 
     &:hover {
         transform: translateY(-3px);
-        box-shadow: 0 16px 34px rgba(20, 60, 95, 0.12);
+        box-shadow: 0 16px 34px $ui-shadow-blue;
 
         .image {
             transform: scale(1.04);
@@ -145,7 +145,7 @@
 
     padding: 10px 18px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: rgba($brand-primary, 0.08);
     color: $brand-primary;
@@ -160,7 +160,7 @@
 
     &:hover {
         background: $brand-primary;
-        color: white;
+        color: $color-white;
         transform: translateY(-2px);
     }
 }
@@ -199,6 +199,6 @@
 
     .card {
         height: 180px;
-        border-radius: 18px;
+        border-radius: $radius-md;
     }
 }

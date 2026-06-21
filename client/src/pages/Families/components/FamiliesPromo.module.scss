@@ -9,7 +9,7 @@
 
     min-height: 470px;
 
-    border-radius: 32px;
+    border-radius: $radius-card-xl;
 
     background-image: url("../../../assets/families-hero.webp");
     background-size: cover;
@@ -50,7 +50,7 @@
 
     border: 1px solid rgba(255, 255, 255, 0.18);
 
-    border-radius: 28px;
+    border-radius: $radius-card-lg;
 }
 
 .title {
@@ -85,10 +85,10 @@
 
     padding: 0 28px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: $brand-primary;
-    color: #fff;
+    color: $color-white;
 
     text-decoration: none;
     font-weight: 800;
@@ -126,8 +126,8 @@
         background: rgba(89, 134, 178, 0.22);
         backdrop-filter: blur(4px);
         border: 1px solid rgba(255, 255, 255, .15);
-        border-radius: 24px;
-        color: white;
+        border-radius: $radius-card;
+        color: $color-white;
     }
 
     .title {

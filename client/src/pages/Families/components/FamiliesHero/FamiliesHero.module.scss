@@ -68,7 +68,7 @@
 
     min-width: $hero-cta-min-width;
     padding: 18px 38px;
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: linear-gradient(135deg, #f3bf3d, #ffd76a);
     color: #173a63;
@@ -90,7 +90,7 @@
 
     &:hover {
         background: linear-gradient(135deg, #173a63, #29578f);
-        color: white;
+        color: $color-white;
         transform: translateY(-6px) scale(1.06);
 
         box-shadow:
@@ -185,7 +185,7 @@
 
     .overlay {
         background: linear-gradient(180deg,
-                rgba(255, 255, 255, 0.92) 0%,
+                $ui-surface-soft 0%,
                 rgba(255, 255, 255, 0.76) 28%,
                 rgba(255, 255, 255, 0.16) 54%,
                 rgba(249, 253, 255, 0.9) 100%);

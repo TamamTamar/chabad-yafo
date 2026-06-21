@@ -9,7 +9,7 @@
     background:
         radial-gradient(circle at 30% 10%, rgba(255, 255, 255, 0.08), transparent 32%),
         linear-gradient(180deg, #153d61 0%, #0d2a45 100%);
-    color: white;
+    color: $color-white;
     box-shadow: 0 18px 44px $ui-shadow-card-hover;
 }
 

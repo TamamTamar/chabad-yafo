@@ -73,7 +73,7 @@
 
 @media (max-width: 768px) {
     .card {
-        border-radius: 18px;
+        border-radius: $radius-md;
     }
 
     .table {

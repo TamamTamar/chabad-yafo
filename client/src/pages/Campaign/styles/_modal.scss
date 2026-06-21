@@ -24,7 +24,7 @@
 
 .modal {
   position: relative;
-  background: #ffffff;
+  background: $brand-bg;
   width: 100%;
   max-width: 500px;
   max-height: 85vh;
@@ -44,7 +44,7 @@
 .modalHeader {
   background: $brand-primary;
   padding: 16px 24px;
-  color: #fff;
+  color: $color-white;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -68,7 +68,7 @@
 .modalClose {
   background: transparent;
   border: none;
-  color: #fff;
+  color: $color-white;
   font-size: $type-card-title;
   cursor: pointer;
   opacity: 0.7;
@@ -221,7 +221,7 @@
 
 .modalFooter {
   padding: 16px 24px;
-  background: #fff;
+  background: $brand-bg;
   border-top: 1px solid $ui-border-soft;
   flex-shrink: 0;
 }
@@ -238,7 +238,7 @@
   color: $brand-primary;
   border: none;
   padding: 11px;
-  border-radius: 999px;
+  border-radius: $radius-pill;
   font-weight: 900;
   font-size: $type-body-sm;
   cursor: pointer;
@@ -253,7 +253,7 @@
   background: #f8f9fa;
   border: 1px solid $ui-border-soft;
   padding: 11px;
-  border-radius: 999px;
+  border-radius: $radius-pill;
   font-weight: 700;
   cursor: pointer;
 }
@@ -300,7 +300,7 @@
 
 // Compact Form Section
 .compactForm {
-  background: #ffffff;
+  background: $brand-bg;
   padding: 30px;
   border-radius: $radius;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
@@ -379,7 +379,7 @@
     color: color.adjust($brand-secondary, $lightness: -20%);
     border: 1px dashed $brand-secondary;
     padding: 6px 14px;
-    border-radius: 999px;
+    border-radius: $radius-pill;
     font-size: $type-caption;
     font-weight: 800;
     cursor: pointer;
@@ -396,7 +396,7 @@
     color: $brand-primary;
     padding: 16px;
     border: none;
-    border-radius: 999px;
+    border-radius: $radius-pill;
     font-size: $type-card-title;
     font-weight: 900;
     cursor: pointer;

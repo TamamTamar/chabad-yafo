@@ -3,6 +3,7 @@
 /* =========================
   Base Colors
 ========================= */
+$color-white: #ffffff;
 $body-bg: #f9fdff;
 
 /* =========================
@@ -13,6 +14,12 @@ $header-height: 56px;
 
 $radius: 14px;
 $radius-sm: 10px;
+$radius-md: 18px;
+$radius-lg: 22px;
+$radius-card: 24px;
+$radius-card-lg: 28px;
+$radius-card-xl: 32px;
+$radius-pill: 999px;
 
 /* =========================
    Brand (זהות צבעונית)
@@ -31,8 +38,17 @@ $ui-text-muted: rgba(14, 26, 34, 0.75);
 $ui-border-soft: rgba(14, 26, 34, 0.08);
 $ui-border-strong: rgba(14, 26, 34, 0.14);
 
+$ui-surface: $brand-bg;
+$ui-surface-glass: rgba(255, 255, 255, 0.96);
+$ui-surface-soft: rgba(255, 255, 255, 0.92);
+
 $ui-shadow-card: rgba(0, 0, 0, 0.12);
 $ui-shadow-card-hover: rgba(0, 0, 0, 0.18);
+$ui-shadow-blue-soft: rgba(20, 60, 95, 0.08);
+$ui-shadow-blue: rgba(20, 60, 95, 0.12);
+$ui-shadow-blue-strong: rgba(20, 60, 95, 0.18);
+$ui-shadow-blue-hover: rgba(20, 60, 95, 0.24);
+$ui-shadow-modal: rgba(0, 0, 0, 0.35);
 
 /* Buttons */
 $ui-btn-primary-bg: $brand-primary;
@@ -76,8 +92,8 @@ $hero-overlay-top: rgba(10, 30, 50, 0.15);
 $hero-overlay-mid: rgba(10, 30, 50, 0.25);
 $hero-overlay-bottom: rgba(10, 30, 50, 0.35);
 
-$hero-title-color: #ffffff;
-$hero-subtitle-color: rgba(255, 255, 255, 0.92);
+$hero-title-color: $color-white;
+$hero-subtitle-color: $ui-surface-soft;
 
 $hero-title-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
 
@@ -135,7 +151,7 @@ $footer-text-muted: rgba(255, 255, 255, 0.78);
 
 $footer-border: rgba(255, 255, 255, 0.14);
 
-$footer-link: rgba(255, 255, 255, 0.96);
+$footer-link: $ui-surface-glass;
 $footer-link-underline: rgba(255, 255, 255, 0.4);
 /* =========================
 Validation

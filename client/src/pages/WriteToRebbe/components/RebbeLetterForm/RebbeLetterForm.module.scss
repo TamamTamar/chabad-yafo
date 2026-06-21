@@ -4,9 +4,9 @@
     padding: 24px 28px;
     position: relative;
     z-index: 2;
-    border-radius: 32px;
+    border-radius: $radius-card-xl;
     width: 100%;
-    background: #ffffff;
+    background: $brand-bg;
 
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
 }
@@ -64,7 +64,7 @@
     border: 1px solid $ui-border-strong;
     border-radius: 16px;
 
-    background: #ffffff;
+    background: $brand-bg;
 
     color: $brand-text;
 
@@ -126,13 +126,13 @@
     padding: 16px;
 
     border: none;
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: linear-gradient(135deg,
             $brand-primary,
             #143c5f);
 
-    color: #ffffff;
+    color: $color-white;
 
     font-size: $type-button;
     font-weight: 900;

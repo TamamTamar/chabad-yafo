@@ -120,7 +120,7 @@
     // פרופורציות משופרות
     height: 40px;
     padding: 0 22px;
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: linear-gradient(180deg, $header-cta-top, $header-cta-bottom);
     color: $header-cta-text !important;

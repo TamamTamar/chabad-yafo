@@ -2,7 +2,7 @@
 @use "../../../styles/variables" as *;
 
 .calculatorCard {
-  background: #ffffff;
+  background: $brand-bg;
   border-radius: 30px;
   padding: 40px;
   max-width: 550px;
@@ -158,10 +158,10 @@
 .applyAmountBtn {
   margin-top: 15px;
   background: $brand-primary;
-  color: white;
+  color: $color-white;
   border: none;
   padding: 12px 24px; // הגדלת שטח הלחיצה (Touch Target)
-  border-radius: 999px;
+  border-radius: $radius-pill;
   font-weight: 700;
   font-size: $type-body-sm;
   cursor: pointer;

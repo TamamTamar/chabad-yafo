@@ -58,7 +58,7 @@
         width: 100px;
         height: 3px;
         margin: 10px auto 0;
-        border-radius: 999px;
+        border-radius: $radius-pill;
         background: $brand-secondary;
     }
 }
@@ -70,7 +70,7 @@
     margin-top: 20px;
     padding: 10px 20px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: rgba($brand-secondary, 0.16);
 
@@ -99,7 +99,7 @@
     padding: 0;
     border: 3px solid rgba(255, 255, 255, .9);
     border-radius: 50%;
-    background: #fff;
+    background: $brand-bg;
     cursor: pointer;
     box-shadow: 0 14px 34px rgba(20, 60, 95, 0.14);
     appearance: none;
@@ -129,7 +129,7 @@
         align-items: center;
         justify-content: center;
         background: rgba(14, 42, 68, 0.38);
-        color: white;
+        color: $color-white;
         font-size: $type-body-sm;
         font-weight: 700;
         opacity: 0;
@@ -170,9 +170,9 @@
 .modalImage {
     max-width: min(1050px, 94vw);
     max-height: 86vh;
-    border-radius: 22px;
+    border-radius: $radius-lg;
     object-fit: contain;
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 24px 70px $ui-shadow-modal;
 }
 
 .close {
@@ -182,8 +182,8 @@
     width: 42px;
     height: 42px;
     border: none;
-    border-radius: 999px;
-    background: #fff;
+    border-radius: $radius-pill;
+    background: $brand-bg;
     color: $brand-primary;
     font-size: $type-section-title-sm;
     line-height: 1;

@@ -4,7 +4,7 @@
     margin-top: 50px;
     padding: 24px 20px 16px;
     background: linear-gradient(180deg, #1f4669 0%, #12314d 100%);
-    color: #fff;
+    color: $color-white;
 }
 
 .inner {
@@ -26,7 +26,7 @@
 
 .title {
     margin: 0;
-    color: #fff;
+    color: $color-white;
     font-size: $type-section-title-sm;
     font-weight: 900;
     line-height: $line-title;
@@ -51,8 +51,8 @@
     align-items: center;
     gap: 7px;
     padding: 7px 13px;
-    border-radius: 999px;
-    color: #fff;
+    border-radius: $radius-pill;
+    color: $color-white;
     text-decoration: none;
     font-size: $type-body-sm;
     font-weight: 600;

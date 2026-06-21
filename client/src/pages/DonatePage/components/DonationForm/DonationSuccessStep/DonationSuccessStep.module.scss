@@ -16,7 +16,7 @@
     padding: 40px 32px;
 
     border: 1px solid rgba($brand-primary, 0.08);
-    border-radius: 28px;
+    border-radius: $radius-card-lg;
 
     background:
         radial-gradient(circle at top,
@@ -36,14 +36,14 @@
     display: grid;
     place-items: center;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background:
         linear-gradient(135deg,
             #1f4e79,
             #d8b25b);
 
-    color: #ffffff;
+    color: $color-white;
 
     font-size: $type-section-title;
     font-weight: 900;
@@ -95,7 +95,7 @@
     margin: -2px 0 2px;
     padding: 10px 16px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: rgba($brand-secondary, 0.1);
     color: $brand-primary;
@@ -150,7 +150,7 @@
     border: 1px solid rgba($brand-primary, 0.14);
     border-radius: 14px;
 
-    background: #ffffff;
+    background: $brand-bg;
     color: $brand-primary;
 
     font-size: $type-button;
@@ -171,7 +171,7 @@
 
         border-color: rgba($brand-primary, 0.25);
 
-        box-shadow: 0 10px 24px rgba(20, 60, 95, 0.08);
+        box-shadow: 0 10px 24px $ui-shadow-blue-soft;
     }
 }
 

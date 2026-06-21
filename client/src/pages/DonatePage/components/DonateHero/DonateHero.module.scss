@@ -10,7 +10,7 @@
 
     overflow: hidden;
 
-    border-radius: 32px;
+    border-radius: $radius-card-xl;
 
     background-image: url("../../../../assets/gallery/street/s8.jpg");
     background-size: cover;
@@ -53,7 +53,7 @@ background-position: 40% 20%;
 .title {
     margin-top: 12px;
 
-    color: white;
+    color: $color-white;
 
     font-size: $type-hero-title;
     font-weight: 900;
@@ -79,7 +79,7 @@ background-position: 40% 20%;
 
     padding: 16px 32px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: $brand-secondary;
 

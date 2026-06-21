@@ -14,8 +14,8 @@
 .formCard {
     padding: 40px;
     border: 1px solid $ui-border-soft;
-    border-radius: 28px;
-    background: #ffffff;
+    border-radius: $radius-card-lg;
+    background: $brand-bg;
     box-shadow: 0 18px 44px rgba(20, 60, 95, 0.1);
 }
 .formInner {
@@ -80,9 +80,9 @@
     padding: 8px 14px;
 text-align: center;
     border: 1px solid rgba($brand-primary, 0.12);
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
-    background: #ffffff;
+    background: $brand-bg;
     color: $brand-primary;
 
     font: inherit;
@@ -140,7 +140,7 @@ text-align: center;
 
     .formCard {
         padding: 22px;
-        border-radius: 22px;
+        border-radius: $radius-lg;
     }
 
     .title {

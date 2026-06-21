@@ -30,9 +30,9 @@
     border: 1px solid rgba(255, 255, 255, 0.16);
 
     background: #0b2742;
-    color: #fff;
+    color: $color-white;
 
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 24px 60px $ui-shadow-modal;
     padding: 16px;
 
     @media (max-width: 420px) {
@@ -91,7 +91,7 @@
 .text {
     margin: 0;
     line-height: 1.65;
-    color: rgba(255, 255, 255, 0.92);
+    color: $ui-surface-soft;
     font-size: $type-body-sm;
 }
 
@@ -113,7 +113,7 @@
     text-decoration: none;
     font-weight: 900;
 
-    background: rgba(255, 255, 255, 0.92);
+    background: $ui-surface-soft;
     color: #0b2236;
 
     border: 0;
@@ -144,7 +144,7 @@
 
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: transparent;
-    color: rgba(255, 255, 255, 0.92);
+    color: $ui-surface-soft;
 
     font-weight: 800;
     cursor: pointer;

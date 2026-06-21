@@ -39,7 +39,7 @@
     top: 58%;
     width: 48px;
     height: 2px;
-    border-radius: 999px;
+    border-radius: $radius-pill;
     background: rgba(31, 78, 121, 0.12);
 
     @media (min-width: 720px) {
@@ -138,7 +138,7 @@
   display: grid;
   place-items: center;
 
-  background: #fff;
+  background: $brand-bg;
   border: 2px solid $brand-secondary;
   border-radius: 50%;
 

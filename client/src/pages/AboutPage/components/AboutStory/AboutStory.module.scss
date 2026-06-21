@@ -20,7 +20,7 @@
     width: 100%;
     min-height: 430px;
 
-    border-radius: 24px;
+    border-radius: $radius-card;
 
     background:
         linear-gradient(180deg, rgba($brand-primary, 0.08), rgba($brand-primary, 0.2)),
@@ -43,9 +43,9 @@
     padding: 18px 22px;
 
     border: 1px solid rgba($brand-secondary, 0.5);
-    border-radius: 18px;
+    border-radius: $radius-md;
 
-    background: #ffffff;
+    background: $brand-bg;
 
     box-shadow: 0 16px 36px rgba($ui-shadow-card, 0.14);
 }
@@ -165,7 +165,7 @@
     }
 
     .image {
-        border-radius: 18px;
+        border-radius: $radius-md;
     }
 
     .badge {

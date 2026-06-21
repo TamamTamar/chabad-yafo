@@ -95,7 +95,7 @@
 .tag {
     padding: 4px 10px;
 
-    border-radius: 999px;
+    border-radius: $radius-pill;
 
     background: rgba($brand-primary, 0.08);
 
@@ -134,7 +134,7 @@
     }
 
     .card {
-        border-radius: 18px;
+        border-radius: $radius-md;
     }
 
     .table {

@@ -9,10 +9,10 @@
     display: grid;
 
     border: 1px solid rgba($brand-primary, 0.08);
-    border-radius: 24px;
+    border-radius: $radius-card;
 
-    background: #ffffff;
-    box-shadow: 0 14px 34px rgba(20, 60, 95, 0.08);
+    background: $brand-bg;
+    box-shadow: 0 14px 34px $ui-shadow-blue-soft;
 }
 
 .header {
@@ -132,7 +132,7 @@
 
         padding: 14px 16px;
 
-        border-radius: 18px;
+        border-radius: $radius-md;
 
         background:
             linear-gradient(135deg,
@@ -140,7 +140,7 @@
                 rgba($brand-secondary, 0.11)),
             #ffffff;
 
-        box-shadow: 0 10px 24px rgba(20, 60, 95, 0.08);
+        box-shadow: 0 10px 24px $ui-shadow-blue-soft;
     }
 
     .header {

@@ -14,9 +14,9 @@
 .formBox {
     height: 100%;
     padding: 24px 28px;
-    background: rgba(255, 255, 255, 0.96);
+    background: $ui-surface-glass;
     border: 1px solid rgba(230, 201, 139, 0.95);
-    border-radius: 22px;
+    border-radius: $radius-lg;
     box-shadow: 0 14px 38px rgba(0, 0, 0, 0.06);
     animation: formReveal 0.75s ease both;
 }
@@ -107,7 +107,7 @@
         outline: none;
         border-color: rgba(230, 201, 139, 0.95);
         box-shadow: none;
-        background: white;
+        background: $brand-bg;
     }
 }
 
@@ -140,7 +140,7 @@
         margin: 6px auto 0;
 
         background: rgba(230, 201, 139, 0.9);
-        border-radius: 999px;
+        border-radius: $radius-pill;
     }
 }
 
@@ -214,7 +214,7 @@
     border-radius: 11px;
 
     background: linear-gradient(135deg, #173a63, #214c7f);
-    color: white;
+    color: $color-white;
 
     font: inherit;
     font-size: $type-button;

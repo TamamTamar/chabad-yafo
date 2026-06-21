@@ -59,9 +59,9 @@
     justify-content: center;
     gap: 6px;
 
-    border-radius: 22px;
+    border-radius: $radius-lg;
 
-    background: #ffffff;
+    background: $brand-bg;
     color: $brand-primary;
 
     font: inherit;
@@ -85,7 +85,7 @@
 
     border-color: rgba($brand-secondary, 0.75);
 
-    box-shadow: 0 18px 34px rgba(20, 60, 95, 0.08);
+    box-shadow: 0 18px 34px $ui-shadow-blue-soft;
 }
 
 .amountFeatured {
@@ -96,7 +96,7 @@
             rgba($brand-secondary, 0.12),
             rgba($brand-secondary, 0.04));
 
-    box-shadow: 0 18px 36px rgba(20, 60, 95, 0.12);
+    box-shadow: 0 18px 36px $ui-shadow-blue;
 
     &::after {
         content: "מומלץ";
@@ -106,7 +106,7 @@
 
         padding: 5px 12px;
 
-        border-radius: 999px;
+        border-radius: $radius-pill;
 
         background: $brand-secondary;
         color: $brand-primary;
@@ -141,10 +141,10 @@
         display: grid;
         place-items: center;
 
-        border-radius: 999px;
+        border-radius: $radius-pill;
 
         background: $brand-primary;
-        color: #ffffff;
+        color: $color-white;
 
         font-size: $type-micro;
         font-weight: 900;
@@ -230,7 +230,7 @@
     border: 1px solid rgba($brand-primary, 0.12);
     border-radius: 14px;
 
-    background: #ffffff;
+    background: $brand-bg;
     color: $brand-text;
 
     font: inherit;
@@ -306,11 +306,11 @@
 .typeActive {
     transform: translateY(-1px);
 
-    background: #ffffff;
+    background: $brand-bg;
     color: $brand-primary;
 
     box-shadow:
-        0 8px 18px rgba(20, 60, 95, 0.12),
+        0 8px 18px $ui-shadow-blue,
         inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -348,7 +348,7 @@
     border-radius: 14px;
 
     background: $brand-primary;
-    color: #ffffff;
+    color: $color-white;
 
     font: inherit;
     font-size: $type-button;
@@ -356,7 +356,7 @@
 
     cursor: pointer;
 
-    box-shadow: 0 12px 28px rgba(20, 60, 95, 0.18);
+    box-shadow: 0 12px 28px $ui-shadow-blue-strong;
 
     transition:
         transform 0.2s ease,
@@ -368,7 +368,7 @@
 
         background: color.adjust($brand-primary, $lightness: -4%);
 
-        box-shadow: 0 18px 36px rgba(20, 60, 95, 0.24);
+        box-shadow: 0 18px 36px $ui-shadow-blue-hover;
     }
 }
 

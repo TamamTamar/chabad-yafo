@@ -35,7 +35,7 @@
   padding: 28px 32px;
 
   border: 1px solid rgba($brand-primary, 0.08);
-  border-radius: 22px;
+  border-radius: $radius-lg;
 
   background:
     linear-gradient(135deg, rgba(#ffffff, 0.96), rgba($brand-secondary, 0.12)),
@@ -90,9 +90,9 @@
   min-height: 46px;
   padding: 0 22px;
 
-  border-radius: 999px;
+  border-radius: $radius-pill;
 
-  color: #ffffff;
+  color: $color-white;
   background: $brand-primary;
 
   font-weight: 900;

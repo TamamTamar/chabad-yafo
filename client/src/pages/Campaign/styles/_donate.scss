@@ -3,7 +3,7 @@
 
 .donateSection {
   width: 100%;
-  background: #ffffff;
+  background: $brand-bg;
   padding: clamp(16px, 5vw, 32px); // פדינג גמיש שקטן במובייל
   border-radius: $radius;
   border: 1px solid $ui-border-soft;
@@ -43,7 +43,7 @@
   justify-content: center;
   border-radius: $radius-sm;
   border: 1.5px solid $brand-secondary;
-  background: #ffffff;
+  background: $brand-bg;
   color: $brand-primary;
   font-weight: 800;
   font-size: $type-button;

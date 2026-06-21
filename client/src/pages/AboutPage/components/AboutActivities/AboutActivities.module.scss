@@ -51,9 +51,9 @@
     padding: 26px 24px;
 
     border: 1px solid rgba($brand-primary, 0.08);
-    border-radius: 18px;
+    border-radius: $radius-md;
 
-    background: #ffffff;
+    background: $brand-bg;
 
     box-shadow: 0 12px 32px rgba($ui-shadow-card, 0.07);
 
