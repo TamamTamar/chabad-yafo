@@ -3,7 +3,7 @@ const isDev = import.meta.env.DEV;
 export const logger = {
     log: (...args: unknown[]) => {
         if (isDev) {
-            console.log(...args);
+            console.info(...args);
         }
     },
 

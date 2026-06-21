@@ -12,8 +12,6 @@ const AdminFamiliesTab = () => {
             try {
                 const data = await getAllFamilies();
 
-                console.log("families from admin tab:", data);
-
                 setFamilies(data);
             } catch (error) {
                 console.error("Failed to fetch families:", error);
