@@ -5,25 +5,13 @@ const http = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-    withCredentials: false, // אם בעתיד תעבדי עם cookies/auth -> אפשר לשנות ל-true
-});
-
-http.interceptors.request.use((config) => {
-    const token = localStorage.getItem("adminToken");
-
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
+    withCredentials: true,
 });
 
 http.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem("adminToken");
-
             if (window.location.pathname.startsWith("/admin")) {
                 window.location.href = "/admin/login";
             }

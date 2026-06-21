@@ -10,6 +10,11 @@
 }
 
 .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+
     margin-bottom: 28px;
 }
 
@@ -28,6 +33,35 @@
     color: $ui-text-muted;
 
     line-height: 1.7;
+}
+
+.logoutButton {
+    flex: 0 0 auto;
+
+    padding: 9px 16px;
+
+    border: 1px solid $ui-border-strong;
+    border-radius: 999px;
+
+    background: #ffffff;
+
+    color: $brand-primary;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+
+    &:hover {
+        border-color: $brand-primary;
+
+        background: $brand-primary;
+
+        color: #ffffff;
+    }
 }
 
 .tabs {
@@ -75,6 +109,10 @@
 
     .title {
         font-size: 1.8rem;
+    }
+
+    .header {
+        flex-direction: column;
     }
 
     .tabs {

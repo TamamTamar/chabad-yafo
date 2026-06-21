@@ -12,9 +12,7 @@ const AdminLogin = () => {
         try {
             setError("");
 
-            const data = await loginAdmin(password);
-
-            localStorage.setItem("adminToken", data.token);
+            await loginAdmin(password);
 
             navigate("/admin/dashboard");
         } catch {

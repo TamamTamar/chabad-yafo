@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Container from "../../components/Container/Container";
+import { logoutAdmin } from "../../services/adminAuthService";
 import AdminFamiliesTab from "./components/AdminFamiliesTab/AdminFamiliesTab";
 import AdminPaymentsTab from "./components/AdminPaymentsTab/AdminPaymentsTab";
 import AdminRebbeLettersTab from "./components/AdminRebbeLettersTab/AdminRebbeLettersTab";
@@ -9,18 +11,34 @@ type AdminTab = "families" | "rebbeLetters" | "payments";
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState<AdminTab>("families");
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await logoutAdmin();
+        navigate("/admin/login", { replace: true });
+    };
 
     return (
         <main className={styles.page}>
             <Container>
                 <section className={styles.header}>
-                    <h1 className={styles.title}>
-                        ניהול האתר
-                    </h1>
+                    <div>
+                        <h1 className={styles.title}>
+                            ניהול האתר
+                        </h1>
 
-                    <p className={styles.description}>
-                        צפייה וניהול פניות מהאתר של בית חב״ד יפו.
-                    </p>
+                        <p className={styles.description}>
+                            צפייה וניהול פניות מהאתר של בית חב״ד יפו.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        className={styles.logoutButton}
+                        onClick={handleLogout}
+                    >
+                        יציאה
+                    </button>
                 </section>
 
                 <nav className={styles.tabs} aria-label="לשוניות ניהול">
