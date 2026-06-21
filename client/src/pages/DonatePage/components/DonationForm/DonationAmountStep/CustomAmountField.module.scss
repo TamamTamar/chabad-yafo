@@ -1,0 +1,65 @@
+@use "../../../../../styles/variables" as *;
+
+.field {
+    display: grid;
+    gap: 7px;
+}
+
+.fieldLabel {
+    color: $brand-primary;
+
+    font-size: $type-eyebrow;
+    font-weight: 800;
+}
+
+.inputWrapper {
+    position: relative;
+}
+
+.currency {
+    position: absolute;
+    top: 50%;
+    inset-inline-start: 16px;
+
+    transform: translateY(-50%);
+
+    color: $brand-primary;
+
+    font-size: $type-body-lg;
+    font-weight: 900;
+
+    pointer-events: none;
+}
+
+.input {
+    width: 100%;
+
+    padding: 12px 44px 12px 14px;
+
+    border: 1px solid rgba($brand-primary, 0.12);
+    border-radius: $radius;
+
+    background: $brand-bg;
+    color: $brand-text;
+
+    font: inherit;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+    &::placeholder {
+        color: rgba($brand-text, 0.42);
+    }
+
+    &:focus {
+        border-color: rgba($brand-secondary, 0.9);
+
+        background: rgba($brand-secondary, 0.04);
+
+        box-shadow: 0 0 0 4px rgba($brand-secondary, 0.14);
+    }
+}

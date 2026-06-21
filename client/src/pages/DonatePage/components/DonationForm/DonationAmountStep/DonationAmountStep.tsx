@@ -6,6 +6,10 @@ import type {
 } from "react-hook-form";
 
 import type { DonationFormValues, DonationType } from "../DonationForm";
+import AmountPresets, { type PresetAmount } from "./AmountPresets";
+import CustomAmountField from "./CustomAmountField";
+import DonationTypeToggle from "./DonationTypeToggle";
+import PaymentsSelect from "./PaymentsSelect";
 
 import styles from "./DonationAmountStep.module.scss";
 
@@ -19,7 +23,7 @@ type DonationAmountStepProps = {
     onNext: () => void;
 };
 
-const PRESET_AMOUNTS = [
+const PRESET_AMOUNTS: PresetAmount[] = [
     {
         value: 180,
         title: "שותפות בשבת",
@@ -119,85 +123,17 @@ const DonationAmountStep = ({
                     בסעודות השבת ובחיזוק החיים היהודיים ביפו.
                 </p>
 
-                <div className={styles.amounts}>
-                    {PRESET_AMOUNTS.map((presetAmount) => (
-                        <button
-                            key={presetAmount.value}
-                            type="button"
-                            className={
-                                !isCustomAmountOpen &&
-                                    amount === String(presetAmount.value)
-                                    ? styles.amountActive
-                                    : presetAmount.featured
-                                        ? styles.amountFeatured
-                                        : styles.amountButton
-                            }
-                            onClick={() =>
-                                selectPresetAmount(presetAmount.value)
-                            }
-                        >
-                            <strong className={styles.amountValue}>
-                                ₪{presetAmount.value.toLocaleString()}
-                            </strong>
-
-                            <span className={styles.amountTitle}>
-                                {presetAmount.title}
-                            </span>
-
-                            <span className={styles.amountSubtitle}>
-                                {presetAmount.subtitle}
-                            </span>
-                        </button>
-                    ))}
-
-                    <button
-                        type="button"
-                        className={
-                            isCustomAmountOpen
-                                ? styles.amountActive
-                                : styles.amountButton
-                        }
-                        onClick={openCustomAmount}
-                    >
-                        <strong className={styles.customAmountValue}>
-                            {customAmountLabel}
-                        </strong>
-
-                        <span className={styles.amountTitle}>
-                            קבעו את הסכום
-                        </span>
-                    </button>
-                </div>
+                <AmountPresets
+                    amount={amount}
+                    customAmountLabel={customAmountLabel}
+                    isCustomAmountOpen={isCustomAmountOpen}
+                    onOpenCustomAmount={openCustomAmount}
+                    onSelectPresetAmount={selectPresetAmount}
+                    presetAmounts={PRESET_AMOUNTS}
+                />
 
                 {isCustomAmountOpen && (
-                    <label className={styles.field} htmlFor="amount">
-                        <span className={styles.fieldLabel}>סכום מותאם</span>
-
-                        <span className={styles.inputWrapper}>
-                            <span className={styles.currency}>₪</span>
-
-                            <input
-                                id="amount"
-                                className={styles.input}
-                                inputMode="numeric"
-                                placeholder="הקלידו סכום"
-                                autoFocus
-                                {...register("amount", {
-                                    required: "נא לבחור סכום תרומה",
-                                    validate: (value) =>
-                                        Number(value) >= 18 ||
-                                        "סכום התרומה המינימלי הוא ₪18",
-                                    onChange: (event) => {
-                                        event.target.value =
-                                            event.target.value.replace(
-                                                /[^\d]/g,
-                                                ""
-                                            );
-                                    },
-                                })}
-                            />
-                        </span>
-                    </label>
+                    <CustomAmountField register={register} />
                 )}
 
                 {errors.amount?.message && (
@@ -207,76 +143,19 @@ const DonationAmountStep = ({
                 )}
             </fieldset>
 
-            <fieldset className={styles.fieldset}>
-                <legend className={styles.legend}>סוג התרומה</legend>
-
-                <div className={styles.typeToggle}>
-                    <button
-                        type="button"
-                        className={
-                            donationType === "once"
-                                ? styles.typeActive
-                                : styles.typeButton
-                        }
-                        onClick={() => selectDonationType("once")}
-                    >
-                        חד־פעמי
-                    </button>
-
-                    <button
-                        type="button"
-                        className={
-                            donationType === "monthly"
-                                ? styles.typeActive
-                                : styles.typeButton
-                        }
-                        onClick={() => selectDonationType("monthly")}
-                    >
-                        הו״ק ל־12 חודשים
-                    </button>
-                </div>
-
-                <input
-                    type="hidden"
-                    {...register("donationType", {
-                        required: "נא לבחור סוג תרומה",
-                    })}
-                />
-            </fieldset>
+            <DonationTypeToggle
+                donationType={donationType}
+                onSelectDonationType={selectDonationType}
+                register={register}
+            />
 
             {donationType === "once" && (
-                <fieldset className={styles.fieldset}>
-                    <legend className={styles.legend}>מספר תשלומים</legend>
-
-                    <select
-                        id="payments"
-                        className={styles.input}
-                        value={payments}
-                        {...register("payments", {
-                            required: "נא לבחור מספר תשלומים",
-                        })}
-                        onChange={(event) =>
-                            setValue("payments", event.target.value, {
-                                shouldValidate: true,
-                                shouldDirty: true,
-                            })
-                        }
-                    >
-                        {Array.from({ length: 12 }, (_, index) => {
-                            const paymentsCount = index + 1;
-                            const totalAmount = Number(amount) || 0;
-                            const paymentAmount = totalAmount / paymentsCount;
-
-                            return (
-                                <option key={paymentsCount} value={String(paymentsCount)}>
-                                    {paymentsCount === 1
-                                        ? `תשלום אחד - ₪${paymentAmount.toLocaleString()}`
-                                        : `${paymentsCount} תשלומים - ₪${paymentAmount.toLocaleString()} כל חודש`}
-                                </option>
-                            );
-                        })}
-                    </select>
-                </fieldset>
+                <PaymentsSelect
+                    amount={amount}
+                    payments={payments}
+                    register={register}
+                    setValue={setValue}
+                />
             )}
 
             <footer className={styles.stepActions}>

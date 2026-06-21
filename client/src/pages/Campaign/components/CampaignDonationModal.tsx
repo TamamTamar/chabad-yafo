@@ -1,13 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import styles from "../DonationCampaignPage.module.scss";
 
 import { buildNedarimPayload } from "../../../shared/donations/nedarimPayload";
 import type { Currency } from "../../../shared/donations/nedarimPayload";
 import { useNedarimIframe } from "../../../shared/donations/useNedarimIframe";
-import type { DonorForm, DonationCampaignConfig } from "../types";
+import type { DonationCampaignConfig, DonorForm } from "../types";
+import CampaignDonorFields from "./CampaignDonationModal/CampaignDonorFields";
+import CampaignModalFooter from "./CampaignDonationModal/CampaignModalFooter";
+import CampaignModalHeader from "./CampaignDonationModal/CampaignModalHeader";
+import CampaignModalSteps from "./CampaignDonationModal/CampaignModalSteps";
+import CampaignPaymentFrame from "./CampaignDonationModal/CampaignPaymentFrame";
+import CampaignSuccessMessage from "./CampaignDonationModal/CampaignSuccessMessage";
+import type { CampaignDonationStep } from "./CampaignDonationModal/types";
 
-type Step = 1 | 2;
+import styles from "../DonationCampaignPage.module.scss";
 
 type Props = {
   open: boolean;
@@ -19,7 +25,14 @@ type Props = {
   campaignTitle: string;
   nedarim: DonationCampaignConfig["nedarim"];
   prefilledDonor?: DonorForm;
-  initialStep?: 1 | 2;
+  initialStep?: CampaignDonationStep;
+};
+
+const EMPTY_DONOR: DonorForm = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
 };
 
 const CampaignDonationModal: React.FC<Props> = ({
@@ -37,7 +50,7 @@ const CampaignDonationModal: React.FC<Props> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const customInputRef = useRef<HTMLInputElement>(null);
 
-  const [step, setStep] = useState<Step>(1);
+  const [step, setStep] = useState<CampaignDonationStep>(1);
   const [amountMode, setAmountMode] = useState<"preset" | "custom">("preset");
   const [selectedAmount, setSelectedAmount] = useState<number>(presetAmount);
   const [customRaw, setCustomRaw] = useState<string>("");
@@ -50,18 +63,19 @@ const CampaignDonationModal: React.FC<Props> = ({
     formState: { errors, isValid },
   } = useForm<DonorForm>({
     mode: "onChange",
-    defaultValues: prefilledDonor || { firstName: "", lastName: "", phone: "", email: "" },
+    defaultValues: prefilledDonor || EMPTY_DONOR,
   });
 
   const watchedDonor = watch();
   const currency: Currency = nedarim.Currency;
 
-  const { isPaying, errorText, setErrorText, startPayment, resetPaymentUi, ok } = useNedarimIframe({
-    enabled: open && step === 2,
-    iframeRef,
-    onSuccess: onClose,
-    successDelay: 4000,
-  });
+  const { isPaying, errorText, setErrorText, startPayment, resetPaymentUi, ok } =
+    useNedarimIframe({
+      enabled: open && step === 2,
+      iframeRef,
+      onSuccess: onClose,
+      successDelay: 4000,
+    });
 
   useEffect(() => {
     if (!open) return;
@@ -72,7 +86,7 @@ const CampaignDonationModal: React.FC<Props> = ({
 
     setSelectedAmount(presetAmount);
     setCustomRaw("");
-    reset(prefilledDonor || { firstName: "", lastName: "", phone: "", email: "" });
+    reset(prefilledDonor || EMPTY_DONOR);
 
     if (startWithCustom) {
       setAmountMode("custom");
@@ -80,13 +94,23 @@ const CampaignDonationModal: React.FC<Props> = ({
     } else {
       setAmountMode("preset");
     }
-  }, [open, presetAmount, startWithCustom, resetPaymentUi, setErrorText, prefilledDonor, initialStep, reset]);
+  }, [
+    open,
+    presetAmount,
+    startWithCustom,
+    resetPaymentUi,
+    setErrorText,
+    prefilledDonor,
+    initialStep,
+    reset,
+  ]);
 
   const amountToShow = useMemo(() => {
     if (amountMode === "custom") {
       const parsed = Number(customRaw.replace(/[^\d]/g, ""));
       return parsed > 0 ? parsed : 0;
     }
+
     return selectedAmount;
   }, [amountMode, customRaw, selectedAmount]);
 
@@ -106,19 +130,29 @@ const CampaignDonationModal: React.FC<Props> = ({
       PaymentType: nedarim.PaymentType,
     });
 
-    // ✅ חשוב: בלי ThirdPartyReceipt כדי שנדרים יפיקו קבלה אוטומטית
     return { ...base, ForceUpdateMatching: "1" };
-  }, [nedarim, amountToShow, currency, campaignTitle, yearLabel, shaliachName, watchedDonor]);
+  }, [
+    nedarim,
+    amountToShow,
+    currency,
+    campaignTitle,
+    yearLabel,
+    shaliachName,
+    watchedDonor,
+  ]);
 
   const goNext = () => {
     if (amountMode === "custom") {
       const parsed = Number(customRaw.replace(/[^\d]/g, ""));
+
       if (parsed < 1) {
         setErrorText("נא להזין סכום תקין");
         return;
       }
+
       setSelectedAmount(parsed);
     }
+
     setStep(2);
   };
 
@@ -129,150 +163,50 @@ const CampaignDonationModal: React.FC<Props> = ({
       <div className={styles.modalBackdrop} onClick={onClose} />
 
       <div className={styles.modal}>
-        <div className={styles.modalHeader}>
-          <div className={styles.modalTitle}>
-            {campaignTitle} <span className={styles.modalMuted}>{yearLabel}</span>
-          </div>
-          <button className={styles.modalClose} onClick={onClose} type="button">
-            ✕
-          </button>
-        </div>
+        <CampaignModalHeader
+          campaignTitle={campaignTitle}
+          yearLabel={yearLabel}
+          onClose={onClose}
+        />
 
-        {!ok && (
-          <div className={styles.modalSteps}>
-            <div className={`${styles.stepChip} ${step === 1 ? styles.stepChipActive : ""}`}>1. פרטים</div>
-            <div className={`${styles.stepChip} ${step === 2 ? styles.stepChipActive : ""}`}>2. תשלום</div>
-          </div>
-        )}
+        {!ok && <CampaignModalSteps step={step} />}
 
         <div className={styles.modalBody}>
           {ok ? (
-            <div className={styles.successMessage} style={{ textAlign: "center", padding: "40px 20px" }}>
-              <div style={{ fontSize: "60px", marginBottom: "20px" }}>🎉</div>
-              <h2 style={{ color: "#28a745", fontSize: "24px" }}>תודה רבה, {watchedDonor.firstName}!</h2>
-              <p style={{ fontSize: "18px" }}>
-                התרומה על סך <b>₪{selectedAmount}</b> התקבלה בהצלחה.
-              </p>
-              <p style={{ color: "#888", marginTop: "20px", fontSize: "0.9em" }}>החלון יסגר כעת...</p>
-            </div>
+            <CampaignSuccessMessage
+              firstName={watchedDonor.firstName}
+              selectedAmount={selectedAmount}
+            />
           ) : step === 1 ? (
-            <div className={styles.formContainer}>
-              <div className={styles.modalAmountBox}>
-                <span className={styles.modalAmountLabel}>סכום התרומה</span>
-                <span className={styles.modalAmountValue}>₪{amountToShow}</span>
-              </div>
-
-              {amountMode === "custom" && (
-                <div className={styles.customAmountRow}>
-                  <input
-                    ref={customInputRef}
-                    className={styles.customAmountInput}
-                    inputMode="numeric"
-                    placeholder="0"
-                    value={customRaw}
-                    onChange={(e) => setCustomRaw(e.target.value.replace(/[^0-9]/g, ""))}
-                  />
-                </div>
-              )}
-
-              <div className={styles.formGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>שם פרטי</label>
-                  <input
-                    className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
-                    {...register("firstName", {
-                      required: "שדה חובה",
-                      minLength: { value: 2, message: "מינימום 2 תווים" },
-                    })}
-                  />
-                  {errors.firstName && <span className={styles.errorText}>{errors.firstName.message}</span>}
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>שם משפחה</label>
-                  <input
-                    className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
-                    {...register("lastName", {
-                      required: "שדה חובה",
-                      minLength: { value: 2, message: "מינימום 2 תווים" },
-                    })}
-                  />
-                  {errors.lastName && <span className={styles.errorText}>{errors.lastName.message}</span>}
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>טלפון</label>
-                  <input
-                    className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
-                    {...register("phone", {
-                      required: "שדה חובה",
-                      pattern: { value: /^[0-9]{9,10}$/, message: "מספר טלפון לא תקין" },
-                    })}
-                  />
-                  {errors.phone && <span className={styles.errorText}>{errors.phone.message}</span>}
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>אימייל</label>
-                  <input
-                    className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-                    {...register("email", {
-                      required: "שדה חובה",
-                      pattern: {
-                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: "כתובת אימייל לא תקינה",
-                      },
-                    })}
-                  />
-                  {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
-                </div>
-              </div>
-            </div>
+            <CampaignDonorFields
+              amountMode={amountMode}
+              amountToShow={amountToShow}
+              customInputRef={customInputRef}
+              customRaw={customRaw}
+              errors={errors}
+              register={register}
+              setCustomRaw={setCustomRaw}
+            />
           ) : (
-            <div className={styles.iframeStep}>
-              <div className={styles.amountOnly}>₪{selectedAmount}</div>
-
-              <div className={styles.iframeCard}>
-                <iframe
-                  ref={iframeRef}
-                  title="Nedarim Plus"
-                  src="https://matara.pro/nedarimplus/iframe?language=he"
-                  className={styles.iframe}
-                  scrolling="no"
-                />
-              </div>
-            </div>
+            <CampaignPaymentFrame
+              iframeRef={iframeRef}
+              selectedAmount={selectedAmount}
+            />
           )}
 
-          {errorText && (
-            <div className={styles.errorBox} style={{ textAlign: "center", color: "red", marginTop: "10px" }}>
-              {errorText}
-            </div>
-          )}
+          {errorText && <div className={styles.errorBox}>{errorText}</div>}
         </div>
 
         {!ok && (
-          <div className={styles.modalFooter}>
-            <div className={styles.modalActions}>
-              <button
-                className={styles.btnSecondary}
-                onClick={step === 2 ? () => setStep(1) : onClose}
-                disabled={isPaying}
-                type="button"
-              >
-                {step === 2 ? "חזרה" : "ביטול"}
-              </button>
-
-              <button
-                className={styles.btnPrimary}
-                onClick={step === 1 ? handleSubmit(goNext) : () => startPayment(payload)}
-                disabled={isPaying || (step === 1 && !isValid)}
-                type="button"
-              >
-                {step === 1 ? "המשך לתשלום" : isPaying ? "מעבד..." : "בצע תשלום"}
-              </button>
-            </div>
-          </div>
+          <CampaignModalFooter
+            isPaying={isPaying}
+            isValid={isValid}
+            onBack={() => setStep(1)}
+            onCancel={onClose}
+            onNext={handleSubmit(goNext)}
+            onPay={() => startPayment(payload)}
+            step={step}
+          />
         )}
       </div>
     </div>

@@ -1,0 +1,167 @@
+@use "../../../../../styles/variables" as *;
+
+.amounts {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+}
+
+.amountButton,
+.amountActive,
+.amountFeatured {
+    position: relative;
+
+    min-height: 122px;
+    padding: 18px 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    border-radius: $radius-lg;
+
+    background: $brand-bg;
+    color: $brand-primary;
+
+    font: inherit;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.amountButton {
+    border: 1px solid rgba($brand-primary, 0.1);
+}
+
+.amountButton:hover,
+.amountFeatured:hover {
+    transform: translateY(-4px);
+
+    border-color: rgba($brand-secondary, 0.75);
+
+    box-shadow: 0 18px 34px $ui-shadow-blue-soft;
+}
+
+.amountFeatured {
+    border: 2px solid rgba($brand-secondary, 0.9);
+
+    background:
+        linear-gradient(180deg,
+            rgba($brand-secondary, 0.12),
+            rgba($brand-secondary, 0.04));
+
+    box-shadow: 0 18px 36px $ui-shadow-blue;
+
+    &::after {
+        content: "מומלץ";
+
+        position: absolute;
+        top: -11px;
+
+        padding: 5px 12px;
+
+        border-radius: $radius-pill;
+
+        background: $brand-secondary;
+        color: $brand-primary;
+
+        font-size: $type-micro;
+        font-weight: 900;
+    }
+}
+
+.amountActive {
+    transform: translateY(-4px);
+
+    border: 2px solid rgba($brand-secondary, 0.9);
+
+    background:
+        linear-gradient(180deg,
+            rgba($brand-secondary, 0.18),
+            rgba($brand-secondary, 0.08));
+
+    box-shadow: 0 24px 42px rgba(20, 60, 95, 0.16);
+
+    &::before {
+        content: "✓";
+
+        position: absolute;
+        top: 10px;
+        inset-inline-start: 12px;
+
+        width: 22px;
+        height: 22px;
+
+        display: grid;
+        place-items: center;
+
+        border-radius: $radius-pill;
+
+        background: $brand-primary;
+        color: $color-white;
+
+        font-size: $type-micro;
+        font-weight: 900;
+    }
+}
+
+.amountValue,
+.customAmountValue {
+    display: block;
+
+    color: $brand-primary;
+
+    font-weight: 900;
+    line-height: 1.05;
+    text-align: center;
+}
+
+.amountValue {
+    font-size: $type-display-number-sm;
+}
+
+.customAmountValue {
+    font-size: $type-card-title;
+}
+
+.amountTitle {
+    display: block;
+
+    color: rgba($brand-text, 0.68);
+
+    font-size: $type-body-sm;
+    font-weight: 800;
+    text-align: center;
+}
+
+.amountSubtitle {
+    color: rgba($brand-text, 0.58);
+
+    font-size: $type-micro;
+    text-align: center;
+}
+
+@media (max-width: 1100px) {
+    .amounts {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .amounts {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 420px) {
+    .amounts {
+        grid-template-columns: 1fr;
+    }
+}

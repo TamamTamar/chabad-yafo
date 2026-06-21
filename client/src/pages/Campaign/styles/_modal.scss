@@ -1,5 +1,6 @@
 @use "sass:color";
 @use "../../../styles/variables" as *;
+@use "./compact-form";
 
 .modalOverlay {
   position: fixed;
@@ -219,6 +220,48 @@
   }
 }
 
+.errorText {
+  color: #ff4d4d;
+  font-size: $type-micro;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.errorBox {
+  margin-top: 10px;
+  color: #d32f2f;
+  text-align: center;
+  font-weight: 700;
+}
+
+.successMessage {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.successIcon {
+  margin-bottom: 20px;
+  font-size: 3.75rem;
+  line-height: 1;
+}
+
+.successTitle {
+  margin: 0;
+  color: $ui-success;
+  font-size: $type-card-title;
+}
+
+.successText {
+  color: $brand-text;
+  font-size: $type-body-lg;
+}
+
+.successNote {
+  margin-top: 20px;
+  color: $ui-text-muted;
+  font-size: $type-caption;
+}
+
 .modalFooter {
   padding: 16px 24px;
   background: $brand-bg;
@@ -296,148 +339,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-// Compact Form Section
-.compactForm {
-  background: $brand-bg;
-  padding: 30px;
-  border-radius: $radius;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 450px;
-  margin: 0 auto;
-  border: 1px solid $ui-border-soft;
-
-  @media (max-width: 480px) {
-    padding: 20px 16px;
-  }
-
-  .compactInputSection {
-    text-align: center;
-    margin-bottom: 24px;
-
-    .compactLabel {
-      display: block;
-      font-size: $type-button;
-      font-weight: 800;
-      color: $brand-primary;
-      margin-bottom: 12px;
-    }
-
-    .amountInputWrapper {
-      position: relative;
-      display: inline-block;
-      width: 100%;
-      max-width: 200px;
-
-      .compactAmountInput {
-        width: 100%;
-        padding: 12px;
-        text-align: center;
-        font-size: $type-display-number;
-        font-weight: 900;
-        color: $brand-primary;
-        border: 2px solid $brand-secondary;
-        border-radius: $radius-sm;
-        outline: none;
-
-        &.inputError {
-          border-color: #ff4d4d;
-        }
-      }
-
-      &::before {
-        content: "₪";
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: $type-card-title;
-        font-weight: 900;
-        color: $brand-secondary;
-        pointer-events: none;
-      }
-    }
-  }
-
-.compactDetailsGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  margin-bottom: 20px;
-
-  @media (min-width: 640px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-  .calcLinkBtn {
-    display: inline-block;
-    margin-top: 12px;
-    background: rgba($brand-secondary, 0.15);
-    color: color.adjust($brand-secondary, $lightness: -20%);
-    border: 1px dashed $brand-secondary;
-    padding: 6px 14px;
-    border-radius: $radius-pill;
-    font-size: $type-caption;
-    font-weight: 800;
-    cursor: pointer;
-
-    &:hover {
-      background: $brand-secondary;
-      color: $brand-primary;
-    }
-  }
-
-  .compactSubmitBtn {
-    width: 100%;
-    background: linear-gradient(135deg, $brand-secondary, color.adjust($brand-secondary, $lightness: -10%));
-    color: $brand-primary;
-    padding: 16px;
-    border: none;
-    border-radius: $radius-pill;
-    font-size: $type-card-title;
-    font-weight: 900;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba($brand-secondary, 0.3);
-    transition: transform 0.2s;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-  }
-    /* ===== Compact: override modal field defaults + tighter inputs ===== */
-  .field {
-    min-height: auto; // לא 70px כמו במודאל
-    gap: 6px;
-  }
-
-  .label {
-    text-align: right;
-    font-size: $type-caption;
-    line-height: 1.1;
-  }
-
-  /* גורם לשדות להיות "קטנים יותר" בתוך כל תא */
-  .input {
-    width: 100%;
-    max-width: 280px;     // ✅ מקטין רוחב השדות
-    padding: 10px 12px;
-    border-radius: 10px;
-    margin-inline-start: auto; // ✅ ב-RTL זה מיישר לימין
-  }
-
-  .error {
-    font-size: $type-micro;
-    margin-top: 0;
-    text-align: right;
-  }
-  
 }

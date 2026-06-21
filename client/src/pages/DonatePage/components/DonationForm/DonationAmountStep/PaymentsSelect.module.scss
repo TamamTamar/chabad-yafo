@@ -1,0 +1,48 @@
+@use "../../../../../styles/variables" as *;
+
+.fieldset {
+    display: grid;
+    gap: 14px;
+
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.legend {
+    margin: 0 0 6px;
+
+    color: $brand-primary;
+
+    font-size: $type-body-lg;
+    font-weight: 900;
+}
+
+.input {
+    width: 100%;
+
+    padding: 12px 44px 12px 14px;
+
+    border: 1px solid rgba($brand-primary, 0.12);
+    border-radius: $radius;
+
+    background: $brand-bg;
+    color: $brand-text;
+
+    font: inherit;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+    &:focus {
+        border-color: rgba($brand-secondary, 0.9);
+
+        background: rgba($brand-secondary, 0.04);
+
+        box-shadow: 0 0 0 4px rgba($brand-secondary, 0.14);
+    }
+}

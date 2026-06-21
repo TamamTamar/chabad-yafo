@@ -1,0 +1,46 @@
+import styles from "../../DonationCampaignPage.module.scss";
+import type { CampaignDonationStep } from "./types";
+
+type CampaignModalFooterProps = {
+  isPaying: boolean;
+  isValid: boolean;
+  onBack: () => void;
+  onCancel: () => void;
+  onNext: () => void;
+  onPay: () => void;
+  step: CampaignDonationStep;
+};
+
+const CampaignModalFooter = ({
+  isPaying,
+  isValid,
+  onBack,
+  onCancel,
+  onNext,
+  onPay,
+  step,
+}: CampaignModalFooterProps) => (
+  <div className={styles.modalFooter}>
+    <div className={styles.modalActions}>
+      <button
+        className={styles.btnSecondary}
+        onClick={step === 2 ? onBack : onCancel}
+        disabled={isPaying}
+        type="button"
+      >
+        {step === 2 ? "חזרה" : "ביטול"}
+      </button>
+
+      <button
+        className={styles.btnPrimary}
+        onClick={step === 1 ? onNext : onPay}
+        disabled={isPaying || (step === 1 && !isValid)}
+        type="button"
+      >
+        {step === 1 ? "המשך לתשלום" : isPaying ? "מעבד..." : "בצע תשלום"}
+      </button>
+    </div>
+  </div>
+);
+
+export default CampaignModalFooter;
