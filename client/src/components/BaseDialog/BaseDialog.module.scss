@@ -1,5 +1,7 @@
 /* BaseDialog.module.scss */
 
+@use "../../styles/variables" as *;
+
 .dialog {
     border: 0;
     padding: 0;
@@ -49,7 +51,7 @@
 
 .title {
     margin: 0;
-    font-size: 18px;
+    font-size: $type-card-title;
     font-weight: 900;
     letter-spacing: 0.2px;
 }
@@ -58,7 +60,7 @@
     border: 0;
     background: transparent;
     color: rgba(255, 255, 255, 0.9);
-    font-size: 18px;
+    font-size: $type-card-title;
     cursor: pointer;
 
     padding: 6px 10px;
@@ -90,7 +92,7 @@
     margin: 0;
     line-height: 1.65;
     color: rgba(255, 255, 255, 0.92);
-    font-size: 15px;
+    font-size: $type-body-sm;
 }
 
 .actions {

@@ -22,7 +22,7 @@
 .title {
     margin: 0 0 12px;
     color: $brand-primary;
-    font-size: 2rem;
+    font-size: $type-section-title-sm;
 }
 
 .description {
@@ -36,7 +36,7 @@
     padding: 14px 16px;
     border-radius: 14px;
     border: 1px solid $ui-border-soft;
-    font-size: 1rem;
+    font-size: $type-input;
     margin-bottom: 16px;
     text-align: center;
 
@@ -72,5 +72,5 @@
     display: block;
     margin-bottom: 14px;
     color: #c62828;
-    font-size: 0.95rem;
+    font-size: $type-body-sm;
 }

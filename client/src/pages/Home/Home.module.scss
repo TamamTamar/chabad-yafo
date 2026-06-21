@@ -55,7 +55,7 @@
 
   color: $brand-secondary;
 
-  font-size: 0.9rem;
+  font-size: $type-eyebrow;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
@@ -65,9 +65,9 @@
 
   color: $brand-primary;
 
-  font-size: clamp(1.45rem, 2.7vw, 2.2rem);
+  font-size: $type-section-title-sm;
   font-weight: 900;
-  line-height: 1.22;
+  line-height: $line-title;
 }
 
 .aboutBridgeText {
@@ -76,8 +76,8 @@
 
   color: $ui-text-muted;
 
-  font-size: 1.04rem;
-  line-height: 1.8;
+  font-size: $type-body-lg;
+  line-height: $line-body;
 }
 
 .aboutBridgeButton {

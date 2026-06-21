@@ -31,6 +31,14 @@ const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink }: Props) => {
                 אודות
             </Link>
 
+            <Link
+                to="/gallery"
+                className={styles.navLink}
+                onClick={onCloseMenu}
+            >
+                גלריה
+            </Link>
+
             {/* לינק רגיל - צור קשר */}
             <a 
                 href={whatsappLink} 

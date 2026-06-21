@@ -17,14 +17,16 @@
 
 .title {
     margin-bottom: 12px;
-    font-size: 24px;
+    font-size: $type-section-title-sm;
     font-weight: 800;
+    line-height: $line-title;
 }
 
 .description {
     margin-bottom: 20px;
     opacity: .95;
-    line-height: 1.7;
+    font-size: $type-body;
+    line-height: $line-body;
 }
 
 /* CTA Button - בהיר על רקע כהה */

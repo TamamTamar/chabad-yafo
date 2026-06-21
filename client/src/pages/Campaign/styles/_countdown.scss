@@ -19,7 +19,7 @@
 
 .countdownTitle {
   color: $brand-primary;
-  font-size: clamp(22px, 5vw, 28px); // גודל דינמי
+  font-size: $type-section-title-sm;
   font-weight: 900;
   line-height: 1.2;
   margin: 0;
@@ -55,20 +55,20 @@
 }
 
 .timeNum {
-  font-size: clamp(20px, 5vw, 32px); // מספרים קצת יותר קטנים במובייל
+  font-size: $type-display-number-sm;
   font-weight: 900;
   line-height: 1;
 }
 
 .timeLbl {
-  font-size: clamp(10px, 3vw, 13px); // תוויות מותאמות
+  font-size: $type-micro;
   font-weight: 700;
   opacity: 0.9;
 }
 
 .countdownDone {
   color: $brand-primary;
-  font-size: clamp(18px, 4vw, 28px);
+  font-size: $type-section-title-sm;
   font-weight: 900;
   max-width: 90%;
   line-height: 1.3;

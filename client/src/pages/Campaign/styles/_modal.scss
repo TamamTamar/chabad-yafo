@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../../styles/variables" as *;
 
 .modalOverlay {
@@ -55,7 +56,7 @@
 }
 
 .modalTitle {
-  font-size: 18px;
+  font-size: $type-card-title;
   font-weight: 900;
 
   .modalMuted {
@@ -68,7 +69,7 @@
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 20px;
+  font-size: $type-card-title;
   cursor: pointer;
   opacity: 0.7;
   transition: opacity 0.2s;
@@ -89,7 +90,7 @@
 }
 
 .stepChip {
-  font-size: 13px;
+  font-size: $type-caption;
   font-weight: 800;
   color: $ui-text-muted;
   padding-bottom: 4px;
@@ -124,11 +125,11 @@
   .modalAmountLabel {
     font-weight: 700;
     color: $brand-primary;
-    font-size: 14px;
+    font-size: $type-body-sm;
   }
 
   .modalAmountValue {
-    font-size: 20px;
+    font-size: $type-card-title;
     font-weight: 900;
     color: $brand-primary;
   }
@@ -144,7 +145,7 @@
     width: 100%;
     padding: 8px;
     text-align: center;
-    font-size: 26px;
+    font-size: $type-section-title-sm;
     font-weight: 900;
     color: $brand-primary;
     border: 2px solid $brand-secondary;
@@ -162,7 +163,7 @@
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 18px;
+    font-size: $type-card-title;
     font-weight: 900;
     color: $brand-secondary;
     pointer-events: none;
@@ -186,7 +187,7 @@
   min-height: 70px; // שומר מקום לשגיאה כדי למנוע קפיצות
 
   .label {
-    font-size: 12px;
+    font-size: $type-micro;
     font-weight: 800;
     color: $brand-primary;
   }
@@ -195,7 +196,7 @@
     padding: 9px 12px;
     border: 1px solid $ui-border-soft;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: $type-input;
     transition: border-color 0.2s;
 
     &:focus {
@@ -212,7 +213,7 @@
 
   .error {
     color: #ff4d4d;
-    font-size: 10px;
+    font-size: $type-micro;
     font-weight: 600;
     margin-top: 2px;
   }
@@ -233,13 +234,13 @@
 }
 
 .btnPrimary {
-  background: linear-gradient(135deg, $brand-secondary, darken($brand-secondary, 10%));
+  background: linear-gradient(135deg, $brand-secondary, color.adjust($brand-secondary, $lightness: -10%));
   color: $brand-primary;
   border: none;
   padding: 11px;
   border-radius: 999px;
   font-weight: 900;
-  font-size: 15px;
+  font-size: $type-body-sm;
   cursor: pointer;
 
   &:disabled {
@@ -259,13 +260,13 @@
 
 .micro {
   text-align: center;
-  font-size: 10px;
+  font-size: $type-micro;
   color: $ui-text-muted;
 }
 
 .amountOnly {
   text-align: center;
-  font-size: 28px;
+  font-size: $type-display-number-sm;
   font-weight: 900;
   color: $brand-primary;
   margin-bottom: 12px;
@@ -318,7 +319,7 @@
 
     .compactLabel {
       display: block;
-      font-size: 16px;
+      font-size: $type-button;
       font-weight: 800;
       color: $brand-primary;
       margin-bottom: 12px;
@@ -334,7 +335,7 @@
         width: 100%;
         padding: 12px;
         text-align: center;
-        font-size: 32px;
+        font-size: $type-display-number;
         font-weight: 900;
         color: $brand-primary;
         border: 2px solid $brand-secondary;
@@ -352,7 +353,7 @@
         right: 15px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 20px;
+        font-size: $type-card-title;
         font-weight: 900;
         color: $brand-secondary;
         pointer-events: none;
@@ -375,11 +376,11 @@
     display: inline-block;
     margin-top: 12px;
     background: rgba($brand-secondary, 0.15);
-    color: darken($brand-secondary, 20%);
+    color: color.adjust($brand-secondary, $lightness: -20%);
     border: 1px dashed $brand-secondary;
     padding: 6px 14px;
     border-radius: 999px;
-    font-size: 13px;
+    font-size: $type-caption;
     font-weight: 800;
     cursor: pointer;
 
@@ -391,12 +392,12 @@
 
   .compactSubmitBtn {
     width: 100%;
-    background: linear-gradient(135deg, $brand-secondary, darken($brand-secondary, 10%));
+    background: linear-gradient(135deg, $brand-secondary, color.adjust($brand-secondary, $lightness: -10%));
     color: $brand-primary;
     padding: 16px;
     border: none;
     border-radius: 999px;
-    font-size: 18px;
+    font-size: $type-card-title;
     font-weight: 900;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba($brand-secondary, 0.3);
@@ -420,7 +421,7 @@
 
   .label {
     text-align: right;
-    font-size: 13px;
+    font-size: $type-caption;
     line-height: 1.1;
   }
 
@@ -434,7 +435,7 @@
   }
 
   .error {
-    font-size: 11px;
+    font-size: $type-micro;
     margin-top: 0;
     text-align: right;
   }

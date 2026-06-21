@@ -23,6 +23,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 22px;
+  animation: softRise 600ms ease 420ms both;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(20, 60, 95, 0.14);
+  }
 }
 
 .topbar {
@@ -43,13 +52,13 @@
 
 .title {
   margin: 0;
-  font-size: 16px;
+  font-size: $type-body;
   font-weight: 700;
   color: $brand-primary;
 }
 
 .date {
-  font-size: 13px;
+  font-size: $type-caption;
   color: rgba($brand-text, 0.6);
 }
 
@@ -70,13 +79,13 @@
 }
 
 .timeLabel {
-  font-size: 12px;
+  font-size: $type-caption;
   font-weight: 700;
   color: rgba($brand-text, 0.55);
 }
 
 .timeValue {
-  font-size: 22px;
+  font-size: $type-card-title;
   line-height: 1;
   font-weight: 850;
   color: $brand-primary;
@@ -114,11 +123,11 @@
   }
 
   .title {
-    font-size: 16px;
+    font-size: $type-body;
   }
 
   .date {
-    font-size: 12px;
+    font-size: $type-caption;
   }
 
   .timesBox {
@@ -127,6 +136,6 @@
   }
 
   .timeValue {
-    font-size: 18px;
+    font-size: $type-card-title;
   }
 }

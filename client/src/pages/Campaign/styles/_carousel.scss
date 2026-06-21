@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../../styles/variables" as *;
 
 
@@ -18,7 +19,7 @@
   width: 100%;
   height: 80px; 
   // שימוש בכחול המותגי שלך עם גרדיאנט עמוק
-  background: linear-gradient(90deg, darken($brand-primary, 10%) 0%, $brand-primary 100%);
+  background: linear-gradient(90deg, color.adjust($brand-primary, $lightness: -10%) 0%, $brand-primary 100%);
   overflow: hidden;
   border-bottom: 3px solid $brand-secondary; // שימוש בזהב יפו כקו מפריד
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -56,7 +57,7 @@
     
     h2 {
       margin: 0;
-      font-size: 18px;
+      font-size: $type-card-title;
       color: $brand-secondary; // זהב לכותרת הקמפיין
       font-weight: 900;
       text-shadow: 0 1px 2px rgba(0,0,0,0.3);
@@ -64,7 +65,7 @@
     
     p {
       margin: 0;
-      font-size: 14px;
+      font-size: $type-body-sm;
       color: #ffffff; // לבן נקי על רקע כחול
       opacity: 0.95;
     }
@@ -77,7 +78,7 @@
     border-radius: 50px;
     font-weight: 800;
     text-decoration: none;
-    font-size: 14px;
+    font-size: $type-body-sm;
     white-space: nowrap;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     transition: all 0.2s ease;
@@ -86,7 +87,7 @@
     animation: buttonPulse 2s infinite;
 
     &:hover {
-      background: lighten($brand-secondary, 10%);
+      background: color.adjust($brand-secondary, $lightness: 10%);
       transform: scale(1.05);
       animation: none; // מפסיק את הפעימה כשעומדים על הכפתור
     }
@@ -136,8 +137,8 @@
     
     .slideText { 
       text-align: center; 
-      h2 { font-size: 17px; }
-      p { font-size: 13px; padding: 0 10px; }
+      h2 { font-size: $type-card-title; }
+      p { font-size: $type-caption; padding: 0 10px; }
     }
 
     .slideBtn {

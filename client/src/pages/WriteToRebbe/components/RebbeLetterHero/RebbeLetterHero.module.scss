@@ -44,7 +44,7 @@
 
     color: $brand-secondary;
 
-    font-size: 0.95rem;
+    font-size: $type-eyebrow;
     font-weight: 900;
 
     letter-spacing: 0.08em;
@@ -55,10 +55,10 @@
 
     color: $hero-title-color;
 
-    font-size: clamp(3rem, 6vw, 5rem);
+    font-size: $type-hero-title;
     font-weight: 900;
 
-    line-height: 1;
+    line-height: $line-title;
 }
 
 .subtitle {
@@ -66,9 +66,9 @@
 
     color: $hero-subtitle-color;
 
-    font-size: 1.4rem;
+    font-size: $type-hero-subtitle;
     font-weight: 500;
-    line-height: 1.8;
+    line-height: $line-body;
 }
 
 @media (max-width: 768px) {
@@ -83,12 +83,12 @@
     }
 
     .title {
-        font-size: clamp(2.6rem, 10vw, 4rem);
+        font-size: $type-hero-title-compact;
     }
 
     .subtitle {
-        font-size: 1.2rem;
-        line-height: 1.75;
+        font-size: $type-body;
+        line-height: $line-body;
     }
 
     .overlay {

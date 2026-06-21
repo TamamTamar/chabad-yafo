@@ -27,14 +27,14 @@
 
 .title {
     font-weight: 800;
-    font-size: 24px;
+    font-size: $type-section-title-sm;
     color: $brand-primary;
     position: relative;
     padding: 0 12px;
     text-align: center;
 
     @media (min-width: 720px) {
-        font-size: 26px;
+        font-size: $type-section-title-sm;
         padding: 0 14px;
     }
 
@@ -153,7 +153,7 @@
 
 .cardTitle {
     margin: 0;
-    font-size: 18px;
+    font-size: $type-card-title;
     font-weight: 800;
     color: $brand-text;
     line-height: 1.25;
@@ -176,7 +176,7 @@
 
 .shaliach {
     margin: 0;
-    font-size: 14px;
+    font-size: $type-body-sm;
     font-weight: 600;
     color: $brand-primary;
     line-height: 1.35;
@@ -184,7 +184,7 @@
 
 .address {
     margin: 0;
-    font-size: 14px;
+    font-size: $type-body-sm;
     color: $ui-text-muted;
     line-height: 1.35;
 }
@@ -193,7 +193,7 @@
     margin-top: 10px;
     padding-top: 8px;
     border-top: 1px solid $ui-border-soft;
-    font-size: 14px;
+    font-size: $type-body-sm;
     font-weight: 600;
 }
 /* ===== Mobile tap feedback ===== */

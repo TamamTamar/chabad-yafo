@@ -13,7 +13,7 @@
 
 .eyebrow {
     color: $brand-secondary;
-    font-size: 14px;
+    font-size: $type-eyebrow;
     font-weight: 800;
     letter-spacing: .08em;
 }
@@ -21,9 +21,9 @@
 .title {
     margin:0 0 25px 0;
     color: $brand-primary;
-    font-size: clamp(32px, 5vw, 48px);
+    font-size: $type-section-title;
     font-weight: 800;
-        line-height: 1;
+    line-height: $line-title;
 }
 
 .grid {
@@ -60,7 +60,7 @@
 
 .cardTitle {
     color: $brand-primary;
-    font-size: 20px;
+    font-size: $type-card-title;
     font-weight: 800;
 }
 
@@ -69,7 +69,8 @@
 
     color: rgba($brand-text, .75);
 
-    line-height: 1.8;
+    font-size: $type-body;
+    line-height: $line-body;
 }
 
 @media (max-width: 900px) {

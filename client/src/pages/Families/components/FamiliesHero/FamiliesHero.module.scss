@@ -38,8 +38,8 @@
 .heroTitle {
     margin: 16px 0;
     color: $brand-primary;
-    font-size: clamp(2.8rem, 6vw, 5.8rem);
-    line-height: 1.05;
+    font-size: $type-hero-title;
+    line-height: $line-title;
     font-weight: 900;
     animation: titlePop 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -51,8 +51,8 @@
     margin-bottom: 32px;
     border-radius: $radius-sm;
     color: $brand-text;
-    font-size: 1.28rem;
-    line-height: 1.85;
+    font-size: $type-hero-subtitle;
+    line-height: $line-body;
     font-weight: 600;
     background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(6px);
@@ -73,7 +73,7 @@
     background: linear-gradient(135deg, #f3bf3d, #ffd76a);
     color: #173a63;
     text-decoration: none;
-    font-size: 1.08rem;
+    font-size: $type-body;
     font-weight: 900;
 
     box-shadow:
@@ -205,8 +205,8 @@
 
     .heroTitle {
         margin: 0 0 12px;
-        font-size: clamp(2.25rem, 10vw, 3.2rem);
-        line-height: 1.02;
+        font-size: $type-hero-title-compact;
+        line-height: $line-title;
         animation: fadeUp 0.6s ease both;
     }
 
@@ -215,7 +215,7 @@
         max-width: 340px;
         margin: 0 0 16px;
         padding: 12px 14px;
-        font-size: 0.98rem;
+        font-size: $type-body-sm;
         line-height: 1.65;
         font-weight: 700;
         background: rgba(255, 255, 255, 0.8);
@@ -228,7 +228,7 @@
         max-width: 320px;
         min-height: 56px;
         padding: 15px 24px;
-        font-size: 1rem;
+        font-size: $type-body;
         margin-top: auto;
         animation: fadeUp 0.6s ease 0.3s both;
     }

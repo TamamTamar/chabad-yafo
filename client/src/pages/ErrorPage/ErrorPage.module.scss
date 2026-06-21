@@ -1,8 +1,6 @@
+@use "../../styles/variables" as *;
+
 .errorPage {
-    --primary-blue: #1f4e79;
-    --accent-gold: #e6c98b;
-    --text-dark: #0e1a22;
-    --text-muted: #475569;
 
     position: relative;
     min-height: 100dvh;
@@ -12,7 +10,7 @@
     padding: 24px;
     direction: rtl;
     overflow: hidden;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: "Assistant", system-ui, -apple-system, sans-serif;
 
     background: linear-gradient(135deg,
             #1a4369 0%,
@@ -52,7 +50,7 @@
     transform: translateX(-50%);
     width: 80%;
     height: 4px;
-    background: var(--accent-gold);
+    background: $brand-secondary;
     border-radius: 0 0 8px 8px;
     transform: translateX(-50%) scaleX(0);
     animation: expandLine 0.9s ease-out forwards;
@@ -72,18 +70,18 @@
     padding: 6px 16px;
     border-radius: 100px;
     background: rgba(230, 201, 139, 0.15);
-    color: var(--primary-blue);
-    font-size: 0.9rem;
+    color: $brand-primary;
+    font-size: $type-eyebrow;
     font-weight: 700;
     letter-spacing: 0.5px;
 }
 
 .title {
     margin-bottom: 20px;
-    font-size: clamp(1.8rem, 5vw, 2.6rem); // גודל רספונסיבי
+    font-size: $type-section-title;
     font-weight: 850;
-    color: var(--text-dark);
-    line-height: 1.2;
+    color: $brand-text;
+    line-height: $line-title;
 }
 
 .content {
@@ -91,15 +89,15 @@
 }
 
 .text {
-    font-size: 1.15rem;
-    color: var(--text-muted);
+    font-size: $type-body-lg;
+    color: $ui-text-muted;
     line-height: 1.6;
     margin-bottom: 8px;
 }
 
 .subText {
-    font-size: 1.05rem;
-    color: var(--text-dark);
+    font-size: $type-body;
+    color: $brand-text;
     font-weight: 500;
 }
 
@@ -112,7 +110,7 @@
     border-radius: 100px;
     background: #25d366;
     color: #fff;
-    font-size: 1.1rem;
+    font-size: $type-button;
     font-weight: 700;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -134,11 +132,11 @@
 }
 
 .note {
-    font-size: 0.9rem;
+    font-size: $type-body-sm;
     color: #64748b;
 
     strong {
-        color: var(--primary-blue);
+        color: $brand-primary;
     }
 }
 

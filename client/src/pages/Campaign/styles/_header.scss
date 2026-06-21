@@ -37,7 +37,7 @@
 
 .title {
   color: $brand-primary;
-  font-size: clamp(26px, 5vw, 48px); // הקטנת המינימום למובייל (מ-32 ל-26)
+  font-size: $type-section-title;
   font-weight: 900;
   margin: 0;
   line-height: 1.1;

@@ -39,7 +39,7 @@
 
     color: $brand-secondary;
 
-    font-size: 13px;
+    font-size: $type-caption;
     font-weight: 900;
 }
 
@@ -48,7 +48,7 @@
 
     color: $brand-primary;
 
-    font-size: clamp(30px, 3.4vw, 42px);
+    font-size: $type-section-title;
     font-weight: 900;
     line-height: 1.12;
 }
@@ -59,7 +59,7 @@
 
     color: $ui-text-muted;
 
-    font-size: 15px;
+    font-size: $type-body-sm;
     line-height: 1.65;
 }
 
@@ -86,7 +86,7 @@ text-align: center;
     color: $brand-primary;
 
     font: inherit;
-    font-size: 13px;
+    font-size: $type-caption;
     font-weight: 900;
 
     cursor: pointer;
@@ -144,7 +144,7 @@ text-align: center;
     }
 
     .title {
-        font-size: 30px;
+        font-size: $type-section-title-sm;
     }
 
     .steps {
@@ -155,7 +155,7 @@ text-align: center;
     .stepActive {
         min-width: auto;
         padding: 8px 11px;
-        font-size: 12px;
+        font-size: $type-caption;
     }
 
     .stepLine {

@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../../../../styles/variables" as *;
 
 .stepContent {
@@ -19,7 +20,7 @@
 
     color: $brand-primary;
 
-    font-size: 1.05rem;
+    font-size: $type-body-lg;
     font-weight: 900;
 }
 
@@ -30,7 +31,7 @@
 
     color: rgba($brand-text, 0.72);
 
-    font-size: 0.95rem;
+    font-size: $type-body-sm;
     line-height: 1.7;
 }
 
@@ -110,7 +111,7 @@
         background: $brand-secondary;
         color: $brand-primary;
 
-        font-size: 0.72rem;
+        font-size: $type-micro;
         font-weight: 900;
     }
 }
@@ -145,7 +146,7 @@
         background: $brand-primary;
         color: #ffffff;
 
-        font-size: 12px;
+        font-size: $type-micro;
         font-weight: 900;
     }
 }
@@ -162,11 +163,11 @@
 }
 
 .amountValue {
-    font-size: 1.7rem;
+    font-size: $type-display-number-sm;
 }
 
 .customAmountValue {
-    font-size: 1.42rem;
+    font-size: $type-card-title;
 }
 
 .amountTitle {
@@ -174,7 +175,7 @@
 
     color: rgba($brand-text, 0.68);
 
-    font-size: 0.95rem;
+    font-size: $type-body-sm;
     font-weight: 800;
     text-align: center;
 }
@@ -182,7 +183,7 @@
 .amountSubtitle {
     color: rgba($brand-text, 0.58);
 
-    font-size: 0.78rem;
+    font-size: $type-micro;
     text-align: center;
 }
 
@@ -198,7 +199,7 @@
 .fieldLabel {
     color: $brand-primary;
 
-    font-size: 0.9rem;
+    font-size: $type-eyebrow;
     font-weight: 800;
 }
 
@@ -215,7 +216,7 @@
 
     color: $brand-primary;
 
-    font-size: 1.05rem;
+    font-size: $type-body-lg;
     font-weight: 900;
 
     pointer-events: none;
@@ -281,7 +282,7 @@
     border-radius: 16px;
 
     font: inherit;
-    font-size: 0.95rem;
+    font-size: $type-body-sm;
     font-weight: 900;
 
     cursor: pointer;
@@ -322,7 +323,7 @@
 
     color: #c62828;
 
-    font-size: 0.82rem;
+    font-size: $type-caption;
     font-weight: 700;
 }
 
@@ -350,7 +351,7 @@
     color: #ffffff;
 
     font: inherit;
-    font-size: 1rem;
+    font-size: $type-button;
     font-weight: 900;
 
     cursor: pointer;
@@ -365,7 +366,7 @@
     &:hover {
         transform: translateY(-2px);
 
-        background: darken($brand-primary, 4%);
+        background: color.adjust($brand-primary, $lightness: -4%);
 
         box-shadow: 0 18px 36px rgba(20, 60, 95, 0.24);
     }
@@ -402,7 +403,7 @@
         min-height: 42px;
         padding: 6px 8px;
 
-        font-size: 0.84rem;
+        font-size: $type-caption;
         line-height: 1.2;
 
         white-space: normal;

@@ -34,6 +34,14 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink }: Props) => 
                         אודות
                     </Link>
 
+                    <Link
+                        to="/gallery"
+                        className={m.drawerItem}
+                        onClick={onClose}
+                    >
+                        גלריה
+                    </Link>
+
                     {/* קישור חיצוני לוואטסאפ - מעולה ל-SEO */}
                     <a
                         href={whatsappLink}

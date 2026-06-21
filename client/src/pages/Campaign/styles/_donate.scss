@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../../styles/variables" as *;
 
 .donateSection {
@@ -13,13 +14,13 @@
 .donateTitle {
   margin: 0;
   font-weight: 900;
-  font-size: clamp(20px, 4vw, 24px); // כותרת שקטינה מעט במובייל
+  font-size: $type-card-title;
   color: $brand-primary;
 }
 
 .donateSub {
   margin-top: 6px;
-  font-size: 14px;
+  font-size: $type-body-sm;
   color: $ui-text-muted;
   padding: 0 10px; // מניעת היצמדות טקסט לקצוות
 }
@@ -45,7 +46,7 @@
   background: #ffffff;
   color: $brand-primary;
   font-weight: 800;
-  font-size: clamp(16px, 3.5vw, 18px);
+  font-size: $type-button;
   padding: 14px 10px; // צמצום קל של הפדינג
   cursor: pointer;
   transition: all 0.2s ease;
@@ -68,7 +69,7 @@
   border-color: $brand-secondary;
 
   &:hover {
-    background: darken($brand-secondary, 5%);
+    background: color.adjust($brand-secondary, $lightness: -5%);
     box-shadow: 0 6px 15px rgba($brand-secondary, 0.4);
   }
 }

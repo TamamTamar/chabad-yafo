@@ -18,7 +18,7 @@ const Hero = () => {
 
                     <div className={styles.actions}>
                         <Link to="/shabbat" className={styles.primary}>
-                            רישום לסעודת שבת
+                            סעודות שבת
                         </Link>
 
                         <Link to="/donate#donate-form"

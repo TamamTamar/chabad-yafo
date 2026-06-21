@@ -18,7 +18,7 @@ const FloatingSocials = () => {
                 href="https://www.instagram.com/chabad_yaffo"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${styles.fab} ${styles.instagram}`}
+                className={`${styles.fab} ${styles.instagram} ${styles.secondarySocial}`}
                 aria-label="מעבר לעמוד אינסטגרם"
             >
                 <Instagram size={20} strokeWidth={1.8} />
@@ -28,7 +28,7 @@ const FloatingSocials = () => {
                 href="https://www.facebook.com/profile.php?id=61551949830199"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${styles.fab} ${styles.facebook}`}
+                className={`${styles.fab} ${styles.facebook} ${styles.secondarySocial}`}
                 aria-label="מעבר לעמוד פייסבוק"
             >
                 <Facebook size={20} strokeWidth={1.8} />

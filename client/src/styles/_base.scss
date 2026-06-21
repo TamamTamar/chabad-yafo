@@ -9,7 +9,7 @@
 html {
     direction: rtl;
     scroll-behavior: smooth;
-    scroll-padding-top: $header-height;
+    scroll-padding-top: calc($header-height + 28px);
 }
 
 body {
@@ -32,8 +32,58 @@ button {
     cursor: pointer;
 }
 
+a,
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a:active,
+button:active {
+    transform: scale(0.99);
+}
+
 .container {
     max-width: $max-width;
     margin: 0 auto;
     padding: 0 16px;
+}
+
+section[id],
+#donate-form,
+#form,
+#donation-form-section {
+    scroll-margin-top: calc($header-height + 28px);
+}
+
+@keyframes softRise {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes softFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+    }
 }

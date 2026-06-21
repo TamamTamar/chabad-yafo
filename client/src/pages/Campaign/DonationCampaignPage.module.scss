@@ -131,7 +131,7 @@
 
 .machatzitText {
   color: #fff;
-  font-size: clamp(18px, 4.5vw, 22px);
+  font-size: $type-card-title;
   font-weight: 900;
   text-align: center;
 }

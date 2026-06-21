@@ -21,8 +21,8 @@
 
     .title {
         margin-bottom: 24px;
-        font-size: 2rem;
-        line-height: 1.25;
+        font-size: $type-section-title-sm;
+        line-height: $line-title;
         font-weight: 800;
         text-align: center;
     }
@@ -30,7 +30,8 @@
     .text {
         max-width: 420px;
         margin: 0 auto 22px;
-        line-height: 1.9;
+        font-size: $type-body;
+        line-height: $line-body;
         color: rgba(255, 255, 255, 0.9);
         text-align: center;
     }
@@ -49,7 +50,7 @@
 
     .signatureName {
         color: #d8ae5a;
-        font-size: 1.35rem;
+        font-size: $type-card-title;
         font-weight: 700;
         line-height: 1.4;
     }
@@ -57,7 +58,7 @@
     .signatureRole {
         margin-top: 4px;
         color: rgba(255, 255, 255, 0.78);
-        font-size: 0.95rem;
+        font-size: $type-body-sm;
     }
 }
 
@@ -81,11 +82,11 @@
         padding: 36px 24px;
 
         h2 {
-            font-size: 1.75rem;
+            font-size: $type-section-title-sm;
         }
 
         p {
-            font-size: 0.98rem;
+            font-size: $type-body;
             line-height: 1.85;
         }
     }

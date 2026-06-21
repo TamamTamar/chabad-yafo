@@ -4,8 +4,14 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    background: $header-bg-bottom;
+    background: linear-gradient(
+        180deg,
+        rgba(22, 58, 88, 0.96),
+        rgba(18, 48, 76, 0.94)
+    );
+    backdrop-filter: blur(14px);
     border-bottom: 1px solid $header-border;
+    box-shadow: 0 8px 24px rgba(8, 30, 50, 0.12);
 }
 
 /* 3 אזורים: ימין | מרכז | שמאל (ב-flex) */
@@ -46,7 +52,7 @@
     color: $header-nav-text-hover;
     font-weight: 900;
     letter-spacing: 0.2px;
-    font-size: 15px;
+    font-size: $type-nav;
     padding: 6px 0;
     white-space: nowrap;
 }
@@ -57,7 +63,7 @@
 .navDesktop {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 24px;
     white-space: nowrap;
 }
 
@@ -67,7 +73,7 @@
     color: $header-nav-text;
     font-weight: 700;
     line-height: 1;
-    font-size: 15px;
+    font-size: $type-nav;
     transition: color 0.2s ease;
 
     &:hover {
@@ -89,7 +95,7 @@
     // מראה זהה ללינקים
     color: $header-nav-text;
     font-weight: 700;
-    font-size: 15px;
+    font-size: $type-nav;
     line-height: 1;
     transition: color 0.2s ease;
 
@@ -112,15 +118,15 @@
     justify-content: center;
 
     // פרופורציות משופרות
-    height: 42px; 
-    padding: 0 24px; 
-    border-radius: 12px;
+    height: 40px;
+    padding: 0 22px;
+    border-radius: 999px;
 
     background: linear-gradient(180deg, $header-cta-top, $header-cta-bottom);
     color: $header-cta-text !important;
 
     font-weight: 900;
-    font-size: 15px;
+    font-size: $type-nav;
     letter-spacing: 0.3px;
     text-decoration: none;
     white-space: nowrap;
@@ -129,8 +135,8 @@
 
     // צללית בסיס + הילה פנימית עדינה
     box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        0 4px 14px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
 
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -150,14 +156,14 @@
     }
 
     &:hover {
-      transform: translateY(-2px);
+        transform: translateY(-1px);
         filter: brightness(1.1);
         
         // אפקט ה-Glow (הילה חיצונית בצבע של הכפתור)
         // משתמש בערך של משתנה ה-CTA שלך כדי שהצבע יהיה תואם
         box-shadow:
-            0 8px 25px rgba(0, 0, 0, 0.4),
-            0 0 15px rgba($header-cta-top, 0.4), // הילה רכה מסביב
+            0 8px 20px rgba(0, 0, 0, 0.22),
+            0 0 12px rgba($header-cta-top, 0.24), // הילה רכה מסביב
             inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
 

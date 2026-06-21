@@ -19,7 +19,7 @@
 ========================= */
 .h1 {
     margin: 0 0 8px;
-    font-size: 28px;
+    font-size: $type-section-title-sm;
     color: $brand-text;
 }
 
@@ -62,7 +62,7 @@
     gap: 6px;
 
     span {
-        font-size: 13px;
+        font-size: $type-caption;
         color: $ui-text-muted;
     }
 
@@ -94,7 +94,7 @@
 }
 
 .error {
-    font-size: 12px;
+    font-size: $type-micro;
     font-weight: 600;
     color: $ui-error;
 }
@@ -138,7 +138,7 @@
 ========================= */
 .note {
     margin-top: 12px;
-    font-size: 12px;
+    font-size: $type-micro;
     opacity: 0.7;
     color: $ui-text-muted;
 }
@@ -147,7 +147,7 @@
     padding: 56px 0;
 
     h1 {
-        font-size: 28px;
+        font-size: $type-section-title-sm;
         margin-bottom: 10px;
         color: $brand-text;
     }

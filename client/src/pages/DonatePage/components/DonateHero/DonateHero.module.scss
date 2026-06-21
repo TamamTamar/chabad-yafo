@@ -44,7 +44,7 @@ background-position: 40% 20%;
 .eyebrow {
     color: $brand-secondary;
 
-    font-size: 14px;
+    font-size: $type-eyebrow;
     font-weight: 800;
 
     letter-spacing: .08em;
@@ -55,10 +55,10 @@ background-position: 40% 20%;
 
     color: white;
 
-    font-size: clamp(42px, 7vw, 72px);
+    font-size: $type-hero-title;
     font-weight: 900;
 
-    line-height: 1.05;
+    line-height: $line-title;
 }
 
 .description {
@@ -68,8 +68,8 @@ background-position: 40% 20%;
 
     color: rgba(255, 255, 255, .92);
 
-    font-size: 20px;
-    line-height: 1.8;
+    font-size: $type-hero-subtitle;
+    line-height: $line-body;
 }
 
 .button {
@@ -117,15 +117,15 @@ background-position: 40% 20%;
 padding: 230px 22px 50px;    }
 
     .title {
-        font-size: 38px;
-        line-height: 1.05;
+        font-size: $type-hero-title-compact;
+        line-height: $line-title;
     }
 
     .description {
         margin-top: 14px;
 
-        font-size: 17px;
-        line-height: 1.7;
+        font-size: $type-body;
+        line-height: $line-body;
     }
 
     .button {

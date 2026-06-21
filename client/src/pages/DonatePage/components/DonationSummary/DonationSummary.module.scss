@@ -32,7 +32,7 @@
 
     color: $brand-secondary;
 
-    font-size: 13px;
+    font-size: $type-caption;
     font-weight: 900;
     letter-spacing: 0.05em;
 }
@@ -43,7 +43,7 @@
 
     color: $brand-primary;
 
-    font-size: 44px;
+    font-size: $type-display-number;
     font-weight: 900;
     line-height: 1.05;
 }
@@ -53,7 +53,7 @@
 
     color: $brand-text;
 
-    font-size: 15px;
+    font-size: $type-body-sm;
     font-weight: 800;
 }
 
@@ -69,7 +69,7 @@
 
     color: rgba($brand-text, 0.65);
 
-    font-size: 14px;
+    font-size: $type-body-sm;
     font-weight: 700;
     text-align: center;
 }
@@ -88,14 +88,14 @@
 .totalLabel {
     color: $brand-text;
 
-    font-size: 14px;
+    font-size: $type-body-sm;
     font-weight: 800;
 }
 
 .totalAmount {
     color: $brand-primary;
 
-    font-size: 32px;
+    font-size: $type-display-number-sm;
     font-weight: 900;
 }
 
@@ -116,7 +116,7 @@
     background: rgba($brand-primary, 0.04);
     color: $brand-primary;
 
-    font-size: 12px;
+    font-size: $type-micro;
     font-weight: 800;
     text-align: center;
 }
@@ -157,14 +157,14 @@
     }
 
     .eyebrow {
-        font-size: 0.72rem;
+        font-size: $type-micro;
         letter-spacing: 0;
     }
 
     .amount {
         margin: 0;
 
-        font-size: 1.7rem;
+        font-size: $type-display-number-sm;
         line-height: 1;
     }
 
@@ -173,7 +173,7 @@
 
         color: rgba($brand-text, 0.66);
 
-        font-size: 0.78rem;
+        font-size: $type-micro;
         font-weight: 800;
     }
 
@@ -203,7 +203,7 @@
     .totalLabel {
         color: rgba($brand-text, 0.58);
 
-        font-size: 0.7rem;
+        font-size: $type-micro;
         font-weight: 800;
         white-space: nowrap;
     }
@@ -211,7 +211,7 @@
     .totalAmount {
         color: $brand-primary;
 
-        font-size: 1.25rem;
+        font-size: $type-card-title;
         font-weight: 900;
         line-height: 1;
         white-space: nowrap;

@@ -39,7 +39,7 @@
 
     color: $brand-secondary;
 
-    font-size: 0.95rem;
+    font-size: $type-eyebrow;
     font-weight: 900;
     letter-spacing: 0.08em;
 }
@@ -49,9 +49,9 @@
 
     color: #ffffff;
 
-    font-size: clamp(2.7rem, 6vw, 5rem);
+    font-size: $type-hero-title;
     font-weight: 900;
-    line-height: 1.05;
+    line-height: $line-title;
 }
 
 .subtitle {
@@ -60,8 +60,8 @@
 
     color: rgba(255, 255, 255, 0.92);
 
-    font-size: 1.15rem;
-    line-height: 1.9;
+    font-size: $type-hero-subtitle;
+    line-height: $line-body;
 }
 
 @media (max-width: 768px) {

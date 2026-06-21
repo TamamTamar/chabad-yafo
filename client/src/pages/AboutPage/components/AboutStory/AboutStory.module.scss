@@ -53,7 +53,7 @@
 .badgeValue {
     color: $brand-primary;
 
-    font-size: 1.45rem;
+    font-size: $type-card-title;
     font-weight: 900;
     line-height: 1;
 }
@@ -73,7 +73,7 @@
 
     color: $brand-secondary;
 
-    font-size: 0.9rem;
+    font-size: $type-eyebrow;
     font-weight: 900;
     letter-spacing: 0.08em;
 }
@@ -83,9 +83,9 @@
 
     color: $brand-primary;
 
-    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-size: $type-section-title;
     font-weight: 900;
-    line-height: 1.15;
+    line-height: $line-title;
 }
 
 .text {
@@ -93,8 +93,8 @@
 
     color: $ui-text-muted;
 
-    font-size: 1.06rem;
-    line-height: 1.9;
+    font-size: $type-body-lg;
+    line-height: $line-body;
 }
 
 .list {

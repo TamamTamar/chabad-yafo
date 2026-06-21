@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../../styles/variables" as *;
 
 .calculatorCard {
@@ -18,23 +19,23 @@
   }
 
   .calcTitle {
-    font-size: 24px;
+    font-size: $type-card-title;
     font-weight: 900;
     color: $brand-primary;
     margin-bottom: 8px;
 
     @media (max-width: 480px) {
-      font-size: 20px; // כותרת מעט קטנה יותר בנייד
+      font-size: $type-card-title;
     }
   }
 
   .calcSubtitle {
-    font-size: 15px;
+    font-size: $type-body-sm;
     color: $ui-text-muted;
     margin-bottom: 30px;
 
     @media (max-width: 480px) {
-      font-size: 14px;
+      font-size: $type-body-sm;
       margin-bottom: 20px;
     }
   }
@@ -45,7 +46,7 @@
     .inputLabel {
       display: block;
       font-weight: 800;
-      font-size: 14px;
+      font-size: $type-body-sm;
       margin-bottom: 12px;
       color: $brand-primary;
     }
@@ -63,7 +64,7 @@
         border: 2px solid #e0e6ed;
         border-radius: 12px;
         text-align: center;
-        font-size: 24px;
+        font-size: $type-card-title;
         font-weight: 900;
         color: $brand-primary;
         outline: none;
@@ -75,7 +76,7 @@
 
         @media (max-width: 480px) {
           width: 70px;
-          font-size: 20px;
+          font-size: $type-card-title;
         }
       }
 
@@ -85,7 +86,7 @@
         border-radius: 50%;
         border: 1px solid #e0e6ed;
         background: #f8f9fa;
-        font-size: 20px;
+        font-size: $type-card-title;
         font-weight: bold;
         cursor: pointer;
         display: flex;
@@ -106,7 +107,7 @@
     }
 
     .rateInfo {
-      font-size: 13px;
+      font-size: $type-caption;
       color: $ui-text-muted;
       font-weight: 600;
     }
@@ -124,32 +125,32 @@
     }
 
     .resultLabel {
-      font-size: 14px;
+      font-size: $type-body-sm;
       font-weight: 700;
       color: $brand-primary;
     }
 
     .totalDisplay {
-      font-size: 42px;
+      font-size: $type-display-number;
       font-weight: 900;
       color: $brand-primary;
       margin-top: 5px;
 
       @media (max-width: 480px) {
-        font-size: 32px; // סכום ברור אבל לא ענק מדי למובייל
+        font-size: $type-display-number-sm;
       }
     }
   }
 
   .calcFooterText {
-    font-size: 13px;
+    font-size: $type-caption;
     color: #777;
     line-height: 1.6;
     padding-top: 20px;
     border-top: 1px solid #f0f0f0;
 
     @media (max-width: 480px) {
-      font-size: 12px;
+      font-size: $type-micro;
     }
   }
 }
@@ -162,7 +163,7 @@
   padding: 12px 24px; // הגדלת שטח הלחיצה (Touch Target)
   border-radius: 999px;
   font-weight: 700;
-  font-size: 15px;
+  font-size: $type-body-sm;
   cursor: pointer;
   width: 100%; // כפתור רחב יותר למובייל
   max-width: 280px;
@@ -170,12 +171,12 @@
   -webkit-tap-highlight-color: transparent;
 
   &:hover {
-    background: lighten($brand-primary, 10%);
+    background: color.adjust($brand-primary, $lightness: 10%);
     transform: scale(1.02);
   }
 
   @media (max-width: 480px) {
-    font-size: 14px;
+    font-size: $type-body-sm;
     padding: 14px 20px;
   }
 }

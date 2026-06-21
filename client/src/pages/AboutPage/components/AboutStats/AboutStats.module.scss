@@ -15,7 +15,7 @@
 
     color: $brand-secondary;
 
-    font-size: 0.9rem;
+    font-size: $type-eyebrow;
     font-weight: 900;
 
     letter-spacing: 0.08em;
@@ -26,8 +26,9 @@
 
     color: $brand-primary;
 
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-size: $type-section-title;
     font-weight: 900;
+    line-height: $line-title;
 }
 
 .subtitle {
@@ -35,7 +36,8 @@
 
     color: $ui-text-muted;
 
-    line-height: 1.8;
+    font-size: $type-body;
+    line-height: $line-body;
 }
 
 .grid {
@@ -73,7 +75,7 @@
 .value {
     color: $brand-primary;
 
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-size: $type-display-number;
     font-weight: 900;
 }
 
@@ -82,7 +84,7 @@
 
     color: $ui-text-muted;
 
-    font-size: 1rem;
+    font-size: $type-body;
     font-weight: 700;
 }
 

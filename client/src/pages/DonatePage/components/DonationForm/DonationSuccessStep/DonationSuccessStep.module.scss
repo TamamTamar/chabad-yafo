@@ -45,7 +45,7 @@
 
     color: #ffffff;
 
-    font-size: 2.2rem;
+    font-size: $type-section-title;
     font-weight: 900;
 
     box-shadow: 0 18px 38px rgba($brand-primary, 0.18);
@@ -75,7 +75,7 @@
 
     color: $brand-secondary;
 
-    font-size: 0.82rem;
+    font-size: $type-caption;
     font-weight: 900;
 
     letter-spacing: 0.08em;
@@ -86,7 +86,7 @@
 
     color: $brand-primary;
 
-    font-size: 1.75rem;
+    font-size: $type-modal-title;
     font-weight: 900;
     line-height: 1.2;
 }
@@ -100,7 +100,7 @@
     background: rgba($brand-secondary, 0.1);
     color: $brand-primary;
 
-    font-size: 0.95rem;
+    font-size: $type-body-sm;
     font-weight: 900;
     line-height: 1.5;
 }
@@ -111,7 +111,7 @@
 
     color: rgba($brand-text, 0.76);
 
-    font-size: 1rem;
+    font-size: $type-body;
     line-height: 1.9;
 }
 
@@ -132,7 +132,7 @@
 
     color: $brand-primary;
 
-    font-size: 0.92rem;
+    font-size: $type-body-sm;
     font-weight: 800;
     line-height: 1.6;
 }
@@ -153,7 +153,7 @@
     background: #ffffff;
     color: $brand-primary;
 
-    font-size: 0.95rem;
+    font-size: $type-button;
     font-weight: 900;
 
     text-decoration: none;
@@ -184,22 +184,22 @@
         width: 74px;
         height: 74px;
 
-        font-size: 1.9rem;
+        font-size: $type-section-title-sm;
     }
 
     .title {
-        font-size: 1.55rem;
+        font-size: $type-form-title;
     }
 .amountLine {
     width: 100%;
 
     border-radius: 14px;
 
-    font-size: 0.9rem;
+    font-size: $type-eyebrow;
 }
 
     .text {
-        font-size: 0.95rem;
+        font-size: $type-body-sm;
     }
 
     .infoCard {

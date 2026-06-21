@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../../styles/variables" as *;
 
 .introContainer {
@@ -15,8 +16,7 @@
 
 .mainTitle {
   color: $brand-primary;
-  /* clamp שמתחיל קצת יותר נמוך במובייל כדי למנוע שבירת מילים מוזרה */
-  font-size: clamp(28px, 8vw, 52px); 
+  font-size: $type-hero-title;
   font-weight: 900;
   margin: 0;
   line-height: 1.1;
@@ -24,17 +24,17 @@
 
 .infoTitle {
   color: $brand-text;
-  font-size: clamp(18px, 4vw, 22px);
+  font-size: $type-card-title;
   font-weight: 700;
   margin: 0;
 
   &:last-child {
-    color: darken($brand-secondary, 15%);
+    color: color.adjust($brand-secondary, $lightness: -15%);
   }
 }
 
 .lead {
-  font-size: clamp(17px, 4.5vw, 20px);
+  font-size: $type-body-lg;
   font-weight: 700;
   color: $brand-text;
   line-height: 1.4;
@@ -45,7 +45,7 @@
 }
 
 .text {
-  font-size: clamp(15px, 4vw, 17px);
+  font-size: $type-body;
   color: $ui-text-muted;
   line-height: 1.6;
   

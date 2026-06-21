@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../styles/variables" as *;
 
 /* ===== Desktop / Tablet ===== */
@@ -14,8 +15,8 @@
 }
 
 .fab {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 999px;
 
     display: flex;
@@ -24,12 +25,16 @@
 
     color: #ffffff;
 
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 6px 16px rgba(14, 42, 68, 0.18);
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        opacity 0.15s ease;
 
     &:hover {
-        background: lighten($brand-primary, 8%);
+        background: color.adjust($brand-primary, $lightness: 8%);
         border-color: $brand-secondary;
+        transform: translateY(-1px);
     }
 
     &:focus-visible {
@@ -46,20 +51,34 @@
     color: white;
 }
 
+.whatsapp {
+    background: $brand-primary;
+}
+
+.instagram,
+.facebook {
+    opacity: 0.92;
+}
+
 /* ===== Mobile ===== */
 @media (max-width: 768px) {
     .wrapper {
         left: auto;
         right: 16px;
         top: auto;
-        bottom: calc(16px + env(safe-area-inset-bottom));
+        bottom: calc(18px + env(safe-area-inset-bottom));
         transform: none;
 
-        gap: 8px;
+        gap: 7px;
     }
 
     .fab {
         width: 30px;
         height: 30px;
+        border: 1px solid rgba($brand-secondary, 0.5);
+    }
+
+    .secondarySocial {
+        display: none;
     }
 }

@@ -33,7 +33,7 @@
 
     color: $brand-secondary;
 
-    font-size: 0.9rem;
+    font-size: $type-eyebrow;
     font-weight: 900;
     letter-spacing: 0.08em;
 }
@@ -43,9 +43,9 @@
 
     color: #ffffff;
 
-    font-size: clamp(1.75rem, 3vw, 2.6rem);
+    font-size: $type-section-title;
     font-weight: 900;
-    line-height: 1.2;
+    line-height: $line-title;
 }
 
 .text {
@@ -53,8 +53,8 @@
 
     color: rgba(255, 255, 255, 0.86);
 
-    font-size: 1.05rem;
-    line-height: 1.8;
+    font-size: $type-body-lg;
+    line-height: $line-body;
 }
 
 .actions {
