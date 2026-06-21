@@ -18,15 +18,15 @@ const RebbeLetterHero = () => {
             <Container>
                 <div className={styles.content}>
                     <p className={styles.eyebrow}>
-                        {writeToRebbeConfigs.gimmelTammuz.eyebrow}
+                        {writeToRebbeConfigs.general.eyebrow}
                     </p>
 
                     <h1 className={styles.title}>
-                        {writeToRebbeConfigs.gimmelTammuz.title}
+                        {writeToRebbeConfigs.general.title}
                     </h1>
 
                     <p className={styles.subtitle}>
-                        {writeToRebbeConfigs.gimmelTammuz.subtitle}
+                        {writeToRebbeConfigs.general.subtitle}
                     </p>
                 </div>
             </Container>

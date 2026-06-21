@@ -40,7 +40,7 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
         try {
             await createRebbeLetter({
                 ...data,
-                occasion: writeToRebbeConfigs.gimmelTammuz.occasion,
+                occasion: writeToRebbeConfigs.general.occasion,
             });
 
             reset();
