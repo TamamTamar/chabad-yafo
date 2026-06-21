@@ -18,14 +18,19 @@ const app = express();
 
 logger.log("SERVER STARTING");
 
+app.set("trust proxy", 1);
+
+const allowedOrigins = [
+    process.env.CLIENT_ORIGIN,
+    "https://www.chabadyafo.org",
+    "https://chabadyafo.org",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+].filter(Boolean) as string[];
+
 app.use(
     cors({
-        origin: [
-            "https://www.chabadyafo.org",
-            "https://chabadyafo.org",
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-        ],
+        origin: allowedOrigins,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,

@@ -6,7 +6,9 @@ const router = Router();
 const adminCookieName = "admin_token";
 const adminTokenMaxAgeMs = 7 * 24 * 60 * 60 * 1000;
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction =
+    process.env.NODE_ENV === "production" ||
+    process.env.RAILWAY_ENVIRONMENT === "production";
 
 router.post("/login", (req, res) => {
     const { password } = req.body;

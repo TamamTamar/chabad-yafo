@@ -12,8 +12,11 @@ http.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            if (window.location.pathname.startsWith("/admin")) {
-                window.location.href = "/admin/login";
+            const isAdminPage = window.location.pathname.startsWith("/admin");
+            const isLoginPage = window.location.pathname === "/admin/login";
+
+            if (isAdminPage && !isLoginPage) {
+                window.location.replace("/admin/login");
             }
         }
 
