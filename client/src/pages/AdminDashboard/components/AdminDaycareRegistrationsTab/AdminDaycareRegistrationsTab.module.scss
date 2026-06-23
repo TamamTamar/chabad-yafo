@@ -1,0 +1,85 @@
+@use "../../../../styles/variables" as *;
+
+.card {
+    overflow: hidden;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-bg;
+    box-shadow: 0 16px 40px $ui-shadow-card;
+}
+
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    min-width: 1180px;
+    border-collapse: collapse;
+}
+
+.tableHeader,
+.tableCell {
+    padding: 16px 18px;
+    border-bottom: 1px solid $ui-border-soft;
+    text-align: right;
+    vertical-align: top;
+}
+
+.tableHeader {
+    white-space: nowrap;
+    background: rgba($brand-primary, 0.06);
+    color: $brand-primary;
+    font-weight: 800;
+}
+
+.tableCell {
+    color: $brand-text;
+    line-height: 1.6;
+}
+
+.tableRow:hover .tableCell {
+    background: rgba($brand-primary, 0.025);
+}
+
+.phone,
+.email {
+    direction: ltr;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tag {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.08);
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.empty,
+.loading {
+    padding: 40px;
+    text-align: center;
+    color: $ui-text-muted;
+}
+
+@media (max-width: 768px) {
+    .card {
+        border-radius: $radius-md;
+    }
+
+    .table {
+        min-width: 1080px;
+    }
+
+    .tableHeader,
+    .tableCell {
+        padding: 13px 14px;
+        font-size: $type-body-sm;
+    }
+}

@@ -66,3 +66,51 @@ export const sendRebbeLetterWhatsApp = async (args: {
         body: text,
     });
 };
+
+export const sendDaycareRegistrationWhatsApp = async (args: {
+    parentName: string;
+    phone: string;
+    email?: string;
+    childName: string;
+    birthDate: string;
+    requiredHours: string;
+    requiredHoursOther?: string;
+    fridayCare: string;
+    costApproval: boolean;
+    notes?: string;
+}) => {
+    const {
+        parentName,
+        phone,
+        email,
+        childName,
+        birthDate,
+        requiredHours,
+        requiredHoursOther,
+        fridayCare,
+        costApproval,
+        notes,
+    } = args;
+    const requiredHoursText =
+        requiredHours === "אחר" && requiredHoursOther
+            ? `${requiredHours} - ${requiredHoursOther}`
+            : requiredHours;
+
+    const text =
+        `🏫 רישום מוקדם חדש למעון בצפון יפו\n\n` +
+        `👤 הורה: ${parentName}\n` +
+        `📞 טלפון: ${phone}\n` +
+        `📧 אימייל: ${email || "—"}\n\n` +
+        `👶 ילד/ה: ${childName}\n` +
+        `🎂 תאריך לידה: ${birthDate}\n` +
+        `שעות נדרשות: ${requiredHoursText}\n` +
+        `ימי שישי: ${fridayCare}\n` +
+        `אישור עלות 5,500 ₪: ${costApproval ? "כן" : "לא"}\n\n` +
+        `הערות: ${notes || "—"}`;
+
+    await client.messages.create({
+        from: env.TWILIO_WHATSAPP_FROM,
+        to: env.ADMIN_WHATSAPP_TO,
+        body: text,
+    });
+};

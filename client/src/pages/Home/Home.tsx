@@ -8,7 +8,7 @@ import Hero from "../../components/Hero/Hero";
 import OurService from "../../components/OurService/OurService";
 import ShabbatTimesBadge from "../../components/ShabbatTimesBadge/ShabbatTimesBadge";
 import { chabadCards } from "../../data/chabadCardsData";
-import FamiliesPromo from "../Families/components/FamiliesPromo";
+import DaycareRegistrationPromo from "./components/DaycareRegistrationPromo/DaycareRegistrationPromo";
 import styles from "./Home.module.scss";
 
 const Home = () => {
@@ -44,7 +44,7 @@ const Home = () => {
                     </Container>
                 </section>
                 <ActivityGallery />
-                <FamiliesPromo />
+                <DaycareRegistrationPromo />
                 <OurService />
                 <ChabadHousesCards cards={chabadCards} />
             </main>

@@ -1,0 +1,454 @@
+@use "../../styles/variables" as *;
+
+.page {
+    min-height: 100vh;
+    background:
+        linear-gradient(180deg, rgba(31, 78, 121, 0.06), transparent 360px),
+        $body-bg;
+    color: $brand-text;
+}
+
+.hero {
+    max-width: $max-width;
+    margin: 0 auto;
+    padding: 72px 24px 24px;
+}
+
+.heroContent {
+    display: grid;
+    gap: 18px;
+    max-width: 880px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.eyebrow {
+    margin: 0;
+    color: $brand-primary;
+    font-size: $type-eyebrow;
+    font-weight: 900;
+}
+
+.title {
+    margin: 0;
+    color: $brand-primary;
+    font-size: $type-section-title;
+    font-weight: 900;
+    line-height: $line-title;
+}
+
+.introText {
+    display: grid;
+    gap: 8px;
+    padding: 22px 26px;
+    border: 1px solid rgba(230, 201, 139, 0.75);
+    border-radius: $radius-lg;
+    background: $ui-surface-glass;
+    box-shadow: 0 16px 42px rgba(20, 60, 95, 0.08);
+}
+
+.noticeParagraph,
+.introParagraph,
+.priceText {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: $type-body-lg;
+    line-height: 1.75;
+}
+
+.noticeParagraph {
+    color: $brand-primary;
+    font-weight: 900;
+}
+
+.priceText {
+    color: $brand-primary;
+    font-weight: 900;
+}
+
+.formSection {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 24px 72px;
+}
+
+.formBox {
+    padding: 28px;
+    border: 1px solid rgba(230, 201, 139, 0.95);
+    border-radius: $radius-lg;
+    background: $ui-surface-glass;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.07);
+}
+
+.formHeader {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.formTitle {
+    margin: 0;
+    color: $brand-primary;
+    font-size: $type-form-title;
+    font-weight: 900;
+}
+
+.formIntro {
+    max-width: 620px;
+    margin: 0 auto;
+    color: $ui-text-muted;
+    font-size: $type-body-sm;
+    line-height: 1.65;
+}
+
+.form {
+    display: grid;
+    gap: 12px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.fieldGroup,
+.optionGroup {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.optionGroup {
+    margin: 0;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-sm;
+    background: rgba(31, 78, 121, 0.025);
+}
+
+.fieldLabel,
+.groupTitle {
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.fieldLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.groupTitle {
+    padding: 0 4px;
+}
+
+.required,
+.optional {
+    color: rgba(14, 26, 34, 0.55);
+    font-size: $type-caption;
+    font-weight: 700;
+}
+
+.fieldInput,
+.fieldTextarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid $ui-border-strong;
+    border-radius: 8px;
+    background: $brand-bg;
+    color: $brand-primary;
+    font-family: inherit;
+    font-size: $type-input;
+    font-weight: 650;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.fieldInput:focus,
+.fieldTextarea:focus {
+    outline: none;
+    border-color: rgba(230, 201, 139, 0.95);
+    box-shadow: 0 0 0 3px rgba(230, 201, 139, 0.2);
+}
+
+.fieldTextarea {
+    min-height: 104px;
+    resize: vertical;
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.radioOption {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-pill;
+    background: $brand-bg;
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.radioOption:hover {
+    border-color: rgba(31, 78, 121, 0.42);
+    transform: translateY(-1px);
+}
+
+.radioOption:has(.radioInput:checked) {
+    border-color: $brand-primary;
+    background: rgba(31, 78, 121, 0.08);
+}
+
+.radioInput {
+    width: 14px;
+    height: 14px;
+    accent-color: $brand-primary;
+}
+
+.radioText {
+    white-space: nowrap;
+}
+
+.confirmationCheckbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid rgba(31, 78, 121, 0.2);
+    border-radius: $radius-sm;
+    background: rgba(31, 78, 121, 0.045);
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.checkboxInput {
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    flex: 0 0 auto;
+    accent-color: $brand-primary;
+}
+
+.checkboxText {
+    display: inline-block;
+}
+
+.errorText,
+.formError {
+    min-height: 18px;
+    color: $ui-error;
+    font-size: $type-caption;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.formError {
+    text-align: center;
+}
+
+.submitButton,
+.modalButton {
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #173a63, #214c7f);
+    color: $color-white;
+    font: inherit;
+    font-size: $type-button;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(23, 58, 99, 0.22);
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease;
+}
+
+.submitButton {
+    margin-top: 4px;
+    padding: 14px 18px;
+}
+
+.submitButton:hover,
+.modalButton:hover {
+    background: linear-gradient(135deg, #f3bf3d, #ffd76a);
+    color: #173a63;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(243, 191, 61, 0.32);
+}
+
+.submitButton:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(20, 25, 35, 0.52);
+    backdrop-filter: blur(7px);
+}
+
+.successModal {
+    position: relative;
+    width: min(520px, 100%);
+    padding: 34px 30px 28px;
+    border: 1px solid rgba(230, 201, 139, 0.9);
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.98);
+    color: $brand-text;
+    text-align: center;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+}
+
+.closeModal {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(23, 58, 99, 0.06);
+    color: $brand-primary;
+    font-size: $type-section-title-sm;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.iconCircle {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f3bf3d, #ffd76a);
+    color: $brand-primary;
+    font-size: $type-card-title;
+    font-weight: 900;
+}
+
+.modalTitle {
+    margin: 0 0 12px;
+    color: $brand-primary;
+    font-size: $type-modal-title;
+}
+
+.modalText {
+    display: grid;
+    gap: 6px;
+    max-width: 420px;
+    margin: 0 auto 18px;
+    color: $ui-text-muted;
+    font-size: $type-body;
+    line-height: 1.65;
+}
+
+.modalButton {
+    padding: 13px 32px;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 48px 16px 18px;
+    }
+
+    .introText {
+        padding: 18px 16px;
+        border-radius: $radius-md;
+    }
+
+    .noticeParagraph,
+    .introParagraph,
+    .priceText {
+        font-size: $type-body-sm;
+    }
+
+    .formSection {
+        padding: 18px 16px 56px;
+    }
+
+    .formBox {
+        padding: 18px 14px;
+        border-radius: $radius-md;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .radioOption {
+        justify-content: center;
+        padding: 8px 10px;
+    }
+
+    .radioText {
+        white-space: normal;
+        text-align: center;
+    }
+
+    .confirmationCheckbox {
+        font-size: $type-caption;
+    }
+
+    .successModal {
+        padding: 30px 22px 24px;
+        border-radius: $radius-lg;
+    }
+
+    .modalButton {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .options {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fieldInput,
+    .fieldTextarea,
+    .radioOption,
+    .confirmationCheckbox,
+    .submitButton,
+    .modalButton {
+        transition: none;
+    }
+}

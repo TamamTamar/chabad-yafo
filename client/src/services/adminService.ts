@@ -4,6 +4,7 @@ import type {
     RebbeLetterAdmin,
     RebbeLetterStatus,
 } from "../types/chabad";
+import type { DaycareRegistrationAdmin } from "../types/daycareRegistration";
 import type { FamilyAdmin } from "../types/family";
 import type { ApiResponse } from "../types/api";
 
@@ -12,6 +13,14 @@ import type { ApiResponse } from "../types/api";
 export const getAllFamilies = async () => {
     const response = await http.get<ApiResponse<FamilyAdmin[]>>(
         "/admin/families"
+    );
+
+    return response.data.data;
+};
+
+export const getAllDaycareRegistrations = async () => {
+    const response = await http.get<ApiResponse<DaycareRegistrationAdmin[]>>(
+        "/admin/daycare-registrations"
     );
 
     return response.data.data;

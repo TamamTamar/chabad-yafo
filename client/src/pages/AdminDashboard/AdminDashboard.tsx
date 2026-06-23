@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Container from "../../components/Container/Container";
 import { logoutAdmin } from "../../services/adminAuthService";
+import AdminDaycareRegistrationsTab from "./components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab";
 import AdminFamiliesTab from "./components/AdminFamiliesTab/AdminFamiliesTab";
 import AdminPaymentsTab from "./components/AdminPaymentsTab/AdminPaymentsTab";
 import AdminRebbeLettersTab from "./components/AdminRebbeLettersTab/AdminRebbeLettersTab";
 import styles from "./AdminDashboard.module.scss";
 
-type AdminTab = "families" | "rebbeLetters" | "payments";
+type AdminTab = "families" | "daycareRegistrations" | "rebbeLetters" | "payments";
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState<AdminTab>("families");
@@ -57,6 +58,18 @@ const AdminDashboard = () => {
                     <button
                         type="button"
                         className={
+                            activeTab === "daycareRegistrations"
+                                ? styles.tabActive
+                                : styles.tab
+                        }
+                        onClick={() => setActiveTab("daycareRegistrations")}
+                    >
+                        מעון צפון יפו
+                    </button>
+
+                    <button
+                        type="button"
+                        className={
                             activeTab === "rebbeLetters"
                                 ? styles.tabActive
                                 : styles.tab
@@ -80,6 +93,9 @@ const AdminDashboard = () => {
                 </nav>
 
                 {activeTab === "families" && <AdminFamiliesTab />}
+                {activeTab === "daycareRegistrations" && (
+                    <AdminDaycareRegistrationsTab />
+                )}
                 {activeTab === "rebbeLetters" && <AdminRebbeLettersTab />}
                 {activeTab === "payments" && <AdminPaymentsTab />}
             </Container>

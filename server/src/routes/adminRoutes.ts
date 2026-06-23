@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { DaycareRegistration } from "../models/DaycareRegistration";
 import { Family } from "../models/Family";
 import { requireAdmin } from "../middleware/adminAuth";
 import {
@@ -22,6 +23,24 @@ router.get("/families", requireAdmin, async (_req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to get families",
+        });
+    }
+});
+
+router.get("/daycare-registrations", requireAdmin, async (_req, res) => {
+    try {
+        const registrations = await DaycareRegistration.find().sort({
+            createdAt: -1,
+        });
+
+        return res.json({
+            success: true,
+            data: registrations,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get daycare registrations",
         });
     }
 });

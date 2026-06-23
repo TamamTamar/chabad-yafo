@@ -1,0 +1,146 @@
+@use "../../../../styles/variables" as *;
+
+.section {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    max-width: $max-width;
+    min-height: 470px;
+    margin: 40px auto;
+    border-radius: $radius-card-xl;
+    background-image: url("../../../../assets/families-hero.webp");
+    background-position: center;
+    background-size: cover;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        rgba(20, 45, 75, 0.22) 0%,
+        rgba(20, 45, 75, 0.12) 45%,
+        rgba(20, 45, 75, 0.04) 100%
+    );
+}
+
+.content {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+    margin-right: 48px;
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: $radius-card-lg;
+    background: rgba(255, 255, 255, 0.16);
+    color: $brand-primary;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    color: $brand-secondary;
+    font-size: $type-eyebrow;
+    font-weight: 900;
+}
+
+.title {
+    margin: 0 0 16px;
+    font-size: $type-section-title;
+    font-weight: 900;
+    line-height: $line-title;
+}
+
+.description {
+    margin: 0 0 24px;
+    font-size: $type-body-lg;
+    line-height: $line-body;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0 28px;
+    border-radius: $radius-pill;
+    background: $brand-primary;
+    color: $color-white;
+    font-weight: 900;
+    text-decoration: none;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba($brand-primary, 0.22);
+}
+
+@media (max-width: 768px) {
+    .section {
+        justify-content: center;
+        min-height: 450px;
+        margin: 24px 16px;
+        padding: 16px;
+        background-image: url("../../../../assets/families-hero-mobile.webp");
+        background-position: center;
+    }
+
+    .overlay {
+        background: linear-gradient(
+            180deg,
+            rgba(20, 45, 75, 0.14) 0%,
+            rgba(20, 45, 75, 0.28) 100%
+        );
+    }
+
+    .content {
+        width: 88%;
+        max-width: 330px;
+        margin: 0;
+        padding: 22px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: $radius-card;
+        background: rgba(89, 134, 178, 0.28);
+        color: $color-white;
+        backdrop-filter: blur(4px);
+    }
+
+    .eyebrow {
+        margin-bottom: 8px;
+    }
+
+    .title {
+        margin-bottom: 10px;
+        font-size: $type-section-title-sm;
+    }
+
+    .description {
+        margin-bottom: 18px;
+        font-size: $type-body-sm;
+        line-height: 1.65;
+    }
+
+    .button {
+        min-height: 46px;
+        padding: 0 20px;
+        font-size: $type-body-sm;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button {
+        transition: none;
+    }
+
+    .button:hover {
+        transform: none;
+    }
+}
