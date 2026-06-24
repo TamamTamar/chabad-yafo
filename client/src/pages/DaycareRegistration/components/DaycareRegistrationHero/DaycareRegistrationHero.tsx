@@ -6,7 +6,7 @@ const DaycareRegistrationHero = () => (
             <div className={styles.heroContent}>
                 <p className={styles.eyebrow}>מרכז חב"ד יפו</p>
                 <h1 className={styles.title}>
-                    מעון חדש בצפון יפו – רישום מוקדם
+                    מעון חדש בצפון יפו - רישום מוקדם
                 </h1>
 
                 <div className={styles.introText}>
