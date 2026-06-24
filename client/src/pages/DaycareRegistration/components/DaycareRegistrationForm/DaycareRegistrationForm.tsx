@@ -1,15 +1,15 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { createDaycareRegistration } from "../../../services/daycareRegistrationService";
-import type { DaycareRegistrationFormValues } from "../../../types/daycareRegistration";
+import { createDaycareRegistration } from "../../../../services/daycareRegistrationService";
+import type { DaycareRegistrationFormValues } from "../../../../types/daycareRegistration";
 import {
     fridayCareOptions,
     requiredHoursOptions,
-} from "../daycareRegistrationOptions";
-import styles from "../DaycareRegistration.module.scss";
-import DaycareChildFields from "./DaycareChildFields";
-import DaycareContactFields from "./DaycareContactFields";
-import DaycareNotesField from "./DaycareNotesField";
-import DaycareRadioGroup from "./DaycareRadioGroup";
+} from "../../daycareRegistrationOptions";
+import DaycareChildFields from "../DaycareChildFields/DaycareChildFields";
+import DaycareContactFields from "../DaycareContactFields/DaycareContactFields";
+import DaycareNotesField from "../DaycareNotesField/DaycareNotesField";
+import DaycareRadioGroup from "../DaycareRadioGroup/DaycareRadioGroup";
+import styles from "./DaycareRegistrationForm.module.scss";
 
 type Props = {
     onSuccess: () => void;
@@ -61,7 +61,11 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
     };
 
     return (
-        <section className={styles.formSection} aria-labelledby="form-title">
+        <section
+            className={styles.formSection}
+            id="daycare-form"
+            aria-labelledby="form-title"
+        >
             <div className={styles.formBox}>
                 <div className={styles.formHeader}>
                     <h2 className={styles.formTitle} id="form-title">

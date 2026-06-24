@@ -1,0 +1,52 @@
+@use "../../../../styles/variables" as *;
+
+.fieldGroup {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.fieldLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.fieldTextarea {
+    width: 100%;
+    min-height: 104px;
+    padding: 11px 13px;
+    border: 1px solid $ui-border-strong;
+    border-radius: 10px;
+    background: $brand-bg;
+    color: $brand-primary;
+    font-family: inherit;
+    font-size: $type-input;
+    font-weight: 650;
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fieldTextarea:focus {
+    outline: none;
+    border-color: rgba(230, 201, 139, 0.95);
+    box-shadow: 0 0 0 3px rgba(230, 201, 139, 0.2);
+}
+
+.errorText {
+    min-height: 18px;
+    color: $ui-error;
+    font-size: $type-caption;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fieldTextarea {
+        transition: none;
+    }
+}

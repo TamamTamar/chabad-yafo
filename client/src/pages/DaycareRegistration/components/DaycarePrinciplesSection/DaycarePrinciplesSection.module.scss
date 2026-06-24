@@ -1,0 +1,161 @@
+@use "../../../../styles/variables" as *;
+
+.principlesSection {
+    max-width: $max-width;
+    margin: 0 auto;
+    padding: 78px 24px 34px;
+}
+
+.principlesHeader {
+    display: grid;
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto 30px;
+    text-align: center;
+}
+
+.sectionEyebrow {
+    color: $brand-secondary;
+    font-size: $type-eyebrow;
+    font-weight: 900;
+}
+
+.principlesTitle {
+    margin: 0;
+    color: $brand-primary;
+    font-size: $type-section-title;
+    font-weight: 900;
+    line-height: $line-title;
+}
+
+.principlesIntro {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: $type-body-lg;
+    line-height: $line-body;
+}
+
+.principlesGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.principleCard {
+    position: relative;
+    overflow: hidden;
+    min-height: 224px;
+    padding: 24px 22px;
+    border: 1px solid rgba(230, 201, 139, 0.48);
+    border-radius: $radius-lg;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.9)), $brand-bg;
+    box-shadow: 0 18px 46px rgba(20, 60, 95, 0.09);
+}
+
+.principleCard::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, $brand-secondary, rgba(230, 201, 139, 0));
+}
+
+.principleNumber {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 18px;
+    border-radius: 50%;
+    background: rgba(230, 201, 139, 0.22);
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.principleTitle {
+    margin: 0 0 10px;
+    color: $brand-primary;
+    font-size: $type-card-title;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.principleText {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: $type-body-sm;
+    font-weight: 650;
+    line-height: 1.78;
+}
+
+.trustBox {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 22px 26px;
+    border: 1px solid rgba(31, 78, 121, 0.12);
+    border-radius: $radius-lg;
+    background: linear-gradient(135deg, rgba(31, 78, 121, 0.07), rgba(230, 201, 139, 0.14));
+    box-shadow: 0 16px 40px rgba(20, 60, 95, 0.07);
+}
+
+.trustAccent {
+    width: 10px;
+    min-height: 58px;
+    border-radius: $radius-pill;
+    background: linear-gradient(180deg, $brand-primary, $brand-secondary);
+}
+
+.trustText {
+    margin: 0;
+    color: $brand-primary;
+    font-size: $type-body-lg;
+    font-weight: 900;
+    line-height: 1.65;
+}
+
+@media (max-width: 920px) {
+    .principlesGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .principlesSection {
+        padding: 48px 16px 22px;
+    }
+
+    .principlesHeader {
+        margin-bottom: 22px;
+    }
+
+    .principlesIntro {
+        font-size: $type-body-sm;
+    }
+
+    .principlesGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .principleCard {
+        min-height: 0;
+        padding: 20px 18px;
+        border-radius: $radius-md;
+    }
+
+    .trustBox {
+        align-items: flex-start;
+        padding: 18px 16px;
+        border-radius: $radius-md;
+    }
+
+    .trustText {
+        font-size: $type-body-sm;
+    }
+}

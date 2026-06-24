@@ -1,8 +1,9 @@
 import { useState } from "react";
 import styles from "./DaycareRegistration.module.scss";
-import DaycareRegistrationForm from "./components/DaycareRegistrationForm";
-import DaycareRegistrationHero from "./components/DaycareRegistrationHero";
-import DaycareSuccessModal from "./components/DaycareSuccessModal";
+import DaycarePrinciplesSection from "./components/DaycarePrinciplesSection/DaycarePrinciplesSection";
+import DaycareRegistrationForm from "./components/DaycareRegistrationForm/DaycareRegistrationForm";
+import DaycareRegistrationHero from "./components/DaycareRegistrationHero/DaycareRegistrationHero";
+import DaycareSuccessModal from "./components/DaycareSuccessModal/DaycareSuccessModal";
 
 const DaycareRegistration = () => {
     const [showSuccess, setShowSuccess] = useState(false);
@@ -19,6 +20,7 @@ const DaycareRegistration = () => {
             )}
 
             <DaycareRegistrationHero />
+            <DaycarePrinciplesSection />
             <DaycareRegistrationForm onSuccess={handleSuccess} />
         </main>
     );

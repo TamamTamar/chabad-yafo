@@ -1,0 +1,69 @@
+@use "../../../../styles/variables" as *;
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.fieldGroup {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.fieldLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.required {
+    color: rgba(14, 26, 34, 0.55);
+    font-size: $type-caption;
+    font-weight: 700;
+}
+
+.fieldInput {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid $ui-border-strong;
+    border-radius: 10px;
+    background: $brand-bg;
+    color: $brand-primary;
+    font-family: inherit;
+    font-size: $type-input;
+    font-weight: 650;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fieldInput:focus {
+    outline: none;
+    border-color: rgba(230, 201, 139, 0.95);
+    box-shadow: 0 0 0 3px rgba(230, 201, 139, 0.2);
+}
+
+.errorText {
+    min-height: 18px;
+    color: $ui-error;
+    font-size: $type-caption;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+    .row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fieldInput {
+        transition: none;
+    }
+}

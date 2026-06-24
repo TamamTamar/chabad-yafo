@@ -1,6 +1,6 @@
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
-import type { DaycareRegistrationFormValues } from "../../../types/daycareRegistration";
-import styles from "../DaycareRegistration.module.scss";
+import type { DaycareRegistrationFormValues } from "../../../../types/daycareRegistration";
+import styles from "./DaycareChildFields.module.scss";
 
 type Props = {
     errors: FieldErrors<DaycareRegistrationFormValues>;

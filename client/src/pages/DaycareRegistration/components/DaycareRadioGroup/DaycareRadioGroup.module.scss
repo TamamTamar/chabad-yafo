@@ -1,0 +1,99 @@
+@use "../../../../styles/variables" as *;
+
+.optionGroup {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-md;
+    background: rgba(31, 78, 121, 0.035);
+}
+
+.groupTitle {
+    padding: 0 4px;
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.radioOption {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-pill;
+    background: $brand-bg;
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 800;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.radioOption:hover {
+    border-color: rgba(31, 78, 121, 0.42);
+    transform: translateY(-1px);
+}
+
+.radioOption:has(.radioInput:checked) {
+    border-color: $brand-primary;
+    background: rgba(31, 78, 121, 0.08);
+}
+
+.radioInput {
+    width: 14px;
+    height: 14px;
+    accent-color: $brand-primary;
+}
+
+.radioText {
+    white-space: nowrap;
+}
+
+.errorText {
+    min-height: 18px;
+    color: $ui-error;
+    font-size: $type-caption;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .radioOption {
+        justify-content: center;
+        padding: 8px 10px;
+    }
+
+    .radioText {
+        white-space: normal;
+        text-align: center;
+    }
+}
+
+@media (max-width: 420px) {
+    .options {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .radioOption {
+        transition: none;
+    }
+}

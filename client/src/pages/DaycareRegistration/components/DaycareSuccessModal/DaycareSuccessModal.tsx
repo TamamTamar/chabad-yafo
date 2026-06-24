@@ -1,4 +1,4 @@
-import styles from "../DaycareRegistration.module.scss";
+import styles from "./DaycareSuccessModal.module.scss";
 
 type Props = {
     onClose: () => void;
