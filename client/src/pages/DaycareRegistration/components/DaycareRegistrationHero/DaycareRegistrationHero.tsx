@@ -8,6 +8,10 @@ const DaycareRegistrationHero = () => (
                 <h1 className={styles.title}>
                     מעון חדש בצפון יפו - רישום מוקדם
                 </h1>
+                <p className={styles.valueStatement}>
+                    מעון קטן וחם לגילאי שנה עד שלוש, עם יחס אישי,
+                    סדר יום רגוע ואווירה נעימה שמותאמת לגיל הרך.
+                </p>
 
                 <div className={styles.introText}>
                     <p className={styles.noticeParagraph}>
@@ -34,7 +38,6 @@ const DaycareRegistrationHero = () => (
                     <span className={styles.heroHighlight}>קבוצה קטנה</span>
                     <span className={styles.heroHighlight}>גינה</span>
                     <span className={styles.heroHighlight}>אווירה משפחתית</span>
-                    <span className={styles.heroHighlight}>צפון יפו</span>
                 </div>
 
                 <a className={styles.heroCta} href="#daycare-form">
