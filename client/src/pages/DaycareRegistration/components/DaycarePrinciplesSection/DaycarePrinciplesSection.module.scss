@@ -3,19 +3,19 @@
 .principlesSection {
     max-width: $max-width;
     margin: 0 auto;
-    padding: 78px 24px 34px;
+    padding: 86px 24px 38px;
 }
 
 .principlesHeader {
     display: grid;
-    gap: 10px;
+    gap: 12px;
     max-width: 760px;
-    margin: 0 auto 30px;
+    margin: 0 auto 34px;
     text-align: center;
 }
 
 .sectionEyebrow {
-    color: $brand-secondary;
+    color: $brand-gold-muted;
     font-size: $type-eyebrow;
     font-weight: 900;
 }
@@ -38,18 +38,22 @@
 .principlesGrid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    gap: 18px;
 }
 
 .principleCard {
     position: relative;
     overflow: hidden;
-    min-height: 224px;
-    padding: 24px 22px;
-    border: 1px solid rgba(230, 201, 139, 0.48);
+    min-height: 232px;
+    padding: 26px 24px;
+    border: 1px solid rgba($brand-gold-rich, 0.38);
     border-radius: $radius-lg;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.9)), $brand-bg;
-    box-shadow: 0 18px 46px rgba(20, 60, 95, 0.09);
+    background:
+        linear-gradient(180deg, rgba($color-white, 0.98), rgba($brand-surface-cool, 0.92)),
+        $brand-bg;
+    box-shadow:
+        0 22px 52px rgba($brand-primary, 0.1),
+        inset 0 1px 0 rgba($color-white, 0.78);
 }
 
 .principleCard::before {
@@ -59,7 +63,16 @@
     top: 0;
     width: 4px;
     height: 100%;
-    background: linear-gradient(180deg, $brand-secondary, rgba(230, 201, 139, 0));
+    background: linear-gradient(180deg, $brand-gold-rich, rgba($brand-gold-rich, 0));
+}
+
+.principleCard::after {
+    content: "";
+    position: absolute;
+    inset-inline: 22px;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba($brand-gold-rich, 0.82), transparent);
 }
 
 .principleNumber {
@@ -70,10 +83,11 @@
     height: 42px;
     margin-bottom: 18px;
     border-radius: 50%;
-    background: rgba(230, 201, 139, 0.22);
+    background: linear-gradient(135deg, rgba($brand-gold-pale, 0.95), rgba($brand-gold-rich, 0.28));
     color: $brand-primary;
     font-size: $type-caption;
     font-weight: 900;
+    box-shadow: 0 12px 28px rgba($brand-gold-rich, 0.18);
 }
 
 .principleTitle {
@@ -96,19 +110,23 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-top: 24px;
-    padding: 22px 26px;
-    border: 1px solid rgba(31, 78, 121, 0.12);
+    margin-top: 28px;
+    padding: 24px 28px;
+    border: 1px solid rgba($brand-gold-rich, 0.34);
     border-radius: $radius-lg;
-    background: linear-gradient(135deg, rgba(31, 78, 121, 0.07), rgba(230, 201, 139, 0.14));
-    box-shadow: 0 16px 40px rgba(20, 60, 95, 0.07);
+    background:
+        linear-gradient(135deg, rgba($brand-primary, 0.08), rgba($brand-secondary, 0.16)),
+        rgba($color-white, 0.82);
+    box-shadow:
+        0 18px 46px $ui-shadow-blue-soft,
+        inset 0 1px 0 rgba($color-white, 0.78);
 }
 
 .trustAccent {
     width: 10px;
     min-height: 58px;
     border-radius: $radius-pill;
-    background: linear-gradient(180deg, $brand-primary, $brand-secondary);
+    background: linear-gradient(180deg, $brand-primary, $brand-gold-rich);
 }
 
 .trustText {
