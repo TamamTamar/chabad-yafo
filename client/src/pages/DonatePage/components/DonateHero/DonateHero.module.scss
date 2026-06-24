@@ -22,9 +22,9 @@ background-position: 40% 20%;
     inset: 0;
     background:
         linear-gradient(90deg,
-            rgba(0, 0, 0, 0.78) 0%,
-            rgba(0, 0, 0, 0.55) 45%,
-            rgba(0, 0, 0, 0.2) 100%);
+            rgba($color-black, 0.78) 0%,
+            rgba($color-black, 0.55) 45%,
+            rgba($color-black, 0.2) 100%);
 }
 
 .content {
@@ -66,7 +66,7 @@ background-position: 40% 20%;
 
     max-width: 620px;
 
-    color: rgba(255, 255, 255, .92);
+    color: rgba($color-white, .92);
 
     font-size: $type-hero-subtitle;
     line-height: $line-body;
@@ -107,9 +107,9 @@ background-position: 40% 20%;
     .overlay {
         background:
             linear-gradient(180deg,
-                rgba(0, 0, 0, 0.15) 0%,
-                rgba(0, 0, 0, 0.3) 40%,
-                rgba(0, 0, 0, 0.78) 100%);
+                rgba($color-black, 0.15) 0%,
+                rgba($color-black, 0.3) 40%,
+                rgba($color-black, 0.78) 100%);
     }
 
     .content {

@@ -8,7 +8,7 @@
     padding: 14px;
     border: 1px solid $ui-border-soft;
     border-radius: $radius-md;
-    background: rgba(31, 78, 121, 0.035);
+    background: rgba($brand-primary, 0.035);
 }
 
 .groupTitle {
@@ -42,13 +42,13 @@
 }
 
 .radioOption:hover {
-    border-color: rgba(31, 78, 121, 0.42);
+    border-color: rgba($brand-primary, 0.42);
     transform: translateY(-1px);
 }
 
 .radioOption:has(.radioInput:checked) {
     border-color: $brand-primary;
-    background: rgba(31, 78, 121, 0.08);
+    background: rgba($brand-primary, 0.08);
 }
 
 .radioInput {

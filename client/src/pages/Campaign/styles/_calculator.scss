@@ -8,8 +8,8 @@
   max-width: 550px;
   margin: 40px auto;
   text-align: center;
-  border: 1px solid #eef0f2;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid $ui-border-neutral;
+  box-shadow: 0 10px 40px rgba($color-black, 0.05);
 
   // התאמה למובייל
   @media (max-width: 480px) {
@@ -61,7 +61,7 @@
       .calcInput {
         width: 80px; // מעט קטן יותר כדי שיהיה מקום לכפתורים בנייד
         padding: 10px;
-        border: 2px solid #e0e6ed;
+        border: 2px solid $ui-border-cool;
         border-radius: 12px;
         text-align: center;
         font-size: $type-card-title;
@@ -84,8 +84,8 @@
         width: 45px;
         height: 45px;
         border-radius: 50%;
-        border: 1px solid #e0e6ed;
-        background: #f8f9fa;
+        border: 1px solid $ui-border-cool;
+        background: $ui-surface-neutral;
         font-size: $type-card-title;
         font-weight: bold;
         cursor: pointer;
@@ -96,7 +96,7 @@
         -webkit-tap-highlight-color: transparent; // מונע ריבוע כחול בלחיצה בנייד
 
         &:hover {
-          background: #eee;
+          background: $ui-neutral-light;
         }
 
         @media (max-width: 480px) {
@@ -144,10 +144,10 @@
 
   .calcFooterText {
     font-size: $type-caption;
-    color: #777;
+    color: $ui-neutral-muted;
     line-height: 1.6;
     padding-top: 20px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid $ui-surface-line;
 
     @media (max-width: 480px) {
       font-size: $type-micro;

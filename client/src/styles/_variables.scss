@@ -4,6 +4,7 @@
   Base Colors
 ========================= */
 $color-white: #ffffff;
+$color-black: #000000;
 $body-bg: #f9fdff;
 
 /* =========================
@@ -34,9 +35,57 @@ $brand-gold-muted: #9b762c;
 $brand-gold-light: #f6d478;
 $brand-gold-pale: #f6e2b2;
 
+$brand-blue-ink: #173a63;
+$brand-blue-ink-dark: #0d2a45;
+$brand-blue-ink-soft: #214c7f;
+$brand-blue-ink-light: #29578f;
+$brand-blue-night: #0a1931;
+$brand-blue-deep-alt: #12314d;
+$brand-blue-footer-top: #1f4669;
+$brand-blue-error-top: #1a4369;
+$brand-blue-error-bottom: #2c5d8f;
+$brand-blue-muted-rgb: #142d4b;
+$brand-blue-header-top: #163a58;
+$brand-blue-header-bottom: #12304c;
+$brand-blue-community-top: #153d61;
+$brand-blue-mobile-cta-bottom: #173d60;
+
+$brand-gold-bright: #f3bf3d;
+$brand-gold-bright-light: #ffd76a;
+$brand-gold-accent: #d8ae5a;
+$brand-gold-success: #d8b25b;
+
 $brand-bg: #ffffff;
 $brand-text: #0e1a22; // כחול-אפור כהה (לא שחור)
 $brand-surface-cool: #f9fcfd;
+
+/* =========================
+   System Colors
+========================= */
+$ui-text-dark-blue: #0b2236;
+$ui-surface-dark-blue: #0b2742;
+$ui-surface-offwhite: #fffdf5;
+$ui-surface-warm: #fffdf7;
+$ui-surface-neutral: #f8f9fa;
+$ui-surface-muted: #f1f3f5;
+$ui-surface-cool-muted: #f1f5f9;
+$ui-surface-line: #f0f0f0;
+$ui-border-neutral: #eef0f2;
+$ui-border-cool: #e0e6ed;
+$ui-neutral-light: #eeeeee;
+$ui-neutral-muted: #777777;
+$ui-neutral-slate: #64748b;
+
+$ui-warning: #b85c38;
+$ui-danger: #c62828;
+$ui-danger-strong: #d32f2f;
+$ui-danger-bright: #ff4d4d;
+$ui-danger-deep: #b41212;
+$ui-success-dark: #1f7a4d;
+$ui-whatsapp: #25d366;
+$ui-overlay-dark: #141923;
+$ui-overlay-ink: #0a1826;
+$ui-promo-blue: #5986b2;
 
 /* =========================
    UI (נגזרות כלליות לשימוש חוזר)
@@ -52,6 +101,7 @@ $ui-surface-soft: rgba(255, 255, 255, 0.92);
 
 $ui-shadow-card: rgba(0, 0, 0, 0.12);
 $ui-shadow-card-hover: rgba(0, 0, 0, 0.18);
+$ui-shadow-header-base: #081e32;
 $ui-shadow-blue-soft: rgba(20, 60, 95, 0.08);
 $ui-shadow-blue: rgba(20, 60, 95, 0.12);
 $ui-shadow-blue-strong: rgba(20, 60, 95, 0.18);

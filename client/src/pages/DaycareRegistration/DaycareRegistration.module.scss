@@ -3,8 +3,8 @@
 .page {
     min-height: 100vh;
     background:
-        radial-gradient(circle at 18% 12%, rgba(230, 201, 139, 0.2), transparent 26%),
-        linear-gradient(180deg, rgba(31, 78, 121, 0.08), transparent 520px),
+        radial-gradient(circle at 18% 12%, rgba($brand-secondary, 0.2), transparent 26%),
+        linear-gradient(180deg, rgba($brand-primary, 0.08), transparent 520px),
         $body-bg;
     color: $brand-text;
 }

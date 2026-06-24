@@ -42,7 +42,7 @@
     text-align: center;
 
     border: 1px solid rgba($brand-primary, .08);
-    box-shadow: 0 12px 32px rgba(20, 60, 95, .06);
+    box-shadow: 0 12px 32px rgba($footer-bg, .06);
 
     transition: .25s;
 }
@@ -50,7 +50,7 @@
 .card:hover {
     transform: translateY(-6px);
     box-shadow:
-        0 20px 44px rgba(20, 60, 95, .12);
+        0 20px 44px rgba($footer-bg, .12);
 }
 
 .icon {

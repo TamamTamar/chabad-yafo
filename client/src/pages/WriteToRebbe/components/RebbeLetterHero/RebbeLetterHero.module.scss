@@ -27,9 +27,9 @@
     inset: 0;
 
     background: linear-gradient(90deg,
-            rgba(14, 26, 34, 0.82) 0%,
-            rgba(14, 26, 34, 0.58) 46%,
-            rgba(14, 26, 34, 0.26) 100%);
+            rgba($brand-text, 0.82) 0%,
+            rgba($brand-text, 0.58) 46%,
+            rgba($brand-text, 0.26) 100%);
 }
 
 .content {
@@ -93,7 +93,7 @@
 
     .overlay {
         background: linear-gradient(180deg,
-                rgba(14, 26, 34, 0.78),
-                rgba(14, 26, 34, 0.62));
+                rgba($brand-text, 0.78),
+                rgba($brand-text, 0.62));
     }
 }

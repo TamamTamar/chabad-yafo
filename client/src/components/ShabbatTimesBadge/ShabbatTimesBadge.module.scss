@@ -17,7 +17,7 @@
   background: $brand-bg;
   border: 1px solid rgba($brand-secondary, 0.45);
   border-top: 3px solid $brand-secondary;
-  box-shadow: 0 12px 28px rgba(20, 60, 95, 0.1);
+  box-shadow: 0 12px 28px rgba($footer-bg, 0.1);
 
   display: flex;
   align-items: center;
@@ -30,7 +30,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 34px rgba(20, 60, 95, 0.14);
+    box-shadow: 0 16px 34px rgba($footer-bg, 0.14);
   }
 }
 
@@ -111,7 +111,7 @@
 }
 
 .error {
-  color: #b00020;
+  color: $ui-error;
   font-weight: 700;
 }
 @media (max-width: 700px) {

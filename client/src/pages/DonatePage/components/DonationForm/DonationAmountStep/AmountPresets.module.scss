@@ -87,7 +87,7 @@
             rgba($brand-secondary, 0.18),
             rgba($brand-secondary, 0.08));
 
-    box-shadow: 0 24px 42px rgba(20, 60, 95, 0.16);
+    box-shadow: 0 24px 42px rgba($footer-bg, 0.16);
 
     &::before {
         content: "✓";

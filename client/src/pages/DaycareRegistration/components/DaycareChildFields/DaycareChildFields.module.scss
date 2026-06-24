@@ -23,7 +23,7 @@
 }
 
 .required {
-    color: rgba(14, 26, 34, 0.55);
+    color: rgba($brand-text, 0.55);
     font-size: $type-caption;
     font-weight: 700;
 }
@@ -43,8 +43,8 @@
 
 .fieldInput:focus {
     outline: none;
-    border-color: rgba(230, 201, 139, 0.95);
-    box-shadow: 0 0 0 3px rgba(230, 201, 139, 0.2);
+    border-color: rgba($brand-secondary, 0.95);
+    box-shadow: 0 0 0 3px rgba($brand-secondary, 0.2);
 }
 
 .errorText {

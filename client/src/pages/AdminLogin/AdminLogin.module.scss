@@ -14,8 +14,8 @@
     background: $brand-bg;
     border-radius: $radius-card;
     padding: 40px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 50px rgba($color-black, 0.08);
+    border: 1px solid rgba($color-black, 0.05);
     text-align: center;
 }
 
@@ -71,6 +71,6 @@
 .error {
     display: block;
     margin-bottom: 14px;
-    color: #c62828;
+    color: $ui-danger;
     font-size: $type-body-sm;
 }

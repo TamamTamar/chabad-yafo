@@ -38,8 +38,8 @@
   border-radius: $radius-lg;
 
   background:
-    linear-gradient(135deg, rgba(#ffffff, 0.96), rgba($brand-secondary, 0.12)),
-    #ffffff;
+    linear-gradient(135deg, rgba($color-white, 0.96), rgba($brand-secondary, 0.12)),
+    $color-white;
 
   box-shadow: 0 14px 36px rgba($ui-shadow-card, 0.08);
 }

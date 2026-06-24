@@ -7,7 +7,7 @@
   padding: clamp(16px, 5vw, 32px); // פדינג גמיש שקטן במובייל
   border-radius: $radius;
   border: 1px solid $ui-border-soft;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 30px rgba($color-black, 0.04);
   text-align: center;
 }
 

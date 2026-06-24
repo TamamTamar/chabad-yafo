@@ -16,7 +16,7 @@
     border: 1px solid $ui-border-soft;
     border-radius: $radius-card-lg;
     background: $brand-bg;
-    box-shadow: 0 18px 44px rgba(20, 60, 95, 0.1);
+    box-shadow: 0 18px 44px rgba($footer-bg, 0.1);
 }
 .formInner {
     max-width: 760px;

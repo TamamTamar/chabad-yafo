@@ -8,7 +8,7 @@
     width: 100%;
     background: $brand-bg;
 
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 40px rgba($color-black, 0.08);
 }
 
 .header {
@@ -130,7 +130,7 @@
 
     background: linear-gradient(135deg,
             $brand-primary,
-            #143c5f);
+            $footer-bg);
 
     color: $color-white;
 

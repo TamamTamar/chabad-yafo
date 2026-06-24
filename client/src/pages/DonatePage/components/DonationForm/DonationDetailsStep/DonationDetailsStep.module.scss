@@ -148,16 +148,16 @@
 
 .inputError,
 .textareaError {
-    border: 1px solid rgba(198, 40, 40, 0.45);
+    border: 1px solid rgba($ui-danger, 0.45);
 
-    background: rgba(198, 40, 40, 0.025);
+    background: rgba($ui-danger, 0.025);
 }
 
 
 .errorText {
     min-height: 18px;
     margin-top: 2px;
-    color: #b85c38;
+    color: $ui-warning;
 
     font-size: $type-micro;
     font-weight: 700;

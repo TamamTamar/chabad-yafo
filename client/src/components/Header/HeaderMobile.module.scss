@@ -25,7 +25,7 @@
     outline: none;
 
     &:focus-visible {
-        outline: 2px solid rgba(255, 255, 255, 0.35);
+        outline: 2px solid rgba($color-white, 0.35);
         outline-offset: 3px;
     }
 }
@@ -55,7 +55,7 @@
         width: min(calc(100vw - 24px), 360px);
         max-height: calc(100vh - 92px);
         overflow-y: auto;
-        background: rgba(255, 253, 247, 0.98);
+        background: rgba($ui-surface-warm, 0.98);
         border: 1px solid rgba($brand-primary, 0.12);
         border-radius: $radius-lg;
         padding: 14px;
@@ -64,7 +64,7 @@
         transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
         pointer-events: none;
         z-index: 55;
-        box-shadow: 0 20px 45px rgba(14, 42, 68, 0.22);
+        box-shadow: 0 20px 45px rgba($header-cta-bottom, 0.22);
     }
 
     .open {
@@ -120,7 +120,7 @@
         border-radius: 16px;
 
         /* עיצוב גרדיאנט לפי התמונה */
-        background: linear-gradient(180deg, $brand-primary, #173d60);
+        background: linear-gradient(180deg, $brand-primary, $brand-blue-mobile-cta-bottom);
         color: $header-cta-text !important;
         font-weight: 900;
         text-decoration: none;
@@ -137,7 +137,7 @@
         display: block;
         position: fixed;
         inset: 0;
-        background: rgba(10, 24, 38, 0.34);
+        background: rgba($ui-overlay-ink, 0.34);
         opacity: 0;
         pointer-events: none;
         transition: opacity 160ms ease;

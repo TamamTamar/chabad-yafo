@@ -40,7 +40,7 @@
     width: 48px;
     height: 2px;
     border-radius: $radius-pill;
-    background: rgba(31, 78, 121, 0.12);
+    background: rgba($brand-primary, 0.12);
 
     @media (min-width: 720px) {
       width: 70px;
@@ -94,7 +94,7 @@
   text-decoration: none;
   color: inherit;
 
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 18px rgba($color-black, 0.08);
 
   transition:
     transform 250ms ease,
@@ -104,11 +104,11 @@
 
 &:hover {
     transform: translateY(-4px);
-    border-color: rgba(230, 201, 139, 0.75);
+    border-color: rgba($brand-secondary, 0.75);
 
     box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.12),
-      0 0 0 1px rgba(230, 201, 139, 0.18);
+      0 10px 24px rgba($color-black, 0.12),
+      0 0 0 1px rgba($brand-secondary, 0.18);
   }
 
   &:hover .circle {
@@ -121,7 +121,7 @@
   }
 
   &:focus-visible {
-    outline: 3px solid rgba(31, 78, 121, 0.22);
+    outline: 3px solid rgba($brand-primary, 0.22);
     outline-offset: 4px;
   }
 }

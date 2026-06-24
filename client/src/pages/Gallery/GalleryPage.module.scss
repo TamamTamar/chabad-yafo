@@ -48,7 +48,7 @@
     border: 1px solid rgba($brand-primary, .08);
     border-radius: $radius-card-xl;
 
-    background: rgba(255, 255, 255, .45);
+    background: rgba($color-white, .45);
     backdrop-filter: blur(8px);
 }
 
@@ -68,7 +68,7 @@
     &:hover {
         transform: translateY(-8px);
         border-color: rgba($brand-secondary, 0.55);
-        box-shadow: 0 18px 40px rgba(20, 60, 95, 0.14);
+        box-shadow: 0 18px 40px rgba($footer-bg, 0.14);
 
         .categoryImage {
             transform: scale(1.08);
@@ -76,8 +76,8 @@
 
         .categoryOverlay {
             background: linear-gradient(180deg,
-                    rgba(0, 0, 0, 0.02),
-                    rgba(0, 0, 0, 0.72));
+                    rgba($color-black, 0.02),
+                    rgba($color-black, 0.72));
         }
     }
 }
@@ -114,8 +114,8 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg,
-            rgba(0, 0, 0, 0.05),
-            rgba(0, 0, 0, 0.82));
+            rgba($color-black, 0.05),
+            rgba($color-black, 0.82));
     transition: background 0.3s ease;
 }
 

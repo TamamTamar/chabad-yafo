@@ -3,7 +3,7 @@
 .footer {
     margin-top: 50px;
     padding: 24px 20px 16px;
-    background: linear-gradient(180deg, #1f4669 0%, #12314d 100%);
+    background: linear-gradient(180deg, $brand-blue-footer-top 0%, $brand-blue-deep-alt 100%);
     color: $color-white;
 }
 
@@ -21,7 +21,7 @@
     width: 64px;
     height: 2px;
     margin: 0 auto 14px;
-    background: #e6c98b;
+    background: $brand-secondary;
 }
 
 .title {
@@ -34,7 +34,7 @@
 
 .subtitle {
     margin: 7px 0 0;
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba($color-white, 0.72);
     font-size: $type-body-sm;
 }
 
@@ -56,17 +56,17 @@
     text-decoration: none;
     font-size: $type-body-sm;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba($color-white, 0.08);
+    border: 1px solid rgba($color-white, 0.14);
     transition: 0.2s ease;
 }
 
 .contact svg {
-    color: #e6c98b;
+    color: $brand-secondary;
 }
 
 .contact:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba($color-white, 0.14);
     transform: translateY(-2px);
 }
 
@@ -83,21 +83,21 @@
     display: grid;
     place-items: center;
     border-radius: 50%;
-    color: #e6c98b;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(230, 201, 139, 0.28);
+    color: $brand-secondary;
+    background: rgba($color-white, 0.06);
+    border: 1px solid rgba($brand-secondary, 0.28);
     transition: 0.2s ease;
 }
 
 .social:hover {
-    background: rgba(230, 201, 139, 0.14);
+    background: rgba($brand-secondary, 0.14);
     transform: translateY(-2px);
 }
 
 .bottom {
     padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.55);
+    border-top: 1px solid rgba($color-white, 0.1);
+    color: rgba($color-white, 0.55);
     font-size: $type-caption;
 }
 

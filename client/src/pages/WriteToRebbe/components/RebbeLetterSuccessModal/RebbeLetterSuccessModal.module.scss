@@ -12,7 +12,7 @@
 
     padding: 20px;
 
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba($color-black, 0.45);
     backdrop-filter: blur(4px);
 }
 
@@ -156,7 +156,7 @@
 
     background: linear-gradient(135deg,
             $brand-primary,
-            #143c5f);
+            $footer-bg);
 
     color: $color-white;
 }
@@ -189,7 +189,7 @@
 
     background: linear-gradient(135deg,
             $brand-primary,
-            #143c5f);
+            $footer-bg);
 
     color: $color-white;
 

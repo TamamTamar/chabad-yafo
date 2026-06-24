@@ -7,8 +7,8 @@
     min-height: 680px;
     border-radius: $radius;
     background:
-        radial-gradient(circle at 30% 10%, rgba(255, 255, 255, 0.08), transparent 32%),
-        linear-gradient(180deg, #153d61 0%, #0d2a45 100%);
+        radial-gradient(circle at 30% 10%, rgba($color-white, 0.08), transparent 32%),
+        linear-gradient(180deg, $brand-blue-community-top 0%, $brand-blue-ink-dark 100%);
     color: $color-white;
     box-shadow: 0 18px 44px $ui-shadow-card-hover;
 }
@@ -32,7 +32,7 @@
         margin: 0 auto 22px;
         font-size: $type-body;
         line-height: $line-body;
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba($color-white, 0.9);
         text-align: center;
     }
 
@@ -44,12 +44,12 @@
 
     .signatureGreeting {
         margin-bottom: 6px;
-        color: #d8ae5a;
+        color: $brand-gold-accent;
         font-weight: 600;
     }
 
     .signatureName {
-        color: #d8ae5a;
+        color: $brand-gold-accent;
         font-size: $type-card-title;
         font-weight: 700;
         line-height: 1.4;
@@ -57,7 +57,7 @@
 
     .signatureRole {
         margin-top: 4px;
-        color: rgba(255, 255, 255, 0.78);
+        color: rgba($color-white, 0.78);
         font-size: $type-body-sm;
     }
 }

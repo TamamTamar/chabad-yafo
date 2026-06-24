@@ -33,8 +33,8 @@
 
 .fieldTextarea:focus {
     outline: none;
-    border-color: rgba(230, 201, 139, 0.95);
-    box-shadow: 0 0 0 3px rgba(230, 201, 139, 0.2);
+    border-color: rgba($brand-secondary, 0.95);
+    box-shadow: 0 0 0 3px rgba($brand-secondary, 0.2);
 }
 
 .errorText {

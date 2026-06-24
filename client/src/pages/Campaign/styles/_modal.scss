@@ -34,7 +34,7 @@
   height: auto;
   border-radius: $radius;
   overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 50px rgba($color-black, 0.3);
   animation: modalEnter 0.3s ease-out;
 
   @media (max-width: 480px) {
@@ -82,7 +82,7 @@
 
 .modalSteps {
   display: flex;
-  background: #f8f9fa;
+  background: $ui-surface-neutral;
   padding: 10px 24px;
   gap: 20px;
   border-bottom: 1px solid $ui-border-soft;
@@ -207,13 +207,13 @@
 
     // קלאס שגיאה ייעודי
     &.inputError {
-      border-color: #ff4d4d;
-      background-color: rgba(#ff4d4d, 0.02);
+      border-color: $ui-danger-bright;
+      background-color: rgba($ui-danger-bright, 0.02);
     }
   }
 
   .error {
-    color: #ff4d4d;
+    color: $ui-danger-bright;
     font-size: $type-micro;
     font-weight: 600;
     margin-top: 2px;
@@ -221,7 +221,7 @@
 }
 
 .errorText {
-  color: #ff4d4d;
+  color: $ui-danger-bright;
   font-size: $type-micro;
   font-weight: 600;
   margin-top: 2px;
@@ -229,7 +229,7 @@
 
 .errorBox {
   margin-top: 10px;
-  color: #d32f2f;
+  color: $ui-danger-strong;
   text-align: center;
   font-weight: 700;
 }
@@ -293,7 +293,7 @@
 }
 
 .btnSecondary {
-  background: #f8f9fa;
+  background: $ui-surface-neutral;
   border: 1px solid $ui-border-soft;
   padding: 11px;
   border-radius: $radius-pill;

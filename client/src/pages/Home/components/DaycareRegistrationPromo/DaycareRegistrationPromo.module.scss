@@ -12,7 +12,7 @@
     background-image: url("../../../../assets/families-hero.webp");
     background-position: center;
     background-size: cover;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 20px 60px rgba($color-black, 0.12);
 }
 
 .overlay {
@@ -20,9 +20,9 @@
     inset: 0;
     background: linear-gradient(
         90deg,
-        rgba(20, 45, 75, 0.22) 0%,
-        rgba(20, 45, 75, 0.12) 45%,
-        rgba(20, 45, 75, 0.04) 100%
+        rgba($brand-blue-muted-rgb, 0.22) 0%,
+        rgba($brand-blue-muted-rgb, 0.12) 45%,
+        rgba($brand-blue-muted-rgb, 0.04) 100%
     );
 }
 
@@ -32,9 +32,9 @@
     max-width: 500px;
     margin-right: 48px;
     padding: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba($color-white, 0.2);
     border-radius: $radius-card-lg;
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba($color-white, 0.16);
     color: $brand-primary;
     text-align: center;
     backdrop-filter: blur(8px);
@@ -96,8 +96,8 @@
     .overlay {
         background: linear-gradient(
             180deg,
-            rgba(20, 45, 75, 0.14) 0%,
-            rgba(20, 45, 75, 0.28) 100%
+            rgba($brand-blue-muted-rgb, 0.14) 0%,
+            rgba($brand-blue-muted-rgb, 0.28) 100%
         );
     }
 
@@ -106,9 +106,9 @@
         max-width: 330px;
         margin: 0;
         padding: 22px 18px;
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba($color-white, 0.16);
         border-radius: $radius-card;
-        background: rgba(89, 134, 178, 0.28);
+        background: rgba($ui-promo-blue, 0.28);
         color: $color-white;
         backdrop-filter: blur(4px);
     }

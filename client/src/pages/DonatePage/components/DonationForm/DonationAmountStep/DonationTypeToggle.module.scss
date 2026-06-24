@@ -30,7 +30,7 @@
 
     background: rgba($brand-primary, 0.04);
 
-    box-shadow: inset 0 1px 2px rgba(20, 60, 95, 0.06);
+    box-shadow: inset 0 1px 2px rgba($footer-bg, 0.06);
 }
 
 .typeButton,
@@ -70,7 +70,7 @@
 
     box-shadow:
         0 8px 18px $ui-shadow-blue,
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        inset 0 1px 0 rgba($color-white, 0.9);
 }
 
 @media (max-width: 640px) {

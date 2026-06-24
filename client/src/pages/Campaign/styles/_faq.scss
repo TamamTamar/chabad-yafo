@@ -19,16 +19,16 @@
 
 .faqItem {
   border-radius: 12px;
-  background: #f1f3f5;
+  background: $ui-surface-muted;
   border: 1px solid transparent;
   transition: all 0.25s ease;
   overflow: hidden;
 
   &Open {
     // החזרתי לצבע המקורי שלך
-    background: #fffdf5; 
+    background: $ui-surface-offwhite; 
     border-color: $brand-secondary;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba($color-black, 0.05);
 
     .faqSummary {
       background: $brand-secondary;
@@ -36,7 +36,7 @@
     }
 
     .faqIcon {
-      background: rgba(180, 18, 18, 0.1);
+      background: rgba($ui-danger-deep, 0.1);
       color: inherit;
       transform: rotate(180deg); // מוסיף עניין ויזואלי לפתיחה
     }
