@@ -1,5 +1,6 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { createDaycareRegistration } from "../../../../services/daycareRegistrationService";
+import { trackLead } from "../../../../services/metaPixelService";
 import type { DaycareRegistrationFormValues } from "../../../../types/daycareRegistration";
 import {
     fridayCareOptions,
@@ -46,6 +47,11 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
                     data.requiredHours === "אחר"
                         ? data.requiredHoursOther?.trim()
                         : undefined,
+            });
+
+            trackLead({
+                content_name: "daycare_registration",
+                content_category: "daycare",
             });
 
             reset();
