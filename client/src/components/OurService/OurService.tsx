@@ -5,6 +5,7 @@ import homeIcon from "../../assets/services/home.png";
 import kashrutIcon from "../../assets/services/kashrut.png";
 import menoraIcon from "../../assets/services/menora.png";
 import mezuzahIcon from "../../assets/services/mezuza.png";
+import { trackWhatsAppClick } from "../../services/googleAnalyticsService";
 import Container from "../Container/Container";
 
 type ServiceItem = {
@@ -87,6 +88,12 @@ const OurService = ({
               target="_blank"
               rel="noreferrer"
               aria-label={`${item.title} - פתיחה בוואטסאפ`}
+              onClick={() =>
+                trackWhatsAppClick({
+                  location: "services_grid",
+                  service_id: item.id,
+                })
+              }
             >
               <span className={styles.circle} aria-hidden="true">
                 <img className={styles.icon} src={item.icon} alt="" />

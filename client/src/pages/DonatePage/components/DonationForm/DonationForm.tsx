@@ -1,6 +1,11 @@
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Container from "../../../../components/Container/Container";
+import {
+    trackDonationComplete,
+    trackDonationPaymentStart,
+    trackDonationStart,
+} from "../../../../services/googleAnalyticsService";
 import { getNedarimCallbackUrl } from "../../../../shared/donations/nedarimPayload";
 import DonationSummary from "../DonationSummary/DonationSummary";
 import DonationAmountStep from "./DonationAmountStep/DonationAmountStep";
@@ -107,6 +112,11 @@ const DonationForm = () => {
 
         if (!isValid) return;
 
+        trackDonationStart({
+            value: amountNumber,
+            currency: "ILS",
+            donation_type: donationType,
+        });
         setStep(2);
     };
 
@@ -120,6 +130,12 @@ const DonationForm = () => {
 
 
         setPaymentData(nextPaymentData);
+        trackDonationPaymentStart({
+            value: Number(data.amount) || 0,
+            currency: "ILS",
+            donation_type: data.donationType,
+            payments: Number(data.payments) || 1,
+        });
         setStep(3);
 
         setTimeout(() => {
@@ -210,7 +226,14 @@ const DonationForm = () => {
                                         iframeRef={iframeRef}
                                         paymentData={paymentData}
                                         onBack={() => setStep(2)}
-                                        onPaymentSuccess={() => setStep(4)}
+                                        onPaymentSuccess={() => {
+                                            trackDonationComplete({
+                                                value: Number(amount) || 0,
+                                                currency: "ILS",
+                                                donation_type: donationType,
+                                            });
+                                            setStep(4);
+                                        }}
                                     />
                                 )}
                                 {step === 4 && <DonationSuccessStep

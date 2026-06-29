@@ -7,6 +7,10 @@ import {
     Mail,
 } from "lucide-react";
 
+import {
+    trackPhoneClick,
+    trackWhatsAppClick,
+} from "../../services/googleAnalyticsService";
 import Container from "../Container/Container";
 import styles from "./Footer.module.scss";
 
@@ -23,7 +27,11 @@ const Footer = () => {
                     </div>
 
                     <div className={styles.contacts}>
-                        <a href="tel:0537700339" className={styles.contact}>
+                        <a
+                            href="tel:0537700339"
+                            className={styles.contact}
+                            onClick={() => trackPhoneClick({ location: "footer" })}
+                        >
                             <Phone size={16} />
                             <span>053-770-0339</span>
                         </a>
@@ -45,7 +53,14 @@ const Footer = () => {
                     </div>
 
                     <div className={styles.socials}>
-                        <a href="https://wa.me/972537700339" target="_blank" rel="noreferrer" aria-label="וואטסאפ" className={styles.social}>
+                        <a
+                            href="https://wa.me/972537700339"
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="וואטסאפ"
+                            className={styles.social}
+                            onClick={() => trackWhatsAppClick({ location: "footer" })}
+                        >
                             <MessageCircle size={18} />
                         </a>
 

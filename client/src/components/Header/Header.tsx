@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import BaseDialog from "../BaseDialog/BaseDialog";
 import dialogStyles from "../BaseDialog/BaseDialog.module.scss";
 import Container from "../Container/Container";
+import { trackWhatsAppClick } from "../../services/googleAnalyticsService";
 import styles from "./Header.module.scss";
 import HeaderDesktopNav from "./HeaderDesktopNav";
 import m from "./HeaderMobile.module.scss";
@@ -91,7 +92,10 @@ const Header = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className={dialogStyles.cta}
-                        onClick={() => setInfoOpen(false)}
+                        onClick={() => {
+                            trackWhatsAppClick({ location: "tefillin_mezuzot_dialog" });
+                            setInfoOpen(false);
+                        }}
                     >
                         צור קשר
                     </a>

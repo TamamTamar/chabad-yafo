@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { trackWhatsAppClick } from "../../services/googleAnalyticsService";
 import m from "./HeaderMobile.module.scss";
 
 type Props = {
@@ -48,7 +49,10 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink }: Props) => 
                         className={m.drawerItem}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={onClose}
+                        onClick={() => {
+                            trackWhatsAppClick({ location: "mobile_header" });
+                            onClose();
+                        }}
                     >
                         צור קשר
                     </a>

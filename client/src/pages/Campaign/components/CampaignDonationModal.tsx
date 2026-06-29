@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import {
+  trackDonationComplete,
+  trackDonationPaymentStart,
+} from "../../../services/googleAnalyticsService";
 import { buildNedarimPayload } from "../../../shared/donations/nedarimPayload";
 import type { Currency } from "../../../shared/donations/nedarimPayload";
 import { useNedarimIframe } from "../../../shared/donations/useNedarimIframe";
@@ -73,7 +77,15 @@ const CampaignDonationModal: React.FC<Props> = ({
     useNedarimIframe({
       enabled: open && step === 2,
       iframeRef,
-      onSuccess: onClose,
+      onSuccess: () => {
+        trackDonationComplete({
+          value: selectedAmount,
+          currency: currency === 1 ? "ILS" : String(currency),
+          donation_source: "campaign",
+          campaign_title: campaignTitle,
+        });
+        onClose();
+      },
       successDelay: 4000,
     });
 
@@ -142,6 +154,8 @@ const CampaignDonationModal: React.FC<Props> = ({
   ]);
 
   const goNext = () => {
+    let nextAmount = amountToShow;
+
     if (amountMode === "custom") {
       const parsed = Number(customRaw.replace(/[^\d]/g, ""));
 
@@ -150,10 +164,17 @@ const CampaignDonationModal: React.FC<Props> = ({
         return;
       }
 
+      nextAmount = parsed;
       setSelectedAmount(parsed);
     }
 
     setStep(2);
+    trackDonationPaymentStart({
+      value: nextAmount,
+      currency: currency === 1 ? "ILS" : String(currency),
+      donation_source: "campaign",
+      campaign_title: campaignTitle,
+    });
   };
 
   if (!open) return null;

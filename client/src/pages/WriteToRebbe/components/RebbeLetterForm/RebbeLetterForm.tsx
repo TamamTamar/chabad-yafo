@@ -1,6 +1,7 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import styles from "./RebbeLetterForm.module.scss";
+import { trackRebbeLetterSubmit } from "../../../../services/googleAnalyticsService";
 import { createRebbeLetter } from "../../../../services/rebbeLetterService";
 import { writeToRebbeConfigs } from "../../writeToRebbeConfig";
 
@@ -41,6 +42,14 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
             await createRebbeLetter({
                 ...data,
                 occasion: writeToRebbeConfigs.general.occasion,
+            });
+
+            trackRebbeLetterSubmit({
+                content_name: "rebbe_letter",
+                occasion: writeToRebbeConfigs.general.occasion,
+                wants_updates: data.wantsUpdates,
+                has_phone: Boolean(data.phone?.trim()),
+                has_email: Boolean(data.email?.trim()),
             });
 
             reset();

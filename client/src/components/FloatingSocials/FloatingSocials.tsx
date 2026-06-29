@@ -1,4 +1,5 @@
 import { Facebook, Instagram, MessageCircle } from "lucide-react";
+import { trackWhatsAppClick } from "../../services/googleAnalyticsService";
 import styles from "./FloatingSocials.module.scss";
 
 const FloatingSocials = () => {
@@ -10,6 +11,7 @@ const FloatingSocials = () => {
                 rel="noopener noreferrer"
                 className={`${styles.fab} ${styles.whatsapp}`}
                 aria-label="שליחת הודעה בוואטסאפ"
+                onClick={() => trackWhatsAppClick({ location: "floating_socials" })}
             >
                 <MessageCircle size={20} strokeWidth={1.8} />
             </a>

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import styles from "./DonationCampaignPage.module.scss";
 
+import { trackDonationStart } from "../../services/googleAnalyticsService";
 import type { DonationCampaignConfig, DonorForm } from "./types";
 import CampaignHeroImage from "./components/CampaignHeroImage";
 import CampaignIntro from "./components/CampaignIntro";
@@ -37,6 +38,12 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
   );
 
   const openDonation = (amount: number) => {
+    trackDonationStart({
+      value: amount,
+      currency: config.nedarim.Currency === 1 ? "ILS" : String(config.nedarim.Currency),
+      donation_source: "campaign",
+      campaign_title: config.title,
+    });
     setPrefilledDonor(undefined);
     setDirectToStep2(false);
     setStartWithCustom(false);
@@ -45,6 +52,12 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
   };
 
   const openCustomDonation = () => {
+    trackDonationStart({
+      currency: config.nedarim.Currency === 1 ? "ILS" : String(config.nedarim.Currency),
+      donation_source: "campaign",
+      campaign_title: config.title,
+      amount_mode: "custom",
+    });
     setPrefilledDonor(undefined);
     setDirectToStep2(false);
     setStartWithCustom(true);
@@ -53,6 +66,12 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
   };
 
   const handleCompactSubmit = (amount: number, donor: DonorForm) => {
+    trackDonationStart({
+      value: amount,
+      currency: config.nedarim.Currency === 1 ? "ILS" : String(config.nedarim.Currency),
+      donation_source: "campaign_compact_form",
+      campaign_title: config.title,
+    });
     setPresetAmount(amount);
     setPrefilledDonor(donor);
     setDirectToStep2(true); 

@@ -1,5 +1,6 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { createDaycareRegistration } from "../../../../services/daycareRegistrationService";
+import { trackDaycareRegistrationSubmit } from "../../../../services/googleAnalyticsService";
 import { trackLead } from "../../../../services/metaPixelService";
 import type { DaycareRegistrationFormValues } from "../../../../types/daycareRegistration";
 import {
@@ -52,6 +53,11 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
             trackLead({
                 content_name: "daycare_registration",
                 content_category: "daycare",
+            });
+            trackDaycareRegistrationSubmit({
+                content_name: "daycare_registration",
+                required_hours: data.requiredHours,
+                friday_care: data.fridayCare,
             });
 
             reset();

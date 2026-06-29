@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import styles from "./SurveyForm.module.scss";
 import type { FormValues } from "../../../../types/family";
 import { createFamily } from "../../../../services/familyService";
+import { trackFamilyFormSubmit } from "../../../../services/googleAnalyticsService";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import { ages, interests } from "../../data";
 import CommunityBox from "../CommunityBox/CommunityBox";
@@ -37,6 +38,13 @@ const SurveyForm = () => {
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         try {
             await createFamily(data);
+
+            trackFamilyFormSubmit({
+                content_name: "families_survey",
+                ages_count: data.ages?.length || 0,
+                interests_count: data.interests?.length || 0,
+                wants_updates: data.updates,
+            });
 
             reset();
             setIsSuccess(true);

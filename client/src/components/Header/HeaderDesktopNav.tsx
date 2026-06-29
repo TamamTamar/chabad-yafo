@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { trackWhatsAppClick } from "../../services/googleAnalyticsService";
 import styles from "./Header.module.scss";
 
 type Props = {
@@ -43,7 +44,10 @@ const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink }: Props) => {
             <a 
                 href={whatsappLink} 
                 className={styles.navLink} 
-                onClick={onCloseMenu} 
+                onClick={() => {
+                    trackWhatsAppClick({ location: "desktop_header" });
+                    onCloseMenu();
+                }}
                 target="_blank" 
                 rel="noopener noreferrer"
             >
