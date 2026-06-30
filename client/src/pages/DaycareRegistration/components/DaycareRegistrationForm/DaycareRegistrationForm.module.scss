@@ -100,33 +100,6 @@
         0 10px 22px rgba($brand-primary, 0.06);
 }
 
-.confirmationCheckbox {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 16px;
-    border: 1px solid rgba($brand-gold-rich, 0.42);
-    border-radius: $radius-md;
-    background: linear-gradient(135deg, rgba($brand-primary, 0.055), rgba($brand-secondary, 0.13));
-    color: $brand-primary;
-    font-size: $type-body-sm;
-    font-weight: 900;
-    line-height: 1.5;
-    cursor: pointer;
-}
-
-.checkboxInput {
-    width: 16px;
-    height: 16px;
-    margin-top: 3px;
-    flex: 0 0 auto;
-    accent-color: $brand-primary;
-}
-
-.checkboxText {
-    display: inline-block;
-}
-
 .errorText,
 .formError {
     min-height: 18px;
@@ -137,6 +110,19 @@
 }
 
 .formError {
+    text-align: center;
+}
+
+.reassurance {
+    margin: 2px 0 0;
+    padding: 12px 14px;
+    border: 1px solid rgba($brand-gold-rich, 0.32);
+    border-radius: $radius-md;
+    background: rgba($color-white, 0.72);
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 850;
+    line-height: 1.55;
     text-align: center;
 }
 
@@ -187,14 +173,13 @@
         inset-inline: 18px;
     }
 
-    .confirmationCheckbox {
+    .reassurance {
         font-size: $type-caption;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .fieldInput,
-    .confirmationCheckbox,
     .submitButton {
         transition: none;
     }

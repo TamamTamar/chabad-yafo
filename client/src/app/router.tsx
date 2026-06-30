@@ -3,6 +3,7 @@ import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRout
 import AboutPage from "../pages/AboutPage/AboutPage";
 import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
 import AdminLogin from "../pages/AdminLogin/AdminLogin";
+import DaycareAdmin from "../pages/Admin/DaycareAdmin/DaycareAdmin";
 import DaycareRegistration from "../pages/DaycareRegistration/DaycareRegistration";
 import DonatePage from "../pages/DonatePage/DonatePage";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
@@ -36,6 +37,14 @@ export const router = createBrowserRouter([
                 element: (
                     <ProtectedRouteAdmin>
                         <AdminDashboard />
+                    </ProtectedRouteAdmin>
+                ),
+            },
+            {
+                path: "admin/daycare",
+                element: (
+                    <ProtectedRouteAdmin>
+                        <DaycareAdmin />
                     </ProtectedRouteAdmin>
                 ),
             },

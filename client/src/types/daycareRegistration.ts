@@ -5,12 +5,13 @@ export type DaycareRegistrationFormValues = {
     parentName: string;
     phone: string;
     email?: string;
-    childName: string;
-    birthDate: string;
+    childName?: string;
+    birthDate?: string;
+    childAge: string;
     requiredHours: RequiredHours;
     requiredHoursOther?: string;
     fridayCare: FridayCare;
-    costApproval: boolean;
+    costApproval?: boolean;
     notes?: string;
 };
 

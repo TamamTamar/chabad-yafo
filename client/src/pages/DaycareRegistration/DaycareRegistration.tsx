@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+    trackDaycareCtaClick,
+    trackDaycarePageView,
+} from "../../services/googleAnalyticsService";
 import styles from "./DaycareRegistration.module.scss";
 import DaycarePrinciplesSection from "./components/DaycarePrinciplesSection/DaycarePrinciplesSection";
 import DaycareRegistrationForm from "./components/DaycareRegistrationForm/DaycareRegistrationForm";
@@ -8,9 +12,23 @@ import DaycareSuccessModal from "./components/DaycareSuccessModal/DaycareSuccess
 const DaycareRegistration = () => {
     const [showSuccess, setShowSuccess] = useState(false);
 
+    useEffect(() => {
+        trackDaycarePageView({
+            page_path: "/daycare-registration",
+            content_name: "daycare_registration",
+        });
+    }, []);
+
     const handleSuccess = () => {
         setShowSuccess(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleStickyClick = () => {
+        trackDaycareCtaClick({
+            location: "sticky_mobile",
+            cta_text: "השאירו פרטים",
+        });
     };
 
     return (
@@ -22,6 +40,14 @@ const DaycareRegistration = () => {
             <DaycareRegistrationHero />
             <DaycarePrinciplesSection />
             <DaycareRegistrationForm onSuccess={handleSuccess} />
+
+            <a
+                className={styles.mobileStickyCta}
+                href="#daycare-form"
+                onClick={handleStickyClick}
+            >
+                השאירו פרטים
+            </a>
         </main>
     );
 };

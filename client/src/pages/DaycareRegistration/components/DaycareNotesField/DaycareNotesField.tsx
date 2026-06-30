@@ -10,7 +10,7 @@ type Props = {
 const DaycareNotesField = ({ errors, register }: Props) => (
     <div className={styles.fieldGroup}>
         <label className={styles.fieldLabel} htmlFor="notes">
-            הערות נוספות
+            הערות נוספות (לא חובה)
         </label>
         <textarea
             id="notes"

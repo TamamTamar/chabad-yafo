@@ -29,12 +29,16 @@ export const daycareRegistrationSchema = new Schema(
         },
         childName: {
             type: String,
-            required: true,
             trim: true,
         },
         birthDate: {
             type: Date,
+        },
+        childAge: {
+            type: String,
             required: true,
+            trim: true,
+            maxlength: 80,
         },
         requiredHours: {
             type: String,
@@ -56,14 +60,11 @@ export const daycareRegistrationSchema = new Schema(
             type: String,
             required: true,
             enum: ["כן", "לא"],
+            default: "לא",
         },
         costApproval: {
             type: Boolean,
-            required: true,
-            validate: {
-                validator: (value: boolean) => value === true,
-                message: "יש לאשר שהעלות המשוערת מתאימה עבורכם",
-            },
+            default: false,
         },
         notes: {
             type: String,

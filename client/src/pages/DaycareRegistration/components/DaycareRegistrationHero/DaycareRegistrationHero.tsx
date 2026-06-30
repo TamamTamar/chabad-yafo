@@ -1,48 +1,82 @@
 import styles from "./DaycareRegistrationHero.module.scss";
+import {
+    trackDaycareCtaClick,
+    trackDaycareWhatsAppClick,
+    trackWhatsAppClick,
+} from "../../../../services/googleAnalyticsService";
+
+const DAYCARE_WHATSAPP_PHONE = "972537700339";
+const DAYCARE_WHATSAPP_TEXT =
+    "שלום, ראיתי את הפרטים על המעון החדש ביפו ואשמח לתאם שיחת היכרות.";
+const daycareWhatsAppLink = `https://wa.me/${DAYCARE_WHATSAPP_PHONE}?text=${encodeURIComponent(
+    DAYCARE_WHATSAPP_TEXT
+)}`;
+
+const trackHeroCta = (ctaText: string, location: string) => {
+    trackDaycareCtaClick({
+        location,
+        cta_text: ctaText,
+    });
+};
 
 const DaycareRegistrationHero = () => (
     <section className={styles.hero}>
         <div className={styles.heroInner}>
             <div className={styles.heroContent}>
-                <p className={styles.eyebrow}>מרכז חב"ד יפו</p>
+                <p className={styles.eyebrow}>רישום מוקדם נפתח</p>
                 <h1 className={styles.title}>
-                    מעון חדש בצפון יפו - רישום מוקדם
+                    נפתחת ההרשמה למעון ביפו
                 </h1>
                 <p className={styles.valueStatement}>
-                    מעון קטן וחם לגילאי שנה עד שלוש, עם יחס אישי,
-                    סדר יום רגוע ואווירה נעימה שמותאמת לגיל הרך.
+                    פתיחה בספטמבר הקרוב באזור שוק הפשפשים
                 </p>
 
-                <div className={styles.introText}>
-                    <p className={styles.noticeParagraph}>
-                        מילוי הטופס אינו מחייב את מרכז חב"ד יפו ואינו מהווה
-                        רישום סופי.
-                    </p>
-                    <p className={styles.introParagraph}>
-                        מרכז חב"ד יפו פועל לקראת פתיחת מעון חדש בצפון יפו
-                        לילדים בגילאי שנה עד שלוש.
-                    </p>
-                    <p className={styles.introParagraph}>
-                        אנו מתחילים ברישום מוקדם לצורך היערכות ושריון מקומות.
-                    </p>
-                    <p className={styles.introParagraph}>
-                        מספר המקומות מוגבל והרישום מתבצע לפי סדר הפנייה.
-                    </p>
-                    <p className={styles.priceText}>
-                        עלות משוערת: 5,500 ₪ לחודש.
-                    </p>
-                </div>
+                <p className={styles.trustLine}>
+                    מעון קטן וחם לילדי יפו, עם דגש על{" "}
+                    <strong>ביטחון</strong>, <strong>צוות אוהב</strong>,{" "}
+                    <strong>יחס אישי</strong> וסביבה ערכית.
+                </p>
 
                 <div className={styles.heroHighlights} aria-label="עיקרי המעון">
-                    <span className={styles.heroHighlight}>גילאי שנה עד שלוש</span>
+                    <span className={styles.heroHighlight}>חצר וגינה</span>
                     <span className={styles.heroHighlight}>קבוצה קטנה</span>
-                    <span className={styles.heroHighlight}>גינה</span>
-                    <span className={styles.heroHighlight}>אווירה משפחתית</span>
+                    <span className={styles.heroHighlight}>יחס אישי</span>
+                    <span className={styles.heroHighlight}>ערכים ומסורת</span>
                 </div>
 
-                <a className={styles.heroCta} href="#daycare-form">
-                    למילוי טופס רישום מוקדם
-                </a>
+                <div className={styles.heroActions}>
+                    <a
+                        className={styles.heroCta}
+                        href="#daycare-form"
+                        onClick={() => trackHeroCta("השאירו פרטים", "hero_primary")}
+                    >
+                        השאירו פרטים עכשיו
+                    </a>
+                    <a
+                        className={styles.secondaryCta}
+                        href={daycareWhatsAppLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => {
+                            trackHeroCta(
+                                "דברו איתנו בוואטסאפ",
+                                "hero_secondary"
+                            );
+                            trackWhatsAppClick({
+                                location: "daycare_hero_secondary",
+                            });
+                            trackDaycareWhatsAppClick({
+                                location: "hero_secondary",
+                            });
+                        }}
+                    >
+                        דברו איתנו בוואטסאפ
+                    </a>
+                </div>
+
+                <p className={styles.scarcityText}>
+                    מספר המקומות מוגבל כדי לשמור על יחס אישי וקבוצה קטנה.
+                </p>
             </div>
         </div>
     </section>

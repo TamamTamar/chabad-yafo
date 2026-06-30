@@ -1,35 +1,31 @@
+import {
+    BookHeart,
+    Flower2,
+    HeartHandshake,
+    UsersRound,
+} from "lucide-react";
 import styles from "./DaycarePrinciplesSection.module.scss";
 
 const principles = [
     {
+        icon: UsersRound,
         title: "קבוצה קטנה ויחס אישי",
-        text:
-            "קבוצה קטנה מאפשרת לצוות להכיר כל ילד באמת, לשים לב לקצב שלו ולתת מענה אישי לאורך היום.",
+        text: "מסגרת אינטימית שמאפשרת להכיר כל ילד באמת ולתת לו מקום לאורך היום.",
     },
     {
-        title: "גינה וחוויית חוץ",
-        text:
-            "גינה נעימה מאפשרת משחק, תנועה וזמן באוויר הפתוח כחלק טבעי משגרת היום.",
+        icon: Flower2,
+        title: "חצר וגינה",
+        text: "מרחב פתוח למשחק, תנועה ואוויר, כחלק טבעי ובריא מהיום של הילדים.",
     },
     {
-        title: "אווירה חמה ומשפחתית",
-        text:
-            "מקום שבו הילד מרגיש שרואים אותו, מכירים אותו ומלווים אותו ברוגע ובביטחון.",
-    },
-    {
+        icon: BookHeart,
         title: "ערכים ומסורת יהודית",
-        text:
-            "שבת, חגים, סיפורים וערכים יהודיים מועברים בדרך נעימה, חווייתית ומותאמת לגיל הרך.",
+        text: "שבת, חגים, סיפורים וערכים יהודיים בדרך נעימה, חווייתית ומותאמת לגיל הרך.",
     },
     {
+        icon: HeartHandshake,
         title: "קשר אישי עם ההורים",
-        text:
-            "עדכונים שוטפים ושיח פתוח, כדי שגם ההורים ירגישו רגועים ובטוחים לאורך היום.",
-    },
-    {
-        title: "מיקום מרכזי בצפון יפו",
-        text:
-            "מיקום נגיש בלב צפון יפו, סמוך לשוק הפשפשים ולשכונות המגורים של משפחות רבות.",
+        text: "שיח פתוח ועדכונים שוטפים, כדי שגם ההורים ירגישו רגועים ובטוחים.",
     },
 ];
 
@@ -37,22 +33,22 @@ const DaycarePrinciplesSection = () => (
     <section className={styles.principlesSection}>
         <div className={styles.principlesHeader}>
             <span className={styles.sectionEyebrow}>
-                העקרונות שעליהם יוקם המעון
+                למה לבחור במעון שלנו?
             </span>
             <h2 className={styles.principlesTitle}>
-                מה חשוב לנו במעון?
+                מה הילדים יקבלו במעון?
             </h2>
             <p className={styles.principlesIntro}>
-                אנחנו בונים מעון קטן ומוקפד, שבו כל ילד מקבל יחס אישי,
-                סדר יום רגוע ומסודר, גינה נעימה ותוכן ערכי שמותאם לגיל הרך.
+                המעון החדש נבנה עבור הורים שמחפשים מסגרת קטנה, חמה
+                ומושקעת, שבה הילד מרגיש בטוח, נראה ואהוב.
             </p>
         </div>
 
         <div className={styles.principlesGrid}>
-            {principles.map((principle, index) => (
+            {principles.map((principle) => (
                 <article className={styles.principleCard} key={principle.title}>
-                    <span className={styles.principleNumber}>
-                        {String(index + 1).padStart(2, "0")}
+                    <span className={styles.principleIcon} aria-hidden="true">
+                        <principle.icon size={24} strokeWidth={1.8} />
                     </span>
                     <h3 className={styles.principleTitle}>
                         {principle.title}
@@ -64,13 +60,11 @@ const DaycarePrinciplesSection = () => (
             ))}
         </div>
 
-        <div className={styles.trustBox}>
-            <span className={styles.trustAccent} aria-hidden="true" />
-            <p className={styles.trustText}>
-                המעון מוקם על ידי מרכז חב"ד יפו, הפועל למעלה מ-35 שנה למען
-                משפחות, ילדים וקהילת יפו.
-            </p>
-        </div>
+        <p className={styles.trustText}>
+            בית חב"ד יפו מקים את המעון מתוך רצון לתת למשפחות ביפו מסגרת
+            קרובה, חמה ובטוחה לגיל הרך. השאירו פרטים ונחזור אליכם לשיחת
+            היכרות קצרה, כדי לספר על המעון ולבדוק יחד אם זה מתאים לכם.
+        </p>
     </section>
 );
 

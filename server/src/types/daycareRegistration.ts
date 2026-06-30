@@ -5,11 +5,12 @@ export interface IDaycareRegistration {
     parentName: string;
     phone: string;
     email?: string;
-    childName: string;
-    birthDate: Date;
+    childName?: string;
+    birthDate?: Date;
+    childAge: string;
     requiredHours: RequiredHours;
     requiredHoursOther?: string;
     fridayCare: FridayCare;
-    costApproval: boolean;
+    costApproval?: boolean;
     notes?: string;
 }

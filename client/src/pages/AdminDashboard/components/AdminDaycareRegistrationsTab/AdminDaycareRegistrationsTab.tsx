@@ -59,11 +59,9 @@ const AdminDaycareRegistrationsTab = () => {
                                 <th className={styles.tableHeader}>שם הורה</th>
                                 <th className={styles.tableHeader}>טלפון</th>
                                 <th className={styles.tableHeader}>דוא"ל</th>
-                                <th className={styles.tableHeader}>שם הילד/ה</th>
-                                <th className={styles.tableHeader}>תאריך לידה</th>
+                                <th className={styles.tableHeader}>גיל הילד/ה</th>
                                 <th className={styles.tableHeader}>שעות</th>
                                 <th className={styles.tableHeader}>ימי שישי</th>
-                                <th className={styles.tableHeader}>אישור 5,500 ₪</th>
                                 <th className={styles.tableHeader}>הערות</th>
                                 <th className={styles.tableHeader}>תאריך פנייה</th>
                             </tr>
@@ -89,23 +87,15 @@ const AdminDaycareRegistrationsTab = () => {
                                         {registration.email || "-"}
                                     </td>
                                     <td className={styles.tableCell}>
-                                        {registration.childName}
-                                    </td>
-                                    <td className={styles.tableCell}>
-                                        {formatDate(registration.birthDate)}
+                                        {registration.childAge ||
+                                            registration.childName ||
+                                            formatDate(registration.birthDate)}
                                     </td>
                                     <td className={styles.tableCell}>
                                         {formatRequiredHours(registration)}
                                     </td>
                                     <td className={styles.tableCell}>
                                         {registration.fridayCare}
-                                    </td>
-                                    <td className={styles.tableCell}>
-                                        <span className={styles.tag}>
-                                            {registration.costApproval
-                                                ? "כן"
-                                                : "לא"}
-                                        </span>
                                     </td>
                                     <td className={styles.tableCell}>
                                         {registration.notes || "-"}

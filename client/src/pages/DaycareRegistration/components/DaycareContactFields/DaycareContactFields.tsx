@@ -48,39 +48,15 @@ const DaycareContactFields = ({ errors, register }: Props) => (
                     placeholder="0501234567"
                     {...register("phone", {
                         required: "יש למלא טלפון נייד",
-                        pattern: {
-                            value: /^05\d{8}$/,
-                            message:
-                                "מספר נייד ישראלי צריך להתחיל ב-05 ולהכיל 10 ספרות",
-                        },
+                        validate: (value) =>
+                            /^05\d{8}$/.test(value.replace(/\D/g, "")) ||
+                            "מספר נייד ישראלי צריך להתחיל ב-05 ולהכיל 10 ספרות",
                     })}
                 />
                 <span className={styles.errorText}>
                     {errors.phone?.message || ""}
                 </span>
             </div>
-        </div>
-
-        <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel} htmlFor="email">
-                כתובת דוא"ל
-            </label>
-            <input
-                id="email"
-                className={styles.fieldInput}
-                type="email"
-                dir="ltr"
-                autoComplete="email"
-                {...register("email", {
-                    pattern: {
-                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: "כתובת דוא״ל לא תקינה",
-                    },
-                })}
-            />
-            <span className={styles.errorText}>
-                {errors.email?.message || ""}
-            </span>
         </div>
     </>
 );

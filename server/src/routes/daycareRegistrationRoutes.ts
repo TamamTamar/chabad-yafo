@@ -7,9 +7,16 @@ const router = Router();
 
 router.post("/", async (req, res) => {
     try {
-        const registration = await DaycareRegistration.create(req.body);
+        const payload = {
+            ...req.body,
+            phone:
+                typeof req.body.phone === "string"
+                    ? req.body.phone.replace(/\D/g, "")
+                    : req.body.phone,
+        };
+        const registration = await DaycareRegistration.create(payload);
 
-        sendDaycareRegistrationWhatsApp(req.body).catch((error) => {
+        sendDaycareRegistrationWhatsApp(payload).catch((error) => {
             logger.error("❌ Failed to send daycare registration WhatsApp");
             logger.error(error);
         });

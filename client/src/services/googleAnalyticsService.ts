@@ -32,6 +32,22 @@ export const trackFamilyFormSubmit = (eventData?: GoogleAnalyticsEventData) => {
     trackEvent("family_form_submit", eventData);
 };
 
+export const trackDaycarePageView = (eventData?: GoogleAnalyticsEventData) => {
+    trackEvent("daycare_page_view", eventData);
+};
+
+export const trackDaycareCtaClick = (eventData?: GoogleAnalyticsEventData) => {
+    trackEvent("daycare_cta_click", eventData);
+};
+
+export const trackDaycareFormStart = (eventData?: GoogleAnalyticsEventData) => {
+    trackEvent("daycare_form_start", eventData);
+};
+
+export const trackDaycareFormSubmit = (eventData?: GoogleAnalyticsEventData) => {
+    trackEvent("daycare_form_submit", eventData);
+};
+
 export const trackDaycareRegistrationSubmit = (eventData?: GoogleAnalyticsEventData) => {
     trackEvent("daycare_registration_submit", eventData);
 };
@@ -46,4 +62,16 @@ export const trackWhatsAppClick = (eventData?: GoogleAnalyticsEventData) => {
 
 export const trackPhoneClick = (eventData?: GoogleAnalyticsEventData) => {
     trackEvent("phone_click", eventData);
+};
+
+export const trackCallClick = (eventData?: GoogleAnalyticsEventData) => {
+    trackEvent("call_click", eventData);
+};
+
+export const trackDaycareWhatsAppClick = (eventData?: GoogleAnalyticsEventData) => {
+    trackEvent("daycare_whatsapp_click", eventData);
+};
+
+export const trackDaycareCallClick = (eventData?: GoogleAnalyticsEventData) => {
+    trackEvent("daycare_call_click", eventData);
 };

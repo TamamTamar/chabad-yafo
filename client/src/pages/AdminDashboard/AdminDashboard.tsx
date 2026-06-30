@@ -45,6 +45,14 @@ const AdminDashboard = () => {
                 <nav className={styles.tabs} aria-label="לשוניות ניהול">
                     <button
                         type="button"
+                        className={styles.tab}
+                        onClick={() => navigate("/admin/daycare")}
+                    >
+                        ניהול מעון
+                    </button>
+
+                    <button
+                        type="button"
                         className={
                             activeTab === "families"
                                 ? styles.tabActive

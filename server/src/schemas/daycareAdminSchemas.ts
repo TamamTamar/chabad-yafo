@@ -1,0 +1,196 @@
+import { Schema } from "mongoose";
+
+const taskCategories = [
+    "תכנון",
+    "שיפוץ",
+    "בטיחות",
+    "אישורים",
+    "כוח אדם",
+    "ציוד",
+    "שיווק",
+    "הרשמות",
+];
+
+export const daycareTaskSchema = new Schema(
+    {
+        title: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        category: {
+            type: String,
+            required: true,
+            enum: taskCategories,
+        },
+        status: {
+            type: String,
+            required: true,
+            enum: ["לא התחיל", "בטיפול", "הושלם"],
+            default: "לא התחיל",
+        },
+        priority: {
+            type: String,
+            required: true,
+            enum: ["נמוכה", "רגילה", "דחופה"],
+            default: "רגילה",
+        },
+        dueDate: Date,
+        notes: {
+            type: String,
+            trim: true,
+            maxlength: 1000,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+export const daycareLeadSchema = new Schema(
+    {
+        childName: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        childAge: {
+            type: String,
+            trim: true,
+        },
+        parentName: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        area: {
+            type: String,
+            trim: true,
+        },
+        status: {
+            type: String,
+            required: true,
+            enum: [
+                "מתעניין",
+                "שיחה בוצעה",
+                "הגיע לראות",
+                "רוצה להירשם",
+                "נרשם",
+                "לא רלוונטי",
+            ],
+            default: "מתעניין",
+        },
+        inquiryDate: Date,
+        notes: {
+            type: String,
+            trim: true,
+            maxlength: 1000,
+        },
+        followUpDate: Date,
+    },
+    {
+        timestamps: true,
+    }
+);
+
+export const daycareDocumentSchema = new Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        status: {
+            type: String,
+            required: true,
+            enum: ["חסר", "בטיפול", "קיים"],
+            default: "חסר",
+        },
+        dueDate: Date,
+        notes: {
+            type: String,
+            trim: true,
+            maxlength: 1000,
+        },
+        fileUrl: {
+            type: String,
+            trim: true,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+export const daycareFinanceSettingsSchema = new Schema(
+    {
+        pricePerChild: {
+            type: Number,
+            required: true,
+            default: 4500,
+            min: 0,
+        },
+        currentChildren: {
+            type: Number,
+            required: true,
+            default: 6,
+            min: 0,
+        },
+        targetChildren: {
+            type: Number,
+            required: true,
+            default: 10,
+            min: 0,
+        },
+        rent: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        directorSalary: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        staffSalaries: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        food: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        supplies: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        insuranceAndPermits: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        extraExpenses: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);

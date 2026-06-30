@@ -1,0 +1,423 @@
+@use "../../../styles/variables" as *;
+
+.page {
+    min-height: 100vh;
+    padding: 48px 0 80px;
+    direction: rtl;
+    background: $body-bg;
+}
+
+.hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding: 28px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-lg;
+    background: $brand-bg;
+    box-shadow: 0 18px 44px $ui-shadow-blue-soft;
+}
+
+.eyebrow {
+    display: inline-flex;
+    margin-bottom: 10px;
+    color: $brand-gold-muted;
+    font-size: $type-eyebrow;
+    font-weight: 900;
+}
+
+.title {
+    margin: 0 0 10px;
+    color: $brand-primary;
+    font-size: $type-section-title;
+    font-weight: 900;
+    line-height: $line-title;
+}
+
+.description,
+.sectionDescription {
+    margin: 0;
+    color: $ui-text-muted;
+    line-height: $line-body;
+}
+
+.section {
+    margin-top: 22px;
+    padding: 24px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-lg;
+    background: $brand-bg;
+    box-shadow: 0 16px 38px $ui-shadow-blue-soft;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.sectionTitle {
+    margin: 0 0 6px;
+    color: $brand-blue-ink;
+    font-size: $type-form-title;
+    font-weight: 900;
+}
+
+.metricsGrid,
+.summaryGrid,
+.expansionGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+}
+
+.metricCard {
+    min-height: 110px;
+    padding: 18px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+}
+
+.metricLabel {
+    display: block;
+    margin-bottom: 10px;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 800;
+}
+
+.metricValue {
+    display: block;
+    color: $brand-primary-deep;
+    font-size: $type-display-number-sm;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 5px 12px;
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.08);
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.statusReady {
+    background: $ui-success-soft;
+    color: $ui-success;
+}
+
+.statusProgress {
+    background: rgba($brand-gold-rich, 0.16);
+    color: $brand-gold-dark;
+}
+
+.statusAttention {
+    background: rgba($ui-warning, 0.14);
+    color: $ui-warning;
+}
+
+.inlineForm,
+.financeForm {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+    padding: 18px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $ui-surface-warm;
+}
+
+.field,
+.fieldWide {
+    display: grid;
+    gap: 7px;
+}
+
+.fieldWide {
+    grid-column: span 2;
+}
+
+.fieldLabel {
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.input {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-sm;
+    background: $brand-bg;
+    color: $brand-text;
+    font-family: inherit;
+    font-size: $type-input;
+}
+
+.formActions {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+}
+
+.primaryButton,
+.secondaryButton,
+.linkButton,
+.dangerButton,
+.secondaryLink {
+    min-height: 40px;
+    border-radius: $radius-pill;
+    font-family: inherit;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.primaryButton {
+    padding: 9px 18px;
+    border: 1px solid $brand-primary;
+    background: $brand-primary;
+    color: $color-white;
+}
+
+.primaryButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.secondaryButton,
+.secondaryLink {
+    padding: 9px 16px;
+    border: 1px solid $ui-border-strong;
+    background: $brand-bg;
+    color: $brand-primary;
+    text-decoration: none;
+}
+
+.secondaryLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.linkButton,
+.dangerButton {
+    min-height: 34px;
+    padding: 6px 12px;
+    background: transparent;
+}
+
+.linkButton {
+    border: 1px solid rgba($brand-primary, 0.22);
+    color: $brand-primary;
+}
+
+.dangerButton {
+    border: 1px solid rgba($ui-danger, 0.22);
+    color: $ui-danger;
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.secondaryLink:hover,
+.linkButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px $ui-shadow-blue-soft;
+}
+
+.dangerButton:hover {
+    background: rgba($ui-danger, 0.08);
+}
+
+.notice {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba($brand-gold-rich, 0.24);
+    border-radius: $radius;
+    background: rgba($brand-gold-rich, 0.08);
+    color: $brand-blue-ink;
+    font-size: $type-body-sm;
+    font-weight: 800;
+    line-height: 1.65;
+}
+
+.alertBox {
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    border: 1px solid rgba($ui-warning, 0.24);
+    border-radius: $radius;
+    background: rgba($ui-warning, 0.1);
+    color: $ui-warning;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    line-height: 1.7;
+}
+
+.expansionGrid {
+    margin-bottom: 16px;
+}
+
+.readinessGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.readinessItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+}
+
+.readinessLabel {
+    color: $brand-blue-ink;
+    font-size: $type-body-sm;
+    font-weight: 900;
+}
+
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+}
+
+.table,
+.tableCompact {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+    background: $brand-bg;
+}
+
+.tableCompact {
+    min-width: 640px;
+}
+
+.tableHeader,
+.tableCell {
+    padding: 14px 16px;
+    border-bottom: 1px solid $ui-border-soft;
+    text-align: right;
+    vertical-align: top;
+}
+
+.tableHeader {
+    background: rgba($brand-primary, 0.06);
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.tableCell {
+    color: $brand-text;
+    font-size: $type-body-sm;
+    line-height: 1.6;
+}
+
+.tableRow:hover .tableCell {
+    background: rgba($brand-primary, 0.025);
+}
+
+.rowActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.inlineLink {
+    color: $brand-primary;
+    font-weight: 900;
+}
+
+.financeGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.financeForm {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    margin-bottom: 0;
+}
+
+.summaryGrid {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+}
+
+.loading {
+    padding: 28px;
+    color: $ui-text-muted;
+    text-align: center;
+}
+
+@media (max-width: 960px) {
+    .hero,
+    .sectionHeader {
+        flex-direction: column;
+    }
+
+    .inlineForm,
+    .financeForm,
+    .financeGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .fieldWide {
+        grid-column: auto;
+    }
+
+    .formActions {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 640px) {
+    .page {
+        padding: 32px 0 64px;
+    }
+
+    .hero,
+    .section {
+        padding: 18px;
+        border-radius: $radius-md;
+    }
+
+    .title {
+        font-size: $type-form-title;
+    }
+
+    .inlineForm,
+    .financeForm {
+        padding: 14px;
+    }
+
+    .tableHeader,
+    .tableCell {
+        padding: 12px;
+    }
+}
