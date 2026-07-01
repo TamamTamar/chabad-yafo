@@ -24,15 +24,57 @@ type DaycareTasksProps = {
     onChanged: () => void;
 };
 
+type CategoryFilter = DaycareTaskCategory | "הכל";
+
 const toDateInputValue = (date?: string) => {
     return date ? date.slice(0, 10) : "";
+};
+
+const getCategoryClassName = (category: DaycareTaskCategory) => {
+    const categoryClassNames: Record<DaycareTaskCategory, string> = {
+        תכנון: styles.categoryPlanning,
+        שיפוץ: styles.categoryRenovation,
+        בטיחות: styles.categorySafety,
+        אישורים: styles.categoryPermits,
+        "כוח אדם": styles.categoryStaff,
+        ציוד: styles.categoryEquipment,
+        שיווק: styles.categoryMarketing,
+        הרשמות: styles.categoryRegistration,
+    };
+
+    return categoryClassNames[category];
+};
+
+const sortTasksByStatus = (tasksToSort: DaycareTask[]) => {
+    return [...tasksToSort].sort((firstTask, secondTask) => {
+        if (firstTask.status === secondTask.status) {
+            return 0;
+        }
+
+        if (firstTask.status === "הושלם") {
+            return 1;
+        }
+
+        if (secondTask.status === "הושלם") {
+            return -1;
+        }
+
+        return 0;
+    });
 };
 
 const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
     const [tasks, setTasks] = useState<DaycareTask[]>([]);
     const [draft, setDraft] = useState<EditableDaycareTask>(emptyTask);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [selectedCategory, setSelectedCategory] =
+        useState<CategoryFilter>("הכל");
     const [loading, setLoading] = useState(true);
+    const visibleTasks = sortTasksByStatus(
+        selectedCategory === "הכל"
+            ? tasks
+            : tasks.filter((task) => task.category === selectedCategory)
+    );
 
     const loadTasks = async () => {
         const data = await getDaycareTasks();
@@ -58,6 +100,8 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
             ...task,
             dueDate: toDateInputValue(task.dueDate),
             notes: task.notes ?? "",
+            resourceLabel: task.resourceLabel ?? "",
+            resourceUrl: task.resourceUrl ?? "",
         });
     };
 
@@ -197,6 +241,34 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                     />
                 </label>
 
+                <label className={styles.field}>
+                    <span className={styles.fieldLabel}>שם קישור עזר</span>
+                    <input
+                        className={styles.input}
+                        value={draft.resourceLabel ?? ""}
+                        onChange={(event) =>
+                            setDraft({
+                                ...draft,
+                                resourceLabel: event.target.value,
+                            })
+                        }
+                    />
+                </label>
+
+                <label className={styles.fieldWide}>
+                    <span className={styles.fieldLabel}>קישור עזר / טופס</span>
+                    <input
+                        className={styles.input}
+                        value={draft.resourceUrl ?? ""}
+                        onChange={(event) =>
+                            setDraft({
+                                ...draft,
+                                resourceUrl: event.target.value,
+                            })
+                        }
+                    />
+                </label>
+
                 <div className={styles.formActions}>
                     <button
                         className={styles.primaryButton}
@@ -217,6 +289,42 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                 </div>
             </div>
 
+            <div className={styles.categoryFilterBar} aria-label="סינון משימות">
+                <span className={styles.categoryFilterLabel}>סינון לפי קטגוריה</span>
+                <button
+                    className={
+                        selectedCategory === "הכל"
+                            ? styles.categoryFilterActive
+                            : styles.categoryFilterButton
+                    }
+                    type="button"
+                    onClick={() => setSelectedCategory("הכל")}
+                >
+                    הכל
+                </button>
+                {daycareTaskCategories.map((category) => (
+                    <button
+                        className={
+                            selectedCategory === category
+                                ? `${styles.categoryFilterActive} ${getCategoryClassName(
+                                      category
+                                  )}`
+                                : `${styles.categoryFilterButton} ${getCategoryClassName(
+                                      category
+                                  )}`
+                        }
+                        key={category}
+                        type="button"
+                        onClick={() => setSelectedCategory(category)}
+                    >
+                        {category}
+                    </button>
+                ))}
+                <span className={styles.categoryFilterCount}>
+                    {visibleTasks.length} משימות
+                </span>
+            </div>
+
             {loading ? (
                 <div className={styles.loading}>טוען משימות...</div>
             ) : (
@@ -230,14 +338,23 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                                 <th className={styles.tableHeader}>עדיפות</th>
                                 <th className={styles.tableHeader}>יעד</th>
                                 <th className={styles.tableHeader}>הערות</th>
+                                <th className={styles.tableHeader}>עזר</th>
                                 <th className={styles.tableHeader}>פעולות</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {tasks.map((task) => (
+                            {visibleTasks.map((task) => (
                                 <tr className={styles.tableRow} key={task._id}>
                                     <td className={styles.tableCell}>{task.title}</td>
-                                    <td className={styles.tableCell}>{task.category}</td>
+                                    <td className={styles.tableCell}>
+                                        <span
+                                            className={`${styles.categoryBadge} ${getCategoryClassName(
+                                                task.category
+                                            )}`}
+                                        >
+                                            {task.category}
+                                        </span>
+                                    </td>
                                     <td className={styles.tableCell}>
                                         <span className={styles.statusBadge}>
                                             {task.status}
@@ -249,6 +366,20 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                                     </td>
                                     <td className={styles.tableCell}>
                                         {task.notes || "-"}
+                                    </td>
+                                    <td className={styles.tableCell}>
+                                        {task.resourceUrl ? (
+                                            <a
+                                                className={styles.inlineLink}
+                                                href={task.resourceUrl}
+                                                rel="noreferrer"
+                                                target="_blank"
+                                            >
+                                                {task.resourceLabel || "פתיחה"}
+                                            </a>
+                                        ) : (
+                                            "-"
+                                        )}
                                     </td>
                                     <td className={styles.tableCell}>
                                         <div className={styles.rowActions}>

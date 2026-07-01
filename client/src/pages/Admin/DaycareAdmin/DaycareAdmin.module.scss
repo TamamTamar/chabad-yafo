@@ -128,6 +128,110 @@
     color: $ui-warning;
 }
 
+.categoryBadge {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 12px;
+    border-radius: $radius-pill;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.categoryPlanning {
+    background: rgba($brand-primary, 0.1);
+    color: $brand-primary;
+}
+
+.categoryRenovation {
+    background: rgba($brand-gold-rich, 0.17);
+    color: $brand-gold-dark;
+}
+
+.categorySafety {
+    background: rgba($ui-danger, 0.1);
+    color: $ui-danger;
+}
+
+.categoryPermits {
+    background: rgba($brand-blue-ink-light, 0.12);
+    color: $brand-blue-ink;
+}
+
+.categoryStaff {
+    background: rgba($ui-success, 0.12);
+    color: $ui-success;
+}
+
+.categoryEquipment {
+    background: rgba($ui-promo-blue, 0.14);
+    color: $brand-blue-ink-soft;
+}
+
+.categoryMarketing {
+    background: rgba($brand-gold-bright, 0.18);
+    color: $brand-gold-muted;
+}
+
+.categoryRegistration {
+    background: rgba($brand-primary-rich, 0.12);
+    color: $brand-primary-rich;
+}
+
+.categoryFilterBar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+}
+
+.categoryFilterLabel,
+.categoryFilterCount {
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.categoryFilterCount {
+    margin-inline-start: auto;
+    color: $ui-text-muted;
+}
+
+.categoryFilterButton,
+.categoryFilterActive {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 13px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-pill;
+    font-family: inherit;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.categoryFilterButton {
+    background: $brand-bg;
+    color: $brand-blue-ink;
+}
+
+.categoryFilterActive {
+    border-color: $brand-primary;
+    background: $brand-primary;
+    color: $color-white;
+    box-shadow: 0 8px 18px $ui-shadow-blue-soft;
+}
+
 .inlineForm,
 .financeForm {
     display: grid;
@@ -141,7 +245,8 @@
 }
 
 .field,
-.fieldWide {
+.fieldWide,
+.filterField {
     display: grid;
     gap: 7px;
 }
@@ -156,6 +261,10 @@
     font-weight: 900;
 }
 
+.filterField {
+    width: min(240px, 100%);
+}
+
 .input {
     width: 100%;
     min-height: 42px;
@@ -166,6 +275,11 @@
     color: $brand-text;
     font-family: inherit;
     font-size: $type-input;
+}
+
+.numberInput {
+    direction: ltr;
+    text-align: right;
 }
 
 .formActions {
@@ -255,6 +369,27 @@
     font-size: $type-body-sm;
     font-weight: 800;
     line-height: 1.65;
+}
+
+.formSaveMessage,
+.formErrorMessage {
+    margin-bottom: 16px;
+    padding: 11px 14px;
+    border-radius: $radius;
+    font-size: $type-body-sm;
+    font-weight: 900;
+}
+
+.formSaveMessage {
+    border: 1px solid rgba($ui-success, 0.22);
+    background: $ui-success-soft;
+    color: $ui-success;
+}
+
+.formErrorMessage {
+    border: 1px solid rgba($ui-danger, 0.22);
+    background: $ui-error-soft;
+    color: $ui-danger;
 }
 
 .alertBox {

@@ -138,12 +138,25 @@ export const getDaycareFinance = async () => {
     return response.data.data;
 };
 
+const getFinancePayload = (settings: DaycareFinanceSettings) => ({
+    pricePerChild: settings.pricePerChild,
+    currentChildren: settings.currentChildren,
+    targetChildren: settings.targetChildren,
+    rent: settings.rent,
+    directorSalary: settings.directorSalary,
+    staffSalaries: settings.staffSalaries,
+    food: settings.food,
+    supplies: settings.supplies,
+    insuranceAndPermits: settings.insuranceAndPermits,
+    extraExpenses: settings.extraExpenses,
+});
+
 export const updateDaycareFinance = async (
     settings: DaycareFinanceSettings
 ) => {
     const response = await http.patch<ApiResponse<DaycareFinanceSettings>>(
         "/admin/daycare/finance",
-        settings
+        getFinancePayload(settings)
     );
 
     return response.data.data;

@@ -18,6 +18,8 @@ export interface IDaycareTask {
     priority: DaycarePriority;
     dueDate?: Date;
     notes?: string;
+    resourceLabel?: string;
+    resourceUrl?: string;
 }
 
 export type DaycareLeadStatus =

@@ -43,9 +43,9 @@ const DaycareAdmin = () => {
                     </Link>
                 </header>
 
+                <DaycareTasks onChanged={loadOverview} />
                 <DaycareDashboard overview={overview} />
                 <DaycareExpansion overview={overview} />
-                <DaycareTasks onChanged={loadOverview} />
                 <DaycareRegistrations onChanged={loadOverview} />
                 <DaycareFinance onChanged={loadOverview} />
                 <DaycareDocuments />

@@ -21,6 +21,8 @@ export type DaycareTask = {
     priority: DaycarePriority;
     dueDate?: string;
     notes?: string;
+    resourceLabel?: string;
+    resourceUrl?: string;
 };
 
 export type DaycareLeadStatus =

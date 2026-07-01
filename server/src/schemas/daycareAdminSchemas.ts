@@ -41,6 +41,14 @@ export const daycareTaskSchema = new Schema(
             trim: true,
             maxlength: 1000,
         },
+        resourceLabel: {
+            type: String,
+            trim: true,
+        },
+        resourceUrl: {
+            type: String,
+            trim: true,
+        },
     },
     {
         timestamps: true,

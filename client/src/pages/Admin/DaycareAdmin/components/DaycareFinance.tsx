@@ -53,6 +53,11 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
     );
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [saveMessage, setSaveMessage] = useState<string | null>(null);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [emptyFocusedFields, setEmptyFocusedFields] = useState<
+        Array<keyof DaycareFinanceSettings>
+    >([]);
 
     useEffect(() => {
         getDaycareFinance()
@@ -84,10 +89,35 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
             return;
         }
 
+        setSaveMessage(null);
+        setSaveError(null);
+        setEmptyFocusedFields((currentFields) =>
+            currentFields.filter((fieldKey) => fieldKey !== key)
+        );
+        const normalizedValue = value
+            .replace(/[^\d]/g, "")
+            .replace(/^0+(?=\d)/, "");
+
         setSettings({
             ...settings,
-            [key]: Number(value),
+            [key]: normalizedValue === "" ? 0 : Number(normalizedValue),
         });
+    };
+
+    const handleNumberFocus = (key: keyof DaycareFinanceSettings) => {
+        if (!settings || key === "_id" || settings[key] !== 0) {
+            return;
+        }
+
+        setEmptyFocusedFields((currentFields) =>
+            currentFields.includes(key) ? currentFields : [...currentFields, key]
+        );
+    };
+
+    const handleNumberBlur = (key: keyof DaycareFinanceSettings) => {
+        setEmptyFocusedFields((currentFields) =>
+            currentFields.filter((fieldKey) => fieldKey !== key)
+        );
     };
 
     const handleSave = async () => {
@@ -95,11 +125,20 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
             return;
         }
 
-        setSaving(true);
-        const updatedSettings = await updateDaycareFinance(settings);
-        setSettings(updatedSettings);
-        onChanged();
-        setSaving(false);
+        try {
+            setSaving(true);
+            setSaveMessage(null);
+            setSaveError(null);
+            const updatedSettings = await updateDaycareFinance(settings);
+            setSettings(updatedSettings);
+            setSaveMessage("התכנון התקציבי נשמר");
+            onChanged();
+        } catch (error) {
+            console.error("Failed to save finance settings:", error);
+            setSaveError("השמירה נכשלה. כדאי לבדוק חיבור לשרת ולנסות שוב.");
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (loading || !settings || !summary) {
@@ -127,19 +166,36 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
                 </button>
             </div>
 
+            {(saveMessage || saveError) && (
+                <div
+                    className={
+                        saveError ? styles.formErrorMessage : styles.formSaveMessage
+                    }
+                >
+                    {saveError ?? saveMessage}
+                </div>
+            )}
+
             <div className={styles.financeGrid}>
                 <div className={styles.financeForm}>
                     {financeFields.map((field) => (
                         <label className={styles.field} key={field.key}>
                             <span className={styles.fieldLabel}>{field.label}</span>
                             <input
-                                className={styles.input}
-                                type="number"
-                                min="0"
-                                value={settings[field.key] ?? 0}
+                                className={`${styles.input} ${styles.numberInput}`}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                type="text"
+                                value={
+                                    emptyFocusedFields.includes(field.key)
+                                        ? ""
+                                        : settings[field.key] ?? 0
+                                }
                                 onChange={(event) =>
                                     handleNumberChange(field.key, event.target.value)
                                 }
+                                onBlur={() => handleNumberBlur(field.key)}
+                                onFocus={() => handleNumberFocus(field.key)}
                             />
                         </label>
                     ))}

@@ -21,43 +21,75 @@ import type {
 const router = Router();
 
 const openingTargetChildren = 6;
+const laborDaycareSearchUrl =
+    "https://www.gov.il/he/search?query=%D7%9E%D7%A2%D7%95%D7%A0%D7%95%D7%AA%20%D7%99%D7%95%D7%9D%20%D7%9C%D7%A4%D7%A2%D7%95%D7%98%D7%95%D7%AA%20%D7%A8%D7%99%D7%A9%D7%99%D7%95%D7%9F";
+const fireSafetySearchUrl =
+    "https://www.gov.il/he/search?query=%D7%90%D7%99%D7%A9%D7%95%D7%A8%20%D7%9B%D7%91%D7%90%D7%95%D7%AA%20%D7%9C%D7%A2%D7%A1%D7%A7";
+const telAvivPlanningUrl = "https://www.tel-aviv.gov.il/";
+const nationalFormsSearchUrl =
+    "https://www.gov.il/he/search?query=%D7%9E%D7%A2%D7%95%D7%9F%20%D7%99%D7%95%D7%9D%20%D7%98%D7%95%D7%A4%D7%A1";
 
 const defaultDaycareTasks: IDaycareTask[] = [
-    { title: "מדידת שטח המבנה והחצר", category: "תכנון", status: "לא התחיל", priority: "דחופה" },
-    { title: "הכנת שרטוט בסיסי", category: "תכנון", status: "לא התחיל", priority: "רגילה" },
-    { title: "בדיקת התאמת המבנה לפתיחה עם 6 ילדים", category: "תכנון", status: "לא התחיל", priority: "דחופה" },
-    { title: "בירור דרישות להגדלה מעל 7 ילדים", category: "אישורים", status: "לא התחיל", priority: "דחופה" },
-    { title: "בדיקת צורך ברישוי / שימוש חורג", category: "אישורים", status: "לא התחיל", priority: "דחופה" },
-    { title: "סיום שיפוץ החצר", category: "שיפוץ", status: "לא התחיל", priority: "דחופה" },
-    { title: "סידור קירות והסרת מפגעים", category: "שיפוץ", status: "לא התחיל", priority: "דחופה" },
-    { title: "גידור ושער בטיחות", category: "בטיחות", status: "לא התחיל", priority: "דחופה" },
-    { title: "בדיקת כיבוי אש", category: "בטיחות", status: "לא התחיל", priority: "דחופה" },
-    { title: "בדיקת בטיחות", category: "בטיחות", status: "לא התחיל", priority: "דחופה" },
-    { title: "ביטוח צד ג׳ ואחריות מקצועית", category: "אישורים", status: "לא התחיל", priority: "דחופה" },
-    { title: "גיוס מנהלת", category: "כוח אדם", status: "לא התחיל", priority: "דחופה" },
-    { title: "גיוס מטפלת", category: "כוח אדם", status: "לא התחיל", priority: "דחופה" },
-    { title: "הכנת רשימת ציוד", category: "ציוד", status: "לא התחיל", priority: "רגילה" },
-    { title: "רכישת מזרנים / לולים / משחקים", category: "ציוד", status: "לא התחיל", priority: "רגילה" },
-    { title: "הכנת יום פתוח", category: "שיווק", status: "לא התחיל", priority: "רגילה" },
-    { title: "מעקב אחרי משפחות מתעניינות", category: "הרשמות", status: "בטיפול", priority: "דחופה" },
-    { title: "בדיקת מוכנות לרישוי מעל 6 ילדים", category: "אישורים", status: "לא התחיל", priority: "דחופה" },
-    { title: "אישור תקן כוח אדם להתרחבות", category: "כוח אדם", status: "לא התחיל", priority: "דחופה" },
-    { title: "עדכון ביטוחים להגדלת מספר הילדים", category: "אישורים", status: "לא התחיל", priority: "דחופה" },
-    { title: "הכנת חוזי הורים למספר ילדים מוגדל", category: "הרשמות", status: "לא התחיל", priority: "דחופה" },
-    { title: "הגדרת מעקב תשלומים חודשי", category: "הרשמות", status: "לא התחיל", priority: "רגילה" },
+    { title: "בירור מסגרת חוקית לפתיחה קטנה עם 6 ילדים", category: "אישורים", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | לוודא מה מותר ומה צריך לבדוק לפני פרסום", resourceLabel: "חיפוש רישוי מעונות", resourceUrl: laborDaycareSearchUrl },
+    { title: "סגירת חוזה / אישור שימוש במבנה", category: "אישורים", status: "בטיפול", priority: "דחופה", notes: "חובה לפתיחה | לבדוק שהשימוש כמעון קטן אפשרי מול בעל המקום/העירייה", resourceLabel: "עיריית תל אביב-יפו", resourceUrl: telAvivPlanningUrl },
+    { title: "בדיקת התאמת המבנה לפתיחה עם 6 ילדים", category: "תכנון", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | חלל, מטבח, שירותים, חצר וגישה בטוחה", resourceLabel: "חיפוש הנחיות רישוי", resourceUrl: laborDaycareSearchUrl },
+    { title: "קביעת שעות פעילות ומחיר להורים", category: "תכנון", status: "לא התחיל", priority: "דחופה", notes: "חובה לפני הרשמות | בסיס להצעה להורים ולתחזית תקציב" },
+    { title: "מטבח - המשך עבודה מול הנגר לאחר מדידות", category: "שיפוץ", status: "בטיפול", priority: "דחופה", notes: "חובה לפתיחה | השבוע" },
+    { title: "חיפוי קרמיקות למטבח", category: "שיפוץ", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | לפני סגירת המטבח" },
+    { title: "גבס לתקרה", category: "שיפוץ", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | לפני צבע" },
+    { title: "צבע לחלל המעון", category: "שיפוץ", status: "לא התחיל", priority: "רגילה", notes: "חשוב לפני פתיחה | אחרי גבס וקירות" },
+    { title: "בניית קיר בין המטבח לחלל הגדול", category: "שיפוץ", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | הפרדה בין אזור מטבח לילדים" },
+    { title: "לסדר חצרות", category: "שיפוץ", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | ניקיון, מפגעים, הצללה ומשחק בטוח" },
+    { title: "בדיקת מפגעים בקירות ובחלל המעון", category: "בטיחות", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | שקעים, פינות חדות, קירות, רצפה, דלתות וחלונות" },
+    { title: "בדיקת חצר: גידור, שער ומפגעים", category: "בטיחות", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | לפני שמזמינים משפחות לראות", resourceLabel: "חיפוש הנחיות בטיחות", resourceUrl: nationalFormsSearchUrl },
+    { title: "בירור צורך באישור כיבוי אש", category: "בטיחות", status: "לא התחיל", priority: "רגילה", notes: "חשוב לפני פתיחה | קודם לברר אם נדרש במסגרת קטנה", resourceLabel: "חיפוש אישור כבאות", resourceUrl: fireSafetySearchUrl },
+    { title: "סגירת ביטוח צד ג׳ ואחריות מקצועית", category: "אישורים", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | לפני כניסת ילדים" },
+    { title: "גיוס / סגירת מטפלת לפתיחה", category: "כוח אדם", status: "לא התחיל", priority: "דחופה", notes: "חובה לפתיחה | את מנהלת את המעון, צריך לסגור מטפלת נוספת" },
+    { title: "הכנת רשימת ציוד מינימלית לפתיחה", category: "ציוד", status: "לא התחיל", priority: "רגילה", notes: "חשוב לפני קניות | להפריד חובה לפתיחה מול אפשר אחרי פתיחה" },
+    { title: "רכישת ציוד חובה: מזרנים / לולים / משחקים בסיסיים", category: "ציוד", status: "לא התחיל", priority: "רגילה", notes: "חשוב לפני פתיחה | לבצע אחרי רשימת ציוד" },
+    { title: "הכנת דף מידע להורים", category: "שיווק", status: "לא התחיל", priority: "דחופה", notes: "חובה לפני פרסום | מחיר, שעות, גילאים, תאריך יעד ויצירת קשר" },
+    { title: "פרסום ראשון ואיסוף מתעניינים", category: "שיווק", status: "לא התחיל", priority: "דחופה", notes: "חובה עכשיו | אין עדיין משפחות, זו משימה מרכזית" },
+    { title: "הכנת יום פתוח / ביקור הורים", category: "שיווק", status: "לא התחיל", priority: "רגילה", notes: "חשוב אחרי שיש חלל מסודר ואפשר להראות מקום" },
+    { title: "מעקב אחרי משפחות מתעניינות", category: "הרשמות", status: "לא התחיל", priority: "דחופה", notes: "חובה עכשיו | לתעד כל פנייה ולחזור בזמן" },
+    { title: "הכנת טופס הרשמה וחוזה הורים לפתיחה", category: "הרשמות", status: "לא התחיל", priority: "דחופה", notes: "חובה לפני הרשמה סופית | לא חוזה הרחבה", resourceLabel: "חיפוש טפסים", resourceUrl: nationalFormsSearchUrl },
+    { title: "הגדרת תהליך גביית תשלום חודשי", category: "הרשמות", status: "לא התחיל", priority: "רגילה", notes: "חשוב לפני הרשמה סופית | אמצעי תשלום, מועד חיוב וביטול" },
+    { title: "מעקב התרחבות מעל 6 ילדים - בירור דרישות", category: "אישורים", status: "לא התחיל", priority: "נמוכה", notes: "מעקב בלבד | לא דחוף לפני שיש כיוון ל־6 ילדים", resourceLabel: "חיפוש רישוי מעונות", resourceUrl: laborDaycareSearchUrl },
+];
+
+const obsoleteDefaultTaskTitles = [
+    "מדידת שטח המבנה והחצר",
+    "הכנת שרטוט בסיסי",
+    "בירור דרישות להגדלה מעל 7 ילדים",
+    "בדיקת צורך ברישוי / שימוש חורג",
+    "סיום שיפוץ החצר",
+    "סידור קירות והסרת מפגעים",
+    "גידור ושער בטיחות",
+    "בדיקת כיבוי אש",
+    "בדיקת בטיחות",
+    "ביטוח צד ג׳ ואחריות מקצועית",
+    "גיוס מנהלת",
+    "גיוס מטפלת",
+    "הכנת רשימת ציוד",
+    "רכישת מזרנים / לולים / משחקים",
+    "הכנת יום פתוח",
+    "בדיקת מוכנות לרישוי מעל 6 ילדים",
+    "אישור תקן כוח אדם להתרחבות",
+    "עדכון ביטוחים להגדלת מספר הילדים",
+    "הכנת חוזי הורים למספר ילדים מוגדל",
+    "הגדרת מעקב תשלומים חודשי",
 ];
 
 const defaultDaycareDocuments: IDaycareDocument[] = [
-    { name: "רישוי / בדיקת צורך ברישוי", status: "חסר" },
-    { name: "בטיחות", status: "חסר" },
-    { name: "כיבוי אש", status: "חסר" },
+    { name: "רישוי / בדיקת צורך ברישוי", status: "חסר", fileUrl: laborDaycareSearchUrl },
+    { name: "בטיחות", status: "חסר", fileUrl: nationalFormsSearchUrl },
+    { name: "כיבוי אש", status: "חסר", fileUrl: fireSafetySearchUrl },
     { name: "ביטוח", status: "חסר" },
     { name: "חוזה שכירות", status: "חסר" },
     { name: "חוזה הורים", status: "חסר" },
-    { name: "טופס הרשמה", status: "חסר" },
+    { name: "טופס הרשמה", status: "חסר", fileUrl: nationalFormsSearchUrl },
     { name: "אישורי צוות", status: "חסר" },
     { name: "עזרה ראשונה", status: "חסר" },
-    { name: "תיק התרחבות מעל 6 ילדים", status: "חסר" },
+    { name: "תיק התרחבות מעל 6 ילדים", status: "חסר", fileUrl: laborDaycareSearchUrl },
     { name: "מעקב תשלומים", status: "חסר" },
 ];
 
@@ -74,7 +106,30 @@ const defaultFinanceSettings: IDaycareFinanceSettings = {
     extraExpenses: 0,
 };
 
+const getTaskDefaultUpdatePayload = (task: IDaycareTask) => {
+    const payload: Partial<IDaycareTask> = {};
+
+    if (task.resourceLabel) {
+        payload.resourceLabel = task.resourceLabel;
+    }
+
+    if (task.resourceUrl) {
+        payload.resourceUrl = task.resourceUrl;
+    }
+
+    if (task.notes) {
+        payload.notes = task.notes;
+    }
+
+    return payload;
+};
+
 const ensureDefaultTasks = async () => {
+    await DaycareTask.deleteMany({
+        title: { $in: obsoleteDefaultTaskTitles },
+        status: "לא התחיל",
+    });
+
     const existingTasks = await DaycareTask.find().select("title");
     const existingTitles = new Set(existingTasks.map((task) => task.title));
     const missingTasks = defaultDaycareTasks.filter(
@@ -84,6 +139,27 @@ const ensureDefaultTasks = async () => {
     if (missingTasks.length > 0) {
         await DaycareTask.insertMany(missingTasks);
     }
+
+    await Promise.all(
+        defaultDaycareTasks
+            .filter((task) => task.resourceUrl || task.notes)
+            .map((task) =>
+                DaycareTask.updateOne(
+                    {
+                        title: task.title,
+                        $or: [
+                            { resourceUrl: { $exists: false } },
+                            { resourceUrl: "" },
+                            { notes: { $exists: false } },
+                            { notes: "" },
+                        ],
+                    },
+                    {
+                        $set: getTaskDefaultUpdatePayload(task),
+                    }
+                )
+            )
+    );
 };
 
 const ensureDefaultDocuments = async () => {
@@ -98,6 +174,27 @@ const ensureDefaultDocuments = async () => {
     if (missingDocuments.length > 0) {
         await DaycareDocument.insertMany(missingDocuments);
     }
+
+    await Promise.all(
+        defaultDaycareDocuments
+            .filter((document) => document.fileUrl)
+            .map((document) =>
+                DaycareDocument.updateOne(
+                    {
+                        name: document.name,
+                        $or: [
+                            { fileUrl: { $exists: false } },
+                            { fileUrl: "" },
+                        ],
+                    },
+                    {
+                        $set: {
+                            fileUrl: document.fileUrl,
+                        },
+                    }
+                )
+            )
+    );
 };
 
 const getFinanceSettings = async () => {
@@ -163,6 +260,19 @@ const getTaskReady = (
         return matchesCategory && matchesTitle && task.status === "הושלם";
     });
 };
+
+const getFinanceUpdatePayload = (body: Partial<IDaycareFinanceSettings>) => ({
+    pricePerChild: body.pricePerChild,
+    currentChildren: body.currentChildren,
+    targetChildren: body.targetChildren,
+    rent: body.rent,
+    directorSalary: body.directorSalary,
+    staffSalaries: body.staffSalaries,
+    food: body.food,
+    supplies: body.supplies,
+    insuranceAndPermits: body.insuranceAndPermits,
+    extraExpenses: body.extraExpenses,
+});
 
 router.get("/families", requireAdmin, async (_req, res) => {
     try {
@@ -570,7 +680,7 @@ router.patch("/daycare/finance", requireAdmin, async (req, res) => {
         const currentSettings = await getFinanceSettings();
         const settings = await DaycareFinanceSettings.findByIdAndUpdate(
             currentSettings._id,
-            req.body,
+            getFinanceUpdatePayload(req.body),
             {
                 new: true,
                 runValidators: true,

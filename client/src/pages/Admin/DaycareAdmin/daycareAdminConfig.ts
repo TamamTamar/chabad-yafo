@@ -51,6 +51,8 @@ export const emptyTask = {
     priority: "רגילה",
     dueDate: "",
     notes: "",
+    resourceLabel: "",
+    resourceUrl: "",
 } as const;
 
 export const emptyLead = {

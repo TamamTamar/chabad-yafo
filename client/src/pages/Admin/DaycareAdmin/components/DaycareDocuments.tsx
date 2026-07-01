@@ -126,7 +126,7 @@ const DaycareDocuments = () => {
                     />
                 </label>
                 <label className={styles.fieldWide}>
-                    <span className={styles.fieldLabel}>קישור לקובץ</span>
+                    <span className={styles.fieldLabel}>קישור לקובץ / טופס</span>
                     <input
                         className={styles.input}
                         value={draft.fileUrl ?? ""}
@@ -175,7 +175,7 @@ const DaycareDocuments = () => {
                                 <th className={styles.tableHeader}>מסמך</th>
                                 <th className={styles.tableHeader}>סטטוס</th>
                                 <th className={styles.tableHeader}>יעד</th>
-                                <th className={styles.tableHeader}>קובץ</th>
+                                <th className={styles.tableHeader}>קובץ / טופס</th>
                                 <th className={styles.tableHeader}>הערות</th>
                                 <th className={styles.tableHeader}>פעולות</th>
                             </tr>
