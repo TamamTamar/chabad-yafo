@@ -180,8 +180,7 @@
     color: $brand-primary-rich;
 }
 
-.categoryFilterBar,
-.stageFilterBar {
+.categoryFilterBar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -231,27 +230,6 @@
     background: $brand-primary;
     color: $color-white;
     box-shadow: 0 8px 18px $ui-shadow-blue-soft;
-}
-
-.stageFilterBar {
-    background: $ui-surface-warm;
-}
-
-.completedToggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    margin-inline-start: auto;
-    color: $brand-blue-ink;
-    font-size: $type-caption;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-.completedToggle input {
-    width: 16px;
-    height: 16px;
-    accent-color: $brand-primary;
 }
 
 .inlineForm,

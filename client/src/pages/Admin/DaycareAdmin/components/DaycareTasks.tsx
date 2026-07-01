@@ -27,7 +27,6 @@ type DaycareTasksProps = {
 };
 
 type CategoryFilter = DaycareTaskCategory | "הכל";
-type StageFilter = DaycareTaskStage | "הכל";
 
 const toDateInputValue = (date?: string) => {
     return date ? date.slice(0, 10) : "";
@@ -76,8 +75,6 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] =
         useState<CategoryFilter>("הכל");
-    const [selectedStage, setSelectedStage] = useState<StageFilter>("עכשיו");
-    const [showCompletedTasks, setShowCompletedTasks] = useState(false);
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -85,13 +82,8 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
         tasks.filter((task) => {
             const categoryMatches =
                 selectedCategory === "הכל" || task.category === selectedCategory;
-            const stageMatches =
-                selectedStage === "הכל" ||
-                (task.stage ?? "לפני פתיחה") === selectedStage;
-            const completionMatches =
-                showCompletedTasks || task.status !== "הושלם";
 
-            return categoryMatches && stageMatches && completionMatches;
+            return categoryMatches;
         })
     );
 
@@ -359,45 +351,6 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                 </div>
             </div>
             )}
-
-            <div className={styles.stageFilterBar} aria-label="סינון לפי שלב">
-                <span className={styles.categoryFilterLabel}>מה רואים עכשיו</span>
-                <button
-                    className={
-                        selectedStage === "הכל"
-                            ? styles.categoryFilterActive
-                            : styles.categoryFilterButton
-                    }
-                    type="button"
-                    onClick={() => setSelectedStage("הכל")}
-                >
-                    הכל
-                </button>
-                {daycareTaskStages.map((stage) => (
-                    <button
-                        className={
-                            selectedStage === stage
-                                ? styles.categoryFilterActive
-                                : styles.categoryFilterButton
-                        }
-                        key={stage}
-                        type="button"
-                        onClick={() => setSelectedStage(stage)}
-                    >
-                        {stage}
-                    </button>
-                ))}
-                <label className={styles.completedToggle}>
-                    <input
-                        checked={showCompletedTasks}
-                        onChange={(event) =>
-                            setShowCompletedTasks(event.target.checked)
-                        }
-                        type="checkbox"
-                    />
-                    <span>להציג גם הושלמו</span>
-                </label>
-            </div>
 
             <div className={styles.categoryFilterBar} aria-label="סינון משימות">
                 <span className={styles.categoryFilterLabel}>סינון לפי קטגוריה</span>
