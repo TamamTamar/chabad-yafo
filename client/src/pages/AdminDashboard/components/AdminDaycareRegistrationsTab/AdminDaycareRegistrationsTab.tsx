@@ -58,10 +58,8 @@ const AdminDaycareRegistrationsTab = () => {
                             <tr>
                                 <th className={styles.tableHeader}>שם הורה</th>
                                 <th className={styles.tableHeader}>טלפון</th>
-                                <th className={styles.tableHeader}>דוא"ל</th>
                                 <th className={styles.tableHeader}>גיל הילד/ה</th>
-                                <th className={styles.tableHeader}>שעות</th>
-                                <th className={styles.tableHeader}>ימי שישי</th>
+                                <th className={styles.tableHeader}>שעות מועדפות</th>
                                 <th className={styles.tableHeader}>הערות</th>
                                 <th className={styles.tableHeader}>תאריך פנייה</th>
                             </tr>
@@ -81,11 +79,6 @@ const AdminDaycareRegistrationsTab = () => {
                                     >
                                         {registration.phone}
                                     </td>
-                                    <td
-                                        className={`${styles.tableCell} ${styles.email}`}
-                                    >
-                                        {registration.email || "-"}
-                                    </td>
                                     <td className={styles.tableCell}>
                                         {registration.childAge ||
                                             registration.childName ||
@@ -93,9 +86,6 @@ const AdminDaycareRegistrationsTab = () => {
                                     </td>
                                     <td className={styles.tableCell}>
                                         {formatRequiredHours(registration)}
-                                    </td>
-                                    <td className={styles.tableCell}>
-                                        {registration.fridayCare}
                                     </td>
                                     <td className={styles.tableCell}>
                                         {registration.notes || "-"}

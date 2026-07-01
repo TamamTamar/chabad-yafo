@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Container from "../../components/Container/Container";
 import { logoutAdmin } from "../../services/adminAuthService";
 import AdminDaycareRegistrationsTab from "./components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab";
@@ -11,7 +11,12 @@ import styles from "./AdminDashboard.module.scss";
 type AdminTab = "families" | "daycareRegistrations" | "rebbeLetters" | "payments";
 
 const AdminDashboard = () => {
-    const [activeTab, setActiveTab] = useState<AdminTab>("families");
+    const [searchParams] = useSearchParams();
+    const initialTab =
+        searchParams.get("tab") === "daycareRegistrations"
+            ? "daycareRegistrations"
+            : "families";
+    const [activeTab, setActiveTab] = useState<AdminTab>(initialTab);
     const navigate = useNavigate();
 
     const handleLogout = async () => {

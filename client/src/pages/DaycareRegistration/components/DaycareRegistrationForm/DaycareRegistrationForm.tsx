@@ -32,8 +32,6 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
         reValidateMode: "onChange",
         defaultValues: {
             requiredHours: "עד 15:30",
-            fridayCare: "לא",
-            costApproval: false,
         },
     });
     const selectedRequiredHours = watch("requiredHours");
@@ -57,7 +55,6 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
             await createDaycareRegistration({
                 ...data,
                 phone: data.phone.replace(/\D/g, ""),
-                email: data.email?.trim() || undefined,
                 notes: data.notes?.trim() || undefined,
                 childAge: data.childAge.trim(),
                 requiredHoursOther:

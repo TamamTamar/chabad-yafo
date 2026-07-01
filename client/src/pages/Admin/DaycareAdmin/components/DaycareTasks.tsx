@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
     daycarePriorities,
     daycareTaskCategories,
+    daycareTaskStages,
     daycareTaskStatuses,
     emptyTask,
 } from "../daycareAdminConfig";
@@ -16,6 +17,7 @@ import type {
     DaycarePriority,
     DaycareTask,
     DaycareTaskCategory,
+    DaycareTaskStage,
     DaycareTaskStatus,
     EditableDaycareTask,
 } from "../types";
@@ -25,6 +27,7 @@ type DaycareTasksProps = {
 };
 
 type CategoryFilter = DaycareTaskCategory | "הכל";
+type StageFilter = DaycareTaskStage | "הכל";
 
 const toDateInputValue = (date?: string) => {
     return date ? date.slice(0, 10) : "";
@@ -46,11 +49,13 @@ const getCategoryClassName = (category: DaycareTaskCategory) => {
 };
 
 const sortTasksByStatus = (tasksToSort: DaycareTask[]) => {
-    return [...tasksToSort].sort((firstTask, secondTask) => {
-        if (firstTask.status === secondTask.status) {
-            return 0;
-        }
+    const priorityWeight: Record<DaycarePriority, number> = {
+        דחופה: 0,
+        רגילה: 1,
+        נמוכה: 2,
+    };
 
+    return [...tasksToSort].sort((firstTask, secondTask) => {
         if (firstTask.status === "הושלם") {
             return 1;
         }
@@ -59,7 +64,9 @@ const sortTasksByStatus = (tasksToSort: DaycareTask[]) => {
             return -1;
         }
 
-        return 0;
+        return (
+            priorityWeight[firstTask.priority] - priorityWeight[secondTask.priority]
+        );
     });
 };
 
@@ -69,11 +76,23 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] =
         useState<CategoryFilter>("הכל");
+    const [selectedStage, setSelectedStage] = useState<StageFilter>("עכשיו");
+    const [showCompletedTasks, setShowCompletedTasks] = useState(false);
+    const [showTaskForm, setShowTaskForm] = useState(false);
+    const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const visibleTasks = sortTasksByStatus(
-        selectedCategory === "הכל"
-            ? tasks
-            : tasks.filter((task) => task.category === selectedCategory)
+        tasks.filter((task) => {
+            const categoryMatches =
+                selectedCategory === "הכל" || task.category === selectedCategory;
+            const stageMatches =
+                selectedStage === "הכל" ||
+                (task.stage ?? "לפני פתיחה") === selectedStage;
+            const completionMatches =
+                showCompletedTasks || task.status !== "הושלם";
+
+            return categoryMatches && stageMatches && completionMatches;
+        })
     );
 
     const loadTasks = async () => {
@@ -92,12 +111,21 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
     const resetDraft = () => {
         setDraft(emptyTask);
         setEditingId(null);
+        setShowTaskForm(false);
+    };
+
+    const handleAddClick = () => {
+        setDraft(emptyTask);
+        setEditingId(null);
+        setShowTaskForm(true);
     };
 
     const handleEdit = (task: DaycareTask) => {
         setEditingId(task._id);
+        setShowTaskForm(true);
         setDraft({
             ...task,
+            stage: task.stage ?? "לפני פתיחה",
             dueDate: toDateInputValue(task.dueDate),
             notes: task.notes ?? "",
             resourceLabel: task.resourceLabel ?? "",
@@ -121,10 +149,23 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
         onChanged();
     };
 
-    const handleComplete = async (task: DaycareTask) => {
-        await updateDaycareTask(task._id, { status: "הושלם" });
-        await loadTasks();
-        onChanged();
+    const handleStatusChange = async (
+        task: DaycareTask,
+        status: DaycareTaskStatus
+    ) => {
+        setUpdatingTaskId(task._id);
+        try {
+            await updateDaycareTask(task._id, { status });
+            await loadTasks();
+            onChanged();
+        } finally {
+            setUpdatingTaskId(null);
+        }
+    };
+
+    const handleCompleteToggle = async (task: DaycareTask) => {
+        const nextStatus = task.status === "הושלם" ? "בטיפול" : "הושלם";
+        await handleStatusChange(task, nextStatus);
     };
 
     const handleDelete = async (id: string) => {
@@ -144,8 +185,17 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                         משימות עבודה לפי קטגוריה, עדיפות ותאריך יעד.
                     </p>
                 </div>
+
+                <button
+                    className={styles.primaryButton}
+                    type="button"
+                    onClick={handleAddClick}
+                >
+                    הוספת משימה
+                </button>
             </div>
 
+            {showTaskForm && (
             <div className={styles.inlineForm}>
                 <label className={styles.field}>
                     <span className={styles.fieldLabel}>כותרת משימה</span>
@@ -213,6 +263,26 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                         {daycarePriorities.map((priority) => (
                             <option key={priority} value={priority}>
                                 {priority}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                <label className={styles.field}>
+                    <span className={styles.fieldLabel}>שלב</span>
+                    <select
+                        className={styles.input}
+                        value={draft.stage ?? "לפני פתיחה"}
+                        onChange={(event) =>
+                            setDraft({
+                                ...draft,
+                                stage: event.target.value as DaycareTaskStage,
+                            })
+                        }
+                    >
+                        {daycareTaskStages.map((stage) => (
+                            <option key={stage} value={stage}>
+                                {stage}
                             </option>
                         ))}
                     </select>
@@ -288,6 +358,46 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                     )}
                 </div>
             </div>
+            )}
+
+            <div className={styles.stageFilterBar} aria-label="סינון לפי שלב">
+                <span className={styles.categoryFilterLabel}>מה רואים עכשיו</span>
+                <button
+                    className={
+                        selectedStage === "הכל"
+                            ? styles.categoryFilterActive
+                            : styles.categoryFilterButton
+                    }
+                    type="button"
+                    onClick={() => setSelectedStage("הכל")}
+                >
+                    הכל
+                </button>
+                {daycareTaskStages.map((stage) => (
+                    <button
+                        className={
+                            selectedStage === stage
+                                ? styles.categoryFilterActive
+                                : styles.categoryFilterButton
+                        }
+                        key={stage}
+                        type="button"
+                        onClick={() => setSelectedStage(stage)}
+                    >
+                        {stage}
+                    </button>
+                ))}
+                <label className={styles.completedToggle}>
+                    <input
+                        checked={showCompletedTasks}
+                        onChange={(event) =>
+                            setShowCompletedTasks(event.target.checked)
+                        }
+                        type="checkbox"
+                    />
+                    <span>להציג גם הושלמו</span>
+                </label>
+            </div>
 
             <div className={styles.categoryFilterBar} aria-label="סינון משימות">
                 <span className={styles.categoryFilterLabel}>סינון לפי קטגוריה</span>
@@ -334,19 +444,46 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                             <tr>
                                 <th className={styles.tableHeader}>משימה</th>
                                 <th className={styles.tableHeader}>קטגוריה</th>
+                                <th className={styles.tableHeader}>שלב</th>
                                 <th className={styles.tableHeader}>סטטוס</th>
                                 <th className={styles.tableHeader}>עדיפות</th>
                                 <th className={styles.tableHeader}>יעד</th>
-                                <th className={styles.tableHeader}>הערות</th>
                                 <th className={styles.tableHeader}>עזר</th>
                                 <th className={styles.tableHeader}>פעולות</th>
                             </tr>
                         </thead>
                         <tbody>
                             {visibleTasks.map((task) => (
-                                <tr className={styles.tableRow} key={task._id}>
-                                    <td className={styles.tableCell}>{task.title}</td>
-                                    <td className={styles.tableCell}>
+                                <tr
+                                    className={
+                                        task.status === "הושלם"
+                                            ? `${styles.tableRow} ${styles.completedRow}`
+                                            : styles.tableRow
+                                    }
+                                    key={task._id}
+                                >
+                                    <td className={styles.tableCell} data-label="משימה">
+                                        <label className={styles.taskCheckLabel}>
+                                            <input
+                                                checked={task.status === "הושלם"}
+                                                className={styles.taskCheckbox}
+                                                disabled={updatingTaskId === task._id}
+                                                onChange={() =>
+                                                    handleCompleteToggle(task)
+                                                }
+                                                type="checkbox"
+                                            />
+                                            <span className={styles.taskTitleText}>
+                                                {task.title}
+                                            </span>
+                                            {task.notes && (
+                                                <span className={styles.taskNoteText}>
+                                                    {task.notes}
+                                                </span>
+                                            )}
+                                        </label>
+                                    </td>
+                                    <td className={styles.tableCell} data-label="קטגוריה">
                                         <span
                                             className={`${styles.categoryBadge} ${getCategoryClassName(
                                                 task.category
@@ -355,19 +492,38 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                                             {task.category}
                                         </span>
                                     </td>
-                                    <td className={styles.tableCell}>
-                                        <span className={styles.statusBadge}>
-                                            {task.status}
+                                    <td className={styles.tableCell} data-label="שלב">
+                                        <span className={styles.stageBadge}>
+                                            {task.stage ?? "לפני פתיחה"}
                                         </span>
                                     </td>
-                                    <td className={styles.tableCell}>{task.priority}</td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="סטטוס">
+                                        <select
+                                            aria-label={`סטטוס ${task.title}`}
+                                            className={styles.statusSelect}
+                                            disabled={updatingTaskId === task._id}
+                                            value={task.status}
+                                            onChange={(event) =>
+                                                handleStatusChange(
+                                                    task,
+                                                    event.target.value as DaycareTaskStatus
+                                                )
+                                            }
+                                        >
+                                            {daycareTaskStatuses.map((status) => (
+                                                <option key={status} value={status}>
+                                                    {status}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                    <td className={styles.tableCell} data-label="עדיפות">
+                                        {task.priority}
+                                    </td>
+                                    <td className={styles.tableCell} data-label="יעד">
                                         {toDateInputValue(task.dueDate) || "-"}
                                     </td>
-                                    <td className={styles.tableCell}>
-                                        {task.notes || "-"}
-                                    </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="עזר">
                                         {task.resourceUrl ? (
                                             <a
                                                 className={styles.inlineLink}
@@ -381,7 +537,7 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                                             "-"
                                         )}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="פעולות">
                                         <div className={styles.rowActions}>
                                             <button
                                                 className={styles.linkButton}
@@ -389,13 +545,6 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                                                 onClick={() => handleEdit(task)}
                                             >
                                                 עריכה
-                                            </button>
-                                            <button
-                                                className={styles.linkButton}
-                                                type="button"
-                                                onClick={() => handleComplete(task)}
-                                            >
-                                                הושלם
                                             </button>
                                             <button
                                                 className={styles.dangerButton}

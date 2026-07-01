@@ -10,12 +10,19 @@ export type DaycareTaskCategory =
 
 export type DaycareTaskStatus = "לא התחיל" | "בטיפול" | "הושלם";
 export type DaycarePriority = "נמוכה" | "רגילה" | "דחופה";
+export type DaycareTaskStage =
+    | "עכשיו"
+    | "השבוע"
+    | "לפני פתיחה"
+    | "אחרי פתיחה"
+    | "התרחבות";
 
 export interface IDaycareTask {
     title: string;
     category: DaycareTaskCategory;
     status: DaycareTaskStatus;
     priority: DaycarePriority;
+    stage?: DaycareTaskStage;
     dueDate?: Date;
     notes?: string;
     resourceLabel?: string;

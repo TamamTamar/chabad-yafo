@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { financeScenarioChildren } from "../daycareAdminConfig";
 import {
     getDaycareFinance,
     updateDaycareFinance,
@@ -15,12 +14,11 @@ const financeFields: Array<{
     key: keyof DaycareFinanceSettings;
     label: string;
 }> = [
-    { key: "pricePerChild", label: "מחיר לילד לחודש" },
-    { key: "currentChildren", label: "מספר ילדים נוכחי" },
-    { key: "targetChildren", label: "יעד ילדים בהמשך" },
+    { key: "currentChildren", label: "ילדים בפועל" },
+    { key: "pricePerChild", label: "תשלום חודשי לילד" },
     { key: "rent", label: "שכירות חודשית" },
-    { key: "directorSalary", label: "משכורת מנהלת" },
-    { key: "staffSalaries", label: "משכורת מטפלות" },
+    { key: "directorSalary", label: "משכורת שלך / מנהלת" },
+    { key: "staffSalaries", label: "מטפלת" },
     { key: "food", label: "אוכל" },
     { key: "supplies", label: "ציוד שוטף" },
     { key: "insuranceAndPermits", label: "ביטוחים / אישורים" },
@@ -74,11 +72,8 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
         const income = settings.pricePerChild * settings.currentChildren;
         const expenses = getExpenses(settings);
         const balance = income - expenses;
-        const breakEven = settings.pricePerChild
-            ? Math.ceil(expenses / settings.pricePerChild)
-            : 0;
 
-        return { income, expenses, balance, breakEven };
+        return { income, expenses, balance };
     }, [settings]);
 
     const handleNumberChange = (
@@ -131,7 +126,7 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
             setSaveError(null);
             const updatedSettings = await updateDaycareFinance(settings);
             setSettings(updatedSettings);
-            setSaveMessage("התכנון התקציבי נשמר");
+            setSaveMessage("המצב הכספי נשמר");
             onChanged();
         } catch (error) {
             console.error("Failed to save finance settings:", error);
@@ -150,10 +145,10 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
             <div className={styles.sectionHeader}>
                 <div>
                     <h2 className={styles.sectionTitle} id="daycare-finance">
-                        תחזית כלכלית פשוטה
+                        מצב כספי בפועל
                     </h2>
                     <p className={styles.sectionDescription}>
-                        מחשבון פנימי להכנסות, הוצאות ונקודת איזון.
+                        מעקב פשוט אחרי מה שקורה עכשיו: ילדים, הכנסות, הוצאות ותוצאה חודשית.
                     </p>
                 </div>
                 <button
@@ -162,7 +157,7 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
                     onClick={handleSave}
                     disabled={saving}
                 >
-                    {saving ? "שומר..." : "שמירת תחזית"}
+                    {saving ? "שומר..." : "שמירת מצב כספי"}
                 </button>
             </div>
 
@@ -203,64 +198,30 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
 
                 <div className={styles.summaryGrid}>
                     <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>הכנסה חודשית</span>
+                        <span className={styles.metricLabel}>ילדים בפועל</span>
+                        <strong className={styles.metricValue}>
+                            {settings.currentChildren}
+                        </strong>
+                    </article>
+                    <article className={styles.metricCard}>
+                        <span className={styles.metricLabel}>הכנסה בפועל</span>
                         <strong className={styles.metricValue}>
                             {formatCurrency(summary.income)}
                         </strong>
                     </article>
                     <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>הוצאות חודשיות</span>
+                        <span className={styles.metricLabel}>הוצאות בפועל</span>
                         <strong className={styles.metricValue}>
                             {formatCurrency(summary.expenses)}
                         </strong>
                     </article>
                     <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>רווח / הפסד חודשי</span>
+                        <span className={styles.metricLabel}>מצב חודשי</span>
                         <strong className={styles.metricValue}>
                             {formatCurrency(summary.balance)}
                         </strong>
                     </article>
-                    <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>נקודת איזון</span>
-                        <strong className={styles.metricValue}>
-                            {summary.breakEven} ילדים
-                        </strong>
-                    </article>
                 </div>
-            </div>
-
-            <div className={styles.tableWrapper}>
-                <table className={styles.tableCompact}>
-                    <thead>
-                        <tr>
-                            <th className={styles.tableHeader}>תרחיש ילדים</th>
-                            <th className={styles.tableHeader}>הכנסה</th>
-                            <th className={styles.tableHeader}>הוצאות</th>
-                            <th className={styles.tableHeader}>תוצאה</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {financeScenarioChildren.map((children) => {
-                            const income = children * settings.pricePerChild;
-                            const result = income - summary.expenses;
-
-                            return (
-                                <tr className={styles.tableRow} key={children}>
-                                    <td className={styles.tableCell}>{children}</td>
-                                    <td className={styles.tableCell}>
-                                        {formatCurrency(income)}
-                                    </td>
-                                    <td className={styles.tableCell}>
-                                        {formatCurrency(summary.expenses)}
-                                    </td>
-                                    <td className={styles.tableCell}>
-                                        {formatCurrency(result)}
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
             </div>
         </section>
     );

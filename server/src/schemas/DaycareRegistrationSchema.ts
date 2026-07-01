@@ -71,6 +71,19 @@ export const daycareRegistrationSchema = new Schema(
             trim: true,
             maxlength: 700,
         },
+        status: {
+            type: String,
+            required: true,
+            enum: [
+                "מתעניין",
+                "שיחה בוצעה",
+                "הגיע לראות",
+                "רוצה להירשם",
+                "נרשם",
+                "לא רלוונטי",
+            ],
+            default: "מתעניין",
+        },
     },
     {
         timestamps: true,

@@ -1,4 +1,4 @@
-import type { FridayCare, RequiredHours } from "../../types/daycareRegistration";
+import type { RequiredHours } from "../../types/daycareRegistration";
 
 export const DAYCARE_MONTHLY_COST = 5500;
 export const DAYCARE_MONTHLY_COST_LABEL = `${DAYCARE_MONTHLY_COST.toLocaleString(
@@ -10,5 +10,3 @@ export const requiredHoursOptions: RequiredHours[] = [
     "עד 16:00",
     "אחר",
 ];
-
-export const fridayCareOptions: FridayCare[] = ["כן", "לא"];

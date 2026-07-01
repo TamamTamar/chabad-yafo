@@ -1,26 +1,35 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { daycareLeadStatuses, emptyLead } from "../daycareAdminConfig";
+import { daycareLeadStatuses } from "../daycareAdminConfig";
 import {
-    createDaycareLead,
-    deleteDaycareLead,
     getDaycareRegistrations,
-    updateDaycareLead,
+    updateDaycarePublicRegistrationStatus,
 } from "../daycareAdminService";
 import styles from "../DaycareAdmin.module.scss";
+import type { DaycareRegistrationsResponse } from "../types";
 import type {
-    DaycareLead,
-    DaycareLeadStatus,
-    DaycareRegistrationsResponse,
-    EditableDaycareLead,
-} from "../types";
+    DaycareInterestStatus,
+    DaycareRegistrationAdmin,
+} from "../../../../types/daycareRegistration";
 
 type DaycareRegistrationsProps = {
     onChanged: () => void;
 };
 
-const toDateInputValue = (date?: string) => {
-    return date ? date.slice(0, 10) : "";
+const formatDate = (date?: string) => {
+    if (!date) {
+        return "-";
+    }
+
+    return new Date(date).toLocaleDateString("he-IL");
+};
+
+const formatRequiredHours = (registration: DaycareRegistrationAdmin) => {
+    if (registration.requiredHours !== "אחר" || !registration.requiredHoursOther) {
+        return registration.requiredHours;
+    }
+
+    return `${registration.requiredHours} - ${registration.requiredHoursOther}`;
 };
 
 const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
@@ -28,9 +37,8 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         leads: [],
         publicRegistrations: [],
     });
-    const [draft, setDraft] = useState<EditableDaycareLead>(emptyLead);
-    const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     const loadRegistrations = async () => {
         const registrations = await getDaycareRegistrations();
@@ -45,43 +53,34 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         });
     }, []);
 
-    const resetDraft = () => {
-        setDraft(emptyLead);
-        setEditingId(null);
-    };
+    const handleStatusChange = async (
+        registrationId: string,
+        status: DaycareInterestStatus
+    ) => {
+        setUpdatingId(registrationId);
 
-    const handleEdit = (lead: DaycareLead) => {
-        setEditingId(lead._id);
-        setDraft({
-            ...lead,
-            childAge: lead.childAge ?? "",
-            area: lead.area ?? "",
-            inquiryDate: toDateInputValue(lead.inquiryDate),
-            notes: lead.notes ?? "",
-            followUpDate: toDateInputValue(lead.followUpDate),
-        });
-    };
+        try {
+            const updatedRegistration =
+                await updateDaycarePublicRegistrationStatus(
+                    registrationId,
+                    status
+                );
 
-    const handleSave = async () => {
-        if (!draft.childName.trim() || !draft.parentName.trim() || !draft.phone.trim()) {
-            return;
+            setData((currentData) => ({
+                ...currentData,
+                publicRegistrations: currentData.publicRegistrations.map(
+                    (registration) =>
+                        registration._id === registrationId
+                            ? updatedRegistration
+                            : registration
+                ),
+            }));
+            onChanged();
+        } catch (error) {
+            console.error("Failed to update daycare registration status:", error);
+        } finally {
+            setUpdatingId(null);
         }
-
-        if (editingId) {
-            await updateDaycareLead(editingId, draft);
-        } else {
-            await createDaycareLead(draft);
-        }
-
-        resetDraft();
-        await loadRegistrations();
-        onChanged();
-    };
-
-    const handleDelete = async (id: string) => {
-        await deleteDaycareLead(id);
-        await loadRegistrations();
-        onChanged();
     };
 
     return (
@@ -89,205 +88,91 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
             <div className={styles.sectionHeader}>
                 <div>
                     <h2 className={styles.sectionTitle} id="daycare-leads">
-                        מעקב הרשמות למעון
+                        פניות מהטופס הציבורי
                     </h2>
                     <p className={styles.sectionDescription}>
-                        ניהול ידני של מתעניינים לצד הרשמות שהגיעו מטופס המעון.
+                        כל מי שממלא את הקישור של המעון מופיע כאן לקריאה ולחזרה.
                     </p>
                 </div>
 
-                <Link className={styles.secondaryLink} to="/admin/dashboard">
-                    לעמוד ניהול המשפחות
+                <Link
+                    className={styles.secondaryLink}
+                    to="/admin/dashboard?tab=daycareRegistrations"
+                >
+                    לדשבורד מעון צפון יפו
                 </Link>
             </div>
 
             <div className={styles.notice}>
-                נמצאו {data.publicRegistrations.length} הרשמות ציבוריות מטופס
-                המעון. הן מוצגות למטה לקריאה, והמעקב הידני מנוהל בטבלה הזו.
-            </div>
-
-            <div className={styles.inlineForm}>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>שם הילד</span>
-                    <input
-                        className={styles.input}
-                        value={draft.childName}
-                        onChange={(event) =>
-                            setDraft({ ...draft, childName: event.target.value })
-                        }
-                    />
-                </label>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>גיל</span>
-                    <input
-                        className={styles.input}
-                        value={draft.childAge ?? ""}
-                        onChange={(event) =>
-                            setDraft({ ...draft, childAge: event.target.value })
-                        }
-                    />
-                </label>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>שם הורה</span>
-                    <input
-                        className={styles.input}
-                        value={draft.parentName}
-                        onChange={(event) =>
-                            setDraft({ ...draft, parentName: event.target.value })
-                        }
-                    />
-                </label>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>טלפון</span>
-                    <input
-                        className={styles.input}
-                        value={draft.phone}
-                        onChange={(event) =>
-                            setDraft({ ...draft, phone: event.target.value })
-                        }
-                    />
-                </label>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>אזור מגורים</span>
-                    <input
-                        className={styles.input}
-                        value={draft.area ?? ""}
-                        onChange={(event) =>
-                            setDraft({ ...draft, area: event.target.value })
-                        }
-                    />
-                </label>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>סטטוס</span>
-                    <select
-                        className={styles.input}
-                        value={draft.status}
-                        onChange={(event) =>
-                            setDraft({
-                                ...draft,
-                                status: event.target.value as DaycareLeadStatus,
-                            })
-                        }
-                    >
-                        {daycareLeadStatuses.map((status) => (
-                            <option key={status} value={status}>
-                                {status}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>תאריך פנייה</span>
-                    <input
-                        className={styles.input}
-                        type="date"
-                        value={draft.inquiryDate ?? ""}
-                        onChange={(event) =>
-                            setDraft({ ...draft, inquiryDate: event.target.value })
-                        }
-                    />
-                </label>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>תאריך לחזרה</span>
-                    <input
-                        className={styles.input}
-                        type="date"
-                        value={draft.followUpDate ?? ""}
-                        onChange={(event) =>
-                            setDraft({ ...draft, followUpDate: event.target.value })
-                        }
-                    />
-                </label>
-                <label className={styles.fieldWide}>
-                    <span className={styles.fieldLabel}>הערות</span>
-                    <input
-                        className={styles.input}
-                        value={draft.notes ?? ""}
-                        onChange={(event) =>
-                            setDraft({ ...draft, notes: event.target.value })
-                        }
-                    />
-                </label>
-                <div className={styles.formActions}>
-                    <button
-                        className={styles.primaryButton}
-                        type="button"
-                        onClick={handleSave}
-                    >
-                        {editingId ? "שמירה" : "הוספת מתעניין"}
-                    </button>
-                    {editingId && (
-                        <button
-                            className={styles.secondaryButton}
-                            type="button"
-                            onClick={resetDraft}
-                        >
-                            ביטול
-                        </button>
-                    )}
-                </div>
+                נמצאו {data.publicRegistrations.length} פניות מהקישור ששלחת.
+                כרגע כל הפניות הן מתעניינים, ולא נרשמים בפועל.
             </div>
 
             {loading ? (
-                <div className={styles.loading}>טוען הרשמות...</div>
+                <div className={styles.loading}>טוען פניות...</div>
+            ) : data.publicRegistrations.length === 0 ? (
+                <div className={styles.emptyState}>
+                    עדיין אין פניות מהטופס הציבורי.
+                </div>
             ) : (
                 <div className={styles.tableWrapper}>
-                    <table className={styles.table}>
+                    <table className={styles.tableCompact}>
                         <thead>
                             <tr>
-                                <th className={styles.tableHeader}>ילד</th>
-                                <th className={styles.tableHeader}>גיל</th>
-                                <th className={styles.tableHeader}>הורה</th>
+                                <th className={styles.tableHeader}>שם הורה</th>
                                 <th className={styles.tableHeader}>טלפון</th>
-                                <th className={styles.tableHeader}>אזור</th>
+                                <th className={styles.tableHeader}>גיל הילד/ה</th>
+                                <th className={styles.tableHeader}>שעות מועדפות</th>
                                 <th className={styles.tableHeader}>סטטוס</th>
-                                <th className={styles.tableHeader}>פנייה</th>
-                                <th className={styles.tableHeader}>לחזרה</th>
                                 <th className={styles.tableHeader}>הערות</th>
-                                <th className={styles.tableHeader}>פעולות</th>
+                                <th className={styles.tableHeader}>תאריך פנייה</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {data.leads.map((lead) => (
-                                <tr className={styles.tableRow} key={lead._id}>
-                                    <td className={styles.tableCell}>{lead.childName}</td>
+                            {data.publicRegistrations.map((registration) => (
+                                <tr
+                                    className={styles.tableRow}
+                                    key={registration._id}
+                                >
                                     <td className={styles.tableCell}>
-                                        {lead.childAge || "-"}
-                                    </td>
-                                    <td className={styles.tableCell}>{lead.parentName}</td>
-                                    <td className={styles.tableCell}>{lead.phone}</td>
-                                    <td className={styles.tableCell}>{lead.area || "-"}</td>
-                                    <td className={styles.tableCell}>
-                                        <span className={styles.statusBadge}>
-                                            {lead.status}
-                                        </span>
+                                        {registration.parentName}
                                     </td>
                                     <td className={styles.tableCell}>
-                                        {toDateInputValue(lead.inquiryDate) || "-"}
+                                        {registration.phone}
                                     </td>
                                     <td className={styles.tableCell}>
-                                        {toDateInputValue(lead.followUpDate) || "-"}
+                                        {registration.childAge ||
+                                            registration.childName ||
+                                            formatDate(registration.birthDate)}
                                     </td>
                                     <td className={styles.tableCell}>
-                                        {lead.notes || "-"}
+                                        {formatRequiredHours(registration)}
                                     </td>
                                     <td className={styles.tableCell}>
-                                        <div className={styles.rowActions}>
-                                            <button
-                                                className={styles.linkButton}
-                                                type="button"
-                                                onClick={() => handleEdit(lead)}
-                                            >
-                                                עריכה
-                                            </button>
-                                            <button
-                                                className={styles.dangerButton}
-                                                type="button"
-                                                onClick={() => handleDelete(lead._id)}
-                                            >
-                                                מחיקה
-                                            </button>
-                                        </div>
+                                        <select
+                                            className={styles.statusSelect}
+                                            value={registration.status || "מתעניין"}
+                                            disabled={updatingId === registration._id}
+                                            onChange={(event) =>
+                                                handleStatusChange(
+                                                    registration._id,
+                                                    event.target
+                                                        .value as DaycareInterestStatus
+                                                )
+                                            }
+                                        >
+                                            {daycareLeadStatuses.map((status) => (
+                                                <option key={status} value={status}>
+                                                    {status}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                    <td className={styles.tableCell}>
+                                        {registration.notes || "-"}
+                                    </td>
+                                    <td className={styles.tableCell}>
+                                        {formatDate(registration.createdAt)}
                                     </td>
                                 </tr>
                             ))}

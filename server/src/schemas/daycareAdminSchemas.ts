@@ -35,6 +35,11 @@ export const daycareTaskSchema = new Schema(
             enum: ["נמוכה", "רגילה", "דחופה"],
             default: "רגילה",
         },
+        stage: {
+            type: String,
+            enum: ["עכשיו", "השבוע", "לפני פתיחה", "אחרי פתיחה", "התרחבות"],
+            default: "לפני פתיחה",
+        },
         dueDate: Date,
         notes: {
             type: String,

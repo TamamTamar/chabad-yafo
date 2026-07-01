@@ -12,6 +12,12 @@ export type DaycareTaskCategory =
 
 export type DaycareTaskStatus = "לא התחיל" | "בטיפול" | "הושלם";
 export type DaycarePriority = "נמוכה" | "רגילה" | "דחופה";
+export type DaycareTaskStage =
+    | "עכשיו"
+    | "השבוע"
+    | "לפני פתיחה"
+    | "אחרי פתיחה"
+    | "התרחבות";
 
 export type DaycareTask = {
     _id: string;
@@ -19,6 +25,7 @@ export type DaycareTask = {
     category: DaycareTaskCategory;
     status: DaycareTaskStatus;
     priority: DaycarePriority;
+    stage?: DaycareTaskStage;
     dueDate?: string;
     notes?: string;
     resourceLabel?: string;

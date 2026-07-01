@@ -180,7 +180,8 @@
     color: $brand-primary-rich;
 }
 
-.categoryFilterBar {
+.categoryFilterBar,
+.stageFilterBar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -230,6 +231,27 @@
     background: $brand-primary;
     color: $color-white;
     box-shadow: 0 8px 18px $ui-shadow-blue-soft;
+}
+
+.stageFilterBar {
+    background: $ui-surface-warm;
+}
+
+.completedToggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-inline-start: auto;
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.completedToggle input {
+    width: 16px;
+    height: 16px;
+    accent-color: $brand-primary;
 }
 
 .inlineForm,
@@ -371,6 +393,45 @@
     line-height: 1.65;
 }
 
+.subsectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 22px 0 12px;
+}
+
+.subsectionTitle {
+    margin: 0;
+    color: $brand-blue-ink;
+    font-size: $type-card-title;
+    font-weight: 900;
+}
+
+.subsectionMeta {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.08);
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.emptyState {
+    margin-bottom: 18px;
+    padding: 22px;
+    border: 1px dashed $ui-border-strong;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+    color: $ui-text-muted;
+    font-size: $type-body-sm;
+    font-weight: 800;
+    text-align: center;
+}
+
 .formSaveMessage,
 .formErrorMessage {
     margin-bottom: 16px;
@@ -476,6 +537,99 @@
     background: rgba($brand-primary, 0.025);
 }
 
+.completedRow .tableCell {
+    background: rgba($ui-success, 0.035);
+    color: rgba($brand-text, 0.62);
+}
+
+.completedRow:hover .tableCell {
+    background: rgba($ui-success, 0.055);
+}
+
+.taskCheckLabel {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: inherit;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.taskCheckbox {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    margin-top: 3px;
+    accent-color: $brand-primary;
+    cursor: pointer;
+}
+
+.taskCheckbox:disabled {
+    cursor: wait;
+}
+
+.taskTitleText {
+    line-height: 1.65;
+}
+
+.completedRow .taskTitleText {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba($ui-success, 0.55);
+}
+
+.statusSelect {
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid rgba($brand-primary, 0.18);
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.06);
+    color: $brand-primary;
+    font-family: inherit;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.statusSelect:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.stageBadge {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 12px;
+    border-radius: $radius-pill;
+    background: rgba($brand-gold-rich, 0.14);
+    color: $brand-gold-dark;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.taskCheckLabel {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 4px;
+}
+
+.taskTitleText,
+.taskNoteText {
+    grid-column: 2;
+}
+
+.taskNoteText {
+    display: block;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
 .rowActions {
     display: flex;
     flex-wrap: wrap;
@@ -528,6 +682,82 @@
     .formActions {
         align-items: stretch;
         flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 700px) {
+    .tableWrapper {
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .table,
+    .tableCompact,
+    .table tbody,
+    .tableCompact tbody,
+    .tableRow,
+    .tableCell {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .table thead,
+    .tableCompact thead {
+        display: none;
+    }
+
+    .table,
+    .tableCompact {
+        border-collapse: separate;
+        background: transparent;
+    }
+
+    .tableRow {
+        margin-bottom: 14px;
+        overflow: hidden;
+        border: 1px solid $ui-border-soft;
+        border-radius: $radius;
+        background: $brand-bg;
+        box-shadow: 0 12px 26px $ui-shadow-blue-soft;
+    }
+
+    .tableCell {
+        display: grid;
+        grid-template-columns: minmax(92px, 34%) minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+        padding: 12px 14px;
+        border-bottom: 1px solid $ui-border-soft;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .tableCell:last-child {
+        border-bottom: 0;
+    }
+
+    .tableCell::before {
+        content: attr(data-label);
+        color: $brand-blue-ink;
+        font-size: $type-caption;
+        font-weight: 900;
+        white-space: normal;
+    }
+
+    .tableRow:hover .tableCell {
+        background: transparent;
+    }
+
+    .rowActions {
+        justify-content: flex-start;
+    }
+
+    .linkButton,
+    .dangerButton {
+        flex: 1 1 92px;
     }
 }
 

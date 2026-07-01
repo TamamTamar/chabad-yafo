@@ -11,6 +11,10 @@ import type {
     EditableDaycareLead,
     EditableDaycareTask,
 } from "./types";
+import type {
+    DaycareInterestStatus,
+    DaycareRegistrationAdmin,
+} from "../../../types/daycareRegistration";
 
 const cleanPayload = <T extends Record<string, unknown>>(payload: T) => {
     return Object.fromEntries(
@@ -65,6 +69,18 @@ export const deleteDaycareTask = async (id: string) => {
 export const getDaycareRegistrations = async () => {
     const response = await http.get<ApiResponse<DaycareRegistrationsResponse>>(
         "/admin/daycare/registrations"
+    );
+
+    return response.data.data;
+};
+
+export const updateDaycarePublicRegistrationStatus = async (
+    id: string,
+    status: DaycareInterestStatus
+) => {
+    const response = await http.patch<ApiResponse<DaycareRegistrationAdmin>>(
+        `/admin/daycare/public-registrations/${id}`,
+        { status }
     );
 
     return response.data.data;

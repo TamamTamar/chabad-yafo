@@ -76,20 +76,16 @@ export const sendDaycareRegistrationWhatsApp = async (args: {
     childAge?: string;
     requiredHours: string;
     requiredHoursOther?: string;
-    fridayCare: string;
+    fridayCare?: string;
     costApproval?: boolean;
     notes?: string;
 }) => {
     const {
         parentName,
         phone,
-        email,
-        childName,
-        birthDate,
         childAge,
         requiredHours,
         requiredHoursOther,
-        fridayCare,
         notes,
     } = args;
     const requiredHoursText =
@@ -101,12 +97,8 @@ export const sendDaycareRegistrationWhatsApp = async (args: {
         `🏫 רישום מוקדם חדש למעון בצפון יפו\n\n` +
         `👤 הורה: ${parentName}\n` +
         `📞 טלפון: ${phone}\n` +
-        `📧 אימייל: ${email || "—"}\n\n` +
         `👶 גיל הילד/ה: ${childAge || "—"}\n` +
-        `שם הילד/ה: ${childName || "—"}\n` +
-        `🎂 תאריך לידה: ${birthDate || "—"}\n` +
-        `שעות נדרשות: ${requiredHoursText}\n` +
-        `ימי שישי: ${fridayCare}\n\n` +
+        `שעות מועדפות: ${requiredHoursText}\n\n` +
         `הערות: ${notes || "—"}`;
 
     await client.messages.create({

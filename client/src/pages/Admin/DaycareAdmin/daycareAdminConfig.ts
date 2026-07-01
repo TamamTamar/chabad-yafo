@@ -3,6 +3,7 @@ import type {
     DaycareLeadStatus,
     DaycarePriority,
     DaycareTaskCategory,
+    DaycareTaskStage,
     DaycareTaskStatus,
 } from "./types";
 
@@ -29,6 +30,14 @@ export const daycarePriorities: DaycarePriority[] = [
     "דחופה",
 ];
 
+export const daycareTaskStages: DaycareTaskStage[] = [
+    "עכשיו",
+    "השבוע",
+    "לפני פתיחה",
+    "אחרי פתיחה",
+    "התרחבות",
+];
+
 export const daycareLeadStatuses: DaycareLeadStatus[] = [
     "מתעניין",
     "שיחה בוצעה",
@@ -49,6 +58,7 @@ export const emptyTask = {
     category: "תכנון",
     status: "לא התחיל",
     priority: "רגילה",
+    stage: "לפני פתיחה",
     dueDate: "",
     notes: "",
     resourceLabel: "",

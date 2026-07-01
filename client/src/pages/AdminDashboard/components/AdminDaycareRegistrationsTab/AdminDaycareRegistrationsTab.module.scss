@@ -15,7 +15,7 @@
 
 .table {
     width: 100%;
-    min-width: 1180px;
+    min-width: 920px;
     border-collapse: collapse;
 }
 
@@ -43,21 +43,9 @@
     background: rgba($brand-primary, 0.025);
 }
 
-.phone,
-.email {
+.phone {
     direction: ltr;
     text-align: right;
-    white-space: nowrap;
-}
-
-.tag {
-    display: inline-flex;
-    padding: 4px 10px;
-    border-radius: $radius-pill;
-    background: rgba($brand-primary, 0.08);
-    color: $brand-primary;
-    font-size: $type-caption;
-    font-weight: 800;
     white-space: nowrap;
 }
 
@@ -74,7 +62,7 @@
     }
 
     .table {
-        min-width: 1080px;
+        min-width: 820px;
     }
 
     .tableHeader,

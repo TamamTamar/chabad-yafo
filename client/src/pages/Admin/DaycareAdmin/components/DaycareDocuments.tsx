@@ -183,16 +183,21 @@ const DaycareDocuments = () => {
                         <tbody>
                             {documents.map((document) => (
                                 <tr className={styles.tableRow} key={document._id}>
-                                    <td className={styles.tableCell}>{document.name}</td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="מסמך">
+                                        {document.name}
+                                    </td>
+                                    <td className={styles.tableCell} data-label="סטטוס">
                                         <span className={styles.statusBadge}>
                                             {document.status}
                                         </span>
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="יעד">
                                         {toDateInputValue(document.dueDate) || "-"}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="קובץ / טופס"
+                                    >
                                         {document.fileUrl ? (
                                             <a
                                                 className={styles.inlineLink}
@@ -206,10 +211,10 @@ const DaycareDocuments = () => {
                                             "-"
                                         )}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="הערות">
                                         {document.notes || "-"}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="פעולות">
                                         <div className={styles.rowActions}>
                                             <button
                                                 className={styles.linkButton}

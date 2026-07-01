@@ -3,8 +3,7 @@ import type { DaycareRegistrationFormValues } from "../../../../types/daycareReg
 import styles from "./DaycareRadioGroup.module.scss";
 
 type RadioFieldName =
-    | "requiredHours"
-    | "fridayCare";
+    | "requiredHours";
 
 type Props = {
     error: FieldErrors<DaycareRegistrationFormValues>[RadioFieldName];
