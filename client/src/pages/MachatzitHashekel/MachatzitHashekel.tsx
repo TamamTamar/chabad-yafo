@@ -56,8 +56,8 @@ const config: DonationCampaignConfig = {
     ],
 
     nedarim: {
-        Mosad: "7013920",
-        ApiValid: "zidFYCLaNi",
+        Mosad: import.meta.env.VITE_NEDARIM_MOSAD,
+        ApiValid: import.meta.env.VITE_NEDARIM_API_VALID,
         Currency: "1",
         Comment: "מחצית השקל",
         PaymentType: "Ragil"

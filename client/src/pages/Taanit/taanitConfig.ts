@@ -26,8 +26,8 @@ const fastDayConfigs: Record<FastDayKey, DonationCampaignConfig> = {
     presetAmounts: [],
     allowCustomAmount: true,
     nedarim: {
-      Mosad: "7013920",
-      ApiValid: "zidFYCLaNi",
+      Mosad: import.meta.env.VITE_NEDARIM_MOSAD,
+      ApiValid: import.meta.env.VITE_NEDARIM_API_VALID,
       Currency: "1",
       Comment: "צדקה ליום צום - י״ז בתמוז",
       PaymentType: "Ragil",
@@ -51,8 +51,8 @@ const fastDayConfigs: Record<FastDayKey, DonationCampaignConfig> = {
     presetAmounts: [],
     allowCustomAmount: true,
     nedarim: {
-      Mosad: "7013920",
-      ApiValid: "zidFYCLaNi",
+      Mosad: import.meta.env.VITE_NEDARIM_MOSAD,
+      ApiValid: import.meta.env.VITE_NEDARIM_API_VALID,
       Currency: "1",
       Comment: "צדקה ליום צום - תשעה באב",
       PaymentType: "Ragil",
