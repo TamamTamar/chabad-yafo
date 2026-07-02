@@ -81,7 +81,7 @@ const CampaignDonorFields = ({
         <div className={styles.field}>
           <label className={styles.label}>טלפון</label>
           <input
-            className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
+            className={`${styles.input} ${styles.ltrInput} ${errors.phone ? styles.inputError : ""}`}
             {...register("phone", {
               required: "חובה להזין טלפון",
               pattern: { value: /^[0-9]{9,10}$/, message: "מספר טלפון לא תקין" },
@@ -96,7 +96,7 @@ const CampaignDonorFields = ({
         <div className={styles.field}>
           <label className={styles.label}>אימייל</label>
           <input
-            className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
+            className={`${styles.input} ${styles.ltrInput} ${errors.email ? styles.inputError : ""}`}
             {...register("email", {
               required: "חובה להזין אימייל",
               pattern: {

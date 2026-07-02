@@ -135,6 +135,22 @@
     margin-inline-start: auto;
   }
 
+  .ltrInput {
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: plaintext;
+  }
+
+  .contactField {
+    @media (min-width: 640px) {
+      grid-column: 1 / -1;
+    }
+
+    .input {
+      max-width: none;
+    }
+  }
+
   .error {
     font-size: $type-micro;
     margin-top: 0;

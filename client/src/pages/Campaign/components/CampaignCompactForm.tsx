@@ -106,11 +106,11 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
           {errors.lastName && <div className={styles.error}>{errors.lastName.message}</div>}
         </div>
 
-        <div className={styles.field}>
+        <div className={`${styles.field} ${styles.contactField}`}>
           <label className={styles.label}>טלפון</label>
           <input
             type="tel"
-            className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
+            className={`${styles.input} ${styles.ltrInput} ${errors.phone ? styles.inputError : ""}`}
             {...register("phone", {
               required: "חובה להזין טלפון",
               pattern: { 
@@ -123,11 +123,11 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
           {errors.phone && <div className={styles.error}>{errors.phone.message}</div>}
         </div>
 
-        <div className={styles.field}>
+        <div className={`${styles.field} ${styles.contactField}`}>
           <label className={styles.label}>אימייל</label>
           <input
             type="email"
-            className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
+            className={`${styles.input} ${styles.ltrInput} ${errors.email ? styles.inputError : ""}`}
             {...register("email", {
               required: "חובה להזין אימייל",
               pattern: {

@@ -212,6 +212,12 @@
     }
   }
 
+  .ltrInput {
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: plaintext;
+  }
+
   .error {
     color: $ui-danger-bright;
     font-size: $type-micro;
