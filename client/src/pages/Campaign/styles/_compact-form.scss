@@ -29,9 +29,8 @@
 
     .amountInputWrapper {
       position: relative;
-      display: inline-block;
+      display: block;
       width: 100%;
-      max-width: 200px;
 
       .compactAmountInput {
         width: 100%;
@@ -129,26 +128,14 @@
 
   .input {
     width: 100%;
-    max-width: 280px;
     padding: 10px 12px;
     border-radius: 10px;
-    margin-inline-start: auto;
   }
 
   .ltrInput {
     direction: ltr;
     text-align: left;
     unicode-bidi: plaintext;
-  }
-
-  .contactField {
-    @media (min-width: 640px) {
-      grid-column: 1 / -1;
-    }
-
-    .input {
-      max-width: none;
-    }
   }
 
   .error {
