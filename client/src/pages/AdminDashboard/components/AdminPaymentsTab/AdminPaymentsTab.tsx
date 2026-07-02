@@ -26,6 +26,7 @@ const sourceLabels: Record<FinanceEntrySource, string> = {
     bit: "ביט",
     credit: "אשראי",
     bank: "העברה בנקאית",
+    check: "צ׳ק",
     nedarim: "נדרים פלוס",
     manual: "ידני",
     other: "אחר",
@@ -43,6 +44,7 @@ const sourceOptions: Record<
         { value: "cash", label: "מזומן" },
         { value: "credit", label: "אשראי" },
         { value: "bank", label: "העברה בנקאית" },
+        { value: "check", label: "צ׳ק" },
     ],
 };
 

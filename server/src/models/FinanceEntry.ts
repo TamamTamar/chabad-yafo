@@ -17,6 +17,7 @@ const FinanceEntrySchema = new mongoose.Schema<FinanceEntry>(
                 "bit",
                 "credit",
                 "bank",
+                "check",
                 "nedarim",
                 "manual",
                 "other",

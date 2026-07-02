@@ -101,6 +101,7 @@ export type FinanceEntrySource =
   | "bit"
   | "credit"
   | "bank"
+  | "check"
   | "nedarim"
   | "manual"
   | "other";

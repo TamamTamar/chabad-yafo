@@ -285,8 +285,8 @@ const getFinanceEntryPayload = (body: Record<string, unknown>): FinanceEntry => 
     type: body.type === "income" ? "income" : "expense",
     source:
         typeof body.source === "string" &&
-        ["cash", "bit", "credit", "bank"].includes(body.source)
-            ? (body.source as "cash" | "bit" | "credit" | "bank")
+        ["cash", "bit", "credit", "bank", "check"].includes(body.source)
+            ? (body.source as "cash" | "bit" | "credit" | "bank" | "check")
             : "cash",
     category: String(body.category || "כללי"),
     title: String(body.title || ""),
