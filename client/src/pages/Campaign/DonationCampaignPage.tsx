@@ -40,7 +40,7 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
   const openDonation = (amount: number) => {
     trackDonationStart({
       value: amount,
-      currency: config.nedarim.Currency === 1 ? "ILS" : String(config.nedarim.Currency),
+      currency: config.nedarim.Currency === "1" ? "ILS" : String(config.nedarim.Currency),
       donation_source: "campaign",
       campaign_title: config.title,
     });
@@ -53,7 +53,7 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
 
   const openCustomDonation = () => {
     trackDonationStart({
-      currency: config.nedarim.Currency === 1 ? "ILS" : String(config.nedarim.Currency),
+      currency: config.nedarim.Currency === "1" ? "ILS" : String(config.nedarim.Currency),
       donation_source: "campaign",
       campaign_title: config.title,
       amount_mode: "custom",
@@ -68,7 +68,7 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
   const handleCompactSubmit = (amount: number, donor: DonorForm) => {
     trackDonationStart({
       value: amount,
-      currency: config.nedarim.Currency === 1 ? "ILS" : String(config.nedarim.Currency),
+      currency: config.nedarim.Currency === "1" ? "ILS" : String(config.nedarim.Currency),
       donation_source: "campaign_compact_form",
       campaign_title: config.title,
     });

@@ -240,14 +240,27 @@
 }
 
 .successIcon {
-  margin-bottom: 20px;
-  font-size: 3.75rem;
+  display: inline-grid;
+  place-items: center;
+
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
+
+  border: 1px solid rgba($ui-success, 0.28);
+  border-radius: 50%;
+
+  background: rgba($ui-success, 0.08);
+  color: $ui-success;
+
+  font-size: 2rem;
+  font-weight: 900;
   line-height: 1;
 }
 
 .successTitle {
   margin: 0;
-  color: $ui-success;
+  color: $brand-text;
   font-size: $type-card-title;
 }
 
@@ -299,6 +312,27 @@
   border-radius: $radius-pill;
   font-weight: 700;
   cursor: pointer;
+}
+
+.devTestButton {
+  width: 100%;
+  padding: 8px 12px;
+
+  border: 1px dashed rgba($brand-primary, 0.35);
+  border-radius: $radius-pill;
+
+  background: rgba($brand-primary, 0.04);
+  color: $ui-text-muted;
+
+  font: inherit;
+  font-size: $type-micro;
+  font-weight: 800;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .micro {

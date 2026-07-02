@@ -8,18 +8,24 @@ type CampaignSuccessMessageProps = {
 const CampaignSuccessMessage = ({
   firstName,
   selectedAmount,
-}: CampaignSuccessMessageProps) => (
-  <div className={styles.successMessage}>
-    <div className={styles.successIcon}>🎉</div>
+}: CampaignSuccessMessageProps) => {
+  const title = firstName ? `תודה רבה, ${firstName}` : "תודה רבה";
 
-    <h2 className={styles.successTitle}>תודה רבה, {firstName}!</h2>
+  return (
+    <div className={styles.successMessage}>
+      <div className={styles.successIcon} aria-hidden="true">
+        ✓
+      </div>
 
-    <p className={styles.successText}>
-      התרומה על סך <b>₪{selectedAmount}</b> התקבלה בהצלחה.
-    </p>
+      <h2 className={styles.successTitle}>{title}</h2>
 
-    <p className={styles.successNote}>החלון יסגר כעת...</p>
-  </div>
-);
+      <p className={styles.successText}>
+        התרומה על סך <b>₪{selectedAmount}</b> התקבלה בהצלחה.
+      </p>
+
+      <p className={styles.successNote}>מיד נחזור לעמוד התרומה.</p>
+    </div>
+  );
+};
 
 export default CampaignSuccessMessage;

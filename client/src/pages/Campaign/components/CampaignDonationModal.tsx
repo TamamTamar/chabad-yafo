@@ -58,6 +58,7 @@ const CampaignDonationModal: React.FC<Props> = ({
   const [amountMode, setAmountMode] = useState<"preset" | "custom">("preset");
   const [selectedAmount, setSelectedAmount] = useState<number>(presetAmount);
   const [customRaw, setCustomRaw] = useState<string>("");
+  const [showSuccessPreview, setShowSuccessPreview] = useState(false);
 
   const {
     register,
@@ -81,7 +82,7 @@ const CampaignDonationModal: React.FC<Props> = ({
       onSuccess: () => {
         trackDonationComplete({
           value: selectedAmount,
-          currency: currency === 1 ? "ILS" : String(currency),
+          currency: currency === "1" ? "ILS" : String(currency),
           donation_source: "campaign",
           campaign_title: campaignTitle,
         });
@@ -94,6 +95,7 @@ const CampaignDonationModal: React.FC<Props> = ({
     if (!open) return;
 
     setStep(initialStep ?? 1);
+    setShowSuccessPreview(false);
     setErrorText("");
     resetPaymentUi();
 
@@ -172,13 +174,23 @@ const CampaignDonationModal: React.FC<Props> = ({
     setStep(2);
     trackDonationPaymentStart({
       value: nextAmount,
-      currency: currency === 1 ? "ILS" : String(currency),
+      currency: currency === "1" ? "ILS" : String(currency),
       donation_source: "campaign",
       campaign_title: campaignTitle,
     });
   };
 
+  const showTestSuccess = () => {
+    const previewAmount = amountToShow || selectedAmount || presetAmount;
+
+    setSelectedAmount(previewAmount);
+    setErrorText("");
+    setShowSuccessPreview(true);
+  };
+
   if (!open) return null;
+
+  const isSuccessVisible = ok || showSuccessPreview;
 
   return (
     <div className={styles.modalOverlay}>
@@ -191,10 +203,10 @@ const CampaignDonationModal: React.FC<Props> = ({
           onClose={onClose}
         />
 
-        {!ok && <CampaignModalSteps step={step} />}
+        {!isSuccessVisible && <CampaignModalSteps step={step} />}
 
         <div className={styles.modalBody}>
-          {ok ? (
+          {isSuccessVisible ? (
             <CampaignSuccessMessage
               firstName={watchedDonor.firstName}
               selectedAmount={selectedAmount}
@@ -219,13 +231,14 @@ const CampaignDonationModal: React.FC<Props> = ({
           {errorText && <div className={styles.errorBox}>{errorText}</div>}
         </div>
 
-        {!ok && (
+        {!isSuccessVisible && (
           <CampaignModalFooter
             isPaying={isPaying}
             onBack={() => setStep(1)}
             onCancel={onClose}
             onNext={handleSubmit(goNext)}
             onPay={() => startPayment(payload)}
+            onTestSuccess={import.meta.env.DEV ? showTestSuccess : undefined}
             step={step}
           />
         )}

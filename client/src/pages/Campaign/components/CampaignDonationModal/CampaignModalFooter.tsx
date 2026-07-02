@@ -7,6 +7,7 @@ type CampaignModalFooterProps = {
   onCancel: () => void;
   onNext: () => void;
   onPay: () => void;
+  onTestSuccess?: () => void;
   step: CampaignDonationStep;
 };
 
@@ -16,6 +17,7 @@ const CampaignModalFooter = ({
   onCancel,
   onNext,
   onPay,
+  onTestSuccess,
   step,
 }: CampaignModalFooterProps) => (
   <div className={styles.modalFooter}>
@@ -38,6 +40,17 @@ const CampaignModalFooter = ({
         {step === 1 ? "המשך לתשלום" : isPaying ? "מעבד..." : "בצע תשלום"}
       </button>
     </div>
+
+    {onTestSuccess && (
+      <button
+        className={styles.devTestButton}
+        onClick={onTestSuccess}
+        disabled={isPaying}
+        type="button"
+      >
+        תצוגת בדיקה למסך האישור
+      </button>
+    )}
   </div>
 );
 
