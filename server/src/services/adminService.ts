@@ -20,8 +20,8 @@ export const getAllRebbeLetters = async () => {
     return rebbeLetter.find().sort({ createdAt: -1 });
 };
 
-export const getAllPayments = async () => {
-    return Payment.find().sort({ createdAt: -1 });
+export const getAllPayments = async (filter = {}) => {
+    return Payment.find(filter).sort({ createdAt: -1 });
 };
 
 export const isValidRebbeLetterStatus = (

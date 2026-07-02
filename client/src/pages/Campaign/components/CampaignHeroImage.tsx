@@ -1,11 +1,19 @@
 import React from "react";
 import styles from "../DonationCampaignPage.module.scss";
 
-type Props = { imageUrl: string };
+type Props = {
+  imageUrl: string;
+  variant?: "default" | "compact";
+};
 
-const CampaignHeroImage: React.FC<Props> = ({ imageUrl }) => {
+const CampaignHeroImage: React.FC<Props> = ({ imageUrl, variant = "default" }) => {
+  const mediaClassName = [
+    styles.heroMedia,
+    variant === "compact" ? styles.heroMediaCompact : "",
+  ].filter(Boolean).join(" ");
+
   return (
-    <div className={styles.heroMedia}>
+    <div className={mediaClassName}>
       <img className={styles.heroImg} src={imageUrl} alt="" />
     </div>
   );

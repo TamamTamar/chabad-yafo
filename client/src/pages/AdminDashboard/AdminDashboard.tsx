@@ -15,6 +15,8 @@ const AdminDashboard = () => {
     const initialTab =
         searchParams.get("tab") === "daycareRegistrations"
             ? "daycareRegistrations"
+            : searchParams.get("tab") === "payments"
+              ? "payments"
             : "families";
     const [activeTab, setActiveTab] = useState<AdminTab>(initialTab);
     const navigate = useNavigate();
@@ -54,6 +56,14 @@ const AdminDashboard = () => {
                         onClick={() => navigate("/admin/daycare")}
                     >
                         ניהול מעון
+                    </button>
+
+                    <button
+                        type="button"
+                        className={styles.tab}
+                        onClick={() => navigate("/admin/daycare-enrollments")}
+                    >
+                        הרשמות מלאות
                     </button>
 
                     <button
@@ -101,7 +111,7 @@ const AdminDashboard = () => {
                         }
                         onClick={() => setActiveTab("payments")}
                     >
-                        תרומות
+                        כספים
                     </button>
                 </nav>
 

@@ -17,7 +17,7 @@
 
   .compactInputSection {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
 
     .compactLabel {
       display: block;
@@ -45,7 +45,8 @@
         outline: none;
 
         &.inputError {
-          border-color: $ui-danger-bright;
+          border-color: rgba($ui-danger-bright, 0.55);
+          background: rgba($ui-danger-bright, 0.025);
         }
       }
 
@@ -67,7 +68,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 
     @media (min-width: 640px) {
       grid-template-columns: 1fr 1fr;
@@ -138,5 +139,7 @@
     font-size: $type-micro;
     margin-top: 0;
     text-align: right;
+    color: color.adjust($ui-danger-bright, $lightness: -8%);
+    font-weight: 700;
   }
 }

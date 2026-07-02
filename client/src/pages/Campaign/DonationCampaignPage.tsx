@@ -85,7 +85,7 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
 
   return (
     <div className={styles.page} dir="rtl" lang="he">
-      <CampaignHeroImage imageUrl={config.heroImage} />
+      <CampaignHeroImage imageUrl={config.heroImage} variant={config.heroVariant} />
 
       <header className={styles.header}>
         <div className={styles.headerInner}>
@@ -103,6 +103,7 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
               {config.isCompact ? (
                 <CampaignCompactForm 
                   externalAmount={syncAmount} 
+                  showCalculatorLink={config.showCalculator !== false}
                   onSubmit={handleCompactSubmit} 
                 />
               ) : (
@@ -126,7 +127,7 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
       {config.targetSunsetIso && <CampaignCountdownBar targetSunsetIso={config.targetSunsetIso} />}
 
       <main className={styles.main}>
-        {config.isCompact && (
+        {config.isCompact && config.showCalculator !== false && (
           <CampaignCalculator onSelectAmount={handleCalculatorSelect} />
         )}
         {config.faq?.length ? <CampaignFaq items={config.faq} /> : null}

@@ -18,6 +18,7 @@ export type DonationCampaignConfig = {
 
   // hero
   heroImage: string;
+  heroVariant?: "default" | "compact";
   title: string; // כותרת עמוד (למשל "מתנות לאביונים")
 
   // content
@@ -37,6 +38,7 @@ export type DonationCampaignConfig = {
   faq?: CampaignFaqItem[];
 
   isCompact?: boolean; // <-- תוסיפי את השורה הזו
+  showCalculator?: boolean;
 
   // nedarim settings
   nedarim: {

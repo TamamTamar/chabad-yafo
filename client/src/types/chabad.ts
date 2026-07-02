@@ -92,3 +92,59 @@ export interface PaymentAdmin {
   createdAt: string;
   updatedAt: string;
 }
+
+export type FinanceEntryType = "income" | "expense";
+
+export type FinanceEntrySource =
+  | "website"
+  | "cash"
+  | "bit"
+  | "credit"
+  | "bank"
+  | "nedarim"
+  | "manual"
+  | "other";
+
+export interface FinanceEntryAdmin {
+  _id: string;
+  type: FinanceEntryType;
+  source: FinanceEntrySource;
+  category: string;
+  title: string;
+  amount: number;
+  occurredAt: string;
+  donorName?: string;
+  notes?: string;
+  linkedPaymentId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface FinanceSummary {
+  income: number;
+  expenses: number;
+  balance: number;
+}
+
+export interface FinanceCategorySummary {
+  category: string;
+  income: number;
+  expenses: number;
+  balance: number;
+}
+
+export interface FinanceOverview {
+  summary: FinanceSummary;
+  categorySummary: FinanceCategorySummary[];
+  entries: FinanceEntryAdmin[];
+}
+
+export type CreateFinanceEntryPayload = {
+  type: FinanceEntryType;
+  source: Exclude<FinanceEntrySource, "website">;
+  category: string;
+  title: string;
+  amount: number;
+  donorName?: string;
+  notes?: string;
+};

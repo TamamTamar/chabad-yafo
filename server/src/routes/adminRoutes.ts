@@ -5,6 +5,7 @@ import { DaycareLead } from "../models/DaycareLead";
 import { DaycareRegistration } from "../models/DaycareRegistration";
 import { DaycareTask } from "../models/DaycareTask";
 import { Family } from "../models/Family";
+import { FinanceEntryModel } from "../models/FinanceEntry";
 import { requireAdmin } from "../middleware/adminAuth";
 import {
     getAllPayments,
@@ -17,6 +18,7 @@ import type {
     IDaycareFinanceSettings,
     IDaycareTask,
 } from "../types/daycareAdmin";
+import type { FinanceEntry } from "../types/financeEntry";
 
 const router = Router();
 
@@ -278,6 +280,103 @@ const getFinanceUpdatePayload = (body: Partial<IDaycareFinanceSettings>) => ({
     insuranceAndPermits: body.insuranceAndPermits,
     extraExpenses: body.extraExpenses,
 });
+
+const getFinanceEntryPayload = (body: Record<string, unknown>): FinanceEntry => ({
+    type: body.type === "income" ? "income" : "expense",
+    source:
+        typeof body.source === "string" &&
+        ["cash", "bit", "credit", "bank"].includes(body.source)
+            ? (body.source as "cash" | "bit" | "credit" | "bank")
+            : "cash",
+    category: String(body.category || "כללי"),
+    title: String(body.title || ""),
+    amount: Number(body.amount),
+    occurredAt: new Date(),
+    donorName: String(body.donorName || ""),
+    notes: String(body.notes || ""),
+});
+
+const getMonthRange = (month?: unknown) => {
+    if (typeof month !== "string" || !/^\d{4}-\d{2}$/.test(month)) {
+        return null;
+    }
+
+    const [year, monthNumber] = month.split("-").map(Number);
+    const start = new Date(year, monthNumber - 1, 1);
+    const end = new Date(year, monthNumber, 1);
+
+    return { start, end };
+};
+
+const getWebsitePaymentTitle = (payment: {
+    FirstName?: string;
+    LastName?: string;
+    PaymentType?: string;
+}) => {
+    const donorName = [payment.FirstName, payment.LastName]
+        .filter(Boolean)
+        .join(" ");
+    const paymentType =
+        payment.PaymentType === "HK" ? "הוראת קבע באתר" : "תרומה באתר";
+
+    return donorName ? `${paymentType} - ${donorName}` : paymentType;
+};
+
+const getFinanceSummary = (
+    entries: Array<{ type: "income" | "expense"; amount: number }>
+) => {
+    const income = entries
+        .filter((entry) => entry.type === "income")
+        .reduce((total, entry) => total + entry.amount, 0);
+    const expenses = entries
+        .filter((entry) => entry.type === "expense")
+        .reduce((total, entry) => total + entry.amount, 0);
+
+    return {
+        income,
+        expenses,
+        balance: income - expenses,
+    };
+};
+
+const getCategorySummary = (
+    entries: Array<{
+        type: "income" | "expense";
+        category?: string;
+        amount: number;
+    }>
+) => {
+    const summaryByCategory = new Map<
+        string,
+        { category: string; income: number; expenses: number; balance: number }
+    >();
+
+    entries.forEach((entry) => {
+        const category = entry.category || "כללי";
+        const current = summaryByCategory.get(category) || {
+            category,
+            income: 0,
+            expenses: 0,
+            balance: 0,
+        };
+
+        if (entry.type === "income") {
+            current.income += entry.amount;
+        } else {
+            current.expenses += entry.amount;
+        }
+
+        current.balance = current.income - current.expenses;
+        summaryByCategory.set(category, current);
+    });
+
+    return Array.from(summaryByCategory.values()).sort(
+        (categoryA, categoryB) =>
+            categoryB.income +
+            categoryB.expenses -
+            (categoryA.income + categoryA.expenses)
+    );
+};
 
 router.get("/families", requireAdmin, async (_req, res) => {
     try {
@@ -768,6 +867,99 @@ router.get("/payments", requireAdmin, async (_req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to get payments",
+        });
+    }
+});
+
+router.get("/finance", requireAdmin, async (req, res) => {
+    try {
+        const monthRange = getMonthRange(req.query.month);
+        const dateFilter = monthRange
+            ? {
+                  createdAt: {
+                      $gte: monthRange.start,
+                      $lt: monthRange.end,
+                  },
+              }
+            : {};
+        const occurredAtFilter = monthRange
+            ? {
+                  occurredAt: {
+                      $gte: monthRange.start,
+                      $lt: monthRange.end,
+                  },
+              }
+            : {};
+
+        const [payments, manualEntries] = await Promise.all([
+            getAllPayments(dateFilter),
+            FinanceEntryModel.find(occurredAtFilter).sort({
+                occurredAt: -1,
+                createdAt: -1,
+            }),
+        ]);
+
+        const websiteEntries = payments.map((payment) => {
+            const paymentWithDates = payment as typeof payment & {
+                createdAt?: Date;
+                updatedAt?: Date;
+            };
+
+            return {
+                _id: `payment-${payment._id}`,
+                type: "income" as const,
+                source: "website",
+                category: "תרומות מהאתר",
+                title: getWebsitePaymentTitle(payment),
+                amount: payment.NormalizedTotal,
+                occurredAt: paymentWithDates.createdAt || new Date(),
+                donorName: [payment.FirstName, payment.LastName]
+                    .filter(Boolean)
+                    .join(" "),
+                phone: payment.Phone,
+                email: payment.Mail,
+                notes: payment.lizchut,
+                linkedPaymentId: payment._id,
+                createdAt: paymentWithDates.createdAt,
+                updatedAt: paymentWithDates.updatedAt,
+            };
+        });
+
+        const allEntries = [...websiteEntries, ...manualEntries].sort(
+            (entryA, entryB) =>
+                new Date(entryB.occurredAt).getTime() -
+                new Date(entryA.occurredAt).getTime()
+        );
+
+        return res.json({
+            success: true,
+            data: {
+                summary: getFinanceSummary(allEntries),
+                categorySummary: getCategorySummary(allEntries),
+                entries: allEntries,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get finance overview",
+        });
+    }
+});
+
+router.post("/finance-entries", requireAdmin, async (req, res) => {
+    try {
+        const payload = getFinanceEntryPayload(req.body);
+        const entry = await FinanceEntryModel.create(payload);
+
+        return res.status(201).json({
+            success: true,
+            data: entry,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Failed to create finance entry",
         });
     }
 });

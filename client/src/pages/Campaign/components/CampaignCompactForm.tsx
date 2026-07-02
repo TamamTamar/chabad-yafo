@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 
 type Props = {
   externalAmount?: number;
+  showCalculatorLink?: boolean;
   onSubmit: (amount: number, donor: DonorForm) => void;
 };
 
@@ -12,23 +13,22 @@ interface FormInputs extends DonorForm {
   amount: string;
 }
 
-const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
+const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLink = true, onSubmit }) => {
   const {
     register,
     handleSubmit,
     setValue,
-    trigger, // הוספנו trigger כדי לעדכן את isValid ידנית
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<FormInputs>({
-    mode: "onChange", // שינוי ל-onChange גורם לכפתור להשתחרר בזמן אמת
+    mode: "onSubmit",
+    reValidateMode: "onChange",
   });
 
   useEffect(() => {
     if (externalAmount !== undefined && externalAmount > 0) {
       setValue("amount", externalAmount.toString(), { shouldValidate: true });
-      trigger(); // מוודא שהטופס בודק את עצמו מחדש כשהסכום מגיע מהמחשבון
     }
-  }, [externalAmount, setValue, trigger]);
+  }, [externalAmount, setValue]);
 
   const onFormSubmit = (data: FormInputs) => {
     const { amount, ...donorData } = data;
@@ -40,6 +40,10 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
+  const keepDigitsOnly = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = event.target.value.replace(/\D/g, "");
+  };
+
   return (
     <form id="donation-form-section"
      className={styles.compactForm} onSubmit={handleSubmit(onFormSubmit)} noValidate>
@@ -47,21 +51,26 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
         <label className={styles.compactLabel}>סכום לתרומה</label>
         <div className={styles.amountInputWrapper}>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             className={`${styles.compactAmountInput} ${errors.amount ? styles.inputError : ""}`}
             placeholder="0"
             {...register("amount", {
-              required: "חובה",
+              required: "חובה להזין סכום",
               min: { value: 1, message: "מינימום תרומה: ₪1" },
+              pattern: { value: /^[1-9]\d*$/, message: "יש להזין ספרות בלבד" },
+              onChange: keepDigitsOnly,
             })}
           />
         </div>
         {/* שימוש באותו Class של שאר השדות */}
         {errors.amount && <div className={styles.error}>{errors.amount.message}</div>}
 
-        <button type="button" className={styles.calcLinkBtn} onClick={scrollToCalculator}>
-          לא יודעים כמה לתרום? נסו את המחשבון שלנו
-        </button>
+        {showCalculatorLink && (
+          <button type="button" className={styles.calcLinkBtn} onClick={scrollToCalculator}>
+            לא יודעים כמה לתרום? נסו את המחשבון שלנו
+          </button>
+        )}
       </div>
 
       <div className={styles.compactDetailsGrid}>
@@ -70,7 +79,7 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
           <input
             className={`${styles.input} ${errors.firstName ? styles.inputError : ""}`}
             {...register("firstName", {
-              required: "חובה",
+              required: "חובה להזין שם פרטי",
               validate: (v) => {
                 const value = String(v || "").trim();
                 return value.length >= 2 || "לפחות 2 אותיות";
@@ -86,7 +95,7 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
           <input
             className={`${styles.input} ${errors.lastName ? styles.inputError : ""}`}
             {...register("lastName", {
-              required: "חובה",
+              required: "חובה להזין שם משפחה",
               validate: (v) => {
                 const value = String(v || "").trim();
                 return value.length >= 2 || "לפחות 2 אותיות";
@@ -103,11 +112,12 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
             type="tel"
             className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
             {...register("phone", {
-              required: "חובה",
+              required: "חובה להזין טלפון",
               pattern: { 
                 value: /^0(?:[23489]|[57]\d)\d{7}$/, 
                 message: "טלפון לא תקין" 
-              }
+              },
+              onChange: keepDigitsOnly,
             })}
           />
           {errors.phone && <div className={styles.error}>{errors.phone.message}</div>}
@@ -119,7 +129,7 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
             type="email"
             className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
             {...register("email", {
-              required: "חובה",
+              required: "חובה להזין אימייל",
               pattern: {
                 value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                 message: "אימייל לא תקין",
@@ -130,7 +140,7 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, onSubmit }) => {
         </div>
       </div>
 
-      <button type="submit" className={styles.compactSubmitBtn} disabled={!isValid}>
+      <button type="submit" className={styles.compactSubmitBtn}>
         אני רוצה לתרום
       </button>
     </form>

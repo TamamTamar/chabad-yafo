@@ -207,8 +207,8 @@
 
     // קלאס שגיאה ייעודי
     &.inputError {
-      border-color: $ui-danger-bright;
-      background-color: rgba($ui-danger-bright, 0.02);
+      border-color: rgba($ui-danger-bright, 0.55);
+      background-color: rgba($ui-danger-bright, 0.025);
     }
   }
 
@@ -221,9 +221,9 @@
 }
 
 .errorText {
-  color: $ui-danger-bright;
+  color: color.adjust($ui-danger-bright, $lightness: -8%);
   font-size: $type-micro;
-  font-weight: 600;
+  font-weight: 700;
   margin-top: 2px;
 }
 

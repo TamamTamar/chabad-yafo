@@ -12,6 +12,7 @@ import { paymentRoutes } from "./routes/paymentRoutes";
 import { logger } from "./utils/logger";
 import { rebbeLetterRoutes } from "./routes/rebbeLetterRoutes";
 import { daycareRegistrationRoutes } from "./routes/daycareRegistrationRoutes";
+import { daycareEnrollmentRoutes } from "./routes/daycareEnrollmentRoutes";
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use("/api/auth", adminAuthRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/rebbe-letters", rebbeLetterRoutes);
 app.use("/api/daycare-registrations", daycareRegistrationRoutes);
+app.use("/api/daycare-enrollments", daycareEnrollmentRoutes);
 
 const port = Number(process.env.PORT) || 4000;
 

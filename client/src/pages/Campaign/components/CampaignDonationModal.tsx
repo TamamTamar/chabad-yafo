@@ -64,9 +64,10 @@ const CampaignDonationModal: React.FC<Props> = ({
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<DonorForm>({
-    mode: "onChange",
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: prefilledDonor || EMPTY_DONOR,
   });
 
@@ -221,7 +222,6 @@ const CampaignDonationModal: React.FC<Props> = ({
         {!ok && (
           <CampaignModalFooter
             isPaying={isPaying}
-            isValid={isValid}
             onBack={() => setStep(1)}
             onCancel={onClose}
             onNext={handleSubmit(goNext)}

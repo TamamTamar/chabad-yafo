@@ -3,7 +3,6 @@ import type { CampaignDonationStep } from "./types";
 
 type CampaignModalFooterProps = {
   isPaying: boolean;
-  isValid: boolean;
   onBack: () => void;
   onCancel: () => void;
   onNext: () => void;
@@ -13,7 +12,6 @@ type CampaignModalFooterProps = {
 
 const CampaignModalFooter = ({
   isPaying,
-  isValid,
   onBack,
   onCancel,
   onNext,
@@ -34,7 +32,7 @@ const CampaignModalFooter = ({
       <button
         className={styles.btnPrimary}
         onClick={step === 1 ? onNext : onPay}
-        disabled={isPaying || (step === 1 && !isValid)}
+        disabled={isPaying}
         type="button"
       >
         {step === 1 ? "המשך לתשלום" : isPaying ? "מעבד..." : "בצע תשלום"}

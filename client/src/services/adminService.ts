@@ -1,5 +1,8 @@
 import http from "./http";
 import type {
+    CreateFinanceEntryPayload,
+    FinanceEntryAdmin,
+    FinanceOverview,
     PaymentAdmin,
     RebbeLetterAdmin,
     RebbeLetterStatus,
@@ -37,6 +40,28 @@ export const getAllRebbeLetters = async () => {
 export const getAllPayments = async () => {
     const response = await http.get<ApiResponse<PaymentAdmin[]>>(
         "/admin/payments"
+    );
+
+    return response.data.data;
+};
+
+export const getFinanceOverview = async (month?: string) => {
+    const response = await http.get<ApiResponse<FinanceOverview>>(
+        "/admin/finance",
+        {
+            params: month ? { month } : undefined,
+        }
+    );
+
+    return response.data.data;
+};
+
+export const createFinanceEntry = async (
+    payload: CreateFinanceEntryPayload
+) => {
+    const response = await http.post<ApiResponse<FinanceEntryAdmin>>(
+        "/admin/finance-entries",
+        payload
     );
 
     return response.data.data;

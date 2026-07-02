@@ -1,5 +1,95 @@
 @use "../../../../styles/variables" as *;
 
+.financePanel {
+    display: grid;
+    gap: 24px;
+}
+
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    justify-content: flex-start;
+}
+
+.toolbar label {
+    display: grid;
+    gap: 8px;
+
+    min-width: 220px;
+
+    color: $brand-text;
+    font-weight: 800;
+}
+
+.toolbar input {
+    min-height: 44px;
+    padding: 10px 12px;
+
+    border: 1px solid $ui-border-strong;
+    border-radius: 8px;
+
+    background: $brand-bg;
+    color: $brand-text;
+
+    font: inherit;
+}
+
+.filterButton {
+    min-height: 44px;
+    padding: 0 16px;
+
+    border: 1px solid $ui-border-soft;
+    border-radius: 8px;
+
+    background: $brand-bg;
+    color: $brand-primary;
+
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.summaryItem,
+.summaryItemStrong {
+    display: grid;
+    gap: 8px;
+
+    padding: 20px;
+
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-md;
+
+    background: $brand-bg;
+    box-shadow: 0 12px 30px $ui-shadow-card;
+}
+
+.summaryItem span,
+.summaryItemStrong span {
+    color: $ui-text-muted;
+    font-weight: 700;
+}
+
+.summaryItem strong,
+.summaryItemStrong strong {
+    direction: ltr;
+
+    color: $brand-text;
+    font-size: 1.55rem;
+    text-align: right;
+}
+
+.summaryItemStrong {
+    background: rgba($brand-primary, 0.06);
+}
+
+.form,
 .card {
     overflow: hidden;
 
@@ -9,6 +99,139 @@
     background: $brand-bg;
 
     box-shadow: 0 16px 40px $ui-shadow-card;
+}
+
+.form {
+    display: grid;
+    gap: 18px;
+    padding: 24px;
+}
+
+.formHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.formHeader h2 {
+    margin: 0 0 6px;
+
+    color: $brand-primary;
+    font-size: 1.35rem;
+}
+
+.formHeader p {
+    margin: 0;
+
+    color: $ui-text-muted;
+}
+
+.segmented {
+    display: inline-grid;
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
+    justify-self: start;
+
+    padding: 4px;
+
+    border: 1px solid $ui-border-soft;
+    border-radius: 999px;
+
+    background: rgba($brand-primary, 0.05);
+}
+
+.segment,
+.segmentActive {
+    min-height: 40px;
+    padding: 0 18px;
+
+    border: 0;
+    border-radius: 999px;
+
+    background: transparent;
+    color: $brand-text;
+
+    font: inherit;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.segmentActive {
+    background: $brand-primary;
+    color: $brand-bg;
+    box-shadow: 0 8px 20px rgba($brand-primary, 0.22);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.formGrid label {
+    display: grid;
+    gap: 8px;
+
+    color: $brand-text;
+    font-weight: 800;
+}
+
+.formGrid input,
+.formGrid select,
+.formGrid textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+
+    border: 1px solid $ui-border-strong;
+    border-radius: 8px;
+
+    background: $brand-bg;
+    color: $brand-text;
+
+    font: inherit;
+}
+
+.formGrid textarea {
+    resize: vertical;
+}
+
+.fullField {
+    grid-column: 1 / -1;
+}
+
+.saveButton {
+    justify-self: start;
+    min-height: 46px;
+    padding: 0 22px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: $brand-primary;
+    color: $brand-bg;
+
+    font: inherit;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+.saveButton:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.error {
+    padding: 12px 14px;
+
+    border: 1px solid rgba(176, 45, 45, 0.24);
+    border-radius: 8px;
+
+    background: rgba(176, 45, 45, 0.08);
+    color: #9a2d2d;
+    font-weight: 800;
 }
 
 .tableWrapper {
@@ -23,8 +246,17 @@
     border-collapse: collapse;
 }
 
+.categoryTable {
+    width: 100%;
+    min-width: 720px;
+
+    border-collapse: collapse;
+}
+
 .table th,
-.table td {
+.table td,
+.categoryTable th,
+.categoryTable td {
     padding: 16px 18px;
 
     text-align: right;
@@ -33,6 +265,7 @@
     border-bottom: 1px solid $ui-border-soft;
 }
 
+.categoryTable th,
 .table th {
     white-space: nowrap;
 
@@ -42,7 +275,8 @@
     font-weight: 800;
 }
 
-.table td {
+.table td,
+.categoryTable td {
     color: $brand-text;
     line-height: 1.6;
 }
@@ -51,15 +285,21 @@
     background: rgba($brand-primary, 0.025);
 }
 
-.phone,
+.incomeAmount,
+.expenseAmount,
 .amount {
     direction: ltr;
     text-align: right;
     white-space: nowrap;
+    font-weight: 900;
 }
 
-.amount {
-    font-weight: 800;
+.incomeAmount {
+    color: #167047;
+}
+
+.expenseAmount {
+    color: #9a2d2d;
 }
 
 .empty,
@@ -71,7 +311,20 @@
     color: $ui-text-muted;
 }
 
+@media (max-width: 980px) {
+    .summaryGrid,
+    .formGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
+    .summaryGrid,
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .form,
     .card {
         border-radius: $radius-md;
     }
