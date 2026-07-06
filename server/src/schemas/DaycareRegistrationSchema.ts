@@ -84,6 +84,29 @@ export const daycareRegistrationSchema = new Schema(
             ],
             default: "מתעניין",
         },
+        interestLevel: {
+            type: String,
+            enum: ["גבוה", "בינוני", "נמוך"],
+        },
+        priceFits: {
+            type: String,
+            enum: ["כן", "לא"],
+        },
+        desiredHours: {
+            type: String,
+            trim: true,
+            maxlength: 160,
+        },
+        parentPriority: {
+            type: String,
+            trim: true,
+            maxlength: 240,
+        },
+        callNotes: {
+            type: String,
+            trim: true,
+            maxlength: 1000,
+        },
     },
     {
         timestamps: true,

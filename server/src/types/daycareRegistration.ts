@@ -7,6 +7,8 @@ export type DaycareInterestStatus =
     | "רוצה להירשם"
     | "נרשם"
     | "לא רלוונטי";
+export type DaycareInterestLevel = "גבוה" | "בינוני" | "נמוך";
+export type DaycarePriceFit = "כן" | "לא";
 
 export interface IDaycareRegistration {
     parentName: string;
@@ -21,4 +23,9 @@ export interface IDaycareRegistration {
     fridayCare?: FridayCare;
     costApproval?: boolean;
     status?: DaycareInterestStatus;
+    interestLevel?: DaycareInterestLevel;
+    priceFits?: DaycarePriceFit;
+    desiredHours?: string;
+    parentPriority?: string;
+    callNotes?: string;
 }

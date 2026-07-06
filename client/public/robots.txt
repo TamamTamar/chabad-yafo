@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /daycare-parent-info
 
 Sitemap: https://chabadyafo.org/sitemap.xml

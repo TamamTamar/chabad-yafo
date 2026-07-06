@@ -619,6 +619,58 @@
     font-weight: 900;
 }
 
+.callSummaryGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.compactField {
+    display: grid;
+    gap: 6px;
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.compactInput,
+.compactTextarea {
+    width: 100%;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-sm;
+    background: $brand-bg;
+    color: $brand-text;
+    font-family: inherit;
+    font-size: $type-body-sm;
+    font-weight: 700;
+}
+
+.compactInput {
+    min-height: 38px;
+    padding: 8px 10px;
+}
+
+.compactTextarea {
+    min-height: 76px;
+    padding: 10px;
+    resize: vertical;
+}
+
+.inlineSaveRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.inlineSuccess {
+    color: $ui-success;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
 .financeGrid {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
@@ -731,6 +783,10 @@
 
     .rowActions {
         justify-content: flex-start;
+    }
+
+    .callSummaryGrid {
+        grid-template-columns: 1fr;
     }
 
     .linkButton,

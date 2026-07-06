@@ -34,13 +34,13 @@ const DaycareRegistrationHero = () => (
                 <p className={styles.trustLine}>
                     מעון קטן וחם לילדי יפו, עם דגש על{" "}
                     <strong>ביטחון</strong>, <strong>צוות אוהב</strong>,{" "}
-                    <strong>יחס אישי</strong> וסביבה ערכית.
+                    <strong>קצב רגוע</strong> וסביבה ערכית.
                 </p>
 
                 <div className={styles.heroHighlights} aria-label="עיקרי המעון">
                     <span className={styles.heroHighlight}>חצר וגינה</span>
                     <span className={styles.heroHighlight}>קבוצה קטנה</span>
-                    <span className={styles.heroHighlight}>יחס אישי</span>
+                    <span className={styles.heroHighlight}>קשר קרוב עם ההורים</span>
                     <span className={styles.heroHighlight}>ערכים ומסורת</span>
                 </div>
 
@@ -75,7 +75,7 @@ const DaycareRegistrationHero = () => (
                 </div>
 
                 <p className={styles.scarcityText}>
-                    מספר המקומות מוגבל כדי לשמור על יחס אישי וקבוצה קטנה.
+                    מספר המקומות מוגבל כדי לשמור על קבוצה קטנה ואווירה רגועה.
                 </p>
             </div>
         </div>

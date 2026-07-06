@@ -1,7 +1,9 @@
 import type {
     DaycareDocumentStatus,
+    DaycareInterestLevel,
     DaycareLeadStatus,
     DaycarePriority,
+    DaycarePriceFit,
     DaycareTaskCategory,
     DaycareTaskStage,
     DaycareTaskStatus,
@@ -47,6 +49,14 @@ export const daycareLeadStatuses: DaycareLeadStatus[] = [
     "לא רלוונטי",
 ];
 
+export const daycareInterestLevels: DaycareInterestLevel[] = [
+    "גבוה",
+    "בינוני",
+    "נמוך",
+];
+
+export const daycarePriceFits: DaycarePriceFit[] = ["כן", "לא"];
+
 export const daycareDocumentStatuses: DaycareDocumentStatus[] = [
     "חסר",
     "בטיפול",
@@ -72,8 +82,13 @@ export const emptyLead = {
     phone: "",
     area: "",
     status: "מתעניין",
+    interestLevel: undefined,
+    priceFits: undefined,
+    desiredHours: "",
+    parentPriority: "",
     inquiryDate: "",
     notes: "",
+    callNotes: "",
     followUpDate: "",
 } as const;
 

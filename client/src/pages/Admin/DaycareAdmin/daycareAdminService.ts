@@ -74,17 +74,22 @@ export const getDaycareRegistrations = async () => {
     return response.data.data;
 };
 
-export const updateDaycarePublicRegistrationStatus = async (
+export const updateDaycarePublicRegistration = async (
     id: string,
-    status: DaycareInterestStatus
+    registration: Partial<DaycareRegistrationAdmin>
 ) => {
     const response = await http.patch<ApiResponse<DaycareRegistrationAdmin>>(
         `/admin/daycare/public-registrations/${id}`,
-        { status }
+        cleanPayload(registration)
     );
 
     return response.data.data;
 };
+
+export const updateDaycarePublicRegistrationStatus = async (
+    id: string,
+    status: DaycareInterestStatus
+) => updateDaycarePublicRegistration(id, { status });
 
 export const createDaycareLead = async (lead: EditableDaycareLead) => {
     const response = await http.post<ApiResponse<DaycareLead>>(

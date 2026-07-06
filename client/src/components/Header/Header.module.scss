@@ -48,11 +48,14 @@
 
 /* Brand */
 .brand {
+    display: inline-flex;
+    align-items: center;
     text-decoration: none;
     color: $header-nav-text-hover;
     font-weight: 900;
     letter-spacing: 0.2px;
     font-size: $type-nav;
+    min-height: 44px;
     padding: 6px 0;
     white-space: nowrap;
 }

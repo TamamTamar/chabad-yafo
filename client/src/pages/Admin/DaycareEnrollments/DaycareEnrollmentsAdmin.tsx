@@ -286,7 +286,7 @@ const DaycareEnrollmentsAdmin = () => {
                                 <p>כתובת: {selectedEnrollment.child.address}</p>
                                 <p>
                                     קופת חולים:{" "}
-                                    {selectedEnrollment.child.healthFund}
+                                    {selectedEnrollment.medical.healthFund}
                                 </p>
                                 <p>
                                     שפה בבית:{" "}
@@ -356,6 +356,19 @@ const DaycareEnrollmentsAdmin = () => {
                             </Detail>
 
                             <Detail title="אישורים וחתימה">
+                                <p>
+                                    אישור מקדמת רישום:{" "}
+                                    {selectedEnrollment.consents
+                                        .registrationDeposit
+                                        ? "כן"
+                                        : "לא"}
+                                </p>
+                                <p>
+                                    אישור עלות חודשית:{" "}
+                                    {selectedEnrollment.consents.monthlyTuition
+                                        ? "כן"
+                                        : "לא"}
+                                </p>
                                 <p>
                                     צילום פנימי:{" "}
                                     {selectedEnrollment.consents.internalPhotos

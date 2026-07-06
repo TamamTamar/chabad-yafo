@@ -38,6 +38,10 @@ const requiredText = { required: "שדה חובה" };
 const optionalCleanText = {
     setValueAs: (value: string) => value?.trim() || undefined,
 };
+const monthlyTuitionText = "5,000 ₪";
+const monthlyEnrichmentFeeText = "500 ₪";
+const monthlyTotalText = "5,500 ₪";
+const registrationDepositText = "500 ₪";
 
 const stepFields: Array<Array<keyof DaycareEnrollmentFormValues | string>> = [
     [
@@ -47,7 +51,6 @@ const stepFields: Array<Array<keyof DaycareEnrollmentFormValues | string>> = [
         "child.birthDate",
         "child.gender",
         "child.address",
-        "child.healthFund",
         "child.homeLanguage",
     ],
     [
@@ -67,6 +70,8 @@ const stepFields: Array<Array<keyof DaycareEnrollmentFormValues | string>> = [
         "consents.emergencyContact",
         "consents.medicalUpdateCommitment",
         "consents.daycareRules",
+        "consents.registrationDeposit",
+        "consents.monthlyTuition",
     ],
     ["signature.signerFullName", "signature.digitalSignatureConsent"],
 ];
@@ -79,7 +84,6 @@ const defaultValues: DaycareEnrollmentFormValues = {
         birthDate: "",
         gender: "",
         address: "",
-        healthFund: "",
         homeLanguage: "",
     },
     parents: {
@@ -111,6 +115,8 @@ const defaultValues: DaycareEnrollmentFormValues = {
         emergencyContact: false,
         medicalUpdateCommitment: false,
         daycareRules: false,
+        registrationDeposit: false,
+        monthlyTuition: false,
         internalPhotos: false,
         whatsappUpdates: false,
     },
@@ -279,15 +285,6 @@ const DaycareEnrollment = () => {
                                         error={errors.child?.address}
                                         label="כתובת מגורים"
                                         name="child.address"
-                                        register={register}
-                                        required
-                                        validation={requiredText}
-                                    />
-                                    <EnrollmentField
-                                        error={errors.child?.healthFund}
-                                        label="קופת חולים"
-                                        name="child.healthFund"
-                                        options={healthFundOptions}
                                         register={register}
                                         required
                                         validation={requiredText}
@@ -566,6 +563,20 @@ const DaycareEnrollment = () => {
                                         error={errors.consents?.daycareRules}
                                         label="אני מאשר/ת שקראתי את נהלי המעון ואפעל לפיהם."
                                         name="consents.daycareRules"
+                                        register={register}
+                                        required
+                                    />
+                                    <ConsentCheckbox
+                                        error={errors.consents?.registrationDeposit}
+                                        label={`אני מאשר/ת כי ידוע לי שלצורך שמירת המקום נדרשת מקדמת רישום בסך ${registrationDepositText}, אשר תקוזז מהתשלום עבור החודש הראשון.`}
+                                        name="consents.registrationDeposit"
+                                        register={register}
+                                        required
+                                    />
+                                    <ConsentCheckbox
+                                        error={errors.consents?.monthlyTuition}
+                                        label={`אני מאשר/ת כי ידוע לי שהעלות החודשית היא ${monthlyTuitionText} שכר לימוד + ${monthlyEnrichmentFeeText} דמי שכלול, סה״כ ${monthlyTotalText} לחודש.`}
+                                        name="consents.monthlyTuition"
                                         register={register}
                                         required
                                     />

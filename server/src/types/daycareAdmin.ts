@@ -36,6 +36,8 @@ export type DaycareLeadStatus =
     | "רוצה להירשם"
     | "נרשם"
     | "לא רלוונטי";
+export type DaycareInterestLevel = "גבוה" | "בינוני" | "נמוך";
+export type DaycarePriceFit = "כן" | "לא";
 
 export interface IDaycareLead {
     childName: string;
@@ -44,8 +46,13 @@ export interface IDaycareLead {
     phone: string;
     area?: string;
     status: DaycareLeadStatus;
+    interestLevel?: DaycareInterestLevel;
+    priceFits?: DaycarePriceFit;
+    desiredHours?: string;
+    parentPriority?: string;
     inquiryDate?: Date;
     notes?: string;
+    callNotes?: string;
     followUpDate?: Date;
 }
 

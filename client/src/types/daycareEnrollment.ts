@@ -21,7 +21,6 @@ export type DaycareEnrollmentFormValues = {
         birthDate: string;
         gender: ChildGender | "";
         address: string;
-        healthFund: string;
         homeLanguage: string;
     };
     parents: {
@@ -50,6 +49,8 @@ export type DaycareEnrollmentFormValues = {
         emergencyContact: boolean;
         medicalUpdateCommitment: boolean;
         daycareRules: boolean;
+        registrationDeposit: boolean;
+        monthlyTuition: boolean;
         internalPhotos?: boolean;
         whatsappUpdates?: boolean;
     };

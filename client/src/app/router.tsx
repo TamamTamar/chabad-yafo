@@ -6,6 +6,7 @@ import AdminLogin from "../pages/AdminLogin/AdminLogin";
 import DaycareAdmin from "../pages/Admin/DaycareAdmin/DaycareAdmin";
 import DaycareEnrollmentsAdmin from "../pages/Admin/DaycareEnrollments/DaycareEnrollmentsAdmin";
 import DaycareEnrollment from "../pages/DaycareEnrollment/DaycareEnrollment";
+import DaycareParentInfo from "../pages/DaycareParentInfo/DaycareParentInfo";
 import DaycareRegistration from "../pages/DaycareRegistration/DaycareRegistration";
 import DonatePage from "../pages/DonatePage/DonatePage";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
@@ -35,6 +36,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: "daycare-registration", element: <DaycareRegistration />
+            },
+            {
+                path: "daycare-parent-info", element: <DaycareParentInfo />
             },
             {
                 path: "daycare-enrollment", element: <DaycareEnrollment />

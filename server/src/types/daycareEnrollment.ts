@@ -21,7 +21,6 @@ export interface IDaycareEnrollment {
         birthDate: Date;
         gender: ChildGender;
         address: string;
-        healthFund: string;
         homeLanguage: string;
     };
     parents: {
@@ -50,6 +49,8 @@ export interface IDaycareEnrollment {
         emergencyContact: boolean;
         medicalUpdateCommitment: boolean;
         daycareRules: boolean;
+        registrationDeposit: boolean;
+        monthlyTuition: boolean;
         internalPhotos?: boolean;
         whatsappUpdates?: boolean;
     };

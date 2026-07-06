@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { daycareLeadStatuses } from "../daycareAdminConfig";
+import {
+    daycareInterestLevels,
+    daycareLeadStatuses,
+    daycarePriceFits,
+} from "../daycareAdminConfig";
 import {
     getDaycareRegistrations,
+    updateDaycarePublicRegistration,
     updateDaycarePublicRegistrationStatus,
 } from "../daycareAdminService";
 import styles from "../DaycareAdmin.module.scss";
@@ -15,6 +20,15 @@ import type {
 type DaycareRegistrationsProps = {
     onChanged: () => void;
 };
+
+type CallSummaryDraft = Pick<
+    DaycareRegistrationAdmin,
+    | "interestLevel"
+    | "priceFits"
+    | "desiredHours"
+    | "parentPriority"
+    | "callNotes"
+>;
 
 const formatDate = (date?: string) => {
     if (!date) {
@@ -32,6 +46,16 @@ const formatRequiredHours = (registration: DaycareRegistrationAdmin) => {
     return `${registration.requiredHours} - ${registration.requiredHoursOther}`;
 };
 
+const getCallSummaryDraft = (
+    registration: DaycareRegistrationAdmin
+): CallSummaryDraft => ({
+    interestLevel: registration.interestLevel,
+    priceFits: registration.priceFits,
+    desiredHours: registration.desiredHours || "",
+    parentPriority: registration.parentPriority || "",
+    callNotes: registration.callNotes || "",
+});
+
 const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     const [data, setData] = useState<DaycareRegistrationsResponse>({
         leads: [],
@@ -39,10 +63,23 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     });
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [savingSummaryId, setSavingSummaryId] = useState<string | null>(null);
+    const [summaryDrafts, setSummaryDrafts] = useState<
+        Record<string, CallSummaryDraft>
+    >({});
+    const [savedSummaryId, setSavedSummaryId] = useState<string | null>(null);
 
     const loadRegistrations = async () => {
         const registrations = await getDaycareRegistrations();
         setData(registrations);
+        setSummaryDrafts(
+            Object.fromEntries(
+                registrations.publicRegistrations.map((registration) => [
+                    registration._id,
+                    getCallSummaryDraft(registration),
+                ])
+            )
+        );
         setLoading(false);
     };
 
@@ -80,6 +117,53 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
             console.error("Failed to update daycare registration status:", error);
         } finally {
             setUpdatingId(null);
+        }
+    };
+
+    const updateSummaryDraft = (
+        registrationId: string,
+        field: keyof CallSummaryDraft,
+        value: string
+    ) => {
+        setSavedSummaryId(null);
+        setSummaryDrafts((currentDrafts) => ({
+            ...currentDrafts,
+            [registrationId]: {
+                ...currentDrafts[registrationId],
+                [field]: value || undefined,
+            },
+        }));
+    };
+
+    const handleSummarySave = async (registrationId: string) => {
+        setSavingSummaryId(registrationId);
+        setSavedSummaryId(null);
+
+        try {
+            const updatedRegistration = await updateDaycarePublicRegistration(
+                registrationId,
+                summaryDrafts[registrationId]
+            );
+
+            setData((currentData) => ({
+                ...currentData,
+                publicRegistrations: currentData.publicRegistrations.map(
+                    (registration) =>
+                        registration._id === registrationId
+                            ? updatedRegistration
+                            : registration
+                ),
+            }));
+            setSummaryDrafts((currentDrafts) => ({
+                ...currentDrafts,
+                [registrationId]: getCallSummaryDraft(updatedRegistration),
+            }));
+            setSavedSummaryId(registrationId);
+            onChanged();
+        } catch (error) {
+            console.error("Failed to update daycare call summary:", error);
+        } finally {
+            setSavingSummaryId(null);
         }
     };
 
@@ -134,21 +218,36 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                     className={styles.tableRow}
                                     key={registration._id}
                                 >
-                                    <td className={styles.tableCell}>
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="שם הורה"
+                                    >
                                         {registration.parentName}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="טלפון"
+                                    >
                                         {registration.phone}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="גיל הילד/ה"
+                                    >
                                         {registration.childAge ||
                                             registration.childName ||
                                             formatDate(registration.birthDate)}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="שעות מועדפות"
+                                    >
                                         {formatRequiredHours(registration)}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="סטטוס"
+                                    >
                                         <select
                                             className={styles.statusSelect}
                                             value={registration.status || "מתעניין"}
@@ -168,10 +267,171 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                             ))}
                                         </select>
                                     </td>
-                                    <td className={styles.tableCell}>
-                                        {registration.notes || "-"}
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="סיכום שיחה"
+                                    >
+                                        <div className={styles.callSummaryGrid}>
+                                            <label className={styles.compactField}>
+                                                <span>רמת עניין</span>
+                                                <select
+                                                    className={styles.compactInput}
+                                                    value={
+                                                        summaryDrafts[
+                                                            registration._id
+                                                        ]?.interestLevel || ""
+                                                    }
+                                                    onChange={(event) =>
+                                                        updateSummaryDraft(
+                                                            registration._id,
+                                                            "interestLevel",
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                >
+                                                    <option value="">לא סומן</option>
+                                                    {daycareInterestLevels.map(
+                                                        (level) => (
+                                                            <option
+                                                                key={level}
+                                                                value={level}
+                                                            >
+                                                                {level}
+                                                            </option>
+                                                        )
+                                                    )}
+                                                </select>
+                                            </label>
+
+                                            <label className={styles.compactField}>
+                                                <span>המחיר מתאים?</span>
+                                                <select
+                                                    className={styles.compactInput}
+                                                    value={
+                                                        summaryDrafts[
+                                                            registration._id
+                                                        ]?.priceFits || ""
+                                                    }
+                                                    onChange={(event) =>
+                                                        updateSummaryDraft(
+                                                            registration._id,
+                                                            "priceFits",
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                >
+                                                    <option value="">לא סומן</option>
+                                                    {daycarePriceFits.map((fit) => (
+                                                        <option
+                                                            key={fit}
+                                                            value={fit}
+                                                        >
+                                                            {fit}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </label>
+
+                                            <label className={styles.compactField}>
+                                                <span>שעות רצויות</span>
+                                                <input
+                                                    className={styles.compactInput}
+                                                    value={
+                                                        summaryDrafts[
+                                                            registration._id
+                                                        ]?.desiredHours || ""
+                                                    }
+                                                    onChange={(event) =>
+                                                        updateSummaryDraft(
+                                                            registration._id,
+                                                            "desiredHours",
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                    placeholder="לדוגמה: עד 16:00"
+                                                />
+                                            </label>
+
+                                            <label className={styles.compactField}>
+                                                <span>מה הכי חשוב להם</span>
+                                                <input
+                                                    className={styles.compactInput}
+                                                    value={
+                                                        summaryDrafts[
+                                                            registration._id
+                                                        ]?.parentPriority || ""
+                                                    }
+                                                    onChange={(event) =>
+                                                        updateSummaryDraft(
+                                                            registration._id,
+                                                            "parentPriority",
+                                                            event.target.value
+                                                        )
+                                                    }
+                                                    placeholder="יחס אישי, מחיר, שעות..."
+                                                />
+                                            </label>
+                                        </div>
+
+                                        <label className={styles.compactField}>
+                                            <span>הערות אחרי שיחה</span>
+                                            <textarea
+                                                className={styles.compactTextarea}
+                                                value={
+                                                    summaryDrafts[
+                                                        registration._id
+                                                    ]?.callNotes || ""
+                                                }
+                                                onChange={(event) =>
+                                                    updateSummaryDraft(
+                                                        registration._id,
+                                                        "callNotes",
+                                                        event.target.value
+                                                    )
+                                                }
+                                                placeholder={
+                                                    registration.notes ||
+                                                    "מה אמרו בשיחה, מתי לחזור, התלבטויות..."
+                                                }
+                                            />
+                                        </label>
+
+                                        <div className={styles.inlineSaveRow}>
+                                            <button
+                                                className={styles.secondaryButton}
+                                                type="button"
+                                                disabled={
+                                                    savingSummaryId ===
+                                                    registration._id
+                                                }
+                                                onClick={() =>
+                                                    handleSummarySave(
+                                                        registration._id
+                                                    )
+                                                }
+                                            >
+                                                {savingSummaryId ===
+                                                registration._id
+                                                    ? "שומר..."
+                                                    : "שמירת סיכום שיחה"}
+                                            </button>
+
+                                            {savedSummaryId ===
+                                                registration._id && (
+                                                <span
+                                                    className={
+                                                        styles.inlineSuccess
+                                                    }
+                                                >
+                                                    נשמר
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td
+                                        className={styles.tableCell}
+                                        data-label="תאריך פנייה"
+                                    >
                                         {formatDate(registration.createdAt)}
                                     </td>
                                 </tr>

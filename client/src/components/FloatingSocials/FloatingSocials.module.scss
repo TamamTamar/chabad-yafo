@@ -64,17 +64,17 @@
 @media (max-width: 768px) {
     .wrapper {
         left: auto;
-        right: 16px;
+        right: 14px;
         top: auto;
-        bottom: calc(18px + env(safe-area-inset-bottom));
+        bottom: calc(14px + env(safe-area-inset-bottom));
         transform: none;
 
         gap: 7px;
     }
 
     .fab {
-        width: 30px;
-        height: 30px;
+        width: 44px;
+        height: 44px;
         border: 1px solid rgba($brand-secondary, 0.5);
     }
 

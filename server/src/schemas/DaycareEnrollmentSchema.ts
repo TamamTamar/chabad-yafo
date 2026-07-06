@@ -93,7 +93,6 @@ export const daycareEnrollmentSchema = new Schema(
                 enum: ["female", "male", "other"],
             },
             address: requiredString,
-            healthFund: requiredString,
             homeLanguage: requiredString,
         },
         parents: {
@@ -141,6 +140,16 @@ export const daycareEnrollmentSchema = new Schema(
                 validate: (value: boolean) => value === true,
             },
             daycareRules: {
+                type: Boolean,
+                required: true,
+                validate: (value: boolean) => value === true,
+            },
+            registrationDeposit: {
+                type: Boolean,
+                required: true,
+                validate: (value: boolean) => value === true,
+            },
+            monthlyTuition: {
                 type: Boolean,
                 required: true,
                 validate: (value: boolean) => value === true,
