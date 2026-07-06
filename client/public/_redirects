@@ -1,3 +1,2 @@
-https://chabadyafo.org/* https://www.chabadyafo.org/:splat 301!
 /api/* https://chabad-yafo-production.up.railway.app/api/:splat 200!
 /* /index.html 200

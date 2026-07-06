@@ -4,12 +4,6 @@
   publish = "dist"
 
 [[redirects]]
-  from = "https://chabadyafo.org/*"
-  to = "https://www.chabadyafo.org/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "/api/*"
   to = "https://chabad-yafo-production.up.railway.app/api/:splat"
   status = 200
@@ -19,3 +13,5 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+
