@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-    trackDaycareCtaClick,
     trackDaycarePageView,
 } from "../../services/googleAnalyticsService";
 import styles from "./DaycareRegistration.module.scss";
@@ -24,13 +23,6 @@ const DaycareRegistration = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleStickyClick = () => {
-        trackDaycareCtaClick({
-            location: "sticky_mobile",
-            cta_text: "השאירו פרטים",
-        });
-    };
-
     return (
         <main className={styles.page} dir="rtl">
             {showSuccess && (
@@ -40,14 +32,6 @@ const DaycareRegistration = () => {
             <DaycareRegistrationHero />
             <DaycarePrinciplesSection />
             <DaycareRegistrationForm onSuccess={handleSuccess} />
-
-            <a
-                className={styles.mobileStickyCta}
-                href="#daycare-form"
-                onClick={handleStickyClick}
-            >
-                השאירו פרטים
-            </a>
         </main>
     );
 };
