@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, type Transition, type Variants } from "framer-motion";
 import {
     Baby,
     BookHeart,
@@ -154,10 +154,12 @@ const faqs = [
     },
 ];
 
-const sectionVariants = {
+const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 28 },
     visible: { opacity: 1, y: 0 },
 };
+
+const sectionTransition: Transition = { duration: 0.55, ease: "easeOut" };
 
 const trackCta = (ctaText: string, location: string) => {
     trackDaycareCtaClick({
@@ -227,7 +229,7 @@ const DaycareParentInfo = () => {
         initial: reducedMotion ? undefined : "hidden",
         whileInView: reducedMotion ? undefined : "visible",
         viewport: { once: true, amount: 0.2 },
-        transition: { duration: 0.55, ease: "easeOut" },
+        transition: sectionTransition,
         variants: sectionVariants,
     };
 

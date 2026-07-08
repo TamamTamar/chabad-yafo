@@ -2,14 +2,15 @@ import type {
     FieldError,
     FieldValues,
     Path,
+    RegisterOptions,
     UseFormRegister,
 } from "react-hook-form";
 import styles from "../DaycareEnrollment.module.scss";
 
-type EnrollmentFieldProps<T extends FieldValues> = {
+type EnrollmentFieldProps<T extends FieldValues, TName extends Path<T>> = {
     error?: FieldError;
     label: string;
-    name: Path<T>;
+    name: TName;
     register: UseFormRegister<T>;
     required?: boolean;
     type?: string;
@@ -19,11 +20,11 @@ type EnrollmentFieldProps<T extends FieldValues> = {
     maxLength?: number;
     rows?: number;
     options?: Array<string | { value: string; label: string }>;
-    validation?: Parameters<UseFormRegister<T>>[1];
+    validation?: RegisterOptions<T, TName>;
     digitsOnly?: boolean;
 };
 
-const EnrollmentField = <T extends FieldValues>({
+const EnrollmentField = <T extends FieldValues, TName extends Path<T>>({
     error,
     label,
     name,
@@ -38,7 +39,7 @@ const EnrollmentField = <T extends FieldValues>({
     options,
     validation,
     digitsOnly,
-}: EnrollmentFieldProps<T>) => {
+}: EnrollmentFieldProps<T, TName>) => {
     const fieldId = String(name).replace(/\./g, "-");
     const registration = register(name, validation);
 

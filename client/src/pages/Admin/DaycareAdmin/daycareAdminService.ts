@@ -62,6 +62,19 @@ export const updateDaycareTask = async (
     return response.data.data;
 };
 
+export const updateDaycareTaskSubtask = async (
+    taskId: string,
+    subtaskIndex: number,
+    updates: Partial<NonNullable<DaycareTask["subtasks"]>[number]>
+) => {
+    const response = await http.patch<ApiResponse<DaycareTask>>(
+        `/admin/daycare/tasks/${taskId}/subtasks/${subtaskIndex}`,
+        cleanPayload(updates)
+    );
+
+    return response.data.data;
+};
+
 export const deleteDaycareTask = async (id: string) => {
     await http.delete(`/admin/daycare/tasks/${id}`);
 };
@@ -160,16 +173,23 @@ export const getDaycareFinance = async () => {
 };
 
 const getFinancePayload = (settings: DaycareFinanceSettings) => ({
-    pricePerChild: settings.pricePerChild,
-    currentChildren: settings.currentChildren,
-    targetChildren: settings.targetChildren,
-    rent: settings.rent,
-    directorSalary: settings.directorSalary,
-    staffSalaries: settings.staffSalaries,
-    food: settings.food,
-    supplies: settings.supplies,
-    insuranceAndPermits: settings.insuranceAndPermits,
-    extraExpenses: settings.extraExpenses,
+    pricePerChild: settings.pricePerChild ?? 0,
+    currentChildren: settings.currentChildren ?? 0,
+    targetChildren: settings.targetChildren ?? 0,
+    rent: settings.rent ?? 0,
+    directorSalary: settings.directorSalary ?? 0,
+    staffSalaries: settings.staffSalaries ?? 0,
+    food: settings.food ?? 0,
+    supplies: settings.supplies ?? 0,
+    insuranceAndPermits: settings.insuranceAndPermits ?? 0,
+    extraExpenses: settings.extraExpenses ?? 0,
+    renovationKitchen: settings.renovationKitchen ?? 0,
+    renovationYard: settings.renovationYard ?? 0,
+    renovationConstruction: settings.renovationConstruction ?? 0,
+    renovationSafety: settings.renovationSafety ?? 0,
+    renovationEquipment: settings.renovationEquipment ?? 0,
+    renovationLabor: settings.renovationLabor ?? 0,
+    renovationOther: settings.renovationOther ?? 0,
 });
 
 export const updateDaycareFinance = async (

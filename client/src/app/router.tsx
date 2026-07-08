@@ -1,24 +1,30 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRouteAdmin";
-import AboutPage from "../pages/AboutPage/AboutPage";
-import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
-import AdminLogin from "../pages/AdminLogin/AdminLogin";
-import DaycareAdmin from "../pages/Admin/DaycareAdmin/DaycareAdmin";
-import DaycareEnrollmentsAdmin from "../pages/Admin/DaycareEnrollments/DaycareEnrollmentsAdmin";
-import DaycareEnrollment from "../pages/DaycareEnrollment/DaycareEnrollment";
-import DaycareParentInfo from "../pages/DaycareParentInfo/DaycareParentInfo";
-import DaycareRegistration from "../pages/DaycareRegistration/DaycareRegistration";
-import DonatePage from "../pages/DonatePage/DonatePage";
-import ErrorPage from "../pages/ErrorPage/ErrorPage";
-import Families from "../pages/Families/Families";
-import GalleryCategoryPage from "../pages/Gallery/GalleryCategoryPage";
-import GalleryPage from "../pages/Gallery/GalleryPage";
-import Home from "../pages/Home/Home";
-import MachatzitHashekel from "../pages/MachatzitHashekel/MachatzitHashekel";
-import PurimMatanotLaEvyonim from "../pages/PurimMatanotLaEvyonim/PurimMatanotLaEvyonim";
-import Taanit from "../pages/Taanit/Taanit";
-import WriteToRebbe from "../pages/WriteToRebbe/WriteToRebbe";
 import Root from "./Root";
+
+const AboutPage = lazy(() => import("../pages/AboutPage/AboutPage"));
+const AdminDashboard = lazy(() => import("../pages/AdminDashboard/AdminDashboard"));
+const AdminLogin = lazy(() => import("../pages/AdminLogin/AdminLogin"));
+const DaycareAdmin = lazy(() => import("../pages/Admin/DaycareAdmin/DaycareAdmin"));
+const DaycareEnrollmentsAdmin = lazy(
+    () => import("../pages/Admin/DaycareEnrollments/DaycareEnrollmentsAdmin")
+);
+const DaycareEnrollment = lazy(() => import("../pages/DaycareEnrollment/DaycareEnrollment"));
+const DaycareParentInfo = lazy(() => import("../pages/DaycareParentInfo/DaycareParentInfo"));
+const DaycareRegistration = lazy(() => import("../pages/DaycareRegistration/DaycareRegistration"));
+const DonatePage = lazy(() => import("../pages/DonatePage/DonatePage"));
+const ErrorPage = lazy(() => import("../pages/ErrorPage/ErrorPage"));
+const Families = lazy(() => import("../pages/Families/Families"));
+const GalleryCategoryPage = lazy(() => import("../pages/Gallery/GalleryCategoryPage"));
+const GalleryPage = lazy(() => import("../pages/Gallery/GalleryPage"));
+const Home = lazy(() => import("../pages/Home/Home"));
+const MachatzitHashekel = lazy(() => import("../pages/MachatzitHashekel/MachatzitHashekel"));
+const PurimMatanotLaEvyonim = lazy(
+    () => import("../pages/PurimMatanotLaEvyonim/PurimMatanotLaEvyonim")
+);
+const Taanit = lazy(() => import("../pages/Taanit/Taanit"));
+const WriteToRebbe = lazy(() => import("../pages/WriteToRebbe/WriteToRebbe"));
 
 
 export const router = createBrowserRouter([

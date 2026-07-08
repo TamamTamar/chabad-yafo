@@ -27,6 +27,26 @@ a {
     text-decoration: none;
 }
 
+.skip-link {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    transform: translateY(-150%);
+    padding: 10px 14px;
+    border-radius: $radius-sm;
+    background: $brand-primary;
+    color: $color-white;
+    font-weight: 800;
+    box-shadow: 0 10px 24px rgba($color-black, 0.2);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+    outline: 3px solid $brand-secondary;
+    outline-offset: 2px;
+}
+
 button {
     font-family: "Assistant", sans-serif; /* חשוב כדי שגם כפתורים יקבלו את הפונט */
     cursor: pointer;

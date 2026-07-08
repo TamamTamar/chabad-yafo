@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { trackPageView } from "../services/metaPixelService";
@@ -39,10 +39,15 @@ const Root = () => {
 
     return (
         <div className="app-root">
+            <a className="skip-link" href="#main-content">
+                דילוג לתוכן המרכזי
+            </a>
             <Header />
-            <main>
-                <Outlet />
-            </main>
+            <div id="main-content" tabIndex={-1}>
+                <Suspense fallback={<div aria-live="polite">טוען...</div>}>
+                    <Outlet />
+                </Suspense>
+            </div>
             <Footer />
         </div>
     );

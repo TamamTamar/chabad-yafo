@@ -5,11 +5,11 @@ import styles from "./DonatePage.module.scss"
 
 const DonatePage = () => {
     return (
-        <div className={styles.page}>
+        <main className={styles.page}>
             <DonateHero />
             <DonateImpact/>
             <DonationForm/>
-        </div>
+        </main>
     );
 };
 

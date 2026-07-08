@@ -261,6 +261,40 @@
     font-weight: 900;
 }
 
+.formGroupNote {
+    grid-column: 1 / -1;
+    margin: -4px 0 2px;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    line-height: 1.6;
+}
+
+.subtaskEditPanel {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-sm;
+    background: rgba($brand-bg, 0.82);
+}
+
+.subtaskEditHeader,
+.subtaskEditRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subtaskEditHeader {
+    justify-content: space-between;
+}
+
+.subtaskEditRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .filterField {
     width: min(240px, 100%);
 }
@@ -345,6 +379,15 @@
 .dangerButton {
     border: 1px solid rgba($ui-danger, 0.22);
     color: $ui-danger;
+}
+
+.iconActionButton {
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .primaryButton:hover,
@@ -543,7 +586,8 @@
 }
 
 .taskCheckbox:disabled {
-    cursor: wait;
+    cursor: default;
+    opacity: 0.75;
 }
 
 .taskTitleText {
@@ -574,18 +618,9 @@
     opacity: 0.7;
 }
 
-.stageBadge {
+.lockedStatus {
     display: inline-flex;
-    min-height: 30px;
-    align-items: center;
-    justify-content: center;
-    padding: 5px 12px;
-    border-radius: $radius-pill;
-    background: rgba($brand-gold-rich, 0.14);
-    color: $brand-gold-dark;
-    font-size: $type-caption;
-    font-weight: 900;
-    white-space: nowrap;
+    cursor: default;
 }
 
 .taskCheckLabel {
@@ -595,17 +630,140 @@
     row-gap: 4px;
 }
 
-.taskTitleText,
-.taskNoteText {
+.taskCellContent {
+    display: grid;
+    gap: 8px;
+}
+
+.taskTitleText {
     grid-column: 2;
 }
 
-.taskNoteText {
-    display: block;
-    color: $ui-text-muted;
+.subtaskToggle {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 34px;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid rgba($brand-primary, 0.18);
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.06);
+    color: $brand-primary;
+    font-family: inherit;
     font-size: $type-caption;
-    font-weight: 700;
-    line-height: 1.55;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.subtaskToggle:hover {
+    border-color: rgba($brand-primary, 0.34);
+    background: rgba($brand-primary, 0.1);
+}
+
+.subtaskToggle span {
+    color: $ui-text-muted;
+    font-weight: 800;
+}
+
+.taskMetaRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.subtaskList {
+    display: grid;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 10px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-sm;
+    background: rgba($brand-primary, 0.025);
+}
+
+.subtaskHeader,
+.subtaskItem {
+    display: grid;
+    gap: 8px;
+    align-items: center;
+}
+
+.subtaskHeaderDetailed,
+.subtaskItemDetailed {
+    grid-template-columns:
+        minmax(180px, 1fr)
+        minmax(82px, 108px)
+        repeat(2, minmax(48px, 58px));
+}
+
+.subtaskHeaderSimple,
+.subtaskItemSimple {
+    grid-template-columns: minmax(180px, 1fr) minmax(42px, 52px);
+}
+
+.subtaskHeader {
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.subtaskItem {
+    color: $brand-text;
+    font-size: $type-caption;
+    font-weight: 800;
+    line-height: 1.45;
+}
+
+.subtaskCheckbox {
+    width: 18px;
+    height: 18px;
+    justify-self: center;
+    accent-color: $brand-primary;
+    cursor: pointer;
+}
+
+.subtaskCheckbox:disabled {
+    cursor: wait;
+}
+
+.subtaskCostInput {
+    width: 100%;
+    min-height: 34px;
+    padding: 6px 9px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-sm;
+    background: $brand-bg;
+    color: $brand-text;
+    font-family: inherit;
+    font-size: $type-caption;
+    font-weight: 900;
+    text-align: center;
+}
+
+.subtaskCostInput:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.subtaskItem:has(.subtaskCheckbox:checked) {
+    color: rgba($brand-text, 0.58);
+}
+
+.subtaskFlag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.subtaskCostField {
+    display: block;
+}
+
+.subtaskFlagText {
+    display: none;
 }
 
 .rowActions {
@@ -624,6 +782,16 @@
     grid-template-columns: repeat(2, minmax(150px, 1fr));
     gap: 10px;
     margin-bottom: 10px;
+}
+
+.callSummaryPanel {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-sm;
+    background: rgba($brand-primary, 0.025);
 }
 
 .compactField {
@@ -673,9 +841,15 @@
 
 .financeGrid {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+    grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.35fr);
     gap: 18px;
     align-items: start;
+}
+
+.financeFormsStack {
+    order: 0;
+    display: grid;
+    gap: 16px;
 }
 
 .financeForm {
@@ -683,8 +857,125 @@
     margin-bottom: 0;
 }
 
+.formGroupTitle {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: $brand-blue-ink;
+    font-size: $type-body;
+    font-weight: 900;
+}
+
 .summaryGrid {
     grid-template-columns: repeat(2, minmax(130px, 1fr));
+}
+
+.financeSummaryPanel {
+    position: sticky;
+    top: 18px;
+    order: -1;
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid rgba($brand-primary, 0.14);
+    border-radius: $radius-lg;
+    background: linear-gradient(
+        180deg,
+        rgba($brand-primary, 0.055),
+        $brand-bg 42%
+    );
+    box-shadow: 0 14px 34px rgba($brand-primary, 0.08);
+}
+
+.financeMainMetric,
+.financeInvestCard {
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-bg;
+}
+
+.financeMainMetric {
+    padding: 18px;
+}
+
+.financeMetricKicker {
+    display: block;
+    margin-bottom: 8px;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.financeMainValue {
+    display: block;
+    font-size: $type-display-number-sm;
+    font-weight: 900;
+    line-height: 1.05;
+}
+
+.financeValuePositive {
+    color: $ui-success;
+}
+
+.financeValueNegative {
+    color: $ui-danger;
+}
+
+.financeDetailList,
+.financeInvestCard {
+    display: grid;
+    gap: 10px;
+}
+
+.financeDetailList {
+    padding: 2px;
+}
+
+.financeDetailItem,
+.financePaybackRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+    font-weight: 800;
+}
+
+.financeDetailItem strong,
+.financePaybackRow strong {
+    color: $brand-primary-deep;
+    font-size: $type-body;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.financeInvestCard {
+    padding: 16px;
+}
+
+.financeInvestTitle {
+    margin: 0;
+    color: $brand-blue-ink;
+    font-size: $type-body;
+    font-weight: 900;
+}
+
+.financeInvestTotal {
+    margin-top: 2px;
+    padding-top: 10px;
+    border-top: 1px solid $ui-border-soft;
+}
+
+.financeInvestTotal strong {
+    color: $brand-primary;
+}
+
+.financePaybackRow {
+    min-height: 40px;
+    margin-top: 2px;
+    padding: 8px 12px;
+    border-radius: $radius-sm;
+    background: rgba($brand-gold-muted, 0.12);
 }
 
 .loading {
@@ -701,8 +992,13 @@
 
     .inlineForm,
     .financeForm,
-    .financeGrid {
+    .financeGrid,
+    .financeFormsStack {
         grid-template-columns: 1fr;
+    }
+
+    .financeSummaryPanel {
+        position: static;
     }
 
     .fieldWide {
@@ -715,7 +1011,7 @@
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
     .tableWrapper {
         overflow: visible;
         border: 0;
@@ -756,7 +1052,7 @@
 
     .tableCell {
         display: grid;
-        grid-template-columns: minmax(92px, 34%) minmax(0, 1fr);
+        grid-template-columns: minmax(82px, 28%) minmax(0, 1fr);
         gap: 12px;
         align-items: start;
         padding: 12px 14px;
@@ -777,12 +1073,81 @@
         white-space: normal;
     }
 
+    .tableCell[data-label="משימה"] {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .tableCell[data-label="משימה"]::before {
+        display: none;
+    }
+
     .tableRow:hover .tableCell {
         background: transparent;
     }
 
     .rowActions {
-        justify-content: flex-start;
+        justify-content: stretch;
+    }
+
+    .subtaskHeader {
+        display: none;
+    }
+
+    .subtaskItem {
+        padding: 10px 0;
+        border-bottom: 1px solid $ui-border-soft;
+    }
+
+    .subtaskItemDetailed {
+        grid-template-columns: 1fr;
+    }
+
+    .subtaskItemSimple {
+        grid-template-columns: 1fr;
+    }
+
+    .subtaskItem:last-child {
+        border-bottom: 0;
+    }
+
+    .subtaskItem > span {
+        grid-column: 1 / -1;
+    }
+
+    .subtaskFlag,
+    .subtaskCostField {
+        min-height: 34px;
+        justify-content: space-between;
+        padding: 7px 10px;
+        border: 1px solid $ui-border-soft;
+        border-radius: $radius-sm;
+        background: $brand-bg;
+    }
+
+    .subtaskCostField {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+    }
+
+    .subtaskFlagText {
+        display: inline;
+        color: $brand-blue-ink;
+        font-size: $type-caption;
+        font-weight: 900;
+    }
+
+    .subtaskCheckbox {
+        width: 20px;
+        height: 20px;
+    }
+
+    .subtaskCostInput {
+        min-height: 36px;
+        text-align: right;
     }
 
     .callSummaryGrid {
@@ -792,6 +1157,13 @@
     .linkButton,
     .dangerButton {
         flex: 1 1 92px;
+    }
+
+    .iconActionButton {
+        flex: 0 0 44px;
+        width: 44px;
+        min-width: 44px;
+        min-height: 40px;
     }
 }
 
@@ -813,6 +1185,19 @@
     .inlineForm,
     .financeForm {
         padding: 14px;
+    }
+
+    .subtaskEditHeader,
+    .subtaskEditRow {
+        align-items: stretch;
+    }
+
+    .subtaskEditHeader {
+        flex-direction: column;
+    }
+
+    .subtaskEditRow {
+        grid-template-columns: 1fr;
     }
 
     .tableHeader,

@@ -40,6 +40,40 @@ export const daycareTaskSchema = new Schema(
             enum: ["עכשיו", "השבוע", "לפני פתיחה", "אחרי פתיחה", "התרחבות"],
             default: "לפני פתיחה",
         },
+        subtasks: [
+            {
+                title: {
+                    type: String,
+                    required: true,
+                    trim: true,
+                },
+                completed: {
+                    type: Boolean,
+                    default: false,
+                },
+                exists: {
+                    type: Boolean,
+                    default: false,
+                },
+                donated: {
+                    type: Boolean,
+                    default: false,
+                },
+                ordered: {
+                    type: Boolean,
+                    default: false,
+                },
+                installed: {
+                    type: Boolean,
+                    default: false,
+                },
+                actualCost: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+            },
+        ],
         dueDate: Date,
         notes: {
             type: String,
@@ -220,6 +254,48 @@ export const daycareFinanceSettingsSchema = new Schema(
             min: 0,
         },
         extraExpenses: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        renovationKitchen: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        renovationYard: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        renovationConstruction: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        renovationSafety: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        renovationEquipment: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        renovationLabor: {
+            type: Number,
+            required: true,
+            default: 0,
+            min: 0,
+        },
+        renovationOther: {
             type: Number,
             required: true,
             default: 0,

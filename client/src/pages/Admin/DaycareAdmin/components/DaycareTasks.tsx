@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import {
     daycarePriorities,
     daycareTaskCategories,
-    daycareTaskStages,
-    daycareTaskStatuses,
     emptyTask,
 } from "../daycareAdminConfig";
 import {
@@ -11,26 +10,23 @@ import {
     deleteDaycareTask,
     getDaycareTasks,
     updateDaycareTask,
+    updateDaycareTaskSubtask,
 } from "../daycareAdminService";
 import styles from "../DaycareAdmin.module.scss";
 import type {
     DaycarePriority,
     DaycareTask,
     DaycareTaskCategory,
-    DaycareTaskStage,
     DaycareTaskStatus,
     EditableDaycareTask,
 } from "../types";
 
 type DaycareTasksProps = {
     onChanged: () => void;
+    onFinanceChanged?: () => void;
 };
 
 type CategoryFilter = DaycareTaskCategory | "הכל";
-
-const toDateInputValue = (date?: string) => {
-    return date ? date.slice(0, 10) : "";
-};
 
 const getCategoryClassName = (category: DaycareTaskCategory) => {
     const categoryClassNames: Record<DaycareTaskCategory, string> = {
@@ -69,7 +65,67 @@ const sortTasksByStatus = (tasksToSort: DaycareTask[]) => {
     });
 };
 
-const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
+const getStatusFromSubtasks = (
+    subtasks: DaycareTask["subtasks"]
+): DaycareTaskStatus => {
+    if (!subtasks || subtasks.length === 0) {
+        return "לא התחיל";
+    }
+
+    const completedCount = subtasks.filter((subtask) => subtask.completed).length;
+    const hasStartedSubtask = subtasks.some(
+        (subtask) =>
+            subtask.completed ||
+            subtask.ordered ||
+            subtask.installed ||
+            (subtask.actualCost ?? 0) > 0
+    );
+
+    if (completedCount === subtasks.length) {
+        return "הושלם";
+    }
+
+    if (hasStartedSubtask) {
+        return "בטיפול";
+    }
+
+    return "לא התחיל";
+};
+
+const getSubtaskProgressText = (task: DaycareTask) => {
+    const subtasks = task.subtasks || [];
+
+    if (subtasks.length === 0) {
+        return "";
+    }
+
+    const completedCount = subtasks.filter((subtask) => subtask.completed).length;
+
+    return `${completedCount}/${subtasks.length}`;
+};
+
+const hasSubtasks = (task: DaycareTask) => {
+    return Boolean(task.subtasks && task.subtasks.length > 0);
+};
+
+const shouldShowProcurementFields = (task: DaycareTask) => {
+    return (
+        task.title.startsWith("הקמה מלאה") ||
+        task.title === "רשימת ציוד לקנייה לפתיחת המעון" ||
+        task.title === "ניהול תרומות ופריטים שאפשר לבקש"
+    );
+};
+
+type SubtaskUpdate =
+    NonNullable<DaycareTask["subtasks"]>[number];
+
+const parseCostValue = (value: string) => {
+    const numericValue = Number(value.replace(/[^\d.]/g, ""));
+
+    return Number.isFinite(numericValue) ? numericValue : 0;
+};
+
+const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
     const [tasks, setTasks] = useState<DaycareTask[]>([]);
     const [draft, setDraft] = useState<EditableDaycareTask>(emptyTask);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -77,6 +133,7 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
         useState<CategoryFilter>("הכל");
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+    const [expandedTaskIds, setExpandedTaskIds] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const visibleTasks = sortTasksByStatus(
         tasks.filter((task) => {
@@ -117,11 +174,45 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
         setShowTaskForm(true);
         setDraft({
             ...task,
-            stage: task.stage ?? "לפני פתיחה",
-            dueDate: toDateInputValue(task.dueDate),
-            notes: task.notes ?? "",
-            resourceLabel: task.resourceLabel ?? "",
-            resourceUrl: task.resourceUrl ?? "",
+            subtasks: task.subtasks?.length
+                ? task.subtasks
+                : [{ title: "", completed: false }],
+        });
+    };
+
+    const updateDraftSubtaskTitle = (subtaskIndex: number, title: string) => {
+        const subtasks = draft.subtasks?.length
+            ? draft.subtasks
+            : [{ title: "", completed: false }];
+
+        setDraft({
+            ...draft,
+            subtasks: subtasks.map((subtask, index) =>
+                index === subtaskIndex ? { ...subtask, title } : subtask
+            ),
+        });
+    };
+
+    const addDraftSubtask = () => {
+        setDraft({
+            ...draft,
+            subtasks: [
+                ...(draft.subtasks || []),
+                { title: "", completed: false },
+            ],
+        });
+    };
+
+    const removeDraftSubtask = (subtaskIndex: number) => {
+        const nextSubtasks = (draft.subtasks || []).filter(
+            (_subtask, index) => index !== subtaskIndex
+        );
+
+        setDraft({
+            ...draft,
+            subtasks: nextSubtasks.length
+                ? nextSubtasks
+                : [{ title: "", completed: false }],
         });
     };
 
@@ -130,10 +221,21 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
             return;
         }
 
+        const cleanSubtasks = (draft.subtasks || [])
+            .map((subtask) => ({ ...subtask, title: subtask.title.trim() }))
+            .filter((subtask) => subtask.title);
+        const taskToSave = cleanSubtasks.length
+            ? {
+                  ...draft,
+                  subtasks: cleanSubtasks,
+                  status: getStatusFromSubtasks(cleanSubtasks),
+              }
+            : draft;
+
         if (editingId) {
-            await updateDaycareTask(editingId, draft);
+            await updateDaycareTask(editingId, taskToSave);
         } else {
-            await createDaycareTask(draft);
+            await createDaycareTask(taskToSave);
         }
 
         resetDraft();
@@ -141,23 +243,92 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
         onChanged();
     };
 
-    const handleStatusChange = async (
+    const handleSubtaskToggle = async (
         task: DaycareTask,
-        status: DaycareTaskStatus
+        subtaskIndex: number
     ) => {
+        const subtask = task.subtasks?.[subtaskIndex];
+
+        if (!subtask) {
+            return;
+        }
+
         setUpdatingTaskId(task._id);
         try {
-            await updateDaycareTask(task._id, { status });
-            await loadTasks();
+            const updatedTask = await updateDaycareTaskSubtask(
+                task._id,
+                subtaskIndex,
+                { completed: !subtask.completed }
+            );
+            setTasks((currentTasks) =>
+                currentTasks.map((currentTask) =>
+                    currentTask._id === updatedTask._id
+                        ? updatedTask
+                        : currentTask
+                )
+            );
             onChanged();
         } finally {
             setUpdatingTaskId(null);
         }
     };
 
-    const handleCompleteToggle = async (task: DaycareTask) => {
-        const nextStatus = task.status === "הושלם" ? "בטיפול" : "הושלם";
-        await handleStatusChange(task, nextStatus);
+    const handleSubtaskUpdate = async (
+        task: DaycareTask,
+        subtaskIndex: number,
+        updates: Partial<SubtaskUpdate>,
+        updateScope: "all" | "finance" = "all"
+    ) => {
+        setUpdatingTaskId(task._id);
+        try {
+            const updatedTask = await updateDaycareTaskSubtask(
+                task._id,
+                subtaskIndex,
+                updates
+            );
+            setTasks((currentTasks) =>
+                currentTasks.map((currentTask) =>
+                    currentTask._id === updatedTask._id
+                        ? updatedTask
+                        : currentTask
+                )
+            );
+            if (updateScope === "finance") {
+                onFinanceChanged?.();
+            } else {
+                onChanged();
+            }
+        } finally {
+            setUpdatingTaskId(null);
+        }
+    };
+
+    const handleSubtaskCostSave = (
+        task: DaycareTask,
+        subtaskIndex: number,
+        value: string
+    ) => {
+        const subtask = task.subtasks?.[subtaskIndex];
+
+        if (!subtask) {
+            return;
+        }
+
+        const actualCost = parseCostValue(value);
+
+        if ((subtask.actualCost ?? 0) === actualCost) {
+            return;
+        }
+
+        handleSubtaskUpdate(task, subtaskIndex, { actualCost }, "finance");
+    };
+
+    const toggleTaskDetails = (taskId: string) => {
+        setExpandedTaskIds((currentIds) =>
+            currentIds.includes(taskId)
+                ? currentIds.filter((id) => id !== taskId)
+                : [...currentIds, taskId]
+        );
     };
 
     const handleDelete = async (id: string) => {
@@ -221,26 +392,6 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                 </label>
 
                 <label className={styles.field}>
-                    <span className={styles.fieldLabel}>סטטוס</span>
-                    <select
-                        className={styles.input}
-                        value={draft.status}
-                        onChange={(event) =>
-                            setDraft({
-                                ...draft,
-                                status: event.target.value as DaycareTaskStatus,
-                            })
-                        }
-                    >
-                        {daycareTaskStatuses.map((status) => (
-                            <option key={status} value={status}>
-                                {status}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label className={styles.field}>
                     <span className={styles.fieldLabel}>עדיפות</span>
                     <select
                         className={styles.input}
@@ -260,76 +411,46 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                     </select>
                 </label>
 
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>שלב</span>
-                    <select
-                        className={styles.input}
-                        value={draft.stage ?? "לפני פתיחה"}
-                        onChange={(event) =>
-                            setDraft({
-                                ...draft,
-                                stage: event.target.value as DaycareTaskStage,
-                            })
-                        }
-                    >
-                        {daycareTaskStages.map((stage) => (
-                            <option key={stage} value={stage}>
-                                {stage}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>תאריך יעד</span>
-                    <input
-                        className={styles.input}
-                        type="date"
-                        value={draft.dueDate ?? ""}
-                        onChange={(event) =>
-                            setDraft({ ...draft, dueDate: event.target.value })
-                        }
-                    />
-                </label>
-
-                <label className={styles.fieldWide}>
-                    <span className={styles.fieldLabel}>הערות</span>
-                    <input
-                        className={styles.input}
-                        value={draft.notes ?? ""}
-                        onChange={(event) =>
-                            setDraft({ ...draft, notes: event.target.value })
-                        }
-                    />
-                </label>
-
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>שם קישור עזר</span>
-                    <input
-                        className={styles.input}
-                        value={draft.resourceLabel ?? ""}
-                        onChange={(event) =>
-                            setDraft({
-                                ...draft,
-                                resourceLabel: event.target.value,
-                            })
-                        }
-                    />
-                </label>
-
-                <label className={styles.fieldWide}>
-                    <span className={styles.fieldLabel}>קישור עזר / טופס</span>
-                    <input
-                        className={styles.input}
-                        value={draft.resourceUrl ?? ""}
-                        onChange={(event) =>
-                            setDraft({
-                                ...draft,
-                                resourceUrl: event.target.value,
-                            })
-                        }
-                    />
-                </label>
+                <div className={styles.subtaskEditPanel}>
+                    <div className={styles.subtaskEditHeader}>
+                        <span className={styles.fieldLabel}>תתי־משימות</span>
+                        <button
+                            className={styles.secondaryButton}
+                            type="button"
+                            onClick={addDraftSubtask}
+                        >
+                            הוספת תת־משימה
+                        </button>
+                    </div>
+                    {(draft.subtasks?.length
+                        ? draft.subtasks
+                        : [{ title: "", completed: false }]
+                    ).map((subtask, index) => (
+                        <div
+                            className={styles.subtaskEditRow}
+                            key={index}
+                        >
+                            <input
+                                className={styles.input}
+                                placeholder="שם תת־משימה"
+                                value={subtask.title}
+                                onChange={(event) =>
+                                    updateDraftSubtaskTitle(
+                                        index,
+                                        event.target.value
+                                    )
+                                }
+                            />
+                            <button
+                                className={styles.dangerButton}
+                                type="button"
+                                onClick={() => removeDraftSubtask(index)}
+                            >
+                                מחיקה
+                            </button>
+                        </div>
+                    ))}
+                </div>
 
                 <div className={styles.formActions}>
                     <button
@@ -397,44 +518,296 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                             <tr>
                                 <th className={styles.tableHeader}>משימה</th>
                                 <th className={styles.tableHeader}>קטגוריה</th>
-                                <th className={styles.tableHeader}>שלב</th>
                                 <th className={styles.tableHeader}>סטטוס</th>
                                 <th className={styles.tableHeader}>עדיפות</th>
-                                <th className={styles.tableHeader}>יעד</th>
-                                <th className={styles.tableHeader}>עזר</th>
                                 <th className={styles.tableHeader}>פעולות</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {visibleTasks.map((task) => (
-                                <tr
-                                    className={
-                                        task.status === "הושלם"
-                                            ? `${styles.tableRow} ${styles.completedRow}`
-                                            : styles.tableRow
-                                    }
-                                    key={task._id}
-                                >
+                            {visibleTasks.map((task) => {
+                                const showProcurementFields =
+                                    shouldShowProcurementFields(task);
+                                return (
+                                    <tr
+                                        className={
+                                            task.status === "הושלם"
+                                                ? `${styles.tableRow} ${styles.completedRow}`
+                                                : styles.tableRow
+                                        }
+                                        key={task._id}
+                                    >
                                     <td className={styles.tableCell} data-label="משימה">
-                                        <label className={styles.taskCheckLabel}>
-                                            <input
-                                                checked={task.status === "הושלם"}
-                                                className={styles.taskCheckbox}
-                                                disabled={updatingTaskId === task._id}
-                                                onChange={() =>
-                                                    handleCompleteToggle(task)
-                                                }
-                                                type="checkbox"
-                                            />
-                                            <span className={styles.taskTitleText}>
-                                                {task.title}
-                                            </span>
-                                            {task.notes && (
-                                                <span className={styles.taskNoteText}>
-                                                    {task.notes}
+                                        <div className={styles.taskCellContent}>
+                                            <label className={styles.taskCheckLabel}>
+                                                <input
+                                                    checked={task.status === "הושלם"}
+                                                    className={styles.taskCheckbox}
+                                                    disabled
+                                                    title="משימה מושלמת רק אחרי שכל הפירוט הושלם"
+                                                    type="checkbox"
+                                                />
+                                                <span className={styles.taskTitleText}>
+                                                    {task.title}
                                                 </span>
-                                            )}
-                                        </label>
+                                            </label>
+
+                                            {task.subtasks &&
+                                                task.subtasks.length > 0 && (
+                                                    <div
+                                                        className={
+                                                            styles.taskMetaRow
+                                                        }
+                                                    >
+                                                        <button
+                                                            className={
+                                                                styles.subtaskToggle
+                                                            }
+                                                            type="button"
+                                                            onClick={() =>
+                                                                toggleTaskDetails(
+                                                                    task._id
+                                                                )
+                                                            }
+                                                        >
+                                                            {expandedTaskIds.includes(
+                                                                task._id
+                                                            )
+                                                                ? "סגירת פירוט"
+                                                                : "פירוט"}
+                                                            <span>
+                                                                {getSubtaskProgressText(
+                                                                    task
+                                                                )}
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                            {task.subtasks &&
+                                                task.subtasks.length > 0 &&
+                                                expandedTaskIds.includes(
+                                                    task._id
+                                                ) && (
+                                                    <div
+                                                        className={`${styles.subtaskList} ${
+                                                            showProcurementFields
+                                                                ? styles.subtaskListDetailed
+                                                                : styles.subtaskListSimple
+                                                        }`}
+                                                    >
+                                                        <div
+                                                            className={`${styles.subtaskHeader} ${
+                                                                showProcurementFields
+                                                                    ? styles.subtaskHeaderDetailed
+                                                                    : styles.subtaskHeaderSimple
+                                                            }`}
+                                                        >
+                                                            <span>פריט</span>
+                                                            {showProcurementFields && (
+                                                                <>
+                                                                    <span>כמה עלה</span>
+                                                                    <span>הוזמן</span>
+                                                                    <span>הותקן</span>
+                                                                </>
+                                                            )}
+                                                            {!showProcurementFields && (
+                                                                <span>בוצע</span>
+                                                            )}
+                                                        </div>
+                                                        {task.subtasks.map(
+                                                            (subtask, index) => (
+                                                                <div
+                                                                    className={`${styles.subtaskItem} ${
+                                                                        showProcurementFields
+                                                                            ? styles.subtaskItemDetailed
+                                                                            : styles.subtaskItemSimple
+                                                                    }`}
+                                                                    key={`${task._id}-${subtask.title}`}
+                                                                >
+                                                                    <span>
+                                                                        {
+                                                                            subtask.title
+                                                                        }
+                                                                    </span>
+                                                                    {!showProcurementFields && (
+                                                                        <label
+                                                                            className={
+                                                                                styles.subtaskFlag
+                                                                            }
+                                                                        >
+                                                                            <span
+                                                                                className={
+                                                                                    styles.subtaskFlagText
+                                                                                }
+                                                                            >
+                                                                                בוצע
+                                                                            </span>
+                                                                            <input
+                                                                                checked={
+                                                                                    subtask.completed
+                                                                                }
+                                                                                className={
+                                                                                    styles.subtaskCheckbox
+                                                                                }
+                                                                                disabled={
+                                                                                    updatingTaskId ===
+                                                                                    task._id
+                                                                                }
+                                                                                onChange={() =>
+                                                                                    handleSubtaskToggle(
+                                                                                        task,
+                                                                                        index
+                                                                                    )
+                                                                                }
+                                                                                type="checkbox"
+                                                                            />
+                                                                        </label>
+                                                                    )}
+                                                                    {showProcurementFields && (
+                                                                        <>
+                                                                            <label
+                                                                                className={
+                                                                                    styles.subtaskCostField
+                                                                                }
+                                                                            >
+                                                                                <span
+                                                                                    className={
+                                                                                        styles.subtaskFlagText
+                                                                                    }
+                                                                                >
+                                                                                    כמה עלה
+                                                                                </span>
+                                                                                <input
+                                                                                    aria-label={`כמה עלה - ${subtask.title}`}
+                                                                                    className={
+                                                                                        styles.subtaskCostInput
+                                                                                    }
+                                                                                    defaultValue={
+                                                                                        subtask.actualCost
+                                                                                            ? String(
+                                                                                                  subtask.actualCost
+                                                                                              )
+                                                                                            : ""
+                                                                                    }
+                                                                                    disabled={
+                                                                                        updatingTaskId ===
+                                                                                        task._id
+                                                                                    }
+                                                                                    inputMode="decimal"
+                                                                                    onBlur={(
+                                                                                        event
+                                                                                    ) =>
+                                                                                        handleSubtaskCostSave(
+                                                                                            task,
+                                                                                            index,
+                                                                                            event
+                                                                                                .currentTarget
+                                                                                                .value
+                                                                                        )
+                                                                                    }
+                                                                                    onKeyDown={(
+                                                                                        event
+                                                                                    ) => {
+                                                                                        if (
+                                                                                            event.key !==
+                                                                                            "Enter"
+                                                                                        ) {
+                                                                                            return;
+                                                                                        }
+
+                                                                                        event.preventDefault();
+                                                                                        event.currentTarget.blur();
+                                                                                    }}
+                                                                                    placeholder="₪"
+                                                                                    type="text"
+                                                                                />
+                                                                            </label>
+                                                                            <label
+                                                                                className={
+                                                                                    styles.subtaskFlag
+                                                                                }
+                                                                            >
+                                                                                <span
+                                                                                    className={
+                                                                                        styles.subtaskFlagText
+                                                                                    }
+                                                                                >
+                                                                                    הוזמן
+                                                                                </span>
+                                                                                <input
+                                                                                    aria-label={`הוזמן - ${subtask.title}`}
+                                                                                    checked={
+                                                                                        subtask.ordered ||
+                                                                                        false
+                                                                                    }
+                                                                                    className={
+                                                                                        styles.subtaskCheckbox
+                                                                                    }
+                                                                                    disabled={
+                                                                                        updatingTaskId ===
+                                                                                        task._id
+                                                                                    }
+                                                                                    onChange={() =>
+                                                                                        handleSubtaskUpdate(
+                                                                                            task,
+                                                                                            index,
+                                                                                            {
+                                                                                                ordered:
+                                                                                                    !subtask.ordered,
+                                                                                            }
+                                                                                        )
+                                                                                    }
+                                                                                    type="checkbox"
+                                                                                />
+                                                                            </label>
+                                                                            <label
+                                                                                className={
+                                                                                    styles.subtaskFlag
+                                                                                }
+                                                                            >
+                                                                                <span
+                                                                                    className={
+                                                                                        styles.subtaskFlagText
+                                                                                    }
+                                                                                >
+                                                                                    הותקן
+                                                                                </span>
+                                                                                <input
+                                                                                    aria-label={`הותקן - ${subtask.title}`}
+                                                                                    checked={
+                                                                                        subtask.installed ||
+                                                                                        false
+                                                                                    }
+                                                                                    className={
+                                                                                        styles.subtaskCheckbox
+                                                                                    }
+                                                                                    disabled={
+                                                                                        updatingTaskId ===
+                                                                                        task._id
+                                                                                    }
+                                                                                    onChange={() =>
+                                                                                        handleSubtaskUpdate(
+                                                                                            task,
+                                                                                            index,
+                                                                                            {
+                                                                                                installed:
+                                                                                                    !subtask.installed,
+                                                                                                completed:
+                                                                                                    !subtask.installed,
+                                                                                            }
+                                                                                        )
+                                                                                    }
+                                                                                    type="checkbox"
+                                                                                />
+                                                                            </label>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                )}
+                                        </div>
                                     </td>
                                     <td className={styles.tableCell} data-label="קטגוריה">
                                         <span
@@ -445,71 +818,42 @@ const DaycareTasks = ({ onChanged }: DaycareTasksProps) => {
                                             {task.category}
                                         </span>
                                     </td>
-                                    <td className={styles.tableCell} data-label="שלב">
-                                        <span className={styles.stageBadge}>
-                                            {task.stage ?? "לפני פתיחה"}
-                                        </span>
-                                    </td>
                                     <td className={styles.tableCell} data-label="סטטוס">
-                                        <select
-                                            aria-label={`סטטוס ${task.title}`}
-                                            className={styles.statusSelect}
-                                            disabled={updatingTaskId === task._id}
-                                            value={task.status}
-                                            onChange={(event) =>
-                                                handleStatusChange(
-                                                    task,
-                                                    event.target.value as DaycareTaskStatus
-                                                )
-                                            }
+                                        <span
+                                            className={`${styles.statusSelect} ${styles.lockedStatus}`}
+                                            title="הסטטוס נקבע אוטומטית לפי תתי־המשימות"
                                         >
-                                            {daycareTaskStatuses.map((status) => (
-                                                <option key={status} value={status}>
-                                                    {status}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            {task.status}
+                                        </span>
                                     </td>
                                     <td className={styles.tableCell} data-label="עדיפות">
                                         {task.priority}
                                     </td>
-                                    <td className={styles.tableCell} data-label="יעד">
-                                        {toDateInputValue(task.dueDate) || "-"}
-                                    </td>
-                                    <td className={styles.tableCell} data-label="עזר">
-                                        {task.resourceUrl ? (
-                                            <a
-                                                className={styles.inlineLink}
-                                                href={task.resourceUrl}
-                                                rel="noreferrer"
-                                                target="_blank"
-                                            >
-                                                {task.resourceLabel || "פתיחה"}
-                                            </a>
-                                        ) : (
-                                            "-"
-                                        )}
-                                    </td>
                                     <td className={styles.tableCell} data-label="פעולות">
                                         <div className={styles.rowActions}>
                                             <button
-                                                className={styles.linkButton}
+                                                aria-label={`עריכת ${task.title}`}
+                                                className={`${styles.linkButton} ${styles.iconActionButton}`}
+                                                title="עריכה"
                                                 type="button"
                                                 onClick={() => handleEdit(task)}
                                             >
-                                                עריכה
+                                                <Pencil aria-hidden="true" size={17} />
                                             </button>
                                             <button
-                                                className={styles.dangerButton}
+                                                aria-label={`מחיקת ${task.title}`}
+                                                className={`${styles.dangerButton} ${styles.iconActionButton}`}
+                                                title="מחיקה"
                                                 type="button"
                                                 onClick={() => handleDelete(task._id)}
                                             >
-                                                מחיקה
+                                                <Trash2 aria-hidden="true" size={17} />
                                             </button>
                                         </div>
                                     </td>
-                                </tr>
-                            ))}
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

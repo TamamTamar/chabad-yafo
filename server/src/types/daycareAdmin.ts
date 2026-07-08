@@ -23,6 +23,15 @@ export interface IDaycareTask {
     status: DaycareTaskStatus;
     priority: DaycarePriority;
     stage?: DaycareTaskStage;
+    subtasks?: Array<{
+        title: string;
+        completed: boolean;
+        exists?: boolean;
+        donated?: boolean;
+        ordered?: boolean;
+        installed?: boolean;
+        actualCost?: number;
+    }>;
     dueDate?: Date;
     notes?: string;
     resourceLabel?: string;
@@ -77,4 +86,11 @@ export interface IDaycareFinanceSettings {
     supplies: number;
     insuranceAndPermits: number;
     extraExpenses: number;
+    renovationKitchen: number;
+    renovationYard: number;
+    renovationConstruction: number;
+    renovationSafety: number;
+    renovationEquipment: number;
+    renovationLabor: number;
+    renovationOther: number;
 }

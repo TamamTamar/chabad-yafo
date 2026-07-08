@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Container from "../../../components/Container/Container";
 import DaycareDashboard from "./components/DaycareDashboard";
-import DaycareDocuments from "./components/DaycareDocuments";
 import DaycareExpansion from "./components/DaycareExpansion";
 import DaycareFinance from "./components/DaycareFinance";
 import DaycareRegistrations from "./components/DaycareRegistrations";
@@ -13,10 +12,20 @@ import type { DaycareOverview } from "./types";
 
 const DaycareAdmin = () => {
     const [overview, setOverview] = useState<DaycareOverview | null>(null);
+    const [financeRefreshKey, setFinanceRefreshKey] = useState(0);
 
     const loadOverview = async () => {
         const data = await getDaycareOverview();
         setOverview(data);
+    };
+
+    const handleDataChanged = () => {
+        setFinanceRefreshKey((currentKey) => currentKey + 1);
+        return loadOverview();
+    };
+
+    const handleFinanceChanged = () => {
+        setFinanceRefreshKey((currentKey) => currentKey + 1);
     };
 
     useEffect(() => {
@@ -43,12 +52,17 @@ const DaycareAdmin = () => {
                     </Link>
                 </header>
 
-                <DaycareTasks onChanged={loadOverview} />
+                <DaycareTasks
+                    onChanged={handleDataChanged}
+                    onFinanceChanged={handleFinanceChanged}
+                />
                 <DaycareDashboard overview={overview} />
                 <DaycareExpansion overview={overview} />
-                <DaycareRegistrations onChanged={loadOverview} />
-                <DaycareFinance onChanged={loadOverview} />
-                <DaycareDocuments />
+                <DaycareRegistrations onChanged={handleDataChanged} />
+                <DaycareFinance
+                    onChanged={handleDataChanged}
+                    refreshKey={financeRefreshKey}
+                />
             </Container>
         </main>
     );

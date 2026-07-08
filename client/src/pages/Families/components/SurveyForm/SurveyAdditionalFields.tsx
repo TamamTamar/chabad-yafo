@@ -20,6 +20,7 @@ const SurveyAdditionalFields = ({
 
             <textarea
                 className={styles.fieldTextarea}
+                aria-label="מה הכי חסר לכם באזור"
                 placeholder="אפשר לכתוב ממש בקצרה..."
                 {...register("missing", {
                     maxLength: {

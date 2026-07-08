@@ -8,9 +8,10 @@ import type { DaycareFinanceSettings } from "../types";
 
 type DaycareFinanceProps = {
     onChanged: () => void;
+    refreshKey?: number;
 };
 
-const financeFields: Array<{
+const monthlyFinanceFields: Array<{
     key: keyof DaycareFinanceSettings;
     label: string;
 }> = [
@@ -25,6 +26,19 @@ const financeFields: Array<{
     { key: "extraExpenses", label: "הוצאות נוספות" },
 ];
 
+const renovationFinanceFields: Array<{
+    key: keyof DaycareFinanceSettings;
+    label: string;
+}> = [
+    { key: "renovationKitchen", label: "מטבח" },
+    { key: "renovationYard", label: "חצרות" },
+    { key: "renovationConstruction", label: "גבס / צבע / קירות" },
+    { key: "renovationSafety", label: "בטיחות והתאמות" },
+    { key: "renovationEquipment", label: "ציוד פתיחה חד־פעמי" },
+    { key: "renovationLabor", label: "שכר עובד / קבלן שיפוץ" },
+    { key: "renovationOther", label: "שיפוץ - שונות" },
+];
+
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("he-IL", {
         style: "currency",
@@ -33,47 +47,117 @@ const formatCurrency = (value: number) => {
     }).format(value);
 };
 
+const getNumberValue = (
+    settings: DaycareFinanceSettings,
+    key: keyof DaycareFinanceSettings
+) => {
+    if (key === "_id") {
+        return 0;
+    }
+
+    return settings[key] ?? 0;
+};
+
 const getExpenses = (settings: DaycareFinanceSettings) => {
     return (
-        settings.rent +
-        settings.directorSalary +
-        settings.staffSalaries +
-        settings.food +
-        settings.supplies +
-        settings.insuranceAndPermits +
-        settings.extraExpenses
+        getNumberValue(settings, "rent") +
+        getNumberValue(settings, "directorSalary") +
+        getNumberValue(settings, "staffSalaries") +
+        getNumberValue(settings, "food") +
+        getNumberValue(settings, "supplies") +
+        getNumberValue(settings, "insuranceAndPermits") +
+        getNumberValue(settings, "extraExpenses")
     );
 };
 
-const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
+const getRenovationInvestment = (settings: DaycareFinanceSettings) => {
+    return (
+        getNumberValue(settings, "renovationKitchen") +
+        getNumberValue(settings, "renovationYard") +
+        getNumberValue(settings, "renovationConstruction") +
+        getNumberValue(settings, "renovationSafety") +
+        getNumberValue(settings, "renovationEquipment") +
+        getNumberValue(settings, "renovationLabor") +
+        getNumberValue(settings, "renovationOther")
+    );
+};
+
+const formatPayback = (months: number | null) => {
+    if (months === null) {
+        return "אין החזר כרגע";
+    }
+
+    if (months === 1) {
+        return "חודש אחד";
+    }
+
+    return `${months} חודשים`;
+};
+
+const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
     const [settings, setSettings] = useState<DaycareFinanceSettings | null>(
         null
     );
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [saveMessage, setSaveMessage] = useState<string | null>(null);
-    const [saveError, setSaveError] = useState<string | null>(null);
+    const [financeDirty, setFinanceDirty] = useState(false);
     const [emptyFocusedFields, setEmptyFocusedFields] = useState<
         Array<keyof DaycareFinanceSettings>
     >([]);
 
     useEffect(() => {
+        if (!settings) {
+            setLoading(true);
+        }
+
         getDaycareFinance()
-            .then(setSettings)
+            .then((financeSettings) => {
+                setSettings(financeSettings);
+                setFinanceDirty(false);
+            })
             .catch((error) => console.error("Failed to load finance:", error))
             .finally(() => setLoading(false));
-    }, []);
+    }, [refreshKey]);
+
+    useEffect(() => {
+        if (!settings || !financeDirty) {
+            return;
+        }
+
+        const saveTimer = window.setTimeout(() => {
+            handleSave(settings);
+        }, 700);
+
+        return () => window.clearTimeout(saveTimer);
+    }, [financeDirty, settings]);
 
     const summary = useMemo(() => {
         if (!settings) {
             return null;
         }
 
-        const income = settings.pricePerChild * settings.currentChildren;
+        const income =
+            getNumberValue(settings, "pricePerChild") *
+            getNumberValue(settings, "currentChildren");
         const expenses = getExpenses(settings);
         const balance = income - expenses;
+        const manualRenovationInvestment = getRenovationInvestment(settings);
+        const taskActualCosts = settings.taskActualCosts ?? 0;
+        const renovationInvestment =
+            manualRenovationInvestment + taskActualCosts;
+        const paybackMonths =
+            renovationInvestment > 0 && balance > 0
+                ? Math.ceil(renovationInvestment / balance)
+                : null;
 
-        return { income, expenses, balance };
+        return {
+            income,
+            expenses,
+            balance,
+            manualRenovationInvestment,
+            taskActualCosts,
+            renovationInvestment,
+            paybackMonths,
+        };
     }, [settings]);
 
     const handleNumberChange = (
@@ -84,8 +168,6 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
             return;
         }
 
-        setSaveMessage(null);
-        setSaveError(null);
         setEmptyFocusedFields((currentFields) =>
             currentFields.filter((fieldKey) => fieldKey !== key)
         );
@@ -97,6 +179,7 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
             ...settings,
             [key]: normalizedValue === "" ? 0 : Number(normalizedValue),
         });
+        setFinanceDirty(true);
     };
 
     const handleNumberFocus = (key: keyof DaycareFinanceSettings) => {
@@ -115,24 +198,20 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
         );
     };
 
-    const handleSave = async () => {
-        if (!settings) {
+    const handleSave = async (
+        settingsToSave: DaycareFinanceSettings | null = settings
+    ) => {
+        if (!settingsToSave) {
             return;
         }
 
         try {
-            setSaving(true);
-            setSaveMessage(null);
-            setSaveError(null);
-            const updatedSettings = await updateDaycareFinance(settings);
+            const updatedSettings = await updateDaycareFinance(settingsToSave);
             setSettings(updatedSettings);
-            setSaveMessage("המצב הכספי נשמר");
+            setFinanceDirty(false);
             onChanged();
         } catch (error) {
             console.error("Failed to save finance settings:", error);
-            setSaveError("השמירה נכשלה. כדאי לבדוק חיבור לשרת ולנסות שוב.");
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -148,80 +227,143 @@ const DaycareFinance = ({ onChanged }: DaycareFinanceProps) => {
                         מצב כספי בפועל
                     </h2>
                     <p className={styles.sectionDescription}>
-                        מעקב פשוט אחרי מה שקורה עכשיו: ילדים, הכנסות, הוצאות ותוצאה חודשית.
+                        מעקב פשוט אחרי הכנסות והוצאות חודשיות, כולל השקעת
+                        שיפוץ והחזר השקעה משוער.
                     </p>
                 </div>
-                <button
-                    className={styles.primaryButton}
-                    type="button"
-                    onClick={handleSave}
-                    disabled={saving}
-                >
-                    {saving ? "שומר..." : "שמירת מצב כספי"}
-                </button>
             </div>
 
-            {(saveMessage || saveError) && (
-                <div
-                    className={
-                        saveError ? styles.formErrorMessage : styles.formSaveMessage
-                    }
-                >
-                    {saveError ?? saveMessage}
-                </div>
-            )}
-
             <div className={styles.financeGrid}>
-                <div className={styles.financeForm}>
-                    {financeFields.map((field) => (
-                        <label className={styles.field} key={field.key}>
-                            <span className={styles.fieldLabel}>{field.label}</span>
-                            <input
-                                className={`${styles.input} ${styles.numberInput}`}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                type="text"
-                                value={
-                                    emptyFocusedFields.includes(field.key)
-                                        ? ""
-                                        : settings[field.key] ?? 0
-                                }
-                                onChange={(event) =>
-                                    handleNumberChange(field.key, event.target.value)
-                                }
-                                onBlur={() => handleNumberBlur(field.key)}
-                                onFocus={() => handleNumberFocus(field.key)}
-                            />
-                        </label>
-                    ))}
+                <div className={styles.financeFormsStack}>
+                    <div className={styles.financeForm}>
+                        <h3 className={styles.formGroupTitle}>חודשי בפועל</h3>
+                        {monthlyFinanceFields.map((field) => (
+                            <label className={styles.field} key={field.key}>
+                                <span className={styles.fieldLabel}>
+                                    {field.label}
+                                </span>
+                                <input
+                                    className={`${styles.input} ${styles.numberInput}`}
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    type="text"
+                                    value={
+                                        emptyFocusedFields.includes(field.key)
+                                            ? ""
+                                            : settings[field.key] ?? 0
+                                    }
+                                    onChange={(event) =>
+                                        handleNumberChange(
+                                            field.key,
+                                            event.target.value
+                                        )
+                                    }
+                                    onBlur={() => handleNumberBlur(field.key)}
+                                    onFocus={() => handleNumberFocus(field.key)}
+                                />
+                            </label>
+                        ))}
+                    </div>
+
+                    <div className={styles.financeForm}>
+                        <h3 className={styles.formGroupTitle}>
+                            השקעת שיפוץ ידנית / נוספת
+                        </h3>
+                        <p className={styles.formGroupNote}>
+                            כאן מוסיפים רק הוצאות שלא הכנסת כבר בתתי־המשימות.
+                        </p>
+                        {renovationFinanceFields.map((field) => (
+                            <label className={styles.field} key={field.key}>
+                                <span className={styles.fieldLabel}>
+                                    {field.label}
+                                </span>
+                                <input
+                                    className={`${styles.input} ${styles.numberInput}`}
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    type="text"
+                                    value={
+                                        emptyFocusedFields.includes(field.key)
+                                            ? ""
+                                            : settings[field.key] ?? 0
+                                    }
+                                    onChange={(event) =>
+                                        handleNumberChange(
+                                            field.key,
+                                            event.target.value
+                                        )
+                                    }
+                                    onBlur={() => handleNumberBlur(field.key)}
+                                    onFocus={() => handleNumberFocus(field.key)}
+                                />
+                            </label>
+                        ))}
+                    </div>
                 </div>
 
-                <div className={styles.summaryGrid}>
-                    <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>ילדים בפועל</span>
-                        <strong className={styles.metricValue}>
-                            {settings.currentChildren}
-                        </strong>
-                    </article>
-                    <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>הכנסה בפועל</span>
-                        <strong className={styles.metricValue}>
-                            {formatCurrency(summary.income)}
-                        </strong>
-                    </article>
-                    <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>הוצאות בפועל</span>
-                        <strong className={styles.metricValue}>
-                            {formatCurrency(summary.expenses)}
-                        </strong>
-                    </article>
-                    <article className={styles.metricCard}>
-                        <span className={styles.metricLabel}>מצב חודשי</span>
-                        <strong className={styles.metricValue}>
+                <aside className={styles.financeSummaryPanel}>
+                    <article className={styles.financeMainMetric}>
+                        <span className={styles.financeMetricKicker}>
+                            מצב חודשי בפועל
+                        </span>
+                        <strong
+                            className={`${styles.financeMainValue} ${
+                                summary.balance >= 0
+                                    ? styles.financeValuePositive
+                                    : styles.financeValueNegative
+                            }`}
+                        >
                             {formatCurrency(summary.balance)}
                         </strong>
                     </article>
-                </div>
+
+                    <div className={styles.financeDetailList}>
+                        <div className={styles.financeDetailItem}>
+                            <span>ילדים בפועל</span>
+                            <strong>{settings.currentChildren}</strong>
+                        </div>
+                        <div className={styles.financeDetailItem}>
+                            <span>הכנסה חודשית</span>
+                            <strong>{formatCurrency(summary.income)}</strong>
+                        </div>
+                        <div className={styles.financeDetailItem}>
+                            <span>הוצאות חודשיות</span>
+                            <strong>{formatCurrency(summary.expenses)}</strong>
+                        </div>
+                    </div>
+
+                    <article className={styles.financeInvestCard}>
+                        <h3 className={styles.financeInvestTitle}>
+                            השקעת פתיחה
+                        </h3>
+                        <div className={styles.financeDetailItem}>
+                            <span>מתתי־משימות</span>
+                            <strong>
+                                {formatCurrency(summary.taskActualCosts)}
+                            </strong>
+                        </div>
+                        <div className={styles.financeDetailItem}>
+                            <span>ידני / נוסף</span>
+                            <strong>
+                                {formatCurrency(
+                                    summary.manualRenovationInvestment
+                                )}
+                            </strong>
+                        </div>
+                        <div
+                            className={`${styles.financeDetailItem} ${styles.financeInvestTotal}`}
+                        >
+                            <span>סה״כ השקעה</span>
+                            <strong>
+                                {formatCurrency(summary.renovationInvestment)}
+                            </strong>
+                        </div>
+                        <div className={styles.financePaybackRow}>
+                            <span>החזר משוער</span>
+                            <strong>{formatPayback(summary.paybackMonths)}</strong>
+                        </div>
+                    </article>
+                </aside>
             </div>
         </section>
     );

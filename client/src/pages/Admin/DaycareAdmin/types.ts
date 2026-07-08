@@ -26,6 +26,15 @@ export type DaycareTask = {
     status: DaycareTaskStatus;
     priority: DaycarePriority;
     stage?: DaycareTaskStage;
+    subtasks?: Array<{
+        title: string;
+        completed: boolean;
+        exists?: boolean;
+        donated?: boolean;
+        ordered?: boolean;
+        installed?: boolean;
+        actualCost?: number;
+    }>;
     dueDate?: string;
     notes?: string;
     resourceLabel?: string;
@@ -83,6 +92,14 @@ export type DaycareFinanceSettings = {
     supplies: number;
     insuranceAndPermits: number;
     extraExpenses: number;
+    renovationKitchen: number;
+    renovationYard: number;
+    renovationConstruction: number;
+    renovationSafety: number;
+    renovationEquipment: number;
+    renovationLabor: number;
+    renovationOther: number;
+    taskActualCosts?: number;
 };
 
 export type DaycareOverview = {

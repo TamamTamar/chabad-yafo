@@ -1,4 +1,4 @@
-import type { FieldError, UseFormRegister } from "react-hook-form";
+import type { FieldError, FieldErrorsImpl, Merge, UseFormRegister } from "react-hook-form";
 
 import type { FormValues } from "../../../../types/family";
 import styles from "./SurveyForm.module.scss";
@@ -6,7 +6,7 @@ import styles from "./SurveyForm.module.scss";
 type CheckboxFieldName = "ages" | "interests";
 
 type SurveyCheckboxGroupProps = {
-    error?: FieldError;
+    error?: FieldError | Merge<FieldError, FieldErrorsImpl<string[]>>;
     fieldName: CheckboxFieldName;
     options: string[];
     title: string;

@@ -8,9 +8,9 @@ const DonateHero = () => {
 
             <div className={styles.content}>
            
-                <div className={styles.title}>
+                <h1 className={styles.title}>
                     יחד מאירים את יפו
-                </div>
+                </h1>
 
                 <div className={styles.description}>
                     התרומה שלכם מאפשרת לנו להמשיך בפעילות יהודית,
