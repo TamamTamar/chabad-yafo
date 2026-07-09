@@ -93,4 +93,26 @@ export interface IDaycareFinanceSettings {
     renovationEquipment: number;
     renovationLabor: number;
     renovationOther: number;
+    monthlyCashflows?: Array<{
+        month: string;
+        children: number;
+        pricePerChild: number;
+        income: number;
+        extraIncome: number;
+        rent: number;
+        directorSalary: number;
+        staffSalaries: number;
+        food: number;
+        supplies: number;
+        insuranceAndPermits: number;
+        extraExpenses: number;
+        renovationKitchen: number;
+        renovationYard: number;
+        renovationConstruction: number;
+        renovationSafety: number;
+        renovationEquipment: number;
+        renovationLabor: number;
+        renovationOther: number;
+        renovationRepayment: number;
+    }>;
 }

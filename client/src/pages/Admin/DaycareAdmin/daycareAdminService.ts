@@ -190,6 +190,28 @@ const getFinancePayload = (settings: DaycareFinanceSettings) => ({
     renovationEquipment: settings.renovationEquipment ?? 0,
     renovationLabor: settings.renovationLabor ?? 0,
     renovationOther: settings.renovationOther ?? 0,
+    monthlyCashflows: (settings.monthlyCashflows || []).map((cashflow) => ({
+        month: cashflow.month,
+        children: cashflow.children ?? 0,
+        pricePerChild: cashflow.pricePerChild ?? 0,
+        income: cashflow.income ?? 0,
+        extraIncome: cashflow.extraIncome ?? 0,
+        rent: cashflow.rent ?? 0,
+        directorSalary: cashflow.directorSalary ?? 0,
+        staffSalaries: cashflow.staffSalaries ?? 0,
+        food: cashflow.food ?? 0,
+        supplies: cashflow.supplies ?? 0,
+        insuranceAndPermits: cashflow.insuranceAndPermits ?? 0,
+        extraExpenses: cashflow.extraExpenses ?? 0,
+        renovationKitchen: cashflow.renovationKitchen ?? 0,
+        renovationYard: cashflow.renovationYard ?? 0,
+        renovationConstruction: cashflow.renovationConstruction ?? 0,
+        renovationSafety: cashflow.renovationSafety ?? 0,
+        renovationEquipment: cashflow.renovationEquipment ?? 0,
+        renovationLabor: cashflow.renovationLabor ?? 0,
+        renovationOther: cashflow.renovationOther ?? 0,
+        renovationRepayment: cashflow.renovationRepayment ?? 0,
+    })),
 });
 
 export const updateDaycareFinance = async (

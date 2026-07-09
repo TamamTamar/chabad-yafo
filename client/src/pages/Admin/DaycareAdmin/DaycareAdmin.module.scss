@@ -237,55 +237,86 @@
 }
 
 .categoryFilterBar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
+    display: grid;
+    gap: 12px;
     margin: 0 0 18px;
     padding: 14px;
     border: 1px solid $ui-border-soft;
     border-radius: $radius;
-    background: $brand-surface-cool;
+    background: linear-gradient(180deg, $brand-surface-cool, $brand-bg);
 }
 
-.categoryFilterLabel,
-.categoryFilterCount {
+.filterSummaryRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.categoryFilterLabel {
     color: $brand-blue-ink;
     font-size: $type-caption;
     font-weight: 900;
 }
 
 .categoryFilterCount {
-    margin-inline-start: auto;
     color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 900;
 }
 
-.categoryFilterButton,
-.categoryFilterActive {
-    display: inline-flex;
-    min-height: 34px;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 13px;
-    border: 1px solid $ui-border-strong;
+.quickFilterGroup {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.045);
+}
+
+.quickFilterButton,
+.quickFilterActive {
+    min-height: 38px;
+    border: 0;
     border-radius: $radius-pill;
     font-family: inherit;
     font-size: $type-caption;
     font-weight: 900;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.categoryFilterButton {
-    background: $brand-bg;
+.quickFilterButton {
+    background: transparent;
     color: $brand-blue-ink;
 }
 
-.categoryFilterActive {
-    border-color: $brand-primary;
+.quickFilterActive {
     background: $brand-primary;
     color: $color-white;
-    box-shadow: 0 8px 18px $ui-shadow-blue-soft;
+    box-shadow: 0 8px 18px rgba($brand-primary, 0.16);
+}
+
+.categorySelectField {
+    display: grid;
+    gap: 7px;
+}
+
+.categorySelect {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-sm;
+    background: $brand-bg;
+    color: $brand-blue-ink;
+    font-family: inherit;
+    font-size: $type-body-sm;
+    font-weight: 900;
 }
 
 .inlineForm,
@@ -623,6 +654,136 @@
     background: rgba($ui-success, 0.055);
 }
 
+.taskFocusSummary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+    padding: 12px;
+    border: 1px solid rgba($brand-primary, 0.12);
+    border-radius: $radius;
+    background: rgba($brand-primary, 0.045);
+}
+
+.taskFocusItem {
+    display: grid;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: $radius-sm;
+    background: $brand-bg;
+}
+
+.taskFocusItem span {
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.taskFocusItem strong {
+    color: $brand-primary-deep;
+    font-size: $type-body-lg;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.taskFocusButton {
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 1px solid $brand-primary;
+    border-radius: $radius-pill;
+    background: $brand-primary;
+    color: $color-white;
+    font-family: inherit;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.taskCards {
+    display: grid;
+    gap: 14px;
+}
+
+.taskCard {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-bg;
+    box-shadow: 0 12px 28px rgba($brand-primary, 0.07);
+}
+
+.taskCardCompleted {
+    background: rgba($ui-success, 0.035);
+    color: rgba($brand-text, 0.66);
+}
+
+.taskCardCompleted .taskTitleText {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba($ui-success, 0.55);
+}
+
+.taskCardHeader {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    text-align: right;
+    cursor: pointer;
+}
+
+.taskCardHeader:disabled {
+    cursor: default;
+}
+
+.taskHeaderProgress {
+    display: inline-flex;
+    min-height: 32px;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.07);
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.taskHeaderProgress strong {
+    color: $ui-text-muted;
+}
+
+.taskCardMeta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.priorityPill {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 12px;
+    border-radius: $radius-pill;
+    background: rgba($brand-gold-rich, 0.12);
+    color: $brand-gold-dark;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
 .taskCheckLabel {
     display: inline-flex;
     align-items: flex-start;
@@ -644,6 +805,24 @@
 .taskCheckbox:disabled {
     cursor: default;
     opacity: 0.75;
+}
+
+.taskCheckboxVisual {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    margin-top: 3px;
+    border: 2px solid rgba($brand-primary, 0.24);
+    border-radius: 5px;
+    background: $brand-bg;
+}
+
+.taskCheckboxVisualChecked {
+    border-color: $ui-success;
+    background:
+        linear-gradient(135deg, transparent 58%, rgba($color-white, 0) 0),
+        $ui-success;
+    box-shadow: inset 0 0 0 3px $brand-bg;
 }
 
 .taskTitleText {
@@ -718,6 +897,33 @@
 }
 
 .subtaskToggle span {
+    color: $ui-text-muted;
+    font-weight: 800;
+}
+
+.callSummaryToggle {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 34px;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid rgba($brand-primary, 0.18);
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.06);
+    color: $brand-primary;
+    font-family: inherit;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.callSummaryToggle:hover {
+    border-color: rgba($brand-primary, 0.34);
+    background: rgba($brand-primary, 0.1);
+}
+
+.callSummaryToggle span {
     color: $ui-text-muted;
     font-weight: 800;
 }
@@ -833,26 +1039,28 @@
     font-weight: 900;
 }
 
-.callSummaryGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(150px, 1fr));
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
 .callSummaryPanel {
     display: grid;
     gap: 10px;
     margin-top: 10px;
-    padding: 12px;
+    padding: 10px;
     border: 1px solid $ui-border-soft;
     border-radius: $radius-sm;
-    background: rgba($brand-primary, 0.025);
+    background: rgba($brand-primary, 0.018);
+}
+
+.callSummaryPreview {
+    max-width: 260px;
+    margin: 7px 0 0;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 800;
+    line-height: 1.5;
 }
 
 .compactField {
     display: grid;
-    gap: 6px;
+    gap: 5px;
     color: $brand-blue-ink;
     font-size: $type-caption;
     font-weight: 900;
@@ -871,12 +1079,12 @@
 }
 
 .compactInput {
-    min-height: 38px;
-    padding: 8px 10px;
+    min-height: 36px;
+    padding: 7px 10px;
 }
 
 .compactTextarea {
-    min-height: 76px;
+    min-height: 58px;
     padding: 10px;
     resize: vertical;
 }
@@ -886,7 +1094,6 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 10px;
 }
 
 .inlineSuccess {
@@ -919,6 +1126,157 @@
     color: $brand-blue-ink;
     font-size: $type-body;
     font-weight: 900;
+}
+
+.financeMonthHeader {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.financeMonthList {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 12px;
+}
+
+.financeMonthPicker {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: rgba($brand-primary, 0.035);
+}
+
+.financeMonthSelectField {
+    display: grid;
+    gap: 6px;
+}
+
+.financeMonthSelect {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 12px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-sm;
+    background: $brand-bg;
+    color: $brand-blue-ink;
+    font-family: inherit;
+    font-size: $type-body-sm;
+    font-weight: 900;
+}
+
+.financeMonthRow {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-bg;
+    box-shadow: 0 10px 24px rgba($brand-primary, 0.055);
+}
+
+.financeMonthTitle {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.financeMonthTitle .field {
+    width: min(230px, 100%);
+}
+
+.financeMonthName {
+    display: block;
+    margin-top: 4px;
+    color: $brand-primary-deep;
+    font-size: $type-body-lg;
+    font-weight: 900;
+}
+
+.financeSetupBadge,
+.financeOngoingBadge {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: $radius-pill;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.financeSetupBadge {
+    background: rgba($brand-gold-rich, 0.14);
+    color: $brand-gold-dark;
+}
+
+.financeOngoingBadge {
+    background: rgba($brand-primary, 0.08);
+    color: $brand-primary-deep;
+}
+
+.financeMonthGroup {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba($brand-primary, 0.1);
+    border-radius: $radius-sm;
+    background: rgba($brand-primary, 0.024);
+}
+
+.financeMonthGroupTitle {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.financeMonthTotals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 10px;
+}
+
+.financeMonthMeta {
+    display: grid;
+    gap: 5px;
+    min-height: 42px;
+    align-content: center;
+    padding: 8px 10px;
+    border-radius: $radius-sm;
+    background: rgba($brand-primary, 0.055);
+}
+
+.financeMonthMeta span {
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.financeMonthMeta strong {
+    color: $brand-primary-deep;
+    font-size: $type-body-sm;
+    font-weight: 900;
+}
+
+.financeEmptyState {
+    padding: 14px;
+    border: 1px dashed $ui-border-strong;
+    border-radius: $radius-sm;
+    color: $ui-text-muted;
+    font-size: $type-body-sm;
+    font-weight: 800;
+    text-align: center;
 }
 
 .summaryGrid {
@@ -1057,6 +1415,19 @@
         position: static;
     }
 
+    .financeMonthHeader {
+        flex-direction: column;
+    }
+
+    .financeMonthHeader .secondaryButton {
+        width: 100%;
+    }
+
+    .financeMonthRow {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
     .fieldWide {
         grid-column: auto;
     }
@@ -1068,6 +1439,24 @@
 }
 
 @media (max-width: 900px) {
+    .taskCardHeader {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .taskCard > .rowActions {
+        justify-content: flex-start;
+    }
+
+    .taskCardMeta {
+        align-items: stretch;
+    }
+
+    .taskCardMeta .subtaskToggle {
+        width: 100%;
+        justify-content: space-between;
+    }
+
     .tableWrapper {
         overflow: visible;
         border: 0;
@@ -1206,10 +1595,6 @@
         text-align: right;
     }
 
-    .callSummaryGrid {
-        grid-template-columns: 1fr;
-    }
-
     .linkButton,
     .dangerButton {
         flex: 1 1 92px;
@@ -1225,7 +1610,7 @@
 
 @media (max-width: 640px) {
     .page {
-        padding: 32px 0 64px;
+        padding: 22px 0 56px;
     }
 
     .hero,
@@ -1234,13 +1619,173 @@
         border-radius: $radius-md;
     }
 
+    .hero {
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
     .title {
         font-size: $type-form-title;
+    }
+
+    .description {
+        font-size: $type-body-sm;
+    }
+
+    .tabBar {
+        gap: 6px;
+        margin: 0 -2px 16px;
+        padding: 6px;
+        border-radius: $radius;
+    }
+
+    .tabButton,
+    .tabButtonActive {
+        min-height: 42px;
+        font-size: $type-caption;
+    }
+
+    .sectionHeader {
+        margin-bottom: 14px;
+    }
+
+    .sectionTitle {
+        font-size: $type-body-lg;
+    }
+
+    .sectionDescription {
+        font-size: $type-body-sm;
     }
 
     .inlineForm,
     .financeForm {
         padding: 14px;
+    }
+
+    .categoryFilterBar {
+        gap: 8px;
+        padding: 10px;
+        border-radius: $radius-sm;
+    }
+
+    .filterSummaryRow {
+        align-items: flex-start;
+    }
+
+    .categoryFilterCount {
+        white-space: nowrap;
+    }
+
+    .quickFilterGroup {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border-radius: $radius;
+    }
+
+    .quickFilterButton,
+    .quickFilterActive {
+        min-height: 40px;
+    }
+
+    .categorySelect {
+        min-height: 44px;
+    }
+
+    .taskCards {
+        gap: 10px;
+    }
+
+    .taskCard {
+        gap: 12px;
+        padding: 13px;
+        border-radius: $radius-sm;
+        box-shadow: 0 8px 20px rgba($brand-primary, 0.06);
+    }
+
+    .taskFocusSummary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .taskFocusItem {
+        padding: 9px 8px;
+        text-align: center;
+    }
+
+    .taskFocusButton {
+        grid-column: 1 / -1;
+        min-height: 42px;
+    }
+
+    .taskCheckLabel {
+        grid-template-columns: 20px minmax(0, 1fr);
+        column-gap: 9px;
+    }
+
+    .taskCheckbox {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+    }
+
+    .taskCheckboxVisual {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+    }
+
+    .taskHeaderProgress {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .taskTitleText {
+        font-size: $type-body-sm;
+        line-height: 1.55;
+    }
+
+    .taskCardMeta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .taskCardMeta .categoryBadge,
+    .taskCardMeta .statusSelect,
+    .taskCardMeta .priorityPill {
+        width: 100%;
+        min-height: 34px;
+    }
+
+    .taskCardMeta .subtaskToggle {
+        grid-column: 1 / -1;
+        min-height: 42px;
+    }
+
+    .taskCardHeader .rowActions {
+        gap: 8px;
+    }
+
+    .iconActionButton {
+        flex: 0 0 42px;
+        width: 42px;
+        min-width: 42px;
+        min-height: 40px;
+    }
+
+    .subtaskList {
+        padding: 8px 10px;
+        border-radius: $radius-sm;
+    }
+
+    .subtaskItem {
+        gap: 7px;
+        padding: 11px 0;
+    }
+
+    .subtaskItem > span {
+        font-size: $type-body-sm;
+        line-height: 1.45;
     }
 
     .subtaskEditHeader,

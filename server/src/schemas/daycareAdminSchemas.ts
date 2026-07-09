@@ -301,6 +301,110 @@ export const daycareFinanceSettingsSchema = new Schema(
             default: 0,
             min: 0,
         },
+        monthlyCashflows: [
+            {
+                month: {
+                    type: String,
+                    required: true,
+                    trim: true,
+                },
+                children: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                pricePerChild: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                income: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                extraIncome: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                rent: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                directorSalary: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                staffSalaries: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                food: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                supplies: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                insuranceAndPermits: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                extraExpenses: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationKitchen: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationYard: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationConstruction: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationSafety: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationEquipment: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationLabor: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationOther: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                renovationRepayment: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+            },
+        ],
     },
     {
         timestamps: true,

@@ -664,6 +664,7 @@ const defaultFinanceSettings: IDaycareFinanceSettings = {
     renovationEquipment: 0,
     renovationLabor: 0,
     renovationOther: 0,
+    monthlyCashflows: [],
 };
 
 const getTaskDefaultUpdatePayload = (task: IDaycareTask) => {
@@ -929,6 +930,32 @@ const getTaskReady = (
     });
 };
 
+const getMonthlyCashflowPayload = (
+    cashflows: IDaycareFinanceSettings["monthlyCashflows"] = []
+) =>
+    cashflows.map((cashflow) => ({
+        month: cashflow.month,
+        children: Number(cashflow.children) || 0,
+        pricePerChild: Number(cashflow.pricePerChild) || 0,
+        income: Number(cashflow.income) || 0,
+        extraIncome: Number(cashflow.extraIncome) || 0,
+        rent: Number(cashflow.rent) || 0,
+        directorSalary: Number(cashflow.directorSalary) || 0,
+        staffSalaries: Number(cashflow.staffSalaries) || 0,
+        food: Number(cashflow.food) || 0,
+        supplies: Number(cashflow.supplies) || 0,
+        insuranceAndPermits: Number(cashflow.insuranceAndPermits) || 0,
+        extraExpenses: Number(cashflow.extraExpenses) || 0,
+        renovationKitchen: Number(cashflow.renovationKitchen) || 0,
+        renovationYard: Number(cashflow.renovationYard) || 0,
+        renovationConstruction: Number(cashflow.renovationConstruction) || 0,
+        renovationSafety: Number(cashflow.renovationSafety) || 0,
+        renovationEquipment: Number(cashflow.renovationEquipment) || 0,
+        renovationLabor: Number(cashflow.renovationLabor) || 0,
+        renovationOther: Number(cashflow.renovationOther) || 0,
+        renovationRepayment: Number(cashflow.renovationRepayment) || 0,
+    }));
+
 const getFinanceUpdatePayload = (body: Partial<IDaycareFinanceSettings>) => ({
     pricePerChild: body.pricePerChild ?? 0,
     currentChildren: body.currentChildren ?? 0,
@@ -947,6 +974,7 @@ const getFinanceUpdatePayload = (body: Partial<IDaycareFinanceSettings>) => ({
     renovationEquipment: body.renovationEquipment ?? 0,
     renovationLabor: body.renovationLabor ?? 0,
     renovationOther: body.renovationOther ?? 0,
+    monthlyCashflows: getMonthlyCashflowPayload(body.monthlyCashflows),
 });
 
 const getDaycareTaskActualCosts = async () => {

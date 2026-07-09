@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-    daycareInterestLevels,
-    daycareLeadStatuses,
-    daycarePriceFits,
-} from "../daycareAdminConfig";
+import { daycareLeadStatuses } from "../daycareAdminConfig";
 import {
     getDaycareRegistrations,
     updateDaycarePublicRegistration,
@@ -21,14 +17,7 @@ type DaycareRegistrationsProps = {
     onChanged: () => void;
 };
 
-type CallSummaryDraft = Pick<
-    DaycareRegistrationAdmin,
-    | "interestLevel"
-    | "priceFits"
-    | "desiredHours"
-    | "parentPriority"
-    | "callNotes"
->;
+type CallSummaryDraft = Pick<DaycareRegistrationAdmin, "callNotes">;
 
 const formatDate = (date?: string) => {
     if (!date) {
@@ -56,20 +45,8 @@ const getCallSummaryDraft = (
     callNotes: registration.callNotes || "",
 });
 
-const getSummaryProgress = (draft?: CallSummaryDraft) => {
-    if (!draft) {
-        return "0/5";
-    }
-
-    const filledFields = [
-        draft.interestLevel,
-        draft.priceFits,
-        draft.desiredHours,
-        draft.parentPriority,
-        draft.callNotes,
-    ].filter(Boolean).length;
-
-    return `${filledFields}/5`;
+const getSummaryPreview = (draft?: CallSummaryDraft) => {
+    return draft?.callNotes || "";
 };
 
 const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
@@ -233,7 +210,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                 <th className={styles.tableHeader}>גיל הילד/ה</th>
                                 <th className={styles.tableHeader}>שעות מועדפות</th>
                                 <th className={styles.tableHeader}>סטטוס</th>
-                                <th className={styles.tableHeader}>הערות</th>
+                                <th className={styles.tableHeader}>הערה</th>
                                 <th className={styles.tableHeader}>תאריך פנייה</th>
                             </tr>
                         </thead>
@@ -294,10 +271,10 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                     </td>
                                     <td
                                         className={styles.tableCell}
-                                        data-label="סיכום שיחה"
+                                        data-label="הערה"
                                     >
                                         <button
-                                            className={styles.subtaskToggle}
+                                            className={styles.callSummaryToggle}
                                             type="button"
                                             onClick={() =>
                                                 toggleSummary(registration._id)
@@ -306,16 +283,27 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                             {expandedSummaryIds.includes(
                                                 registration._id
                                             )
-                                                ? "סגירת סיכום"
-                                                : "סיכום שיחה"}
-                                            <span>
-                                                {getSummaryProgress(
-                                                    summaryDrafts[
-                                                        registration._id
-                                                    ]
-                                                )}
-                                            </span>
+                                                ? "סגירה"
+                                                : "הערה"}
                                         </button>
+                                        {!expandedSummaryIds.includes(
+                                            registration._id
+                                        ) &&
+                                            getSummaryPreview(
+                                                summaryDrafts[registration._id]
+                                            ) && (
+                                                <p
+                                                    className={
+                                                        styles.callSummaryPreview
+                                                    }
+                                                >
+                                                    {getSummaryPreview(
+                                                        summaryDrafts[
+                                                            registration._id
+                                                        ]
+                                                    )}
+                                                </p>
+                                            )}
 
                                         {expandedSummaryIds.includes(
                                             registration._id
@@ -325,168 +313,12 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                                     styles.callSummaryPanel
                                                 }
                                             >
-                                                <div
-                                                    className={
-                                                        styles.callSummaryGrid
-                                                    }
-                                                >
-                                                    <label
-                                                        className={
-                                                            styles.compactField
-                                                        }
-                                                    >
-                                                        <span>רמת עניין</span>
-                                                        <select
-                                                            className={
-                                                                styles.compactInput
-                                                            }
-                                                            value={
-                                                                summaryDrafts[
-                                                                    registration._id
-                                                                ]?.interestLevel ||
-                                                                ""
-                                                            }
-                                                            onChange={(event) =>
-                                                                updateSummaryDraft(
-                                                                    registration._id,
-                                                                    "interestLevel",
-                                                                    event.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        >
-                                                            <option value="">
-                                                                לא סומן
-                                                            </option>
-                                                            {daycareInterestLevels.map(
-                                                                (level) => (
-                                                                    <option
-                                                                        key={level}
-                                                                        value={
-                                                                            level
-                                                                        }
-                                                                    >
-                                                                        {level}
-                                                                    </option>
-                                                                )
-                                                            )}
-                                                        </select>
-                                                    </label>
-
-                                                    <label
-                                                        className={
-                                                            styles.compactField
-                                                        }
-                                                    >
-                                                        <span>
-                                                            המחיר מתאים?
-                                                        </span>
-                                                        <select
-                                                            className={
-                                                                styles.compactInput
-                                                            }
-                                                            value={
-                                                                summaryDrafts[
-                                                                    registration._id
-                                                                ]?.priceFits ||
-                                                                ""
-                                                            }
-                                                            onChange={(event) =>
-                                                                updateSummaryDraft(
-                                                                    registration._id,
-                                                                    "priceFits",
-                                                                    event.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        >
-                                                            <option value="">
-                                                                לא סומן
-                                                            </option>
-                                                            {daycarePriceFits.map(
-                                                                (fit) => (
-                                                                    <option
-                                                                        key={fit}
-                                                                        value={
-                                                                            fit
-                                                                        }
-                                                                    >
-                                                                        {fit}
-                                                                    </option>
-                                                                )
-                                                            )}
-                                                        </select>
-                                                    </label>
-
-                                                    <label
-                                                        className={
-                                                            styles.compactField
-                                                        }
-                                                    >
-                                                        <span>
-                                                            שעות רצויות
-                                                        </span>
-                                                        <input
-                                                            className={
-                                                                styles.compactInput
-                                                            }
-                                                            value={
-                                                                summaryDrafts[
-                                                                    registration._id
-                                                                ]?.desiredHours ||
-                                                                ""
-                                                            }
-                                                            onChange={(event) =>
-                                                                updateSummaryDraft(
-                                                                    registration._id,
-                                                                    "desiredHours",
-                                                                    event.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            placeholder="לדוגמה: עד 16:00"
-                                                        />
-                                                    </label>
-
-                                                    <label
-                                                        className={
-                                                            styles.compactField
-                                                        }
-                                                    >
-                                                        <span>
-                                                            מה הכי חשוב להם
-                                                        </span>
-                                                        <input
-                                                            className={
-                                                                styles.compactInput
-                                                            }
-                                                            value={
-                                                                summaryDrafts[
-                                                                    registration._id
-                                                                ]?.parentPriority ||
-                                                                ""
-                                                            }
-                                                            onChange={(event) =>
-                                                                updateSummaryDraft(
-                                                                    registration._id,
-                                                                    "parentPriority",
-                                                                    event.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            placeholder="יחס אישי, מחיר, שעות..."
-                                                        />
-                                                    </label>
-                                                </div>
-
                                                 <label
                                                     className={
                                                         styles.compactField
                                                     }
                                                 >
-                                                    <span>
-                                                        הערות אחרי שיחה
-                                                    </span>
+                                                    <span>הערה</span>
                                                     <textarea
                                                         className={
                                                             styles.compactTextarea
@@ -505,7 +337,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                                         }
                                                         placeholder={
                                                             registration.notes ||
-                                                            "מה אמרו בשיחה, מתי לחזור, התלבטויות..."
+                                                            "כתבו הערה קצרה..."
                                                         }
                                                     />
                                                 </label>
@@ -533,7 +365,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                                         {savingSummaryId ===
                                                         registration._id
                                                             ? "שומר..."
-                                                            : "שמירת סיכום שיחה"}
+                                                            : "שמירה"}
                                                     </button>
 
                                                     {savedSummaryId ===
