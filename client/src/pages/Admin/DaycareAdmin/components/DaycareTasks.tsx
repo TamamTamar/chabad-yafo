@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import {
     daycarePriorities,
@@ -147,6 +147,8 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
     const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
     const [expandedTaskIds, setExpandedTaskIds] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
+    const taskFormRef = useRef<HTMLDivElement | null>(null);
+    const taskTitleInputRef = useRef<HTMLInputElement | null>(null);
     const visibleTasks = sortTasksByStatus(
         tasks.filter((task) => {
             if (selectedCategory === "הכל") {
@@ -196,10 +198,21 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
         setShowTaskForm(false);
     };
 
+    const focusTaskForm = () => {
+        window.setTimeout(() => {
+            taskFormRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+            taskTitleInputRef.current?.focus({ preventScroll: true });
+        }, 0);
+    };
+
     const handleAddClick = () => {
         setDraft(emptyTask);
         setEditingId(null);
         setShowTaskForm(true);
+        focusTaskForm();
     };
 
     const handleEdit = (task: DaycareTask) => {
@@ -211,6 +224,7 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                 ? task.subtasks
                 : [{ title: "", completed: false }],
         });
+        focusTaskForm();
     };
 
     const updateDraftSubtaskTitle = (subtaskIndex: number, title: string) => {
@@ -392,11 +406,12 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
             </div>
 
             {showTaskForm && (
-            <div className={styles.inlineForm}>
+            <div className={styles.inlineForm} ref={taskFormRef}>
                 <label className={styles.field}>
                     <span className={styles.fieldLabel}>כותרת משימה</span>
                     <input
                         className={styles.input}
+                        ref={taskTitleInputRef}
                         value={draft.title}
                         onChange={(event) =>
                             setDraft({ ...draft, title: event.target.value })
