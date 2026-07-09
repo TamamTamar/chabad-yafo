@@ -10,9 +10,21 @@ import { getDaycareOverview } from "./daycareAdminService";
 import styles from "./DaycareAdmin.module.scss";
 import type { DaycareOverview } from "./types";
 
+type DaycareAdminTab = "tasks" | "registrations" | "finance";
+
+const daycareAdminTabs: Array<{
+    id: DaycareAdminTab;
+    label: string;
+}> = [
+    { id: "tasks", label: "משימות" },
+    { id: "registrations", label: "רישום" },
+    { id: "finance", label: "כספים" },
+];
+
 const DaycareAdmin = () => {
     const [overview, setOverview] = useState<DaycareOverview | null>(null);
     const [financeRefreshKey, setFinanceRefreshKey] = useState(0);
+    const [activeTab, setActiveTab] = useState<DaycareAdminTab>("tasks");
 
     const loadOverview = async () => {
         const data = await getDaycareOverview();
@@ -52,17 +64,49 @@ const DaycareAdmin = () => {
                     </Link>
                 </header>
 
-                <DaycareTasks
-                    onChanged={handleDataChanged}
-                    onFinanceChanged={handleFinanceChanged}
-                />
-                <DaycareDashboard overview={overview} />
-                <DaycareExpansion overview={overview} />
-                <DaycareRegistrations onChanged={handleDataChanged} />
-                <DaycareFinance
-                    onChanged={handleDataChanged}
-                    refreshKey={financeRefreshKey}
-                />
+                <nav className={styles.tabBar} aria-label="ניווט ניהול מעון">
+                    {daycareAdminTabs.map((tab) => (
+                        <button
+                            aria-pressed={activeTab === tab.id}
+                            className={
+                                activeTab === tab.id
+                                    ? styles.tabButtonActive
+                                    : styles.tabButton
+                            }
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setActiveTab(tab.id)}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </nav>
+
+                {activeTab === "tasks" && (
+                    <div className={styles.tabPanel}>
+                        <DaycareTasks
+                            onChanged={handleDataChanged}
+                            onFinanceChanged={handleFinanceChanged}
+                        />
+                        <DaycareDashboard overview={overview} />
+                        <DaycareExpansion overview={overview} />
+                    </div>
+                )}
+
+                {activeTab === "registrations" && (
+                    <div className={styles.tabPanel}>
+                        <DaycareRegistrations onChanged={handleDataChanged} />
+                    </div>
+                )}
+
+                {activeTab === "finance" && (
+                    <div className={styles.tabPanel}>
+                        <DaycareFinance
+                            onChanged={handleDataChanged}
+                            refreshKey={financeRefreshKey}
+                        />
+                    </div>
+                )}
             </Container>
         </main>
     );

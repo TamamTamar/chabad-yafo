@@ -43,6 +43,62 @@
     line-height: $line-body;
 }
 
+.tabBar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 8px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-pill;
+    background: rgba($brand-bg, 0.94);
+    box-shadow: 0 12px 28px rgba($brand-primary, 0.08);
+    backdrop-filter: blur(12px);
+}
+
+.tabButton,
+.tabButtonActive {
+    min-height: 44px;
+    border-radius: $radius-pill;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.tabButton {
+    background: transparent;
+    color: $brand-blue-ink;
+}
+
+.tabButton:hover {
+    background: rgba($brand-primary, 0.06);
+}
+
+.tabButtonActive {
+    border-color: rgba($brand-primary, 0.2);
+    background: $brand-primary;
+    color: $color-white;
+    box-shadow: 0 10px 20px $ui-shadow-blue-soft;
+}
+
+.tabPanel {
+    display: grid;
+    gap: 22px;
+}
+
+.tabPanel > .section {
+    margin-top: 0;
+}
+
 .section {
     margin-top: 22px;
     padding: 24px;
