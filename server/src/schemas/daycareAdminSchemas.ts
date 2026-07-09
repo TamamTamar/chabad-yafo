@@ -1,4 +1,9 @@
 import { Schema } from "mongoose";
+import {
+    DAYCARE_MONTHLY_COST,
+    DAYCARE_OPENING_CHILDREN,
+    DAYCARE_TARGET_CHILDREN,
+} from "../config/daycareDefaults";
 
 const taskCategories = [
     "תכנון",
@@ -202,19 +207,19 @@ export const daycareFinanceSettingsSchema = new Schema(
         pricePerChild: {
             type: Number,
             required: true,
-            default: 4500,
+            default: DAYCARE_MONTHLY_COST,
             min: 0,
         },
         currentChildren: {
             type: Number,
             required: true,
-            default: 6,
+            default: DAYCARE_OPENING_CHILDREN,
             min: 0,
         },
         targetChildren: {
             type: Number,
             required: true,
-            default: 10,
+            default: DAYCARE_TARGET_CHILDREN,
             min: 0,
         },
         rent: {

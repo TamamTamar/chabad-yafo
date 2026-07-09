@@ -1,9 +1,8 @@
 import type { RequiredHours } from "../../types/daycareRegistration";
-
-export const DAYCARE_MONTHLY_COST = 5500;
-export const DAYCARE_MONTHLY_COST_LABEL = `${DAYCARE_MONTHLY_COST.toLocaleString(
-    "he-IL"
-)} ₪`;
+export {
+    DAYCARE_MONTHLY_COST,
+    DAYCARE_MONTHLY_COST_LABEL,
+} from "../../config/daycareDefaults";
 
 export const requiredHoursOptions: RequiredHours[] = [
     "עד 15:30",

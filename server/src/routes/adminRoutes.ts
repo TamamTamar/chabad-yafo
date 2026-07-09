@@ -8,6 +8,11 @@ import { Family } from "../models/Family";
 import { FinanceEntryModel } from "../models/FinanceEntry";
 import { requireAdmin } from "../middleware/adminAuth";
 import {
+    DAYCARE_MONTHLY_COST,
+    DAYCARE_OPENING_CHILDREN,
+    DAYCARE_TARGET_CHILDREN,
+} from "../config/daycareDefaults";
+import {
     getAllPayments,
     getAllRebbeLetters,
     isValidRebbeLetterStatus,
@@ -22,7 +27,7 @@ import type { FinanceEntry } from "../types/financeEntry";
 
 const router = Router();
 
-const openingTargetChildren = 6;
+const openingTargetChildren = DAYCARE_OPENING_CHILDREN;
 const laborDaycareSearchUrl =
     "https://www.gov.il/he/search?query=%D7%9E%D7%A2%D7%95%D7%A0%D7%95%D7%AA%20%D7%99%D7%95%D7%9D%20%D7%9C%D7%A4%D7%A2%D7%95%D7%98%D7%95%D7%AA%20%D7%A8%D7%99%D7%A9%D7%99%D7%95%D7%9F";
 const fireSafetySearchUrl =
@@ -647,9 +652,9 @@ const defaultDaycareDocuments: IDaycareDocument[] = [
 ];
 
 const defaultFinanceSettings: IDaycareFinanceSettings = {
-    pricePerChild: 4500,
-    currentChildren: 6,
-    targetChildren: 10,
+    pricePerChild: DAYCARE_MONTHLY_COST,
+    currentChildren: DAYCARE_OPENING_CHILDREN,
+    targetChildren: DAYCARE_TARGET_CHILDREN,
     rent: 0,
     directorSalary: 0,
     staffSalaries: 0,

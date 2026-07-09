@@ -1,0 +1,3 @@
+export const DAYCARE_MONTHLY_COST = 5500;
+export const DAYCARE_OPENING_CHILDREN = 6;
+export const DAYCARE_TARGET_CHILDREN = 10;
