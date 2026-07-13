@@ -19,5 +19,15 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      'no-restricted-globals': ['error', {
+        name: 'alert',
+        message: 'Use the project modal instead of a browser alert.',
+      }],
+      'no-restricted-syntax': ['error', {
+        selector: "CallExpression[callee.object.name='window'][callee.property.name='alert']",
+        message: 'Use the project modal instead of a browser alert.',
+      }],
+    },
   },
 ])

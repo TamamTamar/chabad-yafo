@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import BaseDialog from "../../components/BaseDialog/BaseDialog";
+import dialogStyles from "../../components/BaseDialog/BaseDialog.module.scss";
 import styles from "./Shabbat.module.scss";
 import { createShabbatRegistration } from "../../services/shabbatRegistrations.ts";
 
@@ -26,6 +28,7 @@ const Shabbat = () => {
     const [form, setForm] = useState<FormState>(initialForm);
     const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({});
     const [submitted, setSubmitted] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const errors = useMemo(() => {
         const e: Partial<Record<keyof FormState, string>> = {};
@@ -82,9 +85,14 @@ const Shabbat = () => {
             setSubmitted(true);
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                alert(err.response?.data?.message ?? "אירעה שגיאה בשליחת הרישום. נסו שוב.");
+                const responseMessage = err.response?.data?.message;
+                setErrorMessage(
+                    typeof responseMessage === "string"
+                        ? responseMessage
+                        : "אירעה שגיאה בשליחת הרישום. נסו שוב.",
+                );
             } else {
-                alert("אין תקשורת עם השרת.");
+                setErrorMessage("אין תקשורת עם השרת.");
             }
         }
     };
@@ -219,6 +227,23 @@ const Shabbat = () => {
                     <p className={styles.note}>* הפרטים נשמרים לצורך רישום ויצירת קשר בלבד.</p>
                 </form>
             </div>
+
+            <BaseDialog
+                open={errorMessage !== null}
+                onClose={() => setErrorMessage(null)}
+                title="לא הצלחנו לשלוח את הרישום"
+            >
+                <p className={dialogStyles.text}>{errorMessage}</p>
+                <div className={dialogStyles.actions}>
+                    <button
+                        type="button"
+                        className={dialogStyles.cta}
+                        onClick={() => setErrorMessage(null)}
+                    >
+                        הבנתי
+                    </button>
+                </div>
+            </BaseDialog>
         </main>
     );
 };
