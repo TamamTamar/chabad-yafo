@@ -1,8 +1,15 @@
 import { Facebook, Instagram, MessageCircle } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { trackWhatsAppClick } from "../../services/googleAnalyticsService";
 import styles from "./FloatingSocials.module.scss";
 
 const FloatingSocials = () => {
+    const { pathname } = useLocation();
+
+    if (pathname === "/daycare-parent-info") {
+        return null;
+    }
+
     return (
         <div className={styles.wrapper} aria-label="קישורים מהירים">
             <a

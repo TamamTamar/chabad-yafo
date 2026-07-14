@@ -23,10 +23,22 @@ export default defineConfig([
       'no-restricted-globals': ['error', {
         name: 'alert',
         message: 'Use the project modal instead of a browser alert.',
+      }, {
+        name: 'confirm',
+        message: 'Use ConfirmDialog instead of a browser confirm.',
+      }, {
+        name: 'prompt',
+        message: 'Use the project modal instead of a browser prompt.',
       }],
       'no-restricted-syntax': ['error', {
         selector: "CallExpression[callee.object.name='window'][callee.property.name='alert']",
         message: 'Use the project modal instead of a browser alert.',
+      }, {
+        selector: "CallExpression[callee.object.name='window'][callee.property.name='confirm']",
+        message: 'Use ConfirmDialog instead of a browser confirm.',
+      }, {
+        selector: "CallExpression[callee.object.name='window'][callee.property.name='prompt']",
+        message: 'Use the project modal instead of a browser prompt.',
       }],
     },
   },

@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import DaycareLogo from "../../../../components/DaycareLogo/DaycareLogo";
 import { createDaycareRegistration } from "../../../../services/daycareRegistrationService";
 import {
     trackDaycareFormStart,
@@ -98,6 +99,7 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
         >
             <div className={styles.formBox}>
                 <div className={styles.formHeader}>
+                    <DaycareLogo />
                     <h2 className={styles.formTitle} id="form-title">
                         השאירו פרטים לרישום מוקדם
                     </h2>

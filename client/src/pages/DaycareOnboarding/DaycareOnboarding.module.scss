@@ -1,0 +1,868 @@
+@use "../../styles/variables" as *;
+
+.page {
+    min-height: 100dvh;
+    padding: 24px 16px 56px;
+    overflow-x: clip;
+    background:
+        radial-gradient(circle at 92% 0, rgba($brand-secondary, 0.24), transparent 22rem),
+        linear-gradient(180deg, rgba($brand-primary, 0.07), transparent 32rem),
+        $body-bg;
+    color: $brand-text;
+    direction: rtl;
+}
+
+.pageShell {
+    width: min(100%, 820px);
+    margin-inline: auto;
+}
+
+.hero {
+    position: relative;
+    display: grid;
+    gap: 12px;
+    overflow: hidden;
+    padding: 30px 22px 52px;
+    border: 1px solid rgba($brand-primary, 0.2);
+    border-radius: $radius-card-lg;
+    background:
+        radial-gradient(circle at 12% 10%, rgba($brand-secondary, 0.2), transparent 16rem),
+        linear-gradient(145deg, $brand-primary-deep, $brand-primary);
+    color: $color-white;
+    box-shadow: 0 22px 54px rgba($brand-primary, 0.2);
+}
+
+.hero::after {
+    position: absolute;
+    inset-inline: 22px;
+    bottom: 0;
+    height: 4px;
+    border-radius: $radius-pill $radius-pill 0 0;
+    background: $brand-secondary;
+    content: "";
+}
+
+.eyebrow {
+    width: fit-content;
+    margin: 0;
+    padding: 5px 11px;
+    border: 1px solid rgba($brand-secondary, 0.42);
+    border-radius: $radius-pill;
+    background: rgba($brand-bg, 0.1);
+    color: $brand-gold-pale;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.heroTitle {
+    max-width: 660px;
+    margin: 0;
+    color: $color-white;
+    font-size: clamp(1.75rem, 8vw, 2.65rem);
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+}
+
+.heroText {
+    max-width: 620px;
+    margin: 0;
+    color: rgba($color-white, 0.9);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+.progressCard {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: 17px;
+    margin: -24px 12px 0;
+    padding: 21px 18px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-card;
+    background: $brand-bg;
+    box-shadow: 0 18px 40px rgba($brand-primary, 0.13);
+}
+
+.progressHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.progressHeadingGroup {
+    display: grid;
+    gap: 3px;
+}
+
+.progressTitle {
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: 1.15rem;
+    font-weight: 900;
+    line-height: 1.3;
+}
+
+.progressCount {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: 0.88rem;
+    font-weight: 650;
+    line-height: 1.5;
+}
+
+.progressPercentage {
+    flex: 0 0 auto;
+    color: $brand-primary;
+    font-size: 1.7rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.progressBar {
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    border: 0;
+    border-radius: $radius-pill;
+    appearance: none;
+    background: rgba($brand-primary, 0.1);
+}
+
+.progressBar::-webkit-progress-bar {
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.1);
+}
+
+.progressBar::-webkit-progress-value {
+    border-radius: $radius-pill;
+    background: linear-gradient(90deg, $brand-primary, $brand-primary-rich);
+}
+
+.progressBar::-moz-progress-bar {
+    border-radius: $radius-pill;
+    background: linear-gradient(90deg, $brand-primary, $brand-primary-rich);
+}
+
+.overallStatusRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 13px;
+    border-top: 1px solid $ui-border-soft;
+}
+
+.overallStatusLabel {
+    color: $ui-text-muted;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.overallStatusValue {
+    padding: 5px 11px;
+    border-radius: $radius-pill;
+    background: rgba($brand-secondary, 0.25);
+    color: $brand-gold-dark;
+    font-size: 0.84rem;
+    font-weight: 900;
+}
+
+.nextStepCard,
+.completedCard {
+    display: grid;
+    gap: 3px;
+    margin-top: 18px;
+    padding: 17px 18px;
+    border-radius: $radius-md;
+}
+
+.nextStepCard {
+    border: 1px solid rgba($brand-secondary, 0.62);
+    border-inline-start: 5px solid $brand-secondary;
+    background: rgba($brand-secondary, 0.13);
+}
+
+.completedCard {
+    border: 1px solid rgba($ui-success, 0.25);
+    border-inline-start: 5px solid $ui-success;
+    background: $ui-success-soft;
+}
+
+.nextStepLabel {
+    color: $brand-gold-dark;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.nextStepTitle,
+.completedTitle {
+    color: $brand-primary-deep;
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1.4;
+}
+
+.nextStepText,
+.completedText {
+    color: $ui-text-muted;
+    font-size: 0.86rem;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
+.stepsSection {
+    margin-top: 38px;
+}
+
+.profileNoticeRegion {
+    min-height: 8px;
+    margin-top: 18px;
+}
+
+.profileSuccess,
+.profileError {
+    margin: 0;
+    padding: 13px 15px;
+    border-radius: $radius-md;
+    font-size: 0.92rem;
+    font-weight: 800;
+    line-height: 1.55;
+}
+
+.profileSuccess {
+    border: 1px solid rgba($ui-success, 0.32);
+    background: $ui-success-soft;
+    color: $ui-success-dark;
+}
+
+.profileError {
+    border: 1px solid rgba($ui-danger, 0.32);
+    background: rgba($ui-danger, 0.08);
+    color: $ui-danger;
+}
+
+.profileFormCard {
+    display: grid;
+    gap: 22px;
+    margin-top: 18px;
+    padding: 22px 18px;
+    border: 1px solid rgba($brand-primary, 0.24);
+    border-radius: $radius-card-lg;
+    background: $brand-bg;
+    box-shadow: 0 16px 40px rgba($brand-primary, 0.1);
+}
+
+.profileFormHeader {
+    display: grid;
+    gap: 7px;
+}
+
+.profileFormEyebrow {
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: $radius-pill;
+    background: rgba($brand-secondary, 0.2);
+    color: $brand-gold-dark;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.profileFormTitle {
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: 1.45rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.profileFormIntro {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.65;
+}
+
+.profileForm {
+    display: grid;
+    gap: 20px;
+}
+
+.profileFieldset {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+    margin: 0;
+    padding: 17px 15px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-md;
+    background: rgba($brand-primary, 0.025);
+}
+
+.profileLegend {
+    padding-inline: 7px;
+    color: $brand-primary-deep;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.profileFieldsGrid {
+    display: grid;
+    gap: 14px;
+}
+
+.profileLabel {
+    display: grid;
+    gap: 7px;
+    color: $brand-text;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.profileInput,
+.profileSelect {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 12px;
+    border: 1px solid $ui-border-strong;
+    border-radius: 11px;
+    background: $brand-bg;
+    color: $brand-text;
+    font: inherit;
+}
+
+.profileInput:focus-visible,
+.profileSelect:focus-visible,
+.submitProfileButton:focus-visible,
+.secondaryProfileButton:focus-visible {
+    outline: 3px solid rgba($brand-secondary, 0.72);
+    outline-offset: 2px;
+}
+
+.secondaryProfileButton,
+.submitProfileButton {
+    min-height: 48px;
+    border-radius: $radius-pill;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.secondaryProfileButton {
+    justify-self: start;
+    padding: 10px 17px;
+    border: 1px solid $ui-border-strong;
+    background: $brand-bg;
+    color: $brand-primary;
+}
+
+.submitProfileButton {
+    width: 100%;
+    padding: 11px 20px;
+    border: 1px solid $brand-primary;
+    background: $brand-primary;
+    color: $color-white;
+}
+
+.secondaryProfileButton:disabled,
+.submitProfileButton:disabled {
+    cursor: wait;
+    opacity: 0.58;
+}
+
+.profileFeedback {
+    min-height: 4px;
+}
+
+.agreementCard { display: grid; gap: 18px; margin-top: 18px; padding: 22px 18px; border: 1px solid rgba($brand-secondary, .6); border-radius: $radius-card-lg; background: $brand-bg; box-shadow: 0 16px 40px rgba($brand-primary, .1); }
+.agreementHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.agreementEyebrow { color: $brand-gold-dark; font-size: .78rem; font-weight: 900; }
+.agreementTitle { margin: 5px 0; color: $brand-primary-deep; font-size: 1.45rem; font-weight: 900; }
+.agreementIntro { margin: 0; color: $ui-text-muted; font-weight: 600; line-height: 1.55; }
+.agreementStatus { flex: 0 0 auto; padding: 6px 10px; border-radius: $radius-pill; background: rgba($brand-secondary, .25); color: $brand-gold-dark; font-size: .78rem; font-weight: 900; }
+.agreementActions { display: flex; flex-wrap: wrap; gap: 9px; }
+.agreementPrimaryButton, .agreementSecondaryButton, .clearSignatureButton { min-height: 46px; padding: 9px 17px; border-radius: $radius-pill; font: inherit; font-weight: 900; cursor: pointer; }
+.agreementPrimaryButton { border: 1px solid $brand-primary; background: $brand-primary; color: $color-white; }
+.agreementSecondaryButton, .clearSignatureButton { border: 1px solid $ui-border-strong; background: $brand-bg; color: $brand-primary; }
+.agreementPrimaryButton:disabled { cursor: not-allowed; opacity: .5; }
+.agreementSecondaryButton:disabled { cursor: wait; opacity: .58; }
+.agreementPrintArea { display: none; }
+.agreementPrintAreaOpen { display: block; max-height: 640px; overflow-y: auto; padding: 20px 17px; border: 1px solid $ui-border-soft; border-radius: $radius-md; background: #fffdf8; }
+.agreementDocumentHeader { display: flex; align-items: center; justify-content: flex-start; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba($brand-secondary, .7); color: $brand-primary-deep; }
+.agreementDocumentHeader > div { display: grid; gap: 2px; }
+.agreementDocumentHeader strong { font-size: 1.05rem; }
+.agreementDocumentHeader span { color: $ui-text-muted; font-size: .78rem; font-weight: 700; }
+.agreementDocumentLogo { display: block; width: 68px; height: 68px; object-fit: contain; border-radius: 12px; }
+.printTitle { margin: 0 0 5px; color: $brand-primary-deep; font-size: 1.35rem; }
+.printVersion { margin: 0 0 20px; color: $ui-text-muted; font-size: .86rem; font-weight: 700; }
+.agreementContent { display: grid; gap: 20px; color: $brand-text; font-size: .94rem; line-height: 1.75; }
+.documentSubtitle { margin: 5px 0 12px; color: $brand-primary; font-weight: 800; white-space: pre-line; }
+.documentIntro, .documentSection { display: grid; gap: 10px; }
+.documentSection { padding-top: 14px; border-top: 1px solid $ui-border-soft; }
+.documentSectionTitle { margin: 0; color: $brand-primary-deep; font-size: 1.08rem; }
+.documentParagraph { margin: 0; white-space: pre-line; }
+.documentList { display: grid; gap: 6px; margin: 0; padding-inline-start: 24px; }
+.documentListItem { padding-inline-start: 4px; }
+.signatureForm { display: grid; gap: 15px; padding-top: 5px; }
+.signatureField { display: grid; gap: 8px; }
+.signatureLabel { color: $brand-text; font-size: .9rem; font-weight: 800; }
+.signatureCanvas { width: 100%; height: 160px; touch-action: none; border: 2px dashed $ui-border-strong; border-radius: 10px; background: #fff; cursor: crosshair; }
+.clearSignatureButton { width: fit-content; min-height: 38px; }
+.acceptLabel, .pdfUploadLabel { display: flex; align-items: flex-start; gap: 9px; color: $brand-text; font-size: .9rem; font-weight: 800; line-height: 1.55; }
+.pdfUploadLabel { display: grid; padding: 15px; border: 1px solid $ui-border-soft; border-radius: $radius-md; background: rgba($brand-primary, .03); }
+.pdfInput { width: 100%; color: $brand-text; font: inherit; }
+.agreementFeedback { min-height: 4px; }
+
+@media print {
+    :global(body.printing-agreement *) { visibility: hidden !important; }
+    :global(body.printing-agreement) .agreementCard,
+    :global(body.printing-agreement) .agreementCard * { visibility: visible !important; }
+    :global(body.printing-agreement) .agreementCard { position: absolute; inset: 0; display: block; padding: 0; border: 0; box-shadow: none; }
+    :global(body.printing-agreement) .agreementHeader,
+    :global(body.printing-agreement) .agreementActions,
+    :global(body.printing-agreement) .signatureForm,
+    :global(body.printing-agreement) .pdfUploadLabel,
+    :global(body.printing-agreement) .agreementFeedback { display: none !important; }
+    :global(body.printing-agreement) .agreementPrintArea { display: block; max-height: none; overflow: visible; padding: 0; border: 0; }
+}
+
+@media (min-width: 640px) {
+    .profileFormCard {
+        padding: 28px;
+    }
+
+    .profileFieldsGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .submitProfileButton {
+        width: fit-content;
+        min-width: 230px;
+        justify-self: start;
+    }
+}
+
+.stepsHeader {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 16px;
+}
+
+.stepsTitle {
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.stepsIntro {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.stepsList {
+    display: grid;
+    gap: 13px;
+}
+
+.stepCard {
+    display: grid;
+    gap: 14px;
+    padding: 19px 17px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-card;
+    background: $brand-bg;
+    box-shadow: 0 10px 28px rgba($brand-primary, 0.07);
+}
+
+.stepTopRow {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 11px;
+    align-items: start;
+}
+
+.stepNumber {
+    display: inline-grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid rgba($brand-primary, 0.14);
+    border-radius: 11px;
+    background: rgba($brand-primary, 0.07);
+    color: $brand-primary;
+    font-size: 0.88rem;
+    font-weight: 900;
+}
+
+.stepHeadingGroup {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.stepTitle {
+    min-width: 0;
+    margin: 3px 0 0;
+    color: $brand-primary-deep;
+    font-size: 1.08rem;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.statusBadge {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 28px;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: $radius-pill;
+    font-size: 0.75rem;
+    font-weight: 850;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.statusIcon {
+    flex: 0 0 auto;
+}
+
+.statusText {
+    line-height: 1.2;
+}
+
+.statusNotStarted,
+.statusNotRequired {
+    border-color: $ui-border-strong;
+    background: $ui-surface-neutral;
+    color: #4b5563;
+}
+
+.statusInProgress {
+    border-color: rgba($brand-primary, 0.2);
+    background: rgba($brand-primary, 0.1);
+    color: $brand-primary-deep;
+}
+
+.statusPendingReview {
+    border-color: rgba($brand-gold-dark, 0.3);
+    background: rgba($brand-secondary, 0.28);
+    color: #704f14;
+}
+
+.statusCompleted {
+    border-color: rgba($ui-success-dark, 0.24);
+    background: rgba($ui-success-dark, 0.1);
+    color: $ui-success-dark;
+}
+
+.statusRequiresCorrection {
+    border-color: rgba($ui-danger, 0.24);
+    background: rgba($ui-danger, 0.09);
+    color: $ui-danger-deep;
+}
+
+.stepDescription {
+    margin: -2px 45px 0 0;
+    color: $ui-text-muted;
+    font-size: 0.91rem;
+    font-weight: 600;
+    line-height: 1.65;
+}
+
+.stepMessage,
+.stepMessagePending,
+.stepMessageCorrection {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: $radius-sm;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.stepMessage {
+    background: rgba($brand-primary, 0.055);
+    color: $brand-text;
+}
+
+.stepMessagePending {
+    border: 1px solid rgba($brand-secondary, 0.34);
+    background: rgba($brand-secondary, 0.15);
+    color: #60440f;
+}
+
+.stepMessageCorrection {
+    border: 1px solid rgba($ui-danger, 0.18);
+    background: rgba($ui-danger, 0.07);
+    color: $ui-danger-deep;
+}
+
+.stepMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px 12px;
+}
+
+.sourceLabel,
+.updatedDate {
+    color: $ui-text-muted;
+    font-size: 0.78rem;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.sourceLabel {
+    padding: 4px 8px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-pill;
+    background: $brand-surface-cool;
+}
+
+.updatedDate {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stepAction,
+.retryButton {
+    display: inline-flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid $brand-primary;
+    border-radius: $radius-pill;
+    background: $brand-primary;
+    color: $color-white;
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 850;
+    text-decoration: none;
+    box-shadow: 0 9px 20px rgba($brand-primary, 0.18);
+    transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.stepAction {
+    width: 100%;
+    padding: 0 18px;
+}
+
+.stepActionText {
+    line-height: 1.3;
+}
+
+.stepAction:hover,
+.retryButton:hover {
+    background: $brand-primary-rich;
+    box-shadow: 0 12px 24px rgba($brand-primary, 0.23);
+    transform: translateY(-1px);
+}
+
+.stepAction:focus-visible,
+.retryButton:focus-visible {
+    outline: 3px solid $brand-gold-rich;
+    outline-offset: 3px;
+}
+
+.emptyStepsMessage {
+    margin: 0;
+    padding: 24px 18px;
+    border: 1px dashed $ui-border-strong;
+    border-radius: $radius-card;
+    background: rgba($brand-bg, 0.78);
+    color: $ui-text-muted;
+    font-weight: 700;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.privacyNote {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 24px;
+    padding: 14px 15px;
+    border: 1px solid rgba($brand-primary, 0.12);
+    border-radius: $radius-md;
+    background: rgba($brand-bg, 0.72);
+    color: $brand-primary;
+}
+
+.privacyText {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: 0.84rem;
+    font-weight: 650;
+    line-height: 1.55;
+}
+
+.stateCard {
+    display: grid;
+    width: min(100%, 560px);
+    min-height: 320px;
+    place-items: center;
+    align-content: center;
+    gap: 14px;
+    margin: 8vh auto 0;
+    padding: 34px 22px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-card-lg;
+    background: $brand-bg;
+    box-shadow: 0 20px 52px rgba($brand-primary, 0.13);
+    text-align: center;
+}
+
+.stateIcon {
+    display: inline-grid;
+    width: 62px;
+    height: 62px;
+    place-items: center;
+    border-radius: 20px;
+    background: rgba($brand-secondary, 0.24);
+    color: $brand-primary;
+}
+
+.loadingSpinner {
+    width: 46px;
+    height: 46px;
+    border: 4px solid rgba($brand-primary, 0.14);
+    border-top-color: $brand-primary;
+    border-radius: 50%;
+    animation: loading-spin 0.8s linear infinite;
+}
+
+.stateTitle {
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.stateText {
+    max-width: 430px;
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+.retryButton {
+    margin-top: 5px;
+    padding: 0 19px;
+    cursor: pointer;
+}
+
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@keyframes loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (min-width: 680px) {
+    .page {
+        padding: 42px 24px 76px;
+    }
+
+    .hero {
+        padding: 44px 42px 64px;
+    }
+
+    .hero::after {
+        inset-inline: 42px;
+    }
+
+    .progressCard {
+        margin-inline: 30px;
+        padding: 25px 27px;
+    }
+
+    .nextStepCard,
+    .completedCard {
+        margin-inline: 30px;
+        padding: 18px 21px;
+    }
+
+    .stepsSection {
+        margin-top: 46px;
+    }
+
+    .stepCard {
+        padding: 23px 24px;
+    }
+
+    .stepTopRow {
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .stepNumber {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+    }
+
+    .stepTitle {
+        margin-top: 5px;
+        font-size: 1.14rem;
+    }
+
+    .stepDescription {
+        margin-inline-start: 54px;
+    }
+
+    .stepAction {
+        width: fit-content;
+        min-width: 190px;
+        justify-self: start;
+    }
+}
+
+@media (max-width: 420px) {
+    .stepHeadingGroup {
+        display: grid;
+        justify-items: start;
+    }
+
+    .stepDescription {
+        margin-inline-start: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loadingSpinner {
+        animation-duration: 1.8s;
+    }
+
+    .stepAction,
+    .retryButton {
+        transition: none;
+    }
+}

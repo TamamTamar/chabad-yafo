@@ -1,0 +1,12 @@
+@use "../../styles/variables" as *;
+
+.logo {
+    display: block;
+    width: clamp(118px, 24vw, 156px);
+    height: auto;
+    margin-inline: auto;
+    border: 1px solid rgba($brand-primary, 0.12);
+    border-radius: 24px;
+    background: $color-white;
+    box-shadow: 0 12px 30px rgba($brand-primary-deep, 0.14);
+}

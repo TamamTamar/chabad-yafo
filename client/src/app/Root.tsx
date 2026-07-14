@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Suspense, useEffect, useRef } from "react";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
+import FloatingSocials from "../components/FloatingSocials/FloatingSocials";
 import { trackPageView } from "../services/metaPixelService";
 
 const Root = () => {
@@ -49,6 +50,7 @@ const Root = () => {
                 </Suspense>
             </div>
             <Footer />
+            <FloatingSocials />
         </div>
     );
 };

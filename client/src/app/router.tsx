@@ -1,5 +1,5 @@
-import { lazy } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRouteAdmin";
 import Root from "./Root";
 
@@ -7,10 +7,12 @@ const AboutPage = lazy(() => import("../pages/AboutPage/AboutPage"));
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard/AdminDashboard"));
 const AdminLogin = lazy(() => import("../pages/AdminLogin/AdminLogin"));
 const DaycareAdmin = lazy(() => import("../pages/Admin/DaycareAdmin/DaycareAdmin"));
-const DaycareEnrollmentsAdmin = lazy(
-    () => import("../pages/Admin/DaycareEnrollments/DaycareEnrollmentsAdmin")
+const DaycareOnboardingAdmin = lazy(
+    () => import("../pages/Admin/DaycareOnboarding/DaycareOnboardingAdmin")
 );
-const DaycareEnrollment = lazy(() => import("../pages/DaycareEnrollment/DaycareEnrollment"));
+const DaycareOnboarding = lazy(
+    () => import("../pages/DaycareOnboarding/DaycareOnboarding")
+);
 const DaycareParentInfo = lazy(() => import("../pages/DaycareParentInfo/DaycareParentInfo"));
 const DaycareRegistration = lazy(() => import("../pages/DaycareRegistration/DaycareRegistration"));
 const DonatePage = lazy(() => import("../pages/DonatePage/DonatePage"));
@@ -28,6 +30,14 @@ const WriteToRebbe = lazy(() => import("../pages/WriteToRebbe/WriteToRebbe"));
 
 
 export const router = createBrowserRouter([
+    {
+        path: "/daycare/onboarding/:token",
+        element: (
+            <Suspense fallback={<div aria-live="polite">טוען את מסלול ההצטרפות...</div>}>
+                <DaycareOnboarding />
+            </Suspense>
+        ),
+    },
     {
         path: "/",
         element: <Root />,
@@ -47,7 +57,8 @@ export const router = createBrowserRouter([
                 path: "daycare-parent-info", element: <DaycareParentInfo />
             },
             {
-                path: "daycare-enrollment", element: <DaycareEnrollment />
+                path: "daycare-enrollment",
+                element: <Navigate to="/daycare-registration#daycare-form" replace />
             },
             {
                 path: "admin/dashboard",
@@ -66,10 +77,10 @@ export const router = createBrowserRouter([
                 ),
             },
             {
-                path: "admin/daycare-enrollments",
+                path: "admin/daycare-onboarding/:id",
                 element: (
                     <ProtectedRouteAdmin>
-                        <DaycareEnrollmentsAdmin />
+                        <DaycareOnboardingAdmin />
                     </ProtectedRouteAdmin>
                 ),
             },

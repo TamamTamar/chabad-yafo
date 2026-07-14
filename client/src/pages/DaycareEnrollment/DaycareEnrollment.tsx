@@ -1,6 +1,14 @@
 import { useMemo, useState } from "react";
+import { isAxiosError } from "axios";
 import { useFieldArray, useForm, type SubmitHandler } from "react-hook-form";
 import Container from "../../components/Container/Container";
+import DaycareLogo from "../../components/DaycareLogo/DaycareLogo";
+import {
+    DAYCARE_MONTHLY_ADDITIONAL_FEE_LABEL,
+    DAYCARE_MONTHLY_COST_LABEL,
+    DAYCARE_MONTHLY_TUITION_LABEL,
+    DAYCARE_REGISTRATION_DEPOSIT_LABEL,
+} from "../../config/daycareDefaults";
 import { createDaycareEnrollment } from "../../services/daycareEnrollmentService";
 import type { DaycareEnrollmentFormValues } from "../../types/daycareEnrollment";
 import {
@@ -38,11 +46,6 @@ const requiredText = { required: "שדה חובה" };
 const optionalCleanText = {
     setValueAs: (value: string) => value?.trim() || undefined,
 };
-const monthlyTuitionText = "5,000 ₪";
-const monthlyEnrichmentFeeText = "500 ₪";
-const monthlyTotalText = "5,500 ₪";
-const registrationDepositText = "500 ₪";
-
 const stepFields: Array<Array<keyof DaycareEnrollmentFormValues | string>> = [
     [
         "child.firstName",
@@ -186,11 +189,13 @@ const DaycareEnrollment = () => {
             setSubmitted(true);
             reset(defaultValues);
             window.scrollTo({ top: 0, behavior: "smooth" });
-        } catch (error: any) {
+        } catch (error: unknown) {
             setError("root", {
                 type: "server",
                 message:
-                    error?.response?.data?.message ||
+                    (isAxiosError<{ message?: string }>(error)
+                        ? error.response?.data?.message
+                        : undefined) ||
                     "לא הצלחנו לשמור את ההרשמה. נסו שוב בעוד רגע.",
             });
         }
@@ -200,6 +205,7 @@ const DaycareEnrollment = () => {
         <main className={styles.page} dir="rtl">
             <Container>
                 <section className={styles.hero}>
+                    <DaycareLogo />
                     <span className={styles.eyebrow}>מעון חב״ד יפו</span>
                     <h1 className={styles.title}>טופס הרשמה דיגיטלי</h1>
                     <p className={styles.intro}>
@@ -568,14 +574,14 @@ const DaycareEnrollment = () => {
                                     />
                                     <ConsentCheckbox
                                         error={errors.consents?.registrationDeposit}
-                                        label={`אני מאשר/ת כי ידוע לי שלצורך שמירת המקום נדרשת מקדמת רישום בסך ${registrationDepositText}, אשר תקוזז מהתשלום עבור החודש הראשון.`}
+                                        label={`אני מאשר/ת כי ידוע לי שלצורך שמירת המקום נדרשת מקדמת רישום בסך ${DAYCARE_REGISTRATION_DEPOSIT_LABEL}, אשר תקוזז מהתשלום עבור החודש הראשון.`}
                                         name="consents.registrationDeposit"
                                         register={register}
                                         required
                                     />
                                     <ConsentCheckbox
                                         error={errors.consents?.monthlyTuition}
-                                        label={`אני מאשר/ת כי ידוע לי שהעלות החודשית היא ${monthlyTuitionText} שכר לימוד + ${monthlyEnrichmentFeeText} דמי שכלול, סה״כ ${monthlyTotalText} לחודש.`}
+                                        label={`אני מאשר/ת כי ידוע לי שהעלות החודשית הכוללת היא ${DAYCARE_MONTHLY_COST_LABEL}: ${DAYCARE_MONTHLY_TUITION_LABEL} שכר לימוד + ${DAYCARE_MONTHLY_ADDITIONAL_FEE_LABEL} דמי שכלול.`}
                                         name="consents.monthlyTuition"
                                         register={register}
                                         required

@@ -1,0 +1,16 @@
+@use "../../styles/variables" as *;
+
+.button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.danger {
+    background: $ui-danger;
+    color: $color-white;
+
+    &:hover:not(:disabled) {
+        background: $ui-danger-strong;
+        filter: none;
+    }
+}

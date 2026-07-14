@@ -3,6 +3,13 @@
   command = "npm run build"
   publish = "dist"
 
+[[headers]]
+  for = "/daycare/onboarding/*"
+  [headers.values]
+    Cache-Control = "no-store"
+    Referrer-Policy = "no-referrer"
+    X-Robots-Tag = "noindex, nofollow"
+
 [[redirects]]
   from = "/api/*"
   to = "https://chabad-yafo-production.up.railway.app/api/:splat"
@@ -13,5 +20,4 @@
   from = "/*"
   to = "/index.html"
   status = 200
-
 

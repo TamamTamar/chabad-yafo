@@ -1,5 +1,21 @@
-export const DAYCARE_MONTHLY_COST = 5500;
+export const DAYCARE_MONTHLY_TUITION = 5000;
+export const DAYCARE_MONTHLY_ADDITIONAL_FEE = 500;
+export const DAYCARE_MONTHLY_COST =
+    DAYCARE_MONTHLY_TUITION + DAYCARE_MONTHLY_ADDITIONAL_FEE;
+export const DAYCARE_REGISTRATION_DEPOSIT = 500;
 
-export const DAYCARE_MONTHLY_COST_LABEL = `${DAYCARE_MONTHLY_COST.toLocaleString(
-    "he-IL"
-)} ₪`;
+const formatDaycarePrice = (price: number) =>
+    `${price.toLocaleString("he-IL")} ₪`;
+
+export const DAYCARE_MONTHLY_TUITION_LABEL = formatDaycarePrice(
+    DAYCARE_MONTHLY_TUITION
+);
+export const DAYCARE_MONTHLY_ADDITIONAL_FEE_LABEL = formatDaycarePrice(
+    DAYCARE_MONTHLY_ADDITIONAL_FEE
+);
+export const DAYCARE_MONTHLY_COST_LABEL = formatDaycarePrice(
+    DAYCARE_MONTHLY_COST
+);
+export const DAYCARE_REGISTRATION_DEPOSIT_LABEL = formatDaycarePrice(
+    DAYCARE_REGISTRATION_DEPOSIT
+);
