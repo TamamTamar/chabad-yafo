@@ -10,9 +10,7 @@ import {
     type DaycareEnrollmentAdmin,
     type DaycareEnrollmentStatus,
 } from "../../../types/daycareEnrollment";
-import {
-    enrollmentStatuses,
-} from "../../DaycareEnrollment/daycareEnrollmentOptions";
+import { enrollmentStatuses } from "../../DaycareEnrollment/daycareEnrollmentOptions";
 import { getAgeLabel } from "../../DaycareEnrollment/daycareEnrollmentUtils";
 import styles from "./DaycareEnrollmentsAdmin.module.scss";
 
@@ -49,20 +47,17 @@ const DaycareEnrollmentsAdmin = () => {
     useEffect(() => {
         getDaycareEnrollments()
             .then(setEnrollments)
-            .catch(() => setError("לא הצלחנו לטעון את ההרשמות"))
+            .catch(() => setError("לא הצלחנו לטעון את ההרשמות הישנות"))
             .finally(() => setLoading(false));
     }, []);
 
     const filteredEnrollments = useMemo(() => {
         const normalizedQuery = query.trim().toLowerCase();
-
         return enrollments.filter((enrollment) => {
             const matchesQuery =
-                !normalizedQuery ||
-                searchableText(enrollment).includes(normalizedQuery);
+                !normalizedQuery || searchableText(enrollment).includes(normalizedQuery);
             const matchesStatus =
                 statusFilter === "all" || enrollment.status === statusFilter;
-
             return matchesQuery && matchesStatus;
         });
     }, [enrollments, query, statusFilter]);
@@ -72,13 +67,11 @@ const DaycareEnrollmentsAdmin = () => {
         status: DaycareEnrollmentStatus
     ) => {
         setUpdatingId(enrollmentId);
-
         try {
             const updatedEnrollment = await updateDaycareEnrollmentStatus(
                 enrollmentId,
                 status
             );
-
             setEnrollments((current) =>
                 current.map((enrollment) =>
                     enrollment._id === enrollmentId ? updatedEnrollment : enrollment
@@ -97,11 +90,11 @@ const DaycareEnrollmentsAdmin = () => {
             <Container>
                 <section className={styles.header}>
                     <div>
-                        <span className={styles.eyebrow}>ניהול מעון</span>
-                        <h1 className={styles.title}>הרשמות מלאות למעון</h1>
+                        <span className={styles.eyebrow}>ניהול מעון · Legacy</span>
+                        <h1 className={styles.title}>הרשמות מלאות ישנות</h1>
                         <p className={styles.description}>
-                            צפייה בטפסי הרשמה דיגיטליים, חיפוש, סינון ועדכון
-                            סטטוס טיפול.
+                            מסך זה מיועד לצפייה בטפסים הישנים בלבד. פתיחת תיק
+                            הצטרפות חדש מתבצעת בטאב „רישום” במסך ניהול המעון.
                         </p>
                     </div>
                 </section>
@@ -172,11 +165,7 @@ const DaycareEnrollmentsAdmin = () => {
                                             <td className={styles.ltr}>
                                                 {enrollment.child.israeliId}
                                             </td>
-                                            <td>
-                                                {getAgeLabel(
-                                                    enrollment.child.birthDate
-                                                )}
-                                            </td>
+                                            <td>{getAgeLabel(enrollment.child.birthDate)}</td>
                                             <td>{enrollment.parents.motherName}</td>
                                             <td className={styles.ltr}>
                                                 {enrollment.parents.motherPhone}
@@ -188,10 +177,7 @@ const DaycareEnrollmentsAdmin = () => {
                                             <td>
                                                 <select
                                                     className={styles.statusSelect}
-                                                    disabled={
-                                                        updatingId ===
-                                                        enrollment._id
-                                                    }
+                                                    disabled={updatingId === enrollment._id}
                                                     value={enrollment.status}
                                                     onChange={(event) =>
                                                         handleStatusChange(
@@ -201,20 +187,15 @@ const DaycareEnrollmentsAdmin = () => {
                                                         )
                                                     }
                                                 >
-                                                    {enrollmentStatuses.map(
-                                                        (status) => (
-                                                            <option
-                                                                key={status}
-                                                                value={status}
-                                                            >
-                                                                {
-                                                                    daycareEnrollmentStatusLabels[
-                                                                        status
-                                                                    ]
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
+                                                    {enrollmentStatuses.map((status) => (
+                                                        <option key={status} value={status}>
+                                                            {
+                                                                daycareEnrollmentStatusLabels[
+                                                                    status
+                                                                ]
+                                                            }
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </td>
                                             <td>{formatDate(enrollment.createdAt)}</td>
@@ -223,9 +204,7 @@ const DaycareEnrollmentsAdmin = () => {
                                                     className={styles.openButton}
                                                     type="button"
                                                     onClick={() =>
-                                                        setSelectedEnrollment(
-                                                            enrollment
-                                                        )
+                                                        setSelectedEnrollment(enrollment)
                                                     }
                                                 >
                                                     פתיחה
@@ -255,9 +234,7 @@ const DaycareEnrollmentsAdmin = () => {
                     >
                         <div className={styles.modalHeader}>
                             <div>
-                                <span className={styles.eyebrow}>
-                                    כרטיס הרשמה
-                                </span>
+                                <span className={styles.eyebrow}>כרטיס Legacy</span>
                                 <h2 id="enrollment-card-title">
                                     {selectedEnrollment.child.firstName}{" "}
                                     {selectedEnrollment.child.lastName}
@@ -274,24 +251,13 @@ const DaycareEnrollmentsAdmin = () => {
 
                         <div className={styles.detailGrid}>
                             <Detail title="פרטי הילד/ה">
+                                <p>ת.ז: {selectedEnrollment.child.israeliId}</p>
                                 <p>
-                                    ת.ז: {selectedEnrollment.child.israeliId}
-                                </p>
-                                <p>
-                                    תאריך לידה:{" "}
-                                    {formatDate(
-                                        selectedEnrollment.child.birthDate
-                                    )}
+                                    תאריך לידה: {formatDate(selectedEnrollment.child.birthDate)}
                                 </p>
                                 <p>כתובת: {selectedEnrollment.child.address}</p>
-                                <p>
-                                    קופת חולים:{" "}
-                                    {selectedEnrollment.medical.healthFund}
-                                </p>
-                                <p>
-                                    שפה בבית:{" "}
-                                    {selectedEnrollment.child.homeLanguage}
-                                </p>
+                                <p>קופת חולים: {selectedEnrollment.medical.healthFund}</p>
+                                <p>שפה בבית: {selectedEnrollment.child.homeLanguage}</p>
                             </Detail>
 
                             <Detail title="הורים">
@@ -307,92 +273,65 @@ const DaycareEnrollmentsAdmin = () => {
                                 <p>{selectedEnrollment.parents.fatherEmail}</p>
                                 <p>
                                     כתובת אחרת:{" "}
-                                    {selectedEnrollment.parents
-                                        .differentParentAddress || "-"}
+                                    {selectedEnrollment.parents.differentParentAddress || "-"}
                                 </p>
                             </Detail>
 
                             <Detail title="אנשי קשר לשעת חירום">
-                                {selectedEnrollment.emergencyContacts.map(
-                                    (contact) => (
-                                        <p key={`${contact.fullName}-${contact.phone}`}>
-                                            {contact.fullName} | {contact.relation} |{" "}
-                                            {contact.phone}
-                                        </p>
-                                    )
-                                )}
+                                {selectedEnrollment.emergencyContacts.map((contact) => (
+                                    <p key={`${contact.fullName}-${contact.phone}`}>
+                                        {contact.fullName} | {contact.relation} | {contact.phone}
+                                    </p>
+                                ))}
                             </Detail>
 
                             <Detail title="מידע רפואי">
-                                <p>
-                                    אלרגיות:{" "}
-                                    {selectedEnrollment.medical.allergies || "-"}
-                                </p>
+                                <p>אלרגיות: {selectedEnrollment.medical.allergies || "-"}</p>
                                 <p>
                                     רגישויות מזון:{" "}
-                                    {selectedEnrollment.medical
-                                        .foodSensitivities || "-"}
+                                    {selectedEnrollment.medical.foodSensitivities || "-"}
                                 </p>
                                 <p>
                                     תרופות קבועות:{" "}
-                                    {selectedEnrollment.medical
-                                        .regularMedications || "-"}
+                                    {selectedEnrollment.medical.regularMedications || "-"}
                                 </p>
                                 <p>
                                     מגבלות:{" "}
-                                    {selectedEnrollment.medical
-                                        .medicalLimitations || "-"}
+                                    {selectedEnrollment.medical.medicalLimitations || "-"}
                                 </p>
                                 <p>
                                     רופא ילדים:{" "}
-                                    {selectedEnrollment.medical
-                                        .pediatricianName || "-"}
+                                    {selectedEnrollment.medical.pediatricianName || "-"}
                                 </p>
                                 <p>
                                     הערות:{" "}
-                                    {selectedEnrollment.medical.additionalNotes ||
-                                        "-"}
+                                    {selectedEnrollment.medical.additionalNotes || "-"}
                                 </p>
                             </Detail>
 
                             <Detail title="אישורים וחתימה">
                                 <p>
                                     אישור מקדמת רישום:{" "}
-                                    {selectedEnrollment.consents
-                                        .registrationDeposit
+                                    {selectedEnrollment.consents.registrationDeposit
                                         ? "כן"
                                         : "לא"}
                                 </p>
                                 <p>
                                     אישור עלות חודשית:{" "}
-                                    {selectedEnrollment.consents.monthlyTuition
-                                        ? "כן"
-                                        : "לא"}
+                                    {selectedEnrollment.consents.monthlyTuition ? "כן" : "לא"}
                                 </p>
                                 <p>
                                     צילום פנימי:{" "}
-                                    {selectedEnrollment.consents.internalPhotos
-                                        ? "כן"
-                                        : "לא"}
+                                    {selectedEnrollment.consents.internalPhotos ? "כן" : "לא"}
                                 </p>
                                 <p>
                                     עדכוני וואטסאפ:{" "}
-                                    {selectedEnrollment.consents.whatsappUpdates
-                                        ? "כן"
-                                        : "לא"}
+                                    {selectedEnrollment.consents.whatsappUpdates ? "כן" : "לא"}
                                 </p>
-                                <p>
-                                    חותם/ת:{" "}
-                                    {
-                                        selectedEnrollment.signature
-                                            .signerFullName
-                                    }
-                                </p>
+                                <p>חותם/ת: {selectedEnrollment.signature.signerFullName}</p>
                                 <p>
                                     תאריך חתימה:{" "}
-                                    {formatDate(
-                                        selectedEnrollment.signature.signedAt
-                                    )}
+                                    {formatDate(selectedEnrollment.signature.signedAt)}
                                 </p>
                             </Detail>
                         </div>

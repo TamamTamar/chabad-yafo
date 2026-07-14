@@ -1,4 +1,5 @@
 import type { DaycareRegistrationAdmin } from "../../../types/daycareRegistration";
+import type { AdminDaycareOnboardingListItem } from "../../../types/daycareOnboarding";
 
 export type DaycareTaskCategory =
     | "תכנון"
@@ -67,6 +68,9 @@ export type DaycareLead = {
     notes?: string;
     callNotes?: string;
     followUpDate?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    onboardingSummary?: AdminDaycareOnboardingListItem | null;
 };
 
 export type DaycareDocumentStatus = "חסר" | "בטיפול" | "קיים";
@@ -150,7 +154,11 @@ export type DaycareOverview = {
 
 export type DaycareRegistrationsResponse = {
     leads: DaycareLead[];
-    publicRegistrations: DaycareRegistrationAdmin[];
+    publicRegistrations: Array<
+        DaycareRegistrationAdmin & {
+            onboardingSummary?: AdminDaycareOnboardingListItem | null;
+        }
+    >;
 };
 
 export type EditableDaycareTask = Omit<DaycareTask, "_id"> & {

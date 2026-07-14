@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Container from "../../../components/Container/Container";
 import DaycareDashboard from "./components/DaycareDashboard";
 import DaycareExpansion from "./components/DaycareExpansion";
 import DaycareFinance from "./components/DaycareFinance";
 import DaycareRegistrations from "./components/DaycareRegistrations";
 import DaycareTasks from "./components/DaycareTasks";
+import DaycareAgreements from "./components/DaycareAgreements";
 import { getDaycareOverview } from "./daycareAdminService";
 import styles from "./DaycareAdmin.module.scss";
 import type { DaycareOverview } from "./types";
 
-type DaycareAdminTab = "tasks" | "registrations" | "finance";
+type DaycareAdminTab = "tasks" | "registrations" | "finance" | "agreements";
 
 const daycareAdminTabs: Array<{
     id: DaycareAdminTab;
@@ -19,12 +20,24 @@ const daycareAdminTabs: Array<{
     { id: "tasks", label: "משימות" },
     { id: "registrations", label: "רישום" },
     { id: "finance", label: "כספים" },
+    { id: "agreements", label: "הסכמים" },
 ];
 
 const DaycareAdmin = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [overview, setOverview] = useState<DaycareOverview | null>(null);
     const [financeRefreshKey, setFinanceRefreshKey] = useState(0);
-    const [activeTab, setActiveTab] = useState<DaycareAdminTab>("tasks");
+    const requestedTab = searchParams.get("tab");
+    const [activeTab, setActiveTab] = useState<DaycareAdminTab>(
+        requestedTab === "registrations" || requestedTab === "finance" || requestedTab === "agreements"
+            ? requestedTab
+            : "tasks"
+    );
+
+    const selectTab = (tab: DaycareAdminTab) => {
+        setActiveTab(tab);
+        setSearchParams(tab === "tasks" ? {} : { tab });
+    };
 
     const loadOverview = async () => {
         const data = await getDaycareOverview();
@@ -41,9 +54,11 @@ const DaycareAdmin = () => {
     };
 
     useEffect(() => {
-        loadOverview().catch((error) => {
-            console.error("Failed to load daycare overview:", error);
-        });
+        void getDaycareOverview()
+            .then(setOverview)
+            .catch((error) => {
+                console.error("Failed to load daycare overview:", error);
+            });
     }, []);
 
     return (
@@ -75,7 +90,7 @@ const DaycareAdmin = () => {
                             }
                             key={tab.id}
                             type="button"
-                            onClick={() => setActiveTab(tab.id)}
+                            onClick={() => selectTab(tab.id)}
                         >
                             {tab.label}
                         </button>
@@ -88,13 +103,13 @@ const DaycareAdmin = () => {
                             onChanged={handleDataChanged}
                             onFinanceChanged={handleFinanceChanged}
                         />
-                        <DaycareDashboard overview={overview} />
                         <DaycareExpansion overview={overview} />
                     </div>
                 )}
 
                 {activeTab === "registrations" && (
                     <div className={styles.tabPanel}>
+                        <DaycareDashboard overview={overview} />
                         <DaycareRegistrations onChanged={handleDataChanged} />
                     </div>
                 )}
@@ -105,6 +120,12 @@ const DaycareAdmin = () => {
                             onChanged={handleDataChanged}
                             refreshKey={financeRefreshKey}
                         />
+                    </div>
+                )}
+
+                {activeTab === "agreements" && (
+                    <div className={styles.tabPanel}>
+                        <DaycareAgreements />
                     </div>
                 )}
             </Container>

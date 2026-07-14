@@ -6,14 +6,17 @@ import AdminDaycareRegistrationsTab from "./components/AdminDaycareRegistrations
 import AdminFamiliesTab from "./components/AdminFamiliesTab/AdminFamiliesTab";
 import AdminPaymentsTab from "./components/AdminPaymentsTab/AdminPaymentsTab";
 import AdminRebbeLettersTab from "./components/AdminRebbeLettersTab/AdminRebbeLettersTab";
+import AdminProjectsTab from "./components/AdminProjectsTab/AdminProjectsTab";
 import styles from "./AdminDashboard.module.scss";
 
-type AdminTab = "families" | "daycareRegistrations" | "rebbeLetters" | "payments";
+type AdminTab = "projects" | "families" | "daycareRegistrations" | "rebbeLetters" | "payments";
 
 const AdminDashboard = () => {
     const [searchParams] = useSearchParams();
-    const initialTab =
-        searchParams.get("tab") === "daycareRegistrations"
+    const initialTab: AdminTab =
+        searchParams.get("tab") === "projects"
+            ? "projects"
+            : searchParams.get("tab") === "daycareRegistrations"
             ? "daycareRegistrations"
             : searchParams.get("tab") === "payments"
               ? "payments"
@@ -52,18 +55,17 @@ const AdminDashboard = () => {
                 <nav className={styles.tabs} aria-label="לשוניות ניהול">
                     <button
                         type="button"
+                        className={activeTab === "projects" ? styles.tabActive : styles.tab}
+                        onClick={() => setActiveTab("projects")}
+                    >
+                        פרויקטים
+                    </button>
+                    <button
+                        type="button"
                         className={styles.tab}
                         onClick={() => navigate("/admin/daycare")}
                     >
                         ניהול מעון
-                    </button>
-
-                    <button
-                        type="button"
-                        className={styles.tab}
-                        onClick={() => navigate("/admin/daycare-enrollments")}
-                    >
-                        הרשמות מלאות
                     </button>
 
                     <button
@@ -115,6 +117,7 @@ const AdminDashboard = () => {
                     </button>
                 </nav>
 
+                {activeTab === "projects" && <AdminProjectsTab />}
                 {activeTab === "families" && <AdminFamiliesTab />}
                 {activeTab === "daycareRegistrations" && (
                     <AdminDaycareRegistrationsTab />

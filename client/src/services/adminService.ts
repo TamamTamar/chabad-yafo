@@ -10,6 +10,7 @@ import type {
 import type { DaycareRegistrationAdmin } from "../types/daycareRegistration";
 import type { FamilyAdmin } from "../types/family";
 import type { ApiResponse } from "../types/api";
+import type { ProjectAdmin, ProjectPayload } from "../types/project";
 
 
 
@@ -77,4 +78,34 @@ export const updateRebbeLetterStatus = async (
     );
 
     return response.data.data;
+};
+
+export const getProjects = async () => {
+    const response = await http.get<ApiResponse<ProjectAdmin[]>>(
+        "/admin/projects"
+    );
+
+    return response.data.data;
+};
+
+export const createProject = async (payload: ProjectPayload) => {
+    const response = await http.post<ApiResponse<ProjectAdmin>>(
+        "/admin/projects",
+        payload
+    );
+
+    return response.data.data;
+};
+
+export const updateProject = async (id: string, payload: ProjectPayload) => {
+    const response = await http.patch<ApiResponse<ProjectAdmin>>(
+        `/admin/projects/${id}`,
+        payload
+    );
+
+    return response.data.data;
+};
+
+export const deleteProject = async (id: string) => {
+    await http.delete(`/admin/projects/${id}`);
 };
