@@ -13,6 +13,14 @@ import { logger } from "./utils/logger";
 import { rebbeLetterRoutes } from "./routes/rebbeLetterRoutes";
 import { daycareRegistrationRoutes } from "./routes/daycareRegistrationRoutes";
 import { daycareEnrollmentRoutes } from "./routes/daycareEnrollmentRoutes";
+import {
+    daycareOnboardingAdminRoutes,
+    daycareOnboardingPublicRoutes,
+} from "./routes/daycareOnboardingRoutes";
+import { ensureDaycareOnboardingIndexes } from "./services/daycareOnboardingIndexService";
+import { daycareAgreementAdminRoutes, daycareAgreementPublicRoutes } from "./routes/daycareAgreementRoutes";
+import { ensureDefaultAgreementDraft } from "./services/daycareAgreementService";
+import { projectRoutes } from "./routes/projectRoutes";
 
 dotenv.config();
 
@@ -46,7 +54,18 @@ app.get("/", (_req, res) => res.send("OK"));
 app.use("/api/health", healthRoutes);
 app.use("/api/shabbat", shabbatRoutes);
 app.use("/api/families", familyRoutes);
+app.use(
+    "/api/daycare/onboarding/public",
+    daycareOnboardingPublicRoutes
+);
+app.use("/api/daycare/agreements/public", daycareAgreementPublicRoutes);
+app.use("/api/admin/daycare/agreements", daycareAgreementAdminRoutes);
+app.use(
+    "/api/admin/daycare/onboarding",
+    daycareOnboardingAdminRoutes
+);
 app.use("/api/admin", adminRoutes);
+app.use("/api/admin/projects", projectRoutes);
 app.use("/api/auth", adminAuthRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/rebbe-letters", rebbeLetterRoutes);
@@ -59,6 +78,8 @@ const startServer = async () => {
     try {
         logger.log("Connecting to Mongo...");
         await connectDB();
+        await ensureDaycareOnboardingIndexes();
+        await ensureDefaultAgreementDraft();
         logger.log("Mongo finished");
 
         app.listen(port, () => {

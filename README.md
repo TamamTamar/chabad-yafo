@@ -98,6 +98,18 @@ MONGO_URI=
 ADMIN_PASSWORD=
 JWT_SECRET=
 
+# חובה ב-Production עבור הצפנת תעודות זהות וכתובות IP בחתימת הסכם.
+# יצירה לדוגמה: openssl rand -base64 32
+DAYCARE_PII_ENCRYPTION_KEY=
+DAYCARE_PII_ENCRYPTION_KEY_VERSION=v1
+
+# אחסון פרטי S3-compatible עבור חתימות והסכמים חתומים
+BUCKET_ENDPOINT=
+BUCKET_ACCESS_KEY_ID=
+BUCKET_SECRET_ACCESS_KEY=
+BUCKET_NAME=
+BUCKET_REGION=auto
+
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_WHATSAPP_FROM=

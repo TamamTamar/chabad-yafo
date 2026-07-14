@@ -24,6 +24,7 @@ import type {
     IDaycareTask,
 } from "../types/daycareAdmin";
 import type { FinanceEntry } from "../types/financeEntry";
+import { listAdminOnboardings } from "../services/daycareOnboardingService";
 
 const router = Router();
 
@@ -1386,16 +1387,48 @@ router.delete("/daycare/tasks/:id", requireAdmin, async (req, res) => {
 
 router.get("/daycare/registrations", requireAdmin, async (_req, res) => {
     try {
-        const [leads, publicRegistrations] = await Promise.all([
+        const [leads, publicRegistrations, onboardings] = await Promise.all([
             DaycareLead.find().sort({ createdAt: -1 }),
             DaycareRegistration.find().sort({ createdAt: -1 }),
+            listAdminOnboardings(),
         ]);
+        const onboardingByOrigin = new Map<
+            string,
+            (typeof onboardings)[number]
+        >();
+
+        for (const onboarding of onboardings) {
+            if (!onboarding.origin?.recordId) {
+                continue;
+            }
+
+            const key = `${onboarding.origin.type}:${onboarding.origin.recordId}`;
+
+            if (!onboardingByOrigin.has(key)) {
+                onboardingByOrigin.set(key, onboarding);
+            }
+        }
+        const withOnboardingSummary = <T extends { id: string; toObject(): object }>(
+            record: T,
+            sourceType: "daycareRegistration" | "daycareLead"
+        ) => ({
+            ...record.toObject(),
+            onboardingSummary:
+                onboardingByOrigin.get(`${sourceType}:${record.id}`) ?? null,
+        });
 
         return res.json({
             success: true,
             data: {
-                leads,
-                publicRegistrations,
+                leads: leads.map((lead) =>
+                    withOnboardingSummary(lead, "daycareLead")
+                ),
+                publicRegistrations: publicRegistrations.map((registration) =>
+                    withOnboardingSummary(
+                        registration,
+                        "daycareRegistration"
+                    )
+                ),
             },
         });
     } catch (error) {

@@ -23,6 +23,9 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
+# Local database backups (may contain personal data)
+backups/
+
 # Editor
 .vscode
 .idea
@@ -30,3 +33,10 @@ pnpm-debug.log*
 # Server build output
 server/dist
 dist
+
+# Development-only private file storage
+server/private-uploads/
+
+# Generated PDF previews and the server-side source-image duplicate
+server/tmp/
+server/assets/logo-maon.jpeg

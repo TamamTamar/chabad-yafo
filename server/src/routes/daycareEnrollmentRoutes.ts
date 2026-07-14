@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { DaycareEnrollment } from "../models/DaycareEnrollment";
 import { requireAdmin } from "../middleware/adminAuth";
-import type { DaycareEnrollmentStatus } from "../types/daycareEnrollment";
+import type {
+    DaycareEnrollmentStatus,
+    IDaycareEnrollment,
+} from "../types/daycareEnrollment";
 
 const router = Router();
 
@@ -13,46 +16,71 @@ const validStatuses: DaycareEnrollmentStatus[] = [
     "rejected",
 ];
 
+const asRecord = (value: unknown): Record<string, unknown> =>
+    typeof value === "object" && value !== null && !Array.isArray(value)
+        ? (value as Record<string, unknown>)
+        : {};
+
 const cleanDigits = (value: unknown) =>
     typeof value === "string" ? value.replace(/\D/g, "") : value;
 
-const normalizeEnrollmentPayload = (body: any) => ({
-    ...body,
-    child: {
-        ...body.child,
-        israeliId: cleanDigits(body.child?.israeliId),
-    },
-    parents: {
-        ...body.parents,
-        motherPhone: cleanDigits(body.parents?.motherPhone),
-        fatherPhone: cleanDigits(body.parents?.fatherPhone),
-        motherIsraeliId: cleanDigits(body.parents?.motherIsraeliId),
-        fatherIsraeliId: cleanDigits(body.parents?.fatherIsraeliId),
-    },
-    emergencyContacts: Array.isArray(body.emergencyContacts)
-        ? body.emergencyContacts.map((contact: any) => ({
-              ...contact,
-              phone: cleanDigits(contact.phone),
-          }))
-        : body.emergencyContacts,
-    status: "submitted",
-    signature: {
-        ...body.signature,
-        signedAt: body.signature?.signedAt || new Date(),
-    },
-});
+const normalizeEnrollmentPayload = (value: unknown) => {
+    const body = asRecord(value);
+    const child = asRecord(body.child);
+    const parents = asRecord(body.parents);
+    const signature = asRecord(body.signature);
+
+    return {
+        ...body,
+        child: {
+            ...child,
+            israeliId: cleanDigits(child.israeliId),
+        },
+        parents: {
+            ...parents,
+            motherPhone: cleanDigits(parents.motherPhone),
+            fatherPhone: cleanDigits(parents.fatherPhone),
+            motherIsraeliId: cleanDigits(parents.motherIsraeliId),
+            fatherIsraeliId: cleanDigits(parents.fatherIsraeliId),
+        },
+        emergencyContacts: Array.isArray(body.emergencyContacts)
+            ? body.emergencyContacts.map((value) => {
+                  const contact = asRecord(value);
+                  return {
+                      ...contact,
+                      phone: cleanDigits(contact.phone),
+                  };
+              })
+            : body.emergencyContacts,
+        status: "submitted",
+        signature: {
+            ...signature,
+            signedAt: signature.signedAt || new Date(),
+        },
+    };
+};
+
+const isDuplicateKeyError = (error: unknown) =>
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === 11000;
 
 router.post("/", async (req, res) => {
     try {
         const payload = normalizeEnrollmentPayload(req.body);
-        const enrollment = await DaycareEnrollment.create(payload);
+        // The schema remains the authority for validating this normalized
+        // public payload; the cast only bridges the unknown-safe parser.
+        const enrollment = await DaycareEnrollment.create(
+            payload as unknown as IDaycareEnrollment
+        );
 
         return res.status(201).json({
             success: true,
             data: enrollment,
         });
-    } catch (error: any) {
-        if (error?.code === 11000) {
+    } catch (error: unknown) {
+        if (isDuplicateKeyError(error)) {
             return res.status(409).json({
                 success: false,
                 message: "כבר קיימת הרשמה עם תעודת הזהות של הילד/ה.",
@@ -86,7 +114,14 @@ router.get("/", requireAdmin, async (_req, res) => {
 
 router.patch("/:id/status", requireAdmin, async (req, res) => {
     try {
-        if (!validStatuses.includes(req.body.status)) {
+        const requestedStatus = asRecord(req.body).status;
+
+        if (
+            typeof requestedStatus !== "string" ||
+            !validStatuses.includes(
+                requestedStatus as DaycareEnrollmentStatus
+            )
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid enrollment status",
@@ -95,7 +130,7 @@ router.patch("/:id/status", requireAdmin, async (req, res) => {
 
         const enrollment = await DaycareEnrollment.findByIdAndUpdate(
             req.params.id,
-            { status: req.body.status },
+            { status: requestedStatus },
             { new: true, runValidators: true }
         );
 

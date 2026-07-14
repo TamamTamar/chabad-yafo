@@ -60,4 +60,6 @@ export interface IDaycareEnrollment {
         digitalSignatureConsent: boolean;
     };
     status: DaycareEnrollmentStatus;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
