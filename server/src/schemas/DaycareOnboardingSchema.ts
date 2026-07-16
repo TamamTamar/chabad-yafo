@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { DAYCARE_ONBOARDING_STEP_DEFINITIONS } from "../config/daycareOnboardingDefaults";
 import {
     onboardingActionTypes,
     onboardingOverallStatuses,
@@ -71,7 +72,10 @@ const hasCompleteDefaultStepSet = (steps: IOnboardingStep[]) => {
         expectedKeys.every((key) => keys.includes(key as IOnboardingStep["key"]));
 
     return (
-        (matchesStepSet(onboardingStepKeys) ||
+        (matchesStepSet(
+            DAYCARE_ONBOARDING_STEP_DEFINITIONS.map((step) => step.key)
+        ) ||
+            matchesStepSet(onboardingStepKeys) ||
             matchesStepSet(legacyOnboardingStepKeys)) &&
         new Set(orders).size === steps.length &&
         orders.every(
@@ -255,8 +259,7 @@ export const daycareOnboardingSchema = new Schema<IDaycareOnboarding>(
             required: true,
             validate: {
                 validator: hasCompleteDefaultStepSet,
-                message:
-                    "Onboarding must contain the ten unique default steps",
+                message: "Onboarding must contain one complete unique step template",
             },
         },
         parentAccessTokenHash: {

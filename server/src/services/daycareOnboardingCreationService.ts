@@ -1,5 +1,7 @@
 import { DAYCARE_ONBOARDING_AUDIT_ACTIONS } from "../config/daycareOnboardingAuditActions";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
+import { DaycareChild } from "../models/DaycareChild";
+import { DaycareFamily } from "../models/DaycareFamily";
 import type { IDaycareOnboardingOrigin } from "../types/daycareOnboarding";
 import {
     createAuditEntries,
@@ -7,6 +9,8 @@ import {
     getAdminOnboarding,
     toAdminOnboardingDetail,
 } from "./daycareOnboardingService";
+import { DaycareOnboardingServiceError } from "./daycareOnboardingService";
+import type { Types } from "mongoose";
 
 export interface CreateDaycareOnboardingFromInquiryInput {
     schoolYear: string;
@@ -15,6 +19,8 @@ export interface CreateDaycareOnboardingFromInquiryInput {
     temporaryParentPhone: string;
     temporaryChildAge?: string;
     internalNote?: string;
+    familyId?: Types.ObjectId;
+    childId?: Types.ObjectId;
 }
 
 const isDuplicateKeyError = (error: unknown) =>
@@ -27,6 +33,28 @@ export const createDaycareOnboardingFromInquiry = async (
     input: CreateDaycareOnboardingFromInquiryInput,
     now = new Date()
 ) => {
+    if (Boolean(input.familyId) !== Boolean(input.childId)) {
+        throw new DaycareOnboardingServiceError(
+            "פרטי המשפחה השמורים אינם שלמים.",
+            409,
+            "REGISTRATION_IDENTITY_INCOMPLETE"
+        );
+    }
+
+    if (input.familyId && input.childId) {
+        const [family, child] = await Promise.all([
+            DaycareFamily.findById(input.familyId).select("_id").exec(),
+            DaycareChild.findById(input.childId).select("familyId").exec(),
+        ]);
+        if (!family || !child || !child.familyId.equals(family._id)) {
+            throw new DaycareOnboardingServiceError(
+                "לא ניתן לחבר את המשפחה השמורה לתיק החדש.",
+                409,
+                "REGISTRATION_IDENTITY_UNAVAILABLE"
+            );
+        }
+    }
+
     const existing = await DaycareOnboarding.findOne({
         "origin.type": input.origin.type,
         "origin.recordId": input.origin.recordId,
@@ -47,8 +75,10 @@ export const createDaycareOnboardingFromInquiry = async (
             temporaryParentName: input.temporaryParentName,
             temporaryParentPhone: input.temporaryParentPhone,
             temporaryChildAge: input.temporaryChildAge,
-            profileStatus: "incomplete",
             internalNote: input.internalNote,
+            familyId: input.familyId,
+            childId: input.childId,
+            profileStatus: input.familyId && input.childId ? "complete" : "incomplete",
         },
         now
     );

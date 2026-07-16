@@ -64,6 +64,27 @@
     background: rgba($brand-primary, 0.07);
 }
 
+.healthQuickButton {
+    min-height: 40px;
+    margin-top: 6px;
+    padding: 8px 15px;
+    border: 1px solid rgba($ui-danger, 0.35);
+    border-radius: $radius-pill;
+    background: rgba($ui-danger, 0.08);
+    color: $ui-danger-deep;
+    font-family: inherit;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.healthQuickButton:hover {
+    background: rgba($ui-danger, 0.14);
+}
+
+.healthDeclarationCard {
+    scroll-margin-top: 22px;
+}
+
 .progressNumber {
     color: $brand-primary;
     font-size: $type-display-number-sm;
@@ -79,6 +100,81 @@
 .feedback {
     min-height: 48px;
     padding: 10px 0;
+}
+
+.reviewOverview {
+    margin-bottom: 22px;
+    padding: 20px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-lg;
+    background: $brand-bg;
+    box-shadow: 0 12px 30px $ui-shadow-blue-soft;
+}
+
+.reviewOverviewHeading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 14px;
+}
+
+.reviewOverviewHint {
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 700;
+}
+
+.reviewOverviewGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.reviewOverviewItem {
+    display: grid;
+    gap: 5px;
+    min-height: 78px;
+    padding: 13px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+    color: $brand-text;
+    text-align: right;
+    font: inherit;
+    cursor: pointer;
+}
+
+.reviewOverviewItem span {
+    font-weight: 800;
+}
+
+.reviewOverviewItem strong {
+    color: $ui-text-muted;
+    font-size: $type-caption;
+}
+
+.reviewOverviewItemReview {
+    border-color: rgba($brand-secondary, 0.75);
+    background: rgba($brand-secondary, 0.11);
+}
+
+.reviewOverviewItemComplete {
+    border-color: rgba($ui-success-dark, 0.3);
+    background: rgba($ui-success-dark, 0.07);
+}
+
+.reviewOverviewItemComplete strong {
+    color: $ui-success-dark;
+}
+
+.reviewOverviewItemCorrection {
+    border-color: rgba($ui-danger, 0.35);
+    background: rgba($ui-danger, 0.07);
+}
+
+.reviewOverviewItemCorrection strong {
+    color: $ui-danger;
 }
 
 .nextActionCard {
@@ -173,6 +269,10 @@
     border: 1px solid $ui-border-soft;
     border-radius: $radius-lg;
     background: $brand-bg;
+}
+
+.caseSectionAnchor {
+    scroll-margin-top: 24px;
 }
 
 .controlSummary,
@@ -291,6 +391,44 @@
     line-height: 1.6;
 }
 
+.deleteCaseArea {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba($ui-danger, 0.22);
+}
+
+.deleteCaseArea h3 {
+    margin: 0 0 7px;
+    color: $ui-danger-deep;
+    font-size: $type-card-title;
+}
+
+.deleteCaseArea > p {
+    margin: 0 0 12px;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    line-height: 1.6;
+}
+
+.correctionPanel {
+    margin-top: 8px;
+    padding: 12px 14px;
+    border: 1px solid rgba($ui-danger, 0.18);
+    border-radius: $radius;
+    background: rgba($ui-danger, 0.035);
+}
+
+.correctionSummary {
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.correctionPanel[open] .correctionSummary {
+    margin-bottom: 14px;
+}
+
 .linkActions,
 .stepActions,
 .dialogActions {
@@ -370,75 +508,6 @@
     box-shadow: 0 16px 42px $ui-shadow-blue-soft;
 }
 
-.auditSection {
-    margin-top: 24px;
-    padding: 24px;
-    border: 1px solid $ui-border-soft;
-    border-radius: $radius-lg;
-    background: $brand-bg;
-}
-
-.auditList {
-    display: grid;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.auditItem {
-    padding: 14px 16px;
-    border: 1px solid $ui-border-soft;
-    border-radius: $radius;
-    background: $brand-surface-cool;
-}
-
-.auditHeading,
-.auditMeta,
-.auditChange {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-}
-
-.auditHeading {
-    align-items: baseline;
-    justify-content: space-between;
-}
-
-.auditAction {
-    color: $brand-primary-deep;
-}
-
-.auditTime,
-.auditMeta,
-.auditChange,
-.emptyAudit {
-    color: $ui-text-muted;
-    font-size: $type-caption;
-}
-
-.auditMeta,
-.auditChange {
-    margin-top: 7px;
-}
-
-.auditChange {
-    padding-top: 7px;
-    border-top: 1px solid $ui-border-soft;
-    overflow-wrap: anywhere;
-}
-
-.emptyAudit,
-.auditError {
-    margin: 0;
-}
-
-.auditError {
-    color: $ui-danger;
-    font-weight: 800;
-}
-
 .sectionHeading {
     display: flex;
     align-items: flex-end;
@@ -461,11 +530,11 @@
 
 .stepsList {
     display: grid;
-    gap: 15px;
+    gap: 9px;
 }
 
 .stepCard {
-    padding: 18px;
+    padding: 14px 16px;
     border: 1px solid $ui-border-soft;
     border-radius: $radius;
     background: $brand-surface-cool;
@@ -502,7 +571,9 @@
 .stepDescription {
     margin: 0;
     color: $ui-text-muted;
-    line-height: 1.55;
+    font-size: $type-caption;
+    font-weight: 700;
+    line-height: 1.4;
 }
 
 .statusBadge {
@@ -520,14 +591,14 @@
     display: flex;
     flex-wrap: wrap;
     gap: 7px 18px;
-    margin: 12px 46px 15px 0;
+    margin: 7px 46px 8px 0;
     color: $ui-text-muted;
     font-size: $type-caption;
 }
 
 .stepGuidance {
-    margin: 0 46px 14px 0;
-    padding: 11px 13px;
+    margin: 8px 46px 10px 0;
+    padding: 9px 11px;
     border-right: 3px solid $brand-secondary;
     border-radius: $radius-sm;
     background: $brand-bg;
@@ -536,9 +607,16 @@
     line-height: 1.6;
 }
 
+.managedStepNote {
+    margin: 7px 46px 0 0;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 700;
+}
+
 .advancedStepEditor {
-    margin-top: 14px;
-    padding-top: 13px;
+    margin-top: 10px;
+    padding-top: 9px;
     border-top: 1px solid $ui-border-soft;
 }
 
@@ -607,6 +685,22 @@
     box-shadow: 0 16px 38px $ui-shadow-blue-soft;
 }
 
+.detailsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 18px;
+    padding: 16px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+}
+
+.detailsGrid p {
+    margin: 0;
+    color: $brand-text;
+    line-height: 1.6;
+}
+
 .leaveDialog {
     width: min(430px, 100%);
     padding: 24px;
@@ -642,6 +736,14 @@
         justify-items: start;
     }
 
+    .detailsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .reviewOverviewGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .controlGrid,
     .editorGrid {
         grid-template-columns: 1fr;
@@ -660,10 +762,6 @@
     }
 
     .stepsSection {
-        padding: 16px;
-    }
-
-    .auditSection {
         padding: 16px;
     }
 
@@ -695,6 +793,15 @@
     .nextActionCard {
         grid-template-columns: 1fr;
         padding: 16px;
+    }
+
+    .reviewOverviewHeading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .reviewOverviewGrid {
+        grid-template-columns: 1fr;
     }
 
     .freshLinkBox {

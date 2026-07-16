@@ -9,13 +9,44 @@ import {
 import DocumentCard from "./DocumentCard";
 import ParentInfoAccordion from "./ParentInfoAccordion";
 import styles from "../DaycareParentInfo.module.scss";
+import type { DaycareParentDocumentBundle } from "../../../services/daycareParentDocumentService";
 
 interface ParentInfoContentProps {
     activeTab: ParentInfoSectionId;
+    parentDocuments: DaycareParentDocumentBundle | null | undefined;
 }
 
-const ParentInfoContent = ({ activeTab }: ParentInfoContentProps) => {
-    const section = sections[activeTab];
+const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProps) => {
+    const baseSection = sections[activeTab];
+    const displayedDocuments = documents.map((document) => document.id === "menu" && parentDocuments
+        ? { ...document, pdfAvailable: parentDocuments.documents.menu.items.length > 0 }
+        : document);
+    const section = activeTab === "routine" && parentDocuments
+        ? {
+            ...baseSection,
+            title: parentDocuments.documents.routine.title,
+            summary: parentDocuments.documents.routine.subtitle,
+            details: parentDocuments.documents.routine.items.map((item) => `${item.time} · ${item.activity}`),
+            note: parentDocuments.documents.routine.note,
+        }
+        : activeTab === "holidays" && parentDocuments
+          ? {
+              ...baseSection,
+              title: parentDocuments.documents.holidays.title,
+              summary: parentDocuments.documents.holidays.subtitle,
+              details: parentDocuments.documents.holidays.items.map((item) => `${item.occasion} · ${item.hebrewDate} · ${item.vacationDates}`),
+              accordionItems: [{ title: "הבהרות חשובות", content: parentDocuments.documents.holidays.clarifications.join("\n") }],
+              note: undefined,
+          }
+          : activeTab === "menu" && parentDocuments
+            ? {
+                ...baseSection,
+                title: parentDocuments.documents.menu.title,
+                summary: parentDocuments.documents.menu.subtitle,
+                details: parentDocuments.documents.menu.items.map((item) => `${item.meal} · ${item.description}`),
+                note: parentDocuments.documents.menu.note ?? (parentDocuments.documents.menu.items.length ? undefined : "התפריט עדיין לא פורסם."),
+            }
+          : baseSection;
 
     return (
         <section className={styles.contentSection} aria-label="המידע שבחרתם">
@@ -55,7 +86,7 @@ const ParentInfoContent = ({ activeTab }: ParentInfoContentProps) => {
 
                     {section.kind === "documents" && (
                         <div className={styles.documentsGrid}>
-                            {documents.map((document) => (
+                            {displayedDocuments.map((document) => (
                                 <DocumentCard
                                     document={document}
                                     key={document.id}

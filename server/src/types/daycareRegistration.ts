@@ -28,4 +28,6 @@ export interface IDaycareRegistration {
     desiredHours?: string;
     parentPriority?: string;
     callNotes?: string;
+    daycareFamilyId?: import("mongoose").Types.ObjectId;
+    daycareChildId?: import("mongoose").Types.ObjectId;
 }

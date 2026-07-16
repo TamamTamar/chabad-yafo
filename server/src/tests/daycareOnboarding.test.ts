@@ -3,19 +3,23 @@ import test from "node:test";
 import { Types } from "mongoose";
 import { DAYCARE_ONBOARDING_AUDIT_ACTIONS } from "../config/daycareOnboardingAuditActions";
 import { DAYCARE_ONBOARDING_STEP_DEFINITIONS } from "../config/daycareOnboardingDefaults";
+import { DAYCARE_PARENT_DOCUMENTS_2026_2027 } from "../config/daycareParentDocuments";
 import { DaycareChild } from "../models/DaycareChild";
 import { DaycareAgreement } from "../models/DaycareAgreement";
 import { DaycareAgreementVersion } from "../models/DaycareAgreementVersion";
 import { DaycareEnrollment } from "../models/DaycareEnrollment";
 import { DaycareFamily } from "../models/DaycareFamily";
+import { DaycareHealthDeclaration } from "../models/DaycareHealthDeclaration";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
 import { DaycareOnboardingAudit } from "../models/DaycareOnboardingAudit";
+import { DaycarePickupAuthorization } from "../models/DaycarePickupAuthorization";
 import {
     isValidSchoolYear,
     parseAdminAccessPatch,
     parseAdminOverallStatusPatch,
     parseAdminStepPatch,
     parseCreateOnboardingFromInquiry,
+    parseDeleteOnboarding,
     parseLegacyOnboardingImport,
     parsePublicDaycareProfile,
 } from "../schemas/daycareOnboardingValidation";
@@ -35,8 +39,11 @@ import {
 } from "../services/daycareOnboardingService";
 import { mapLegacyEnrollmentToIdentity } from "../services/legacyDaycareEnrollmentImportService";
 import { buildDefaultAgreementDraft, hashAgreementContent, hashSignedAgreementSnapshot, ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT } from "../services/daycareAgreementService";
-import { createAgreementPdf, createSignedAgreementPdf } from "../services/daycareAgreementPdfService";
-import { encryptDaycarePrivateValue, fingerprintDaycareIsraeliId, isValidIsraeliId, normalizeIsraeliId } from "../services/daycarePiiEncryptionService";
+import { createAgreementPdf, createParentDocumentPdf, createSignedAgreementPdf } from "../services/daycareAgreementPdfService";
+import { convertHealthImageUploadToPdf, createBlankHealthDeclarationPdf, createSignedHealthDeclarationPdf } from "../services/daycareHealthDeclarationPdfService";
+import { convertPickupImageUploadToPdf, createBlankPickupAuthorizationPdf, createSignedPickupAuthorizationPdf } from "../services/daycarePickupAuthorizationPdfService";
+import { hashParentDocumentBundle } from "../services/daycareParentDocumentService";
+import { decryptDaycarePrivateValue, encryptDaycarePrivateValue, fingerprintDaycareIsraeliId, isValidIsraeliId, normalizeIsraeliId } from "../services/daycarePiiEncryptionService";
 import type { IDaycareEnrollment } from "../types/daycareEnrollment";
 import type {
     IDaycareOnboarding,
@@ -129,14 +136,14 @@ const createLegacyEnrollmentFixture = (): IDaycareEnrollment => ({
     updatedAt: createdAt,
 });
 
-test("creates the ten new default steps and completes only onboardingOpened", () => {
+test("creates the simplified default steps and completes only onboardingOpened", () => {
     const { onboarding, rawToken } = createOnboardingFixture();
 
     assert.equal(rawToken, tokenA);
     assert.equal(onboarding.familyId, familyId);
     assert.equal(onboarding.childId, childId);
     assert.equal(onboarding.schoolYear, "2026-2027");
-    assert.equal(onboarding.steps.length, 10);
+    assert.equal(onboarding.steps.length, 7);
     assert.deepEqual(
         onboarding.steps.map((step) => step.key),
         DAYCARE_ONBOARDING_STEP_DEFINITIONS.map(
@@ -158,6 +165,23 @@ test("creates the ten new default steps and completes only onboardingOpened", ()
     assert.equal(
         onboarding.steps.find((step) => step.key === "childAndGuardianDetails")
             ?.isAvailable,
+        true
+    );
+    assert.deepEqual(
+        onboarding.steps.map((step) => step.key),
+        [
+            "onboardingOpened",
+            "childAndGuardianDetails",
+            "agreementSigned",
+            "healthDeclarationSubmitted",
+            "pickupAuthorizationSubmitted",
+            "registrationFeeReceived",
+            "registrationApproved",
+        ]
+    );
+    assert.equal(
+        onboarding.steps.find((step) => step.key === "registrationFeeReceived")
+            ?.isVisibleToParent,
         true
     );
     assert.ok(
@@ -318,12 +342,12 @@ test("defines unique indexes for child/year, origin/year and legacy child source
 });
 
 test("existing legacy step templates remain valid without migration", async () => {
-    const legacySteps = createOnboardingFixture().onboarding.steps.map(
-        (step, index) => ({
-            ...step,
-            key: legacyOnboardingStepKeys[index],
-        })
-    );
+    const templateStep = createOnboardingFixture().onboarding.steps[0];
+    const legacySteps = legacyOnboardingStepKeys.map((key, index) => ({
+        ...templateStep,
+        key,
+        order: index + 1,
+    }));
     const document = new DaycareOnboarding({
         ...createOnboardingFixture().onboarding,
         steps: legacySteps,
@@ -340,14 +364,14 @@ test("schema rejects invalid school years and incomplete or duplicate step sets"
     });
     const incompleteSteps = new DaycareOnboarding({
         ...createOnboardingFixture().onboarding,
-        steps: createOnboardingFixture().onboarding.steps.slice(0, 9),
+        steps: createOnboardingFixture().onboarding.steps.slice(0, -1),
     });
     const duplicateSteps = createOnboardingFixture().onboarding.steps.map(
         (step) => ({ ...step })
     );
-    duplicateSteps[9] = {
-        ...duplicateSteps[9],
-        key: duplicateSteps[8].key,
+    duplicateSteps[6] = {
+        ...duplicateSteps[6],
+        key: duplicateSteps[5].key,
     };
     const duplicateStepDocument = new DaycareOnboarding({
         ...createOnboardingFixture().onboarding,
@@ -373,6 +397,21 @@ test("inquiry onboarding validation requires only school year and optional note"
             firstName: "אורי",
             schoolYear: "2026-2027",
         }).success,
+        false
+    );
+});
+
+test("deleting an onboarding requires the exact Hebrew confirmation phrase", () => {
+    assert.deepEqual(parseDeleteOnboarding({ confirmation: "מחיקת תיק" }), {
+        success: true,
+        data: { confirmation: "מחיקת תיק" },
+    });
+    assert.equal(
+        parseDeleteOnboarding({ confirmation: "מחיקה" }).success,
+        false
+    );
+    assert.equal(
+        parseDeleteOnboarding({ confirmation: "מחיקת תיק", force: true }).success,
         false
     );
 });
@@ -511,6 +550,7 @@ test("online agreement signer IDs are validated, normalized and encrypted withou
         assert.equal(first.algorithm, "aes-256-gcm");
         assert.notEqual(first.ciphertext, second.ciphertext);
         assert.equal(JSON.stringify(first).includes("123456782"), false);
+        assert.equal(decryptDaycarePrivateValue(first), "123456782");
         assert.equal(fingerprintDaycareIsraeliId("123456782"), fingerprintDaycareIsraeliId("123456782"));
     } finally {
         if (previousKey === undefined) delete process.env.DAYCARE_PII_ENCRYPTION_KEY;
@@ -518,11 +558,108 @@ test("online agreement signer IDs are validated, normalized and encrypted withou
     }
 });
 
+test("health declarations keep medical payload private and generate a signed PDF", async () => {
+    assert.equal(DaycareHealthDeclaration.schema.path("encryptedPayload").options.select, false);
+    const indexes = DaycareHealthDeclaration.schema.indexes() as Array<[Record<string, number>, { unique?: boolean }]>;
+    assert.equal(indexes.some(([fields, options]) => fields.onboardingId === 1 && fields.revision === 1 && options.unique === true), true);
+    const signatureImage = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", "base64");
+    const pdf = await createSignedHealthDeclarationPdf({
+        documentId: "health-test-document",
+        revision: 1,
+        schoolYear: "2026-2027",
+        childName: "ילד בדיקה",
+        payload: {
+            healthCondition: "תקין",
+            medicationSensitivities: "אין",
+            healthFund: "כללית",
+            hasAllergies: true,
+            allergyDetails: "בוטנים",
+            exposureInstructions: "לפעול לפי הנחיות ההורים והרופא",
+            informationConfirmed: true,
+            allergyResponsibilityAccepted: true,
+            signedBy: "ישראל ישראלי",
+            signerRole: "father",
+        },
+        contentHash: "b".repeat(64),
+        signatureImage,
+        submittedAt: createdAt,
+    });
+    assert.equal(pdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.ok(pdf.length > 5000);
+    const blankPdf = await createBlankHealthDeclarationPdf({ schoolYear: "2026-2027", childName: "ילד בדיקה" });
+    assert.equal(blankPdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.ok(blankPdf.length > 5000);
+    const uploadedPhotoPdf = await convertHealthImageUploadToPdf(signatureImage, "image/png");
+    assert.equal(uploadedPhotoPdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.equal(DaycareHealthDeclaration.schema.path("signingMethod").options.enum.includes("uploadedFile"), true);
+    assert.equal(DaycareHealthDeclaration.schema.path("signatureFile").options.required, undefined);
+    assert.equal(DaycareHealthDeclaration.schema.path("signedPdfFile").options.required, undefined);
+    assert.deepEqual(DaycareHealthDeclaration.schema.path("correctionDisposition").options.enum, ["preserveVersion", "discardFileAfterReplacement"]);
+});
+
+test("pickup authorizations keep collector IDs private and generate printable PDFs", async () => {
+    assert.equal(DaycarePickupAuthorization.schema.path("encryptedPayload").options.select, false);
+    const indexes = DaycarePickupAuthorization.schema.indexes() as Array<[Record<string, number>, { unique?: boolean }]>;
+    assert.equal(indexes.some(([fields, options]) => fields.onboardingId === 1 && fields.revision === 1 && options.unique === true), true);
+    const signatureImage = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", "base64");
+    const guardians = [{ fullName: "ישראל ישראלי", role: "father", phone: "0501234567" }];
+    const payload = { guardians, collectors: [{ fullName: "שרה ישראלי", relationship: "סבתא", phone: "0521234567", israeliId: "123456782" }], informationConfirmed: true as const, signedBy: "ישראל ישראלי", signerRole: "father" as const };
+    const signed = await createSignedPickupAuthorizationPdf({ documentId: "pickup-test", revision: 1, schoolYear: "2026-2027", childName: "ילד בדיקה", payload, contentHash: "c".repeat(64), signatureImage, submittedAt: createdAt });
+    const blank = await createBlankPickupAuthorizationPdf({ schoolYear: "2026-2027", childName: "ילד בדיקה", guardians });
+    const photo = await convertPickupImageUploadToPdf(signatureImage);
+    assert.equal(signed.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.equal(blank.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.equal(photo.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.ok(signed.length > 5000 && blank.length > 5000);
+    assert.equal(DaycarePickupAuthorization.schema.path("signedPdfFile").options.required, undefined);
+    assert.deepEqual(DaycarePickupAuthorization.schema.path("correctionDisposition").options.enum, ["preserveVersion", "discardFileAfterReplacement"]);
+});
+
 test("agreement private evidence fields are excluded from ordinary Mongoose queries", () => {
     assert.equal(DaycareAgreement.schema.path("signerIsraeliId").options.select, false);
     assert.equal(DaycareAgreement.schema.path("signerIsraeliIdFingerprint").options.select, false);
     assert.equal(DaycareAgreement.schema.path("ipAddress").options.select, false);
     assert.equal(DaycareAgreement.schema.path("contentSnapshot").options.select, false);
+    assert.equal(DaycareAgreement.schema.path("parentDocumentsSnapshot").options.select, false);
+    assert.deepEqual(DaycareAgreement.schema.path("correctionDisposition").options.enum, ["preserveVersion", "discardFileAfterReplacement"]);
+    const agreementIndexes = DaycareAgreement.schema.indexes() as Array<[
+        Record<string, number>,
+        { unique?: boolean },
+    ]>;
+    assert.equal(
+        agreementIndexes.some(
+            ([fields, options]) =>
+                fields.onboardingId === 1 &&
+                fields.revision === 1 &&
+                Object.keys(fields).length === 2 &&
+                options.unique === true
+        ),
+        true
+    );
+    const agreement = new DaycareAgreement({
+        onboardingId,
+        versionId: new Types.ObjectId(),
+    });
+    assert.equal(agreement.revision, 1);
+});
+
+test("yearly parent documents have a stable version, hash and dynamic PDFs", async () => {
+    const bundle = DAYCARE_PARENT_DOCUMENTS_2026_2027;
+    assert.equal(bundle.schoolYear, "2026-2027");
+    assert.equal(bundle.version, "2026-2027-v1");
+    assert.equal(bundle.documents.routine.items.length, 18);
+    assert.equal(bundle.documents.holidays.items.length, 9);
+    const hash = hashParentDocumentBundle(bundle);
+    assert.match(hash, /^[a-f0-9]{64}$/);
+    assert.notEqual(hash, hashParentDocumentBundle({ ...bundle, version: "2026-2027-v2" }));
+    const [routinePdf, holidaysPdf] = await Promise.all([
+        createParentDocumentPdf(bundle, "routine"),
+        createParentDocumentPdf(bundle, "holidays"),
+    ]);
+    assert.equal(routinePdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.equal(holidaysPdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.ok(routinePdf.length > 5000);
+    assert.ok(holidaysPdf.length > 5000);
 });
 
 test("final signed agreement PDF includes a stable snapshot and is generated as a PDF", async () => {
@@ -654,11 +791,11 @@ test("progress includes only visible required steps and rounds to an integer", (
     const { onboarding } = createOnboardingFixture();
     onboarding.steps[1].isVisibleToParent = false;
     onboarding.steps[2].status = "notRequired";
-    onboarding.steps[3].status = "completed";
+    onboarding.steps[4].status = "completed";
 
     assert.deepEqual(calculateOnboardingProgress(onboarding.steps), {
-        completedSteps: 2,
-        totalSteps: 8,
+        completedSteps: 1,
+        totalSteps: 4,
         percentage: 25,
     });
 });
@@ -823,8 +960,8 @@ test("legacy import validation requires a consecutive school year and an explici
 test("public DTO exposes only parent-safe fields and visible steps", () => {
     const { onboarding } = createOnboardingFixture();
     onboarding.steps[0].internalNote = "סוד פנימי לצוות";
-    onboarding.steps[0].parentMessage = "התקבל ואושר";
-    onboarding.steps[0].relatedRecord = {
+    onboarding.steps[2].parentMessage = "התקבל ואושר";
+    onboarding.steps[2].relatedRecord = {
         type: "agreement",
         recordId: new Types.ObjectId(),
         documentKey: "internal-document-key",
@@ -839,7 +976,7 @@ test("public DTO exposes only parent-safe fields and visible steps", () => {
 
     assert.equal(publicDto.childName, "אורי כהן");
     assert.equal(publicDto.schoolYear, "2026-2027");
-    assert.equal(publicDto.steps.length, 9);
+    assert.equal(publicDto.steps.length, 5);
     assert.equal(publicDto.steps[0].parentMessage, "התקבל ואושר");
     assert.equal(serialized.includes("internalNote"), false);
     assert.equal(serialized.includes("סוד פנימי"), false);
@@ -853,6 +990,25 @@ test("public DTO exposes only parent-safe fields and visible steps", () => {
     assert.equal(serialized.includes("actionType"), false);
     assert.equal(serialized.includes("updatedBy"), false);
     assert.equal(serialized.includes("audit"), false);
+});
+
+test("parent flow skips submitted reviews and admin-only steps", () => {
+    const { onboarding } = createOnboardingFixture();
+    const profileStep = onboarding.steps.find((step) => step.key === "childAndGuardianDetails");
+    const agreementStep = onboarding.steps.find((step) => step.key === "agreementSigned");
+    assert.ok(profileStep);
+    assert.ok(agreementStep);
+    profileStep.status = "pendingReview";
+    agreementStep.status = "pendingReview";
+
+    const publicDto = toPublicOnboardingDto(onboarding);
+
+    assert.equal(publicDto.canEditProfile, false);
+    assert.equal(publicDto.missingStepTitle, "בריאות והרשאות");
+    assert.equal(
+        publicDto.steps.find((step) => step.key === "pickupAuthorizationSubmitted")?.title,
+        "מורשי איסוף"
+    );
 });
 
 test("public profile serializes Mongoose address subdocuments without internal metadata", () => {

@@ -21,6 +21,7 @@ import {
     DAYCARE_MONTHLY_TUITION_LABEL,
     DAYCARE_REGISTRATION_DEPOSIT_LABEL,
 } from "../../config/daycareDefaults";
+import { currentParentDocumentPdfUrl } from "../../services/daycareParentDocumentService";
 
 export type ParentInfoSectionId =
     | "general"
@@ -62,7 +63,7 @@ export interface ParentInfoSection {
 }
 
 export interface ParentInfoDocument {
-    id: "agreement" | "holidays" | "menu" | "medical";
+    id: "agreement" | "routine" | "holidays" | "menu" | "medical";
     icon: LucideIcon;
     title: string;
     description: string;
@@ -119,16 +120,8 @@ export const sections: Record<ParentInfoSectionId, ParentInfoSection> = {
         id: "routine",
         icon: Clock3,
         title: "סדר יום והסתגלות",
-        summary:
-            "היום בנוי מעוגנים קבועים בין 07:30 ל־16:00, עם מעברים רגועים וגמישות בהתאם לצורכי הילדים.",
-        details: [
-            "07:30–08:15 · קבלת הילדים ומשחק בתיבות פעילות",
-            "08:15–09:00 · ארוחת בוקר ומפגש בוקר עם תפילה ונושא נלמד",
-            "09:00–11:25 · משחק, חצר, פרי, יצירה, היגיינה וג׳ימבורי",
-            "11:25–12:00 · ארוחת צהריים והתארגנות לשינה",
-            "12:00–14:00 · מנוחת צהריים",
-            "14:00–16:00 · השכמה, ארוחת ביניים, מוזיקה, סיפור ומשחק עד לאיסוף",
-        ],
+        summary: "המידע נטען מהגרסה השנתית שפורסמה.",
+        details: [],
         accordionItems: [
             {
                 title: "תהליך ההסתגלות",
@@ -136,7 +129,6 @@ export const sections: Record<ParentInfoSectionId, ParentInfoSection> = {
                     "ההסתגלות מתוכננת בצורה הדרגתית ורגועה, בתיאום עם המשפחה ובהתאם לגיל, לקצב ולהרגלים של כל ילד.",
             },
         ],
-        note: "סדר היום הוא מסגרת מנחה ועשוי להשתנות במהלך היום לפי הקצב והצרכים של הילדים.",
     },
     menu: {
         id: "menu",
@@ -221,13 +213,8 @@ export const sections: Record<ParentInfoSectionId, ParentInfoSection> = {
         id: "holidays",
         icon: CalendarDays,
         title: "חופשות ומועדים",
-        summary:
-            "לוח החופשות השנתי ירכז את ימי הפעילות, ערבי החג, החגים והחזרה לשגרה.",
-        details: [
-            "לוח החופשות עדיין לא פורסם",
-            "לאחר אישורו ניתן יהיה לצפות בו באתר ולהוריד אותו כ־PDF",
-        ],
-        note: "יש להעלות את לוח החופשות המאושר לפני פרסום הטאב להורים.",
+        summary: "המידע נטען מהגרסה השנתית שפורסמה.",
+        details: [],
     },
     faq: {
         id: "faq",
@@ -286,13 +273,12 @@ export const faqItems: ParentInfoAccordionItem[] = [
 
 export const daycareDocumentPaths = {
     agreement: "/documents/daycare/daycare-agreement.pdf",
-    holidays: "/documents/daycare/daycare-holidays.pdf",
-    menu: "/documents/daycare/daycare-menu.pdf",
+    routine: currentParentDocumentPdfUrl("routine"),
+    holidays: currentParentDocumentPdfUrl("holidays"),
+    menu: currentParentDocumentPdfUrl("menu"),
     medical: "/documents/daycare/daycare-medical-form.pdf",
 } as const;
 
-// TODO: After uploading each verified PDF to client/public/documents/daycare,
-// change only its pdfAvailable flag and optionally add updatedAt.
 export const documents: ParentInfoDocument[] = [
     {
         id: "agreement",
@@ -306,14 +292,26 @@ export const documents: ParentInfoDocument[] = [
         onlineLabel: "קריאת תקציר באתר",
     },
     {
+        id: "routine",
+        icon: Clock3,
+        title: "סדר היום במעון",
+        description: "סדר היום המלא, משעת קבלת הילדים ועד לאיסוף.",
+        pdfPath: daycareDocumentPaths.routine,
+        pdfAvailable: true,
+        onlinePath: "/daycare-parent-info?section=routine",
+        onlineLabel: "צפייה באתר",
+        updatedAt: "יולי 2026",
+    },
+    {
         id: "holidays",
         icon: CalendarDays,
         title: "לוח חופשות",
         description: "לוח החופשות השנתי של המעון.",
         pdfPath: daycareDocumentPaths.holidays,
-        pdfAvailable: false,
+        pdfAvailable: true,
         onlinePath: "/daycare-parent-info?section=holidays",
         onlineLabel: "צפייה באתר",
+        updatedAt: "יולי 2026",
     },
     {
         id: "menu",

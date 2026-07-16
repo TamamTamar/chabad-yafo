@@ -33,6 +33,10 @@ export interface CreateOnboardingFromInquiryDto {
     internalNote?: string;
 }
 
+export interface DeleteOnboardingDto {
+    confirmation: "מחיקת תיק";
+}
+
 const guardianRoles = new Set([
     "mother",
     "father",
@@ -502,6 +506,26 @@ export const parseCreateOnboardingFromInquiry = (
                     : undefined,
         },
     };
+};
+
+export const parseDeleteOnboarding = (
+    value: unknown
+): ValidationResult<DeleteOnboardingDto> => {
+    if (!isRecord(value)) {
+        return { success: false, message: "A JSON object is required" };
+    }
+
+    if (
+        Object.keys(value).length !== 1 ||
+        value.confirmation !== "מחיקת תיק"
+    ) {
+        return {
+            success: false,
+            message: "יש להקליד „מחיקת תיק” כדי לאשר את הפעולה",
+        };
+    }
+
+    return { success: true, data: { confirmation: "מחיקת תיק" } };
 };
 
 export const parsePublicDaycareProfile = (

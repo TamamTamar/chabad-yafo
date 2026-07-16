@@ -14,12 +14,14 @@ import {
     isValidIsraeliId,
     normalizeIsraeliId,
 } from "./daycarePiiEncryptionService";
-import type { DaycareAgreementSignerRole, IDaycareStructuredDocument } from "../types/daycareAgreement";
+import type { DaycareAgreementSignerRole, DaycareCorrectionDisposition, IDaycareStructuredDocument } from "../types/daycareAgreement";
 import {
     DAYCARE_AGREEMENT_DRAFT_2026,
     DAYCARE_AGREEMENT_DRAFT_2026_SCHOOL_YEAR,
     DAYCARE_AGREEMENT_DRAFT_2026_VERSION,
 } from "../config/daycareAgreementDraft2026";
+import { getPublishedParentDocumentBundle, hashParentDocumentBundle, lockParentDocumentYear } from "./daycareParentDocumentService";
+import { logger } from "../utils/logger";
 
 export const ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT = "קראתי את הסכם ההתקשרות במלואו, הבנתי את תוכנו, ניתנה לי אפשרות לשאול שאלות ולקבל הבהרות, ואני מסכים/ה לכל תנאיו. ידוע לי כי הזנת פרטיי, סימון תיבה זו ולחיצה על 'אישור וחתימה על ההסכם' מהווים את אישורי והסכמתי להתקשר בהסכם.";
 
@@ -165,6 +167,7 @@ export const publishAgreementDraft = async (id: string, legalReviewConfirmed: bo
 
 const agreementDto = (agreement: InstanceType<typeof DaycareAgreement> | null) => agreement ? ({
     id: agreement.id,
+    revision: agreement.revision,
     status: agreement.status,
     signingMethod: agreement.signingMethod,
     signedBy: agreement.signedBy,
@@ -173,11 +176,13 @@ const agreementDto = (agreement: InstanceType<typeof DaycareAgreement> | null) =
     documentId: agreement.documentId,
     version: agreement.version,
     parentMessage: agreement.parentMessage,
+    correctionDisposition: agreement.correctionDisposition,
     hasSignature: Boolean(agreement.signatureFile),
     hasSignedPdf: Boolean(agreement.signedPdfFile),
 }) : null;
 
 const publicAgreementDto = (agreement: InstanceType<typeof DaycareAgreement> | null) => agreement ? ({
+    revision: agreement.revision,
     status: agreement.status,
     signingMethod: agreement.signingMethod,
     signedBy: agreement.signedBy,
@@ -186,6 +191,7 @@ const publicAgreementDto = (agreement: InstanceType<typeof DaycareAgreement> | n
     documentId: agreement.documentId,
     version: agreement.version,
     parentMessage: agreement.parentMessage,
+    correctionDisposition: agreement.correctionDisposition,
     hasSignature: Boolean(agreement.signatureFile),
     hasSignedPdf: Boolean(agreement.signedPdfFile),
 }) : null;
@@ -199,7 +205,7 @@ export const getAgreementByOnboardingForAdmin = async (onboardingId: string) => 
         throw new DaycareOnboardingServiceError("Onboarding not found", 404, "ONBOARDING_NOT_FOUND");
     }
     const [agreement, publishedVersion] = await Promise.all([
-        DaycareAgreement.findOne({ onboardingId }),
+        DaycareAgreement.findOne({ onboardingId }).sort({ revision: -1 }),
         DaycareAgreementVersion.findOne({
             documentKey: "daycareAgreement",
             schoolYear: onboarding.schoolYear,
@@ -216,20 +222,21 @@ export const getPublicAgreement = async (token: string, now = new Date()) => {
     const onboarding = await getPublicOnboardingDocumentByToken(token, now);
     const profileStep = onboarding.steps.find(step => step.key === "childAndGuardianDetails");
     const agreementStep = onboarding.steps.find(step => step.key === "agreementSigned");
-    if (!profileStep || profileStep.status !== "completed" || !agreementStep?.isVisibleToParent) {
+    if (!profileStep || !["pendingReview", "completed", "notRequired"].includes(profileStep.status) || !agreementStep?.isVisibleToParent) {
         return { available: false, reason: "profileRequiresApproval", signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured() };
     }
     const version = await DaycareAgreementVersion.findOne({ documentKey: "daycareAgreement", schoolYear: onboarding.schoolYear, status: "published" });
     if (!version) return { available: false, reason: "agreementNotPublished", signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured() };
-    const agreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id });
-    return { available: true, signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured(), acceptanceStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, version: publicVersionDto(version), agreement: publicAgreementDto(agreement) };
+    const agreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 }).select("+parentDocumentsSnapshot");
+    const parentDocuments = agreement?.parentDocumentsSnapshot ?? await getPublishedParentDocumentBundle(onboarding.schoolYear);
+    return { available: true, signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured(), acceptanceStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, version: publicVersionDto(version), agreement: publicAgreementDto(agreement), parentDocuments: { version: parentDocuments.version, menuAvailable: parentDocuments.documents.menu.items.length > 0 } };
 };
 
 const getSignableContext = async (token: string, now: Date) => {
     const onboarding = await getPublicOnboardingDocumentByToken(token, now);
     const profileStep = onboarding.steps.find(step => step.key === "childAndGuardianDetails");
     const stepIndex = onboarding.steps.findIndex(step => step.key === "agreementSigned");
-    if (profileStep?.status !== "completed" || stepIndex < 0) throw new DaycareOnboardingServiceError("Agreement is not available", 409, "AGREEMENT_NOT_AVAILABLE");
+    if (!profileStep || !["pendingReview", "completed", "notRequired"].includes(profileStep.status) || stepIndex < 0) throw new DaycareOnboardingServiceError("Agreement is not available", 409, "AGREEMENT_NOT_AVAILABLE");
     const version = await DaycareAgreementVersion.findOne({ documentKey: "daycareAgreement", schoolYear: onboarding.schoolYear, status: "published" });
     if (!version) throw new DaycareOnboardingServiceError("Agreement is not published", 409, "AGREEMENT_NOT_AVAILABLE");
     return { onboarding, version, stepIndex };
@@ -265,24 +272,50 @@ const markPendingReview = async (onboarding: InstanceType<typeof DaycareOnboardi
     ]);
 };
 
-export const submitOnlineAgreement = async (token: string, input: { signedBy: string; signerRole: string; signerIsraeliId: string; acceptedTerms: boolean; ipAddress: string; userAgent: string; signature: Express.Multer.File }, now = new Date()) => {
+const finalizeReplacedAgreement = async (previousAgreement: InstanceType<typeof DaycareAgreement> | null, now: Date) => {
+    if (!previousAgreement) return;
+    previousAgreement.supersededAt = now;
+    await previousAgreement.save();
+    if (previousAgreement.correctionDisposition !== "discardFileAfterReplacement") return;
+
+    const storage = getDaycareStorageProvider();
+    const files = [previousAgreement.signatureFile, previousAgreement.signedPdfFile].filter(Boolean);
+    try {
+        await Promise.all(files.map((file) => storage.delete(file!.storageKey)));
+        await DaycareAgreement.updateOne(
+            { _id: previousAgreement._id },
+            {
+                $unset: { signatureFile: 1, signedPdfFile: 1 },
+                $set: { fileDiscardedAt: now },
+            }
+        );
+    } catch (error) {
+        logger.error("Failed to discard replaced daycare agreement files", error);
+    }
+};
+
+export const submitOnlineAgreement = async (token: string, input: { signedBy: string; signerRole: string; signerIsraeliId: string; acceptedTerms: boolean; parentDocumentsAccepted: boolean; ipAddress: string; userAgent: string; signature: Express.Multer.File }, now = new Date()) => {
     const signedBy = input.signedBy.trim();
     const signerRole = input.signerRole as DaycareAgreementSignerRole;
     const signerIsraeliId = normalizeIsraeliId(input.signerIsraeliId);
-    if (!input.acceptedTerms || signedBy.length < 2 || signedBy.length > 160 || !(["mother", "father", "guardian"] as string[]).includes(signerRole) || !isValidIsraeliId(signerIsraeliId)) {
+    if (!input.acceptedTerms || !input.parentDocumentsAccepted || signedBy.length < 2 || signedBy.length > 160 || !(["mother", "father", "guardian"] as string[]).includes(signerRole) || !isValidIsraeliId(signerIsraeliId)) {
         throw new DaycareOnboardingServiceError("יש למלא שם מלא, תפקיד ותעודת זהות תקינה ולאשר את נוסח ההסכמה.", 400, "INVALID_SIGNATURE");
     }
     if (input.signature.mimetype !== "image/png" || !input.signature.buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
         throw new DaycareOnboardingServiceError("Signature drawing is invalid", 400, "INVALID_SIGNATURE_FILE");
     }
     const { onboarding, version, stepIndex } = await getSignableContext(token, now);
-    if (await DaycareAgreement.exists({ onboardingId: onboarding._id })) {
+    const previousAgreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 });
+    if (previousAgreement && previousAgreement.status !== "requiresCorrection") {
         throw new DaycareOnboardingServiceError("ההסכם כבר אושר וננעל.", 409, "AGREEMENT_ALREADY_SIGNED");
     }
+    const revision = (previousAgreement?.revision ?? 0) + 1;
     const documentId = randomUUID();
     const contentSnapshot = structuredDocumentFromVersion(version);
+    const parentDocumentsSnapshot = await lockParentDocumentYear(onboarding.schoolYear, now);
+    const parentDocumentsHash = hashParentDocumentBundle(parentDocumentsSnapshot);
     const signedContentHash = hashSignedAgreementSnapshot({ documentKey: "daycareAgreement", version: version.version, schoolYear: version.schoolYear, document: contentSnapshot });
-    const pdf = await createSignedAgreementPdf({ documentId, documentKey: "daycareAgreement", version: version.version, schoolYear: version.schoolYear, contentHash: signedContentHash, contentSnapshot, signedBy, signerRole, signerIsraeliId, signatureImage: input.signature.buffer, acceptedStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, signedAt: now });
+    const pdf = await createSignedAgreementPdf({ documentId, documentKey: "daycareAgreement", version: version.version, schoolYear: version.schoolYear, contentHash: signedContentHash, contentSnapshot, signedBy, signerRole, signerIsraeliId, signatureImage: input.signature.buffer, acceptedStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, signedAt: now, parentDocumentsVersion: parentDocumentsSnapshot.version, parentDocumentsHash });
     const storage = getDaycareStorageProvider();
     const signatureFile = await storage.upload({ bytes: input.signature.buffer, mimeType: "image/png", originalName: `signature-${documentId}.png`, category: "signatures" });
     let signedPdfFile;
@@ -296,12 +329,17 @@ export const submitOnlineAgreement = async (token: string, input: { signedBy: st
     try {
         agreement = await DaycareAgreement.create({
             onboardingId: onboarding._id,
+            revision,
             versionId: version._id,
             documentId,
             documentKey: "daycareAgreement",
             version: version.version,
             contentHash: signedContentHash,
             contentSnapshot,
+            parentDocumentsVersion: parentDocumentsSnapshot.version,
+            parentDocumentsHash,
+            parentDocumentsSnapshot,
+            parentDocumentsAccepted: true,
             status: "pendingReview",
             signingMethod: "online",
             signedBy,
@@ -332,6 +370,7 @@ export const submitOnlineAgreement = async (token: string, input: { signedBy: st
         "agreementSignedOnline",
         now
     );
+    await finalizeReplacedAgreement(previousAgreement, now);
     await createAuditEntries([
         {
             onboardingId: onboarding._id,
@@ -348,7 +387,7 @@ export const submitOnlineAgreement = async (token: string, input: { signedBy: st
 
 export const downloadSignedAgreementForParent = async (token: string, now = new Date()) => {
     const onboarding = await getPublicOnboardingDocumentByToken(token, now);
-    const agreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id });
+    const agreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 });
     if (!agreement?.signedPdfFile || agreement.signingMethod !== "online") {
         throw new DaycareOnboardingServiceError("Signed agreement was not found", 404, "AGREEMENT_FILE_NOT_FOUND");
     }
@@ -364,36 +403,72 @@ export const submitSignedAgreementPdf = async (token: string, file: Express.Mult
     if (file.mimetype !== "application/pdf") throw new DaycareOnboardingServiceError("Only PDF files are allowed", 400, "INVALID_AGREEMENT_FILE");
     if (!file.originalname.toLowerCase().endsWith(".pdf") || file.buffer.subarray(0, 5).toString("ascii") !== "%PDF-") throw new DaycareOnboardingServiceError("PDF file is invalid", 400, "INVALID_AGREEMENT_FILE");
     const { onboarding, version, stepIndex } = await getSignableContext(token, now);
-    const existingAgreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id });
-    if (existingAgreement && (existingAgreement.signingMethod === "online" || existingAgreement.status !== "requiresCorrection")) {
+    const existingAgreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 });
+    if (existingAgreement && existingAgreement.status !== "requiresCorrection") {
         throw new DaycareOnboardingServiceError("ההסכם כבר נשלח וננעל.", 409, "AGREEMENT_ALREADY_SIGNED");
     }
+    const revision = (existingAgreement?.revision ?? 0) + 1;
     const stored = await getDaycareStorageProvider().upload({ bytes: file.buffer, mimeType: "application/pdf", originalName: file.originalname, category: "signed-agreements" });
-    const agreement = await DaycareAgreement.findOneAndUpdate(
-        { onboardingId: onboarding._id },
-        { $set: { versionId: version._id, status: "pendingReview", signingMethod: "uploadedPdf", signedAt: now, signedPdfFile: stored }, $unset: { signatureFile: 1, acceptedTerms: 1, signedBy: 1, signerRole: 1, signerRoleDetails: 1 } },
-        { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
+    const parentDocumentsSnapshot = await lockParentDocumentYear(onboarding.schoolYear, now);
+    const parentDocumentsHash = hashParentDocumentBundle(parentDocumentsSnapshot);
+    const contentSnapshot = structuredDocumentFromVersion(version);
+    let agreement: InstanceType<typeof DaycareAgreement>;
+    try {
+        agreement = await DaycareAgreement.create({
+            onboardingId: onboarding._id,
+            revision,
+            versionId: version._id,
+            documentId: randomUUID(),
+            documentKey: "daycareAgreement",
+            version: version.version,
+            contentHash: hashSignedAgreementSnapshot({
+                documentKey: "daycareAgreement",
+                version: version.version,
+                schoolYear: version.schoolYear,
+                document: contentSnapshot,
+            }),
+            contentSnapshot,
+            status: "pendingReview",
+            signingMethod: "uploadedPdf",
+            signedAt: now,
+            signedPdfFile: stored,
+            parentDocumentsVersion: parentDocumentsSnapshot.version,
+            parentDocumentsHash,
+            parentDocumentsSnapshot,
+            parentDocumentsAccepted: true,
+        });
+    } catch (error) {
+        await getDaycareStorageProvider().delete(stored.storageKey).catch(() => undefined);
+        throw error;
+    }
     await markPendingReview(onboarding, stepIndex, agreement._id, "uploadedFile", "agreementPdfUploaded", now);
+    await finalizeReplacedAgreement(existingAgreement, now);
     return publicAgreementDto(agreement);
 };
 
-export const reviewAgreement = async (agreementId: string, input: { status: "completed" | "requiresCorrection"; parentMessage?: string }, now = new Date()) => {
+export const reviewAgreement = async (agreementId: string, input: { status: "completed" | "requiresCorrection"; parentMessage?: string; correctionDisposition?: DaycareCorrectionDisposition }, now = new Date()) => {
     if (!Types.ObjectId.isValid(agreementId)) throw new DaycareOnboardingServiceError("Agreement not found", 404, "AGREEMENT_NOT_FOUND");
     const agreement = await DaycareAgreement.findById(agreementId);
     if (!agreement) throw new DaycareOnboardingServiceError("Agreement not found", 404, "AGREEMENT_NOT_FOUND");
-    if (agreement.signingMethod === "online" && input.status === "requiresCorrection") {
+    if (agreement.supersededAt) throw new DaycareOnboardingServiceError("גרסת ההסכם הוחלפה ואינה ניתנת לאישור.", 409, "AGREEMENT_SUPERSEDED");
+    if (input.status === "requiresCorrection" && !input.parentMessage?.trim()) {
         throw new DaycareOnboardingServiceError(
-            "Online agreements can only be approved after signature review",
-            409,
-            "ONLINE_AGREEMENT_CORRECTION_NOT_SUPPORTED"
+            "יש לכתוב להורה מה נדרש לתקן.",
+            400,
+            "AGREEMENT_CORRECTION_MESSAGE_REQUIRED"
         );
+    }
+    if (input.status === "requiresCorrection" && input.correctionDisposition === "discardFileAfterReplacement" && agreement.signingMethod !== "uploadedPdf") {
+        throw new DaycareOnboardingServiceError("ניתן למחוק לאחר החלפה רק קובץ שהועלה ידנית.", 400, "AGREEMENT_CORRECTION_DISPOSITION_INVALID");
     }
     if (input.status === "completed" && agreement.status === "completed") {
         return agreementDto(agreement);
     }
     agreement.status = input.status;
     agreement.parentMessage = input.parentMessage?.trim() || undefined;
+    agreement.correctionDisposition = input.status === "requiresCorrection"
+        ? input.correctionDisposition ?? "preserveVersion"
+        : undefined;
     agreement.reviewedAt = now;
     agreement.reviewedBy = "shared-admin";
     await agreement.save();
@@ -403,6 +478,66 @@ export const reviewAgreement = async (agreementId: string, input: { status: "com
     }, now);
     await createAuditEntries([{ onboardingId: agreement.onboardingId, actorType: "admin", actorLabel: "shared-admin", action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.agreementReviewed, stepKey: "agreementSigned", newValue: { status: input.status }, createdAt: now }]);
     return agreementDto(agreement);
+};
+
+export const reconcileAgreementOnboardingSteps = async (now = new Date()) => {
+    const agreements = await DaycareAgreement.find({
+        status: { $in: ["pendingReview", "completed", "requiresCorrection"] },
+    }).sort({ onboardingId: 1, revision: -1 }).select("onboardingId revision status parentMessage signedAt reviewedAt");
+    let repaired = 0;
+    const reconciledOnboardings = new Set<string>();
+
+    for (const agreement of agreements) {
+        const onboardingKey = agreement.onboardingId.toString();
+        if (reconciledOnboardings.has(onboardingKey)) continue;
+        reconciledOnboardings.add(onboardingKey);
+        const onboarding = await DaycareOnboarding.findById(agreement.onboardingId);
+        const stepIndex = onboarding?.steps.findIndex((step) => step.key === "agreementSigned") ?? -1;
+        if (!onboarding || stepIndex < 0) continue;
+
+        const step = onboarding.steps[stepIndex];
+        const nextParentMessage = agreement.parentMessage?.trim() || undefined;
+        if (step.status === agreement.status && step.parentMessage === nextParentMessage) continue;
+
+        const previousStatus = step.status;
+        const previousParentMessage = step.parentMessage;
+        step.status = agreement.status;
+        step.parentMessage = nextParentMessage;
+        step.completedAt = agreement.status === "completed"
+            ? step.completedAt ?? agreement.reviewedAt ?? agreement.signedAt ?? now
+            : undefined;
+        step.updatedAt = now;
+        step.updatedBy = "automatic";
+        onboarding.markModified("steps");
+        onboarding.overallStatus = calculateOverallStatus(onboarding.steps);
+        await onboarding.save();
+
+        await createAuditEntries([
+            ...(previousStatus !== step.status ? [{
+                onboardingId: onboarding._id,
+                actorType: "automatic" as const,
+                actorLabel: "agreement-status-reconciliation",
+                action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.stepStatusChanged,
+                stepKey: "agreementSigned",
+                previousValue: previousStatus,
+                newValue: step.status,
+                createdAt: now,
+            }] : []),
+            ...(previousParentMessage !== step.parentMessage ? [{
+                onboardingId: onboarding._id,
+                actorType: "automatic" as const,
+                actorLabel: "agreement-status-reconciliation",
+                action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.parentMessageChanged,
+                stepKey: "agreementSigned",
+                previousValue: previousParentMessage,
+                newValue: step.parentMessage,
+                createdAt: now,
+            }] : []),
+        ]);
+        repaired += 1;
+    }
+
+    return repaired;
 };
 
 export const downloadAgreementFileForAdmin = async (agreementId: string, kind: "signature" | "signedPdf") => {

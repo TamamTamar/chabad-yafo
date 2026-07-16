@@ -95,8 +95,54 @@
     gap: 22px;
 }
 
+.innerTabBar {
+    display: inline-grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    justify-self: start;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-pill;
+    background: $brand-surface-cool;
+}
+
+.innerTabButton,
+.innerTabButtonActive {
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid transparent;
+    border-radius: $radius-pill;
+    font-family: inherit;
+    font-size: $type-body-sm;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.innerTabButton {
+    background: transparent;
+    color: $brand-blue-ink;
+}
+
+.innerTabButton:hover {
+    background: rgba($brand-primary, 0.06);
+}
+
+.innerTabButtonActive {
+    border-color: rgba($brand-primary, 0.18);
+    background: $brand-bg;
+    color: $brand-primary;
+    box-shadow: 0 8px 18px rgba($brand-primary, 0.1);
+}
+
 .tabPanel > .section {
     margin-top: 0;
+}
+
+@media (max-width: 560px) {
+    .innerTabBar {
+        width: 100%;
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .section {
@@ -499,6 +545,76 @@
     font-size: $type-body-sm;
     font-weight: 800;
     line-height: 1.65;
+}
+
+.registrationSummaryBar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.registrationSummaryBar div {
+    display: grid;
+    gap: 3px;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+}
+
+.registrationSummaryBar strong {
+    color: $brand-primary;
+    font-size: $type-form-title;
+}
+
+.registrationSummaryBar span {
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 800;
+}
+
+.registrationToolbar {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) minmax(180px, 260px) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 14px;
+    padding: 14px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-bg;
+}
+
+.registrationResultCount {
+    align-self: center;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.workflowHelp {
+    margin-bottom: 18px;
+    padding: 10px 13px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: $brand-surface-cool;
+}
+
+.workflowHelp > summary {
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.workflowHelp[open] > summary {
+    margin-bottom: 12px;
+}
+
+.workflowHelp .registrationWorkflow {
+    margin-bottom: 0;
 }
 
 .registrationWorkflow {
@@ -1178,6 +1294,38 @@
     margin-top: 5px;
 }
 
+.onboardingStatusLine {
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.08);
+    color: $brand-primary;
+}
+
+.onboardingNextAction {
+    color: $brand-primary-deep;
+    line-height: 1.45;
+}
+
+.healthQuickButton {
+    width: fit-content;
+    min-height: 36px;
+    margin-top: 3px;
+    padding: 7px 13px;
+    border: 1px solid rgba($ui-danger, 0.35);
+    border-radius: $radius-pill;
+    background: rgba($ui-danger, 0.08);
+    color: $ui-danger-deep;
+    font-family: inherit;
+    font-size: $type-caption;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.healthQuickButton:hover {
+    background: rgba($ui-danger, 0.14);
+}
+
 .onboardingUnavailable {
     color: $ui-text-muted;
     font-size: $type-caption;
@@ -1573,6 +1721,14 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .registrationToolbar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .registrationResultCount {
+        grid-column: 1 / -1;
+    }
+
     .hero,
     .sectionHeader {
         flex-direction: column;
@@ -1805,6 +1961,15 @@
 }
 
 @media (max-width: 640px) {
+    .registrationSummaryBar,
+    .registrationToolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .registrationResultCount {
+        grid-column: auto;
+    }
+
     .registrationWorkflow {
         grid-template-columns: 1fr;
     }

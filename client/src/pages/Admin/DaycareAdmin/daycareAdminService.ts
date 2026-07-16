@@ -3,12 +3,10 @@ import type { ApiResponse } from "../../../types/api";
 import type {
     DaycareDocument,
     DaycareFinanceSettings,
-    DaycareLead,
     DaycareOverview,
     DaycareRegistrationsResponse,
     DaycareTask,
     EditableDaycareDocument,
-    EditableDaycareLead,
     EditableDaycareTask,
 } from "./types";
 import type {
@@ -103,31 +101,6 @@ export const updateDaycarePublicRegistrationStatus = async (
     id: string,
     status: DaycareInterestStatus
 ) => updateDaycarePublicRegistration(id, { status });
-
-export const createDaycareLead = async (lead: EditableDaycareLead) => {
-    const response = await http.post<ApiResponse<DaycareLead>>(
-        "/admin/daycare/registrations",
-        cleanPayload(lead)
-    );
-
-    return response.data.data;
-};
-
-export const updateDaycareLead = async (
-    id: string,
-    lead: Partial<EditableDaycareLead>
-) => {
-    const response = await http.patch<ApiResponse<DaycareLead>>(
-        `/admin/daycare/registrations/${id}`,
-        cleanPayload(lead)
-    );
-
-    return response.data.data;
-};
-
-export const deleteDaycareLead = async (id: string) => {
-    await http.delete(`/admin/daycare/registrations/${id}`);
-};
 
 export const getDaycareDocuments = async () => {
     const response = await http.get<ApiResponse<DaycareDocument[]>>(

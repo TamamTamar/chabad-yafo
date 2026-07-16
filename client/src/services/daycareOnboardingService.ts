@@ -96,18 +96,6 @@ export const createOnboardingFromRegistration = async (
     return response.data;
 };
 
-export const createOnboardingFromLead = async (
-    leadId: string,
-    payload: CreateOnboardingFromInquiryPayload
-) => {
-    const response = await http.post<AdminOnboardingLinkResponse & { created: boolean }>(
-        `/admin/daycare/onboarding/from-lead/${encodePathSegment(leadId)}`,
-        payload
-    );
-
-    return response.data;
-};
-
 export const updateAdminOnboardingStep = async (
     onboardingId: string,
     stepKey: string,
@@ -152,4 +140,17 @@ export const regenerateAdminOnboardingLink = async (onboardingId: string) => {
     );
 
     return response.data;
+};
+
+export const deleteAdminDaycareOnboarding = async (onboardingId: string) => {
+    const response = await http.delete<ApiResponse<{
+        onboardingId: string;
+        registrationId: string;
+        identityPreserved: boolean;
+        filesCleanupFailed: number;
+    }>>(`/admin/daycare/onboarding/${encodePathSegment(onboardingId)}`, {
+        data: { confirmation: "מחיקת תיק" },
+    });
+
+    return response.data.data;
 };

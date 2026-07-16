@@ -1,4 +1,4 @@
-import { createCipheriv, createHash, createHmac, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from "node:crypto";
 import type { IEncryptedPrivateValue } from "../types/daycareAgreement";
 import { DaycareOnboardingServiceError } from "./daycareOnboardingService";
 
@@ -49,6 +49,19 @@ export const encryptDaycarePrivateValue = (plaintext: string): IEncryptedPrivate
         authTag: cipher.getAuthTag().toString("base64"),
         ciphertext: ciphertext.toString("base64"),
     };
+};
+
+export const decryptDaycarePrivateValue = (encrypted: IEncryptedPrivateValue) => {
+    const decipher = createDecipheriv(
+        "aes-256-gcm",
+        getEncryptionKey(),
+        Buffer.from(encrypted.iv, "base64")
+    );
+    decipher.setAuthTag(Buffer.from(encrypted.authTag, "base64"));
+    return Buffer.concat([
+        decipher.update(Buffer.from(encrypted.ciphertext, "base64")),
+        decipher.final(),
+    ]).toString("utf8");
 };
 
 export const fingerprintDaycareIsraeliId = (israeliId: string) =>

@@ -7,11 +7,20 @@ import DaycareFinance from "./components/DaycareFinance";
 import DaycareRegistrations from "./components/DaycareRegistrations";
 import DaycareTasks from "./components/DaycareTasks";
 import DaycareAgreements from "./components/DaycareAgreements";
+import DaycareParentDocuments from "./components/DaycareParentDocuments";
 import { getDaycareOverview } from "./daycareAdminService";
 import styles from "./DaycareAdmin.module.scss";
 import type { DaycareOverview } from "./types";
 
-type DaycareAdminTab = "tasks" | "registrations" | "finance" | "agreements";
+type DaycareAdminTab = "tasks" | "registrations" | "finance" | "parent-info";
+type ParentInfoTab = "routine" | "holidays" | "menu" | "agreements";
+
+const parentInfoTabs: Array<{ id: ParentInfoTab; label: string }> = [
+    { id: "routine", label: "סדר יום" },
+    { id: "holidays", label: "לוח חופשות" },
+    { id: "menu", label: "תפריט" },
+    { id: "agreements", label: "הסכם התקשרות" },
+];
 
 const daycareAdminTabs: Array<{
     id: DaycareAdminTab;
@@ -20,7 +29,7 @@ const daycareAdminTabs: Array<{
     { id: "tasks", label: "משימות" },
     { id: "registrations", label: "רישום" },
     { id: "finance", label: "כספים" },
-    { id: "agreements", label: "הסכמים" },
+    { id: "parent-info", label: "מידע להורים" },
 ];
 
 const DaycareAdmin = () => {
@@ -28,15 +37,30 @@ const DaycareAdmin = () => {
     const [overview, setOverview] = useState<DaycareOverview | null>(null);
     const [financeRefreshKey, setFinanceRefreshKey] = useState(0);
     const requestedTab = searchParams.get("tab");
+    const requestedParentInfoTab = searchParams.get("section");
     const [activeTab, setActiveTab] = useState<DaycareAdminTab>(
-        requestedTab === "registrations" || requestedTab === "finance" || requestedTab === "agreements"
+        requestedTab === "registrations" || requestedTab === "finance" || requestedTab === "parent-info"
             ? requestedTab
-            : "tasks"
+            : requestedTab === "agreements"
+                ? "parent-info"
+            : "registrations"
+    );
+    const [parentInfoTab, setParentInfoTab] = useState<ParentInfoTab>(
+        requestedTab === "agreements" || requestedParentInfoTab === "agreements"
+            ? "agreements"
+            : requestedParentInfoTab === "holidays" || requestedParentInfoTab === "menu"
+                ? requestedParentInfoTab
+                : "routine"
     );
 
     const selectTab = (tab: DaycareAdminTab) => {
         setActiveTab(tab);
-        setSearchParams(tab === "tasks" ? {} : { tab });
+        setSearchParams(tab === "registrations" ? {} : tab === "parent-info" ? { tab, section: parentInfoTab } : { tab });
+    };
+
+    const selectParentInfoTab = (tab: ParentInfoTab) => {
+        setParentInfoTab(tab);
+        setSearchParams({ tab: "parent-info", section: tab });
     };
 
     const loadOverview = async () => {
@@ -69,8 +93,7 @@ const DaycareAdmin = () => {
                         <span className={styles.eyebrow}>Admin</span>
                         <h1 className={styles.title}>ניהול מעון</h1>
                         <p className={styles.description}>
-                            מערכת מעקב פנימית לפתיחת מעון חב״ד יפו, מהיערכות
-                            ראשונית ועד התרחבות במהלך השנה.
+                            רישום משפחות, תיקי הצטרפות, תשלומים ומידע להורים במקום אחד.
                         </p>
                     </div>
 
@@ -123,9 +146,24 @@ const DaycareAdmin = () => {
                     </div>
                 )}
 
-                {activeTab === "agreements" && (
+                {activeTab === "parent-info" && (
                     <div className={styles.tabPanel}>
-                        <DaycareAgreements />
+                        <nav className={styles.innerTabBar} aria-label="ניהול מידע והסכמים להורים">
+                            {parentInfoTabs.map((tab) => (
+                                <button
+                                    aria-pressed={parentInfoTab === tab.id}
+                                    className={parentInfoTab === tab.id ? styles.innerTabButtonActive : styles.innerTabButton}
+                                    key={tab.id}
+                                    type="button"
+                                    onClick={() => selectParentInfoTab(tab.id)}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </nav>
+                        {parentInfoTab === "agreements"
+                            ? <DaycareAgreements />
+                            : <DaycareParentDocuments visibleDocument={parentInfoTab} />}
                     </div>
                 )}
             </Container>

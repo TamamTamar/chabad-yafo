@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
     trackDaycareCtaClick,
@@ -17,6 +17,7 @@ import {
     type ParentInfoSectionId,
 } from "./parentInfoConfig";
 import styles from "./DaycareParentInfo.module.scss";
+import { getCurrentDaycareParentDocuments, type DaycareParentDocumentBundle } from "../../services/daycareParentDocumentService";
 
 const trackCta = (ctaText: string, location: string) => {
     trackDaycareCtaClick({
@@ -61,6 +62,7 @@ const usePageMetadata = () => {
 const DaycareParentInfo = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = resolveParentInfoSection(searchParams.get("section"));
+    const [parentDocuments, setParentDocuments] = useState<DaycareParentDocumentBundle | null>();
 
     usePageMetadata();
 
@@ -70,6 +72,14 @@ const DaycareParentInfo = () => {
             content_name: "daycare_parent_info",
             gated: false,
         });
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+        void getCurrentDaycareParentDocuments()
+            .then((data) => { if (active) setParentDocuments(data); })
+            .catch(() => { if (active) setParentDocuments(null); });
+        return () => { active = false; };
     }, []);
 
     const handleTabChange = (section: ParentInfoSectionId) => {
@@ -90,13 +100,13 @@ const DaycareParentInfo = () => {
 
     return (
         <main className={styles.page} dir="rtl">
-            <ParentInfoHero onRegistrationClick={handleRegistrationClick} />
+            <ParentInfoHero onRegistrationClick={handleRegistrationClick} parentDocuments={parentDocuments} />
             <div className={styles.mainContent}>
                 <ParentInfoSummary />
             </div>
             <ParentInfoTabs activeTab={activeTab} onChange={handleTabChange} />
             <div className={styles.mainContent}>
-                <ParentInfoContent activeTab={activeTab} />
+                <ParentInfoContent activeTab={activeTab} parentDocuments={parentDocuments} />
                 <ParentInfoCta
                     onRegistrationClick={handleRegistrationClick}
                     onWhatsAppClick={handleWhatsAppClick}

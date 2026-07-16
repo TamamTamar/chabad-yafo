@@ -4,8 +4,15 @@ import { DAYCARE_ONBOARDING_STEP_DEFINITIONS } from "../config/daycareOnboarding
 import { DAYCARE_ONBOARDING_AUDIT_ACTIONS } from "../config/daycareOnboardingAuditActions";
 import { DaycareChild } from "../models/DaycareChild";
 import { DaycareFamily } from "../models/DaycareFamily";
+import { DaycareAgreement } from "../models/DaycareAgreement";
+import { DaycareHealthDeclaration } from "../models/DaycareHealthDeclaration";
+import { DaycarePickupAuthorization } from "../models/DaycarePickupAuthorization";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
 import { DaycareOnboardingAudit } from "../models/DaycareOnboardingAudit";
+import { DaycareLead } from "../models/DaycareLead";
+import { DaycareRegistration } from "../models/DaycareRegistration";
+import { getDaycareStorageProvider } from "./daycareStorageService";
+import { logger } from "../utils/logger";
 import type { IDaycareChild } from "../types/daycareChild";
 import type { IDaycareFamily } from "../types/daycareFamily";
 import type {
@@ -419,6 +426,9 @@ const getMissingStepTitle = (steps: readonly IOnboardingStep[]) =>
         .filter(
             (step) =>
                 step.isVisibleToParent &&
+                (step.responsibleParty === "parent" ||
+                    step.responsibleParty === "both") &&
+                step.status !== "pendingReview" &&
                 step.status !== "completed" &&
                 step.status !== "notRequired"
         )
@@ -433,11 +443,27 @@ const toFamilyAddressDto = (
     apartment: address.apartment,
 });
 
+const getStepDisplayTitle = (step: IOnboardingStep) => {
+    if (step.key === "registrationFeeReceived") {
+        return step.status === "completed"
+            ? "התשלום אושר"
+            : "ממתין להסדרת תשלום";
+    }
+
+    if (step.key === "registrationApproved") {
+        return step.status === "completed"
+            ? "שובץ בקבוצה — הרישום הושלם"
+            : "ממתין לשיבוץ בקבוצה";
+    }
+
+    return step.title;
+};
+
 const toPublicStep = (
     step: IOnboardingStep
 ): PublicOnboardingStep => ({
     key: step.key,
-    title: step.title,
+    title: getStepDisplayTitle(step),
     description: step.description,
     status: step.status,
     order: step.order,
@@ -461,6 +487,7 @@ export const toPublicOnboardingDto = (
     );
     const canEditProfile = Boolean(
         profileStep?.isVisibleToParent &&
+            profileStep.status !== "pendingReview" &&
             profileStep.status !== "completed" &&
             profileStep.status !== "notRequired"
     );
@@ -555,7 +582,10 @@ export const toAdminOnboardingDetail = (
     calculatedOverallStatus: calculateOverallStatus(onboarding.steps),
     overallStatusOverride: onboarding.overallStatusOverride,
     steps: onboarding.steps
-        .map(cloneOnboardingStep)
+        .map((step) => ({
+            ...cloneOnboardingStep(step),
+            title: getStepDisplayTitle(step),
+        }))
         .sort((left, right) => left.order - right.order),
     progress: calculateOnboardingProgress(onboarding.steps),
     access: {
@@ -642,6 +672,152 @@ export const getAdminOnboarding = async (onboardingId: string) => {
     const onboarding = await getOnboardingOrThrow(onboardingId);
     const { child, family } = await getIdentityOrThrow(onboarding);
     return toAdminOnboardingDetail(onboarding, child, family);
+};
+
+type OnboardingStoredFileRecord = {
+    signatureFile?: { storageKey?: string };
+    signedPdfFile?: { storageKey?: string };
+};
+
+const storedFileKeys = (records: OnboardingStoredFileRecord[]) =>
+    records.flatMap((record) => [
+        record.signatureFile?.storageKey,
+        record.signedPdfFile?.storageKey,
+    ]).filter((key): key is string => Boolean(key));
+
+export const deleteDaycareOnboarding = async (onboardingId: string) => {
+    if (!Types.ObjectId.isValid(onboardingId)) {
+        throw new DaycareOnboardingServiceError(
+            "תיק ההצטרפות לא נמצא.",
+            404,
+            "ONBOARDING_NOT_FOUND"
+        );
+    }
+
+    const onboarding = await DaycareOnboarding.findById(onboardingId).exec();
+    if (!onboarding) {
+        throw new DaycareOnboardingServiceError(
+            "תיק ההצטרפות לא נמצא.",
+            404,
+            "ONBOARDING_NOT_FOUND"
+        );
+    }
+    if (
+        onboarding.origin?.type !== "daycareRegistration" ||
+        !onboarding.origin.recordId
+    ) {
+        throw new DaycareOnboardingServiceError(
+            "אפשר למחוק מכאן רק תיק בדיקה שנפתח מטופס רישום.",
+            409,
+            "ONBOARDING_DELETE_NOT_ALLOWED"
+        );
+    }
+
+    const [agreements, healthDeclarations, pickupAuthorizations] = await Promise.all([
+        DaycareAgreement.find({ onboardingId: onboarding._id })
+            .select("signatureFile signedPdfFile")
+            .lean<OnboardingStoredFileRecord[]>()
+            .exec(),
+        DaycareHealthDeclaration.find({ onboardingId: onboarding._id })
+            .select("signatureFile signedPdfFile")
+            .lean<OnboardingStoredFileRecord[]>()
+            .exec(),
+        DaycarePickupAuthorization.find({ onboardingId: onboarding._id })
+            .select("signatureFile signedPdfFile")
+            .lean<OnboardingStoredFileRecord[]>()
+            .exec(),
+    ]);
+    const fileKeys = Array.from(new Set(storedFileKeys([
+        ...agreements,
+        ...healthDeclarations,
+        ...pickupAuthorizations,
+    ])));
+
+    const session = await startSession();
+    try {
+        await session.withTransaction(async () => {
+            const current = await DaycareOnboarding.findById(onboarding._id)
+                .session(session)
+                .exec();
+            if (!current) {
+                throw new DaycareOnboardingServiceError(
+                    "תיק ההצטרפות לא נמצא.",
+                    404,
+                    "ONBOARDING_NOT_FOUND"
+                );
+            }
+            if (
+                current.origin?.type !== "daycareRegistration" ||
+                !current.origin.recordId
+            ) {
+                throw new DaycareOnboardingServiceError(
+                    "אפשר למחוק מכאן רק תיק בדיקה שנפתח מטופס רישום.",
+                    409,
+                    "ONBOARDING_DELETE_NOT_ALLOWED"
+                );
+            }
+
+            const registrationUpdate: Record<string, unknown> = {
+                status: "רוצה להירשם",
+            };
+            if (current.familyId) registrationUpdate.daycareFamilyId = current.familyId;
+            if (current.childId) registrationUpdate.daycareChildId = current.childId;
+
+            const registration = await DaycareRegistration.findOneAndUpdate(
+                { _id: current.origin.recordId },
+                { $set: registrationUpdate },
+                { new: true, session }
+            ).exec();
+            if (!registration) {
+                throw new DaycareOnboardingServiceError(
+                    "טופס הרישום המקורי לא נמצא ולכן התיק לא נמחק.",
+                    409,
+                    "ONBOARDING_REGISTRATION_NOT_FOUND"
+                );
+            }
+
+            await DaycareAgreement.deleteMany({ onboardingId: current._id }).session(session);
+            await DaycareHealthDeclaration.deleteMany({ onboardingId: current._id }).session(session);
+            await DaycarePickupAuthorization.deleteMany({ onboardingId: current._id }).session(session);
+            await DaycareOnboardingAudit.deleteMany({ onboardingId: current._id }).session(session);
+            await DaycareOnboarding.deleteOne({ _id: current._id }).session(session);
+        });
+    } finally {
+        await session.endSession();
+    }
+
+    let filesCleanupFailed = 0;
+    if (fileKeys.length > 0) {
+        try {
+            const storage = getDaycareStorageProvider();
+            const cleanupResults = await Promise.allSettled(
+                fileKeys.map((key) => storage.delete(key))
+            );
+            filesCleanupFailed = cleanupResults.filter(
+                (result) => result.status === "rejected"
+            ).length;
+        } catch (error: unknown) {
+            filesCleanupFailed = fileKeys.length;
+            logger.error("Failed to clean up deleted daycare onboarding files", {
+                onboardingId,
+                filesCleanupFailed,
+                error,
+            });
+        }
+        if (filesCleanupFailed > 0) {
+            logger.error("Some deleted daycare onboarding files require cleanup", {
+                onboardingId,
+                filesCleanupFailed,
+            });
+        }
+    }
+
+    return {
+        onboardingId,
+        registrationId: onboarding.origin.recordId.toString(),
+        identityPreserved: Boolean(onboarding.familyId && onboarding.childId),
+        filesCleanupFailed,
+    };
 };
 
 export const listAdminOnboardings = async () => {
@@ -883,15 +1059,168 @@ export const updateAdminOnboardingStep = async (
         );
     }
 
+    if (patch.status === "completed" && stepKey === "registrationFeeReceived") {
+        const requiredDocumentSteps = [
+            "childAndGuardianDetails",
+            "agreementSigned",
+            "healthDeclarationSubmitted",
+            "pickupAuthorizationSubmitted",
+        ];
+        const documentsApproved = requiredDocumentSteps.every((requiredKey) => {
+            const requiredStep = onboarding.steps.find((step) => step.key === requiredKey);
+            return requiredStep?.status === "completed" || requiredStep?.status === "notRequired";
+        });
+
+        if (!documentsApproved) {
+            throw new DaycareOnboardingServiceError(
+                "אפשר לאשר את התשלום רק לאחר שכל הפרטים והמסמכים אושרו.",
+                409,
+                "PAYMENT_REQUIRES_APPROVED_DOCUMENTS"
+            );
+        }
+    }
+
+    if (patch.status === "completed" && stepKey === "registrationApproved") {
+        const paymentStep = onboarding.steps.find(
+            (step) => step.key === "registrationFeeReceived"
+        );
+        if (paymentStep?.status !== "completed" && paymentStep?.status !== "notRequired") {
+            throw new DaycareOnboardingServiceError(
+                "אפשר להשלים את הרישום והשיבוץ רק לאחר אישור התשלום.",
+                409,
+                "PLACEMENT_REQUIRES_APPROVED_PAYMENT"
+            );
+        }
+    }
+
+    if (stepKey === "agreementSigned" && patch.status !== undefined) {
+        const agreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 }).select("status");
+        if (agreement && agreement.status !== patch.status) {
+            throw new DaycareOnboardingServiceError(
+                "סטטוס של הסכם שנשלח מתעדכן רק באזור בדיקת ההסכם.",
+                409,
+                "AGREEMENT_STATUS_MANAGED_SEPARATELY"
+            );
+        }
+    }
+
+    if (stepKey === "healthDeclarationSubmitted" && patch.status !== undefined) {
+        const declaration = await DaycareHealthDeclaration.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 }).select("status");
+        if (declaration && declaration.status !== patch.status) {
+            throw new DaycareOnboardingServiceError(
+                "סטטוס של הצהרת בריאות שנשלחה מתעדכן רק באזור בדיקת ההצהרה.",
+                409,
+                "HEALTH_STATUS_MANAGED_SEPARATELY"
+            );
+        }
+    }
+
+    if (stepKey === "pickupAuthorizationSubmitted" && patch.status !== undefined) {
+        const authorization = await DaycarePickupAuthorization.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 }).select("status");
+        if (authorization && authorization.status !== patch.status) {
+            throw new DaycareOnboardingServiceError(
+                "סטטוס של מורשי איסוף שנשלחו מתעדכן רק באזור בדיקת המסמך.",
+                409,
+                "PICKUP_STATUS_MANAGED_SEPARATELY"
+            );
+        }
+    }
+
     const previous = cloneOnboardingStep(onboarding.steps[stepIndex]);
     const next = applyAdminStepPatch(previous, patch, now);
     onboarding.steps[stepIndex] = next;
+    const correctionStepKeys = new Set([
+        "childAndGuardianDetails",
+        "agreementSigned",
+        "healthDeclarationSubmitted",
+        "pickupAuthorizationSubmitted",
+    ]);
+    const downstreamPreviousSteps: IOnboardingStep[] = [];
+    let registrationWasCompleted = false;
+
+    if (next.status === "requiresCorrection" && correctionStepKeys.has(stepKey)) {
+        for (const downstreamKey of ["registrationFeeReceived", "registrationApproved"]) {
+            const downstreamIndex = onboarding.steps.findIndex(
+                (step) => step.key === downstreamKey
+            );
+            if (downstreamIndex < 0) continue;
+
+            const downstreamPrevious = cloneOnboardingStep(
+                onboarding.steps[downstreamIndex]
+            );
+            if (downstreamKey === "registrationApproved" && downstreamPrevious.status === "completed") {
+                registrationWasCompleted = true;
+            }
+            if (downstreamPrevious.status === "notStarted") continue;
+
+            downstreamPreviousSteps.push(downstreamPrevious);
+            onboarding.steps[downstreamIndex] = {
+                ...downstreamPrevious,
+                status: "notStarted",
+                source: "automatic",
+                completedAt: undefined,
+                updatedAt: new Date(now),
+                updatedBy: "automatic",
+                parentMessage: undefined,
+            };
+        }
+        onboarding.overallStatusOverride = undefined;
+    }
     onboarding.markModified("steps");
     onboarding.overallStatus = calculateOverallStatus(onboarding.steps);
     await onboarding.save();
 
+    if (stepKey === "registrationApproved" && next.status === "completed") {
+        const originRecordId = onboarding.origin?.recordId;
+
+        if (originRecordId && onboarding.origin?.type === "daycareRegistration") {
+            await DaycareRegistration.updateOne(
+                { _id: originRecordId },
+                { $set: { status: "נרשם" } }
+            ).exec();
+        }
+
+        if (originRecordId && onboarding.origin?.type === "daycareLead") {
+            await DaycareLead.updateOne(
+                { _id: originRecordId },
+                { $set: { status: "נרשם" } }
+            ).exec();
+        }
+    }
+
+    if (registrationWasCompleted) {
+        const originRecordId = onboarding.origin?.recordId;
+        if (originRecordId && onboarding.origin?.type === "daycareRegistration") {
+            await DaycareRegistration.updateOne(
+                { _id: originRecordId },
+                { $set: { status: "רוצה להירשם" } }
+            ).exec();
+        }
+        if (originRecordId && onboarding.origin?.type === "daycareLead") {
+            await DaycareLead.updateOne(
+                { _id: originRecordId },
+                { $set: { status: "רוצה להירשם" } }
+            ).exec();
+        }
+    }
+
     await createAuditEntries(
-        buildStepAuditEntries(onboarding._id, previous, next, now)
+        [
+            ...buildStepAuditEntries(onboarding._id, previous, next, now),
+            ...downstreamPreviousSteps.flatMap((downstreamPrevious) => {
+                const downstreamNext = onboarding.steps.find(
+                    (step) => step.key === downstreamPrevious.key
+                );
+                return downstreamNext
+                    ? buildStepAuditEntries(
+                          onboarding._id,
+                          downstreamPrevious,
+                          cloneOnboardingStep(downstreamNext),
+                          now
+                      )
+                    : [];
+            }),
+        ]
     );
 
     const { child, family } = await getIdentityOrThrow(onboarding);
@@ -1174,6 +1503,22 @@ export const submitPublicDaycareProfile = async (
             onboarding.overallStatus = calculateOverallStatus(onboarding.steps);
             onboarding.lastParentAccessAt = new Date(now);
             await onboarding.save({ session });
+
+            if (
+                onboarding.origin?.type === "daycareRegistration" &&
+                onboarding.origin.recordId
+            ) {
+                await DaycareRegistration.updateOne(
+                    { _id: onboarding.origin.recordId },
+                    {
+                        $set: {
+                            daycareFamilyId: family._id,
+                            daycareChildId: child._id,
+                        },
+                    },
+                    { session }
+                ).exec();
+            }
 
             const auditBase = {
                 onboardingId: onboarding._id,

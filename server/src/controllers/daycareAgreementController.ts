@@ -108,6 +108,7 @@ export const signPublicDaycareAgreement = async (req: Request, res: Response) =>
             signerRole: String(req.body.signerRole ?? ""),
             signerIsraeliId: String(req.body.signerIsraeliId ?? ""),
             acceptedTerms: req.body.acceptedTerms === "true",
+            parentDocumentsAccepted: req.body.parentDocumentsAccepted === "true",
             ipAddress: req.ip || req.socket.remoteAddress || "unknown",
             userAgent: String(req.get("user-agent") ?? "unknown"),
             signature: req.file,
@@ -134,7 +135,11 @@ export const uploadPublicSignedAgreement = async (req: Request, res: Response) =
 export const reviewAdminAgreement = async (req: Request, res: Response) => {
     const status = req.body?.status;
     if (status !== "completed" && status !== "requiresCorrection") return res.status(400).json({ success: false, message: "סטטוס הבדיקה אינו תקין." });
-    try { return res.json({ success: true, data: await reviewAgreement(req.params.id, { status, parentMessage: typeof req.body.parentMessage === "string" ? req.body.parentMessage : undefined }) }); } catch (error) { return errorResponse(res, error); }
+    const correctionDisposition = req.body?.correctionDisposition;
+    if (correctionDisposition !== undefined && correctionDisposition !== "preserveVersion" && correctionDisposition !== "discardFileAfterReplacement") {
+        return res.status(400).json({ success: false, message: "אופן שמירת הגרסה הקודמת אינו תקין." });
+    }
+    try { return res.json({ success: true, data: await reviewAgreement(req.params.id, { status, parentMessage: typeof req.body.parentMessage === "string" ? req.body.parentMessage : undefined, correctionDisposition }) }); } catch (error) { return errorResponse(res, error); }
 };
 
 export const downloadAdminAgreementFile = async (req: Request, res: Response) => {

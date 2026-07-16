@@ -14,3 +14,23 @@
         filter: none;
     }
 }
+
+.confirmationField {
+    display: grid;
+    gap: 8px;
+    margin-top: 18px;
+    color: $brand-text;
+    font-size: $type-caption;
+    font-weight: 800;
+}
+
+.confirmationField input {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 11px;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-sm;
+    background: $brand-bg;
+    color: $brand-text;
+    font: inherit;
+}

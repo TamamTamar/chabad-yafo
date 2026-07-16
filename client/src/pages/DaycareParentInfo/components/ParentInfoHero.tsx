@@ -2,12 +2,14 @@ import { ArrowLeft, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { documents } from "../parentInfoConfig";
 import styles from "../DaycareParentInfo.module.scss";
+import type { DaycareParentDocumentBundle } from "../../../services/daycareParentDocumentService";
 
 interface ParentInfoHeroProps {
     onRegistrationClick: (location: string) => void;
+    parentDocuments: DaycareParentDocumentBundle | null | undefined;
 }
 
-const ParentInfoHero = ({ onRegistrationClick }: ParentInfoHeroProps) => (
+const ParentInfoHero = ({ onRegistrationClick, parentDocuments }: ParentInfoHeroProps) => (
     <section className={styles.hero} aria-labelledby="parent-info-title">
         <div className={styles.heroInner}>
             <p className={styles.eyebrow}>מרכז מידע להורים</p>
@@ -28,7 +30,7 @@ const ParentInfoHero = ({ onRegistrationClick }: ParentInfoHeroProps) => (
                     <ArrowLeft size={18} aria-hidden="true" />
                 </Link>
                 {documents
-                    .filter((document) => document.pdfAvailable)
+                    .filter((document) => document.pdfAvailable || (document.id === "menu" && Boolean(parentDocuments?.documents.menu.items.length)))
                     .map((document) => (
                         <a
                             className={styles.quickDocumentAction}

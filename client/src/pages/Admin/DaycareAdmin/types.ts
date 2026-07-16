@@ -42,36 +42,8 @@ export type DaycareTask = {
     resourceUrl?: string;
 };
 
-export type DaycareLeadStatus =
-    | "מתעניין"
-    | "שיחה בוצעה"
-    | "הגיע לראות"
-    | "רוצה להירשם"
-    | "נרשם"
-    | "לא רלוונטי";
 export type DaycareInterestLevel = "גבוה" | "בינוני" | "נמוך";
 export type DaycarePriceFit = "כן" | "לא";
-
-export type DaycareLead = {
-    _id: string;
-    childName: string;
-    childAge?: string;
-    parentName: string;
-    phone: string;
-    area?: string;
-    status: DaycareLeadStatus;
-    interestLevel?: DaycareInterestLevel;
-    priceFits?: DaycarePriceFit;
-    desiredHours?: string;
-    parentPriority?: string;
-    inquiryDate?: string;
-    notes?: string;
-    callNotes?: string;
-    followUpDate?: string;
-    createdAt?: string;
-    updatedAt?: string;
-    onboardingSummary?: AdminDaycareOnboardingListItem | null;
-};
 
 export type DaycareDocumentStatus = "חסר" | "בטיפול" | "קיים";
 
@@ -153,8 +125,7 @@ export type DaycareOverview = {
 };
 
 export type DaycareRegistrationsResponse = {
-    leads: DaycareLead[];
-    publicRegistrations: Array<
+    registrations: Array<
         DaycareRegistrationAdmin & {
             onboardingSummary?: AdminDaycareOnboardingListItem | null;
         }
@@ -162,10 +133,6 @@ export type DaycareRegistrationsResponse = {
 };
 
 export type EditableDaycareTask = Omit<DaycareTask, "_id"> & {
-    _id?: string;
-};
-
-export type EditableDaycareLead = Omit<DaycareLead, "_id"> & {
     _id?: string;
 };
 

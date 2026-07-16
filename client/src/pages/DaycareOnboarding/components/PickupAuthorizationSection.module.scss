@@ -1,0 +1,32 @@
+@use "../../../styles/variables" as *;
+.card { scroll-margin-top: 24px; display: grid; gap: 20px; padding: 28px; border: 1px solid rgba($brand-primary, .18); border-radius: $radius-card-lg; background: $brand-bg; box-shadow: 0 16px 38px rgba($brand-primary, .08); }
+.header, .sectionHeading, .collectorHeader { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.eyebrow { color: $brand-gold-dark; font-size: .8rem; font-weight: 900; }
+.title { margin: 5px 0; color: $brand-primary-deep; font-size: 1.55rem; }
+.intro, .helper { margin: 0; color: $ui-text-muted; font-weight: 600; line-height: 1.6; }
+.status { padding: 7px 12px; border-radius: $radius-pill; background: rgba($brand-primary, .08); color: $brand-primary; font-size: .82rem; font-weight: 900; }
+.correction { padding: 14px; border-radius: $radius; background: rgba($ui-danger, .08); color: $ui-danger-deep; font-weight: 800; }
+.form, .collectorList { display: grid; gap: 18px; }
+.section { display: grid; gap: 13px; padding: 18px; border: 1px solid $ui-border-soft; border-radius: $radius-card; background: rgba($brand-primary, .02); }
+.sectionTitle { margin: 0; color: $brand-primary-deep; font-size: 1.12rem; }
+.guardianList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.guardian { display: grid; gap: 4px; padding: 12px; border-radius: 10px; background: #fff; color: $brand-text; }
+.guardian span, .empty { color: $ui-text-muted; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.label { display: grid; gap: 7px; color: $brand-text; font-size: .9rem; font-weight: 800; }
+.input, .select { width: 100%; padding: 11px 12px; border: 1px solid $ui-border-strong; border-radius: 10px; background: #fff; color: $brand-text; font: inherit; }
+.collector { display: grid; gap: 12px; padding: 15px; border: 1px solid $ui-border-soft; border-radius: 12px; background: #fff; }
+.remove { border: 0; background: transparent; color: $ui-danger-deep; font: inherit; font-weight: 800; cursor: pointer; }
+.consent { display: flex; align-items: flex-start; gap: 9px; color: $brand-text; font-weight: 700; line-height: 1.5; }
+.signatureCanvas { width: 100%; max-width: 700px; height: 170px; touch-action: none; border: 1px dashed $ui-border-strong; border-radius: 12px; background: #fff; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.primary, .secondary, .uploadLabel { min-height: 44px; padding: 9px 18px; border-radius: $radius-pill; font: inherit; font-weight: 900; cursor: pointer; }
+.primary, .uploadLabel { display: inline-flex; align-items: center; border: 1px solid $brand-primary; background: $brand-primary; color: #fff; }
+.secondary { border: 1px solid $ui-border-strong; background: #fff; color: $brand-primary; }
+.primary:disabled, .secondary:disabled { cursor: not-allowed; opacity: .55; }
+.manualOption { border: 1px solid $ui-border-soft; border-radius: $radius-card; background: #fff; }
+.manualSummary { padding: 15px 18px; color: $brand-primary; font-weight: 900; cursor: pointer; }
+.manualContent { display: grid; gap: 12px; padding: 0 18px 18px; }
+.fileInput { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.error { margin: 0; color: $ui-danger-deep; font-weight: 800; }.success { margin: 0; color: $ui-success-dark; font-weight: 800; }
+@media (max-width: 680px) { .card { padding: 20px; } .grid, .guardianList { grid-template-columns: 1fr; } }

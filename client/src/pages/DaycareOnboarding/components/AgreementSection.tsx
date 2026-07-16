@@ -11,6 +11,7 @@ import daycareLogo from "../../../assets/logo-maon.jpeg";
 import type { PublicDaycareAgreement } from "../../../types/daycareAgreement";
 import type { DaycareDocumentBlock } from "../../../types/daycareAgreement";
 import styles from "../DaycareOnboarding.module.scss";
+import { tokenParentDocumentPdfUrl } from "../../../services/daycareParentDocumentService";
 
 interface AgreementSectionProps {
     token: string;
@@ -40,6 +41,7 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
     const [signerRole, setSignerRole] = useState<"mother" | "father" | "guardian">("mother");
     const [signerIsraeliId, setSignerIsraeliId] = useState("");
     const [accepted, setAccepted] = useState(false);
+    const [parentInfoAccepted, setParentInfoAccepted] = useState(false);
     const [hasSignature, setHasSignature] = useState(false);
     const [isBusy, setIsBusy] = useState(false);
     const [notice, setNotice] = useState("");
@@ -56,7 +58,7 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
     if (!agreement?.available) return null;
     const canSubmitOnline =
         agreement.signingAvailable &&
-        !agreement.agreement;
+        (!agreement.agreement || agreement.agreement.status === "requiresCorrection");
     const canUploadPdf = agreement.signingAvailable && (
         !agreement.agreement ||
         (agreement.agreement.signingMethod === "uploadedPdf" && agreement.agreement.status === "requiresCorrection")
@@ -108,11 +110,17 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
     };
 
     const submitOnline = async () => {
-        if (!canvasRef.current || !hasSignature || !accepted || !signedBy.trim()) return;
+        if (!canvasRef.current || !hasSignature || !accepted || !parentInfoAccepted || !signedBy.trim()) return;
         setIsBusy(true); setError(""); setNotice("");
         try {
             const signature = await canvasToBlob(canvasRef.current);
-            await signPublicDaycareAgreement(token, { signedBy, signerRole, signerIsraeliId, signature });
+            await signPublicDaycareAgreement(token, {
+                signedBy,
+                signerRole,
+                signerIsraeliId,
+                signature,
+                parentDocumentsAccepted: parentInfoAccepted,
+            });
             setNotice("ההסכם נחתם ונשלח בהצלחה. הוא ממתין כעת לאישור צוות המעון.");
             await load();
             onSubmitted();
@@ -166,14 +174,20 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                 <div>
                     <span className={styles.agreementEyebrow}>השלב הבא</span>
                     <h2 id="agreement-title" className={styles.agreementTitle}>הסכם התקשרות</h2>
-                    <p className={styles.agreementIntro}>אפשר לבצע אישור וחתימה מקוונת, או להדפיס ולהעלות עותק חתום.</p>
+                    <p className={styles.agreementIntro}>{agreement.agreement?.status === "requiresCorrection" ? "צוות המעון ביקש לתקן ולחתום מחדש. הגרסה הקודמת נשמרת בתיק." : agreement.agreement ? "ההסכם והמסמכים להורים נשארים זמינים כאן לצפייה ולהורדה." : "אפשר לבצע אישור וחתימה מקוונת, או להדפיס ולהעלות עותק חתום."}</p>
                 </div>
                 {agreement.agreement ? <span className={styles.agreementStatus}>{agreementStatusLabel}</span> : null}
             </div>
 
             <div className={styles.agreementActions}>
                 <button className={styles.agreementPrimaryButton} type="button" onClick={() => setIsOpen((value) => !value)}>
-                    {isOpen ? "סגירת ההסכם" : "קריאה וחתימה מקוונות"}
+                    {isOpen
+                        ? "סגירת ההסכם"
+                        : agreement.agreement?.status === "requiresCorrection"
+                          ? "תיקון וחתימה מחדש"
+                          : agreement.agreement
+                            ? "צפייה בהסכם"
+                            : "קריאה וחתימה מקוונות"}
                 </button>
                 <button className={styles.agreementSecondaryButton} type="button" disabled={isBusy} onClick={() => void downloadAgreementPdf()}>
                     הורדת ההסכם כ־PDF
@@ -184,6 +198,18 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                     </button>
                 ) : null}
             </div>
+
+            <aside className={styles.preSigningInfo} aria-labelledby="parent-documents-title">
+                <h3 className={styles.preSigningInfoTitle} id="parent-documents-title">מידע ומסמכים להורים</h3>
+                <p className={styles.preSigningInfoText}>המסמכים זמינים לצפייה ולהורדה בכל עת, גם לאחר החתימה:</p>
+                <div className={styles.preSigningLinks}>
+                    <a href={tokenParentDocumentPdfUrl(token, "routine")} target="_blank" rel="noreferrer">צפייה והורדת סדר היום</a>
+                    <a href={tokenParentDocumentPdfUrl(token, "holidays")} target="_blank" rel="noreferrer">צפייה והורדת לוח החופשות</a>
+                    {agreement.parentDocuments.menuAvailable
+                        ? <a href={tokenParentDocumentPdfUrl(token, "menu")} target="_blank" rel="noreferrer">צפייה והורדת התפריט</a>
+                        : <span>התפריט יפורסם בהמשך</span>}
+                </div>
+            </aside>
 
             <article className={`${styles.agreementPrintArea} ${isOpen ? styles.agreementPrintAreaOpen : ""}`}>
                 <div className={styles.agreementDocumentHeader}>
@@ -218,7 +244,8 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                         <button className={styles.clearSignatureButton} type="button" onClick={clearSignature}>ניקוי חתימה</button>
                     </div>
                     <label className={styles.acceptLabel}><input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} />{agreement.acceptanceStatement}</label>
-                    <button className={styles.agreementPrimaryButton} type="button" disabled={isBusy || !accepted || !signedBy.trim() || signerIsraeliId.length !== 9 || !hasSignature} onClick={() => void submitOnline()}>{isBusy ? "מאשר ושומר..." : "אישור וחתימה על ההסכם"}</button>
+                    <label className={styles.acceptLabel}><input type="checkbox" checked={parentInfoAccepted} onChange={(event) => setParentInfoAccepted(event.target.checked)} />קראתי את סדר היום ואת לוח החופשות, וידוע לי שהתפריט יפורסם בהמשך.</label>
+                    <button className={styles.agreementPrimaryButton} type="button" disabled={isBusy || !accepted || !parentInfoAccepted || !signedBy.trim() || signerIsraeliId.length !== 9 || !hasSignature} onClick={() => void submitOnline()}>{isBusy ? "מאשר ושומר..." : "אישור וחתימה על ההסכם"}</button>
                 </div>
             ) : null}
 

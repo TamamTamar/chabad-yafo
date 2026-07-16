@@ -13,6 +13,8 @@ import OnboardingProgress from "./components/OnboardingProgress";
 import OnboardingStepCard from "./components/OnboardingStepCard";
 import IdentityProfileForm from "./components/IdentityProfileForm";
 import AgreementSection from "./components/AgreementSection";
+import HealthDeclarationSection from "./components/HealthDeclarationSection";
+import PickupAuthorizationSection from "./components/PickupAuthorizationSection";
 
 type PageState =
     | { status: "loading" }
@@ -233,16 +235,56 @@ const DaycareOnboarding = () => {
     const orderedSteps = [...onboarding.steps].sort(
         (firstStep, secondStep) => firstStep.order - secondStep.order
     );
-    const nextStep = orderedSteps.find(
-        (step) => step.status !== "completed" && step.status !== "notRequired"
-    );
-    const nextStepTitle = onboarding.missingStepTitle ?? nextStep?.title;
+    const nextStepTitle = onboarding.missingStepTitle;
     const profileStep = orderedSteps.find(
         (step) => step.key === "childAndGuardianDetails"
     );
     const canOpenAgreement =
+        profileStep?.status === "pendingReview" ||
         profileStep?.status === "completed" ||
         profileStep?.status === "notRequired";
+    const agreementStep = orderedSteps.find(
+        (step) => step.key === "agreementSigned"
+    );
+    const canOpenHealthDeclaration =
+        agreementStep?.status === "pendingReview" ||
+        agreementStep?.status === "completed" ||
+        agreementStep?.status === "notRequired";
+    const healthStep = orderedSteps.find(
+        (step) => step.key === "healthDeclarationSubmitted"
+    );
+    const pickupStep = orderedSteps.find(
+        (step) => step.key === "pickupAuthorizationSubmitted"
+    );
+    const paymentStep = orderedSteps.find(
+        (step) => step.key === "registrationFeeReceived"
+    );
+    const placementStep = orderedSteps.find(
+        (step) => step.key === "registrationApproved"
+    );
+    const allDocumentsApproved = [
+        profileStep,
+        agreementStep,
+        healthStep,
+        pickupStep,
+    ].every(
+        (step) => step?.status === "completed" || step?.status === "notRequired"
+    );
+    const waitingAdminStage = allDocumentsApproved && paymentStep?.status !== "completed" && paymentStep?.status !== "notRequired"
+        ? {
+              title: "ממתין להסדרת תשלום",
+              text: "כל הפרטים והמסמכים אושרו. צוות המעון מטפל כעת בהסדרת התשלום ואמצעי התשלום.",
+          }
+        : allDocumentsApproved && placementStep?.status !== "completed" && placementStep?.status !== "notRequired"
+          ? {
+                title: "ממתין לשיבוץ בקבוצה",
+                text: "התשלום אושר. צוות המעון ישבץ את הילד/ה בקבוצה המתאימה וישלים את הרישום.",
+            }
+          : null;
+    const canOpenPickupAuthorization =
+        healthStep?.status === "pendingReview" ||
+        healthStep?.status === "completed" ||
+        healthStep?.status === "notRequired";
 
     return (
         <main className={styles.page} dir="rtl">
@@ -259,8 +301,8 @@ const DaycareOnboarding = () => {
                         ברוכים הבאים למסלול ההצטרפות למעון חב״ד יפו
                     </h1>
                     <p className={styles.heroText}>
-                        כאן תוכלו לראות אילו שלבים כבר הושלמו ומה עדיין נדרש כדי
-                        להשלים את ההרשמה.
+                        כאן תוכלו להשלים את הפרטים והמסמכים שנדרשים מכם ולעקוב
+                        אחרי הטיפול של צוות המעון.
                     </p>
                 </header>
 
@@ -269,27 +311,40 @@ const DaycareOnboarding = () => {
                     progress={onboarding.progress}
                 />
 
-                {nextStepTitle ? (
+                {nextStepTitle || waitingAdminStage ? (
                     <aside className={styles.nextStepCard} aria-label="השלב הבא">
                         <span className={styles.nextStepLabel}>מה עכשיו?</span>
                         <strong className={styles.nextStepTitle}>
-                            {nextStepTitle}
+                            {nextStepTitle ?? waitingAdminStage?.title}
                         </strong>
                         <span className={styles.nextStepText}>
-                            זהו השלב הבא שעדיין נדרש במסלול. צוות המעון יעדכן אתכם
-                            אם נדרשת פעולה נוספת.
+                            {nextStepTitle
+                                ? "אפשר להמשיך לשלב הזה גם בזמן שצוות המעון בודק את המסמכים שכבר שלחתם."
+                                : waitingAdminStage?.text}
                         </span>
                     </aside>
                 ) : (
                     <aside
                         className={styles.completedCard}
-                        aria-label="ההרשמה הושלמה"
+                        aria-label={
+                            onboarding.progress.percentage === 100
+                                ? "ההרשמה הושלמה"
+                                : "ממתין לבדיקת צוות המעון"
+                        }
                     >
                         <strong className={styles.completedTitle}>
-                            כל השלבים הנדרשים הושלמו
+                            {onboarding.progress.percentage === 100
+                                ? onboarding.overallStatus === "completed"
+                                    ? "הרישום הושלם ואושר"
+                                    : "כל מה שנדרש מכם הושלם"
+                                : "אין כרגע פעולה שנדרשת מכם"}
                         </strong>
                         <span className={styles.completedText}>
-                            צוות המעון יעדכן אתכם אם יידרש דבר נוסף.
+                            {onboarding.progress.percentage === 100
+                                ? onboarding.overallStatus === "completed"
+                                    ? "הילד/ה רשום/ה ומשובץ/ת לקבוצה."
+                                    : "המסמכים ממתינים לטיפול צוות המעון. אין צורך לעשות דבר נוסף כרגע."
+                                : "המסמכים שנשלחו ממתינים לבדיקת צוות המעון. תוכלו להמשיך כאשר ייפתח שלב נוסף או אם יידרש תיקון."}
                         </span>
                     </aside>
                 )}
@@ -313,6 +368,26 @@ const DaycareOnboarding = () => {
 
                 {token && canOpenAgreement ? (
                     <AgreementSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                ) : null}
+
+                {token && (canOpenHealthDeclaration || canOpenPickupAuthorization) ? (
+                    <section className={styles.formsGroup} aria-labelledby="health-permissions-title">
+                        <div className={styles.formsGroupHeader}>
+                            <span className={styles.eyebrow}>שלב אחד · שני חלקים</span>
+                            <h2 className={styles.formsGroupTitle} id="health-permissions-title">
+                                בריאות והרשאות
+                            </h2>
+                            <p className={styles.formsGroupText}>
+                                השלימו את הצהרת הבריאות ולאחריה את פרטי מורשי האיסוף.
+                            </p>
+                        </div>
+                        {canOpenHealthDeclaration ? (
+                            <HealthDeclarationSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                        ) : null}
+                        {canOpenPickupAuthorization ? (
+                            <PickupAuthorizationSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                        ) : null}
+                    </section>
                 ) : null}
 
                 <section

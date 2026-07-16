@@ -8,7 +8,7 @@ type StoredFileInput = {
     bytes: Buffer;
     mimeType: string;
     originalName?: string;
-    category: "signatures" | "signed-agreements";
+    category: "signatures" | "signed-agreements" | "health-signatures" | "health-declarations" | "pickup-signatures" | "pickup-authorizations";
 };
 
 type StorageProvider = {
@@ -95,13 +95,13 @@ const createLocalProvider = (): StorageProvider => ({
         };
     },
     async download(storageKey) {
-        if (!/^daycare\/(signatures|signed-agreements)\/[a-f0-9-]+\.(png|pdf)$/.test(storageKey)) {
+        if (!/^daycare\/(signatures|signed-agreements|health-signatures|health-declarations|pickup-signatures|pickup-authorizations)\/[a-f0-9-]+\.(png|pdf)$/.test(storageKey)) {
             throw new Error("Invalid storage key");
         }
         return readFile(path.join(localRoot, storageKey));
     },
     async delete(storageKey) {
-        if (!/^daycare\/(signatures|signed-agreements)\/[a-f0-9-]+\.(png|pdf)$/.test(storageKey)) {
+        if (!/^daycare\/(signatures|signed-agreements|health-signatures|health-declarations|pickup-signatures|pickup-authorizations)\/[a-f0-9-]+\.(png|pdf)$/.test(storageKey)) {
             throw new Error("Invalid storage key");
         }
         await unlink(path.join(localRoot, storageKey)).catch((error: NodeJS.ErrnoException) => {

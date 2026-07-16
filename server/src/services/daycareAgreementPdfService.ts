@@ -1,6 +1,7 @@
 import PDFDocument from "pdfkit";
 import path from "node:path";
 import type { IDaycareAgreementContentSnapshot, DaycareAgreementSignerRole } from "../types/daycareAgreement";
+import type { DaycareParentDocument, DaycareParentDocumentBundle } from "../config/daycareParentDocuments";
 
 type AgreementPdfInput = {
     version: string;
@@ -18,6 +19,8 @@ type SignedAgreementPdfInput = AgreementPdfInput & {
     signatureImage: Buffer;
     acceptedStatement: string;
     signedAt: Date;
+    parentDocumentsVersion?: string;
+    parentDocumentsHash?: string;
 };
 
 const ROLE_LABELS: Record<DaycareAgreementSignerRole, string> = {
@@ -155,6 +158,142 @@ const finishPdf = (
     document.end();
 };
 
+const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: DaycareParentDocument, bundle: DaycareParentDocumentBundle) => {
+    document.font("AssistantBold").fontSize(20).fillColor("#0b3158");
+    rtlText(document, source.title);
+    document.moveDown(0.25).font("Assistant").fontSize(11.5).fillColor("#b7791f");
+    rtlText(document, source.subtitle);
+    document.moveDown(0.35).fontSize(9).fillColor("#4b5563");
+    rtlText(document, `גרסה ${bundle.version}`);
+    document.moveDown(0.75);
+};
+
+const drawCellText = (document: PDFKit.PDFDocument, text: string, x: number, y: number, width: number, bold = false, color = "#243447") => {
+    const isAsciiTime = /^[0-9:.-]+$/.test(text);
+    document.font(bold ? "AssistantBold" : "Assistant").fontSize(8.8).fillColor(color);
+    document.text(isAsciiTime ? text : prepareMixedRtlText(text), x + 8, y + 5, {
+        width: width - 16,
+        align: isAsciiTime ? "center" : "right",
+        features: isAsciiTime ? [] : ["rtla"],
+        lineGap: 2,
+    });
+};
+
+const drawTableRow = (
+    document: PDFKit.PDFDocument,
+    cells: Array<{ text: string; width: number; bold?: boolean }>,
+    y: number,
+    height: number,
+    fill: string
+) => {
+    let x = 54;
+    cells.forEach((cell) => {
+        document.rect(x, y, cell.width, height).fill(fill);
+        drawCellText(document, cell.text, x, y, cell.width, cell.bold, cell.bold ? "#0b3158" : "#243447");
+        x += cell.width;
+    });
+};
+
+const drawTableHeader = (document: PDFKit.PDFDocument, cells: Array<{ text: string; width: number }>, y: number) => {
+    let x = 54;
+    cells.forEach((cell) => {
+        document.rect(x, y, cell.width, 32).fill("#143a63");
+        drawCellText(document, cell.text, x, y + 1, cell.width, true, "#ffffff");
+        x += cell.width;
+    });
+    return y + 32;
+};
+
+const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParentDocument, bundle: DaycareParentDocumentBundle) => {
+    renderParentDocumentTitle(document, source, bundle);
+    let y = document.y;
+    if (source.key === "routine") {
+        y = drawTableHeader(document, [{ text: "פעילות", width: 365 }, { text: "שעה", width: 122 }], y);
+        source.items.forEach((item, index) => {
+            const rowHeight = 24;
+            drawTableRow(document, [
+                { text: item.activity, width: 365 },
+                { text: item.time, width: 122, bold: true },
+            ], y, rowHeight, index % 2 ? "#eef4f8" : "#ffffff");
+            y += rowHeight;
+        });
+        y += 16;
+        document.rect(54, y, 487, 44).fill("#f8f1de");
+        drawCellText(document, source.note, 54, y + 1, 487, true, "#143a63");
+        document.y = y + 54;
+        return;
+    }
+
+    if (source.key === "menu") {
+        y = drawTableHeader(document, [{ text: "תיאור", width: 347 }, { text: "ארוחה", width: 140 }], y);
+        source.items.forEach((item, index) => {
+            const rowHeight = item.description.length > 70 ? 46 : 34;
+            drawTableRow(document, [
+                { text: item.description, width: 347 },
+                { text: item.meal, width: 140, bold: true },
+            ], y, rowHeight, index % 2 ? "#eef4f8" : "#ffffff");
+            y += rowHeight;
+        });
+        if (source.note) {
+            y += 16;
+            document.rect(54, y, 487, 44).fill("#f8f1de");
+            drawCellText(document, source.note, 54, y + 1, 487, true, "#143a63");
+            y += 54;
+        }
+        document.y = y;
+        return;
+    }
+
+    y = drawTableHeader(document, [
+        { text: "תאריכי החופשה", width: 145 },
+        { text: "תאריך עברי", width: 157 },
+        { text: "מועד", width: 185 },
+    ], y);
+    source.items.forEach((item, index) => {
+        const rowHeight = 48;
+        drawTableRow(document, [
+            { text: item.vacationDates, width: 145 },
+            { text: item.hebrewDate, width: 157 },
+            { text: item.occasion, width: 185, bold: true },
+        ], y, rowHeight, index % 2 ? "#eef4f8" : "#ffffff");
+        y += rowHeight;
+    });
+    y += 13;
+    document.font("AssistantBold").fontSize(12).fillColor("#0b3158");
+    document.text(prepareMixedRtlText("הבהרות"), 54, y, { width: 487, align: "right", features: ["rtla"] });
+    y += 24;
+    document.rect(54, y, 487, 88).fill("#f8f1de");
+    document.font("Assistant").fontSize(8.8).fillColor("#243447");
+    source.clarifications.forEach((item, index) => {
+        document.text(prepareMixedRtlText(`${index + 1}. ${item}`), 66, y + 8 + index * 19, {
+            width: 463,
+            height: 18,
+            align: "right",
+            lineBreak: false,
+            features: ["rtla"],
+        });
+    });
+    document.y = y + 98;
+};
+
+export const createParentDocumentPdf = (bundle: DaycareParentDocumentBundle, key: DaycareParentDocument["key"]) =>
+    new Promise<Buffer>((resolve, reject) => {
+        const source = bundle.documents[key];
+        const document = new PDFDocument({
+            size: "A4",
+            margins: { top: 116, right: 54, bottom: 62, left: 54 },
+            bufferPages: true,
+            info: { Title: source.title, Author: "מעון חב״ד יפו", Subject: `גרסה ${bundle.version}` },
+        });
+        const chunks: Buffer[] = [];
+        document.on("data", (chunk: Buffer) => chunks.push(chunk));
+        document.on("error", reject);
+        document.on("end", () => resolve(Buffer.concat(chunks)));
+        registerFonts(document);
+        renderParentDocument(document, source, bundle);
+        finishPdf(document, (pageIndex, pageCount) => `${source.title} | עמוד ${pageIndex + 1} מתוך ${pageCount}`);
+    });
+
 export const createAgreementPdf = (input: AgreementPdfInput) =>
     new Promise<Buffer>((resolve, reject) => {
         const document = new PDFDocument({
@@ -196,6 +335,10 @@ export const createSignedAgreementPdf = (input: SignedAgreementPdfInput) =>
         rtlText(document, `מזהה מסמך: ${input.documentId}`);
         rtlText(document, `גרסה: ${input.version}`);
         rtlText(document, `טביעת תוכן SHA-256: ${input.contentHash}`, { characterSpacing: 0.2 });
+        if (input.parentDocumentsVersion && input.parentDocumentsHash) {
+            rtlText(document, `גרסת מסמכי הורים: ${input.parentDocumentsVersion}`);
+            rtlText(document, `טביעת מסמכי הורים SHA-256: ${input.parentDocumentsHash}`, { characterSpacing: 0.2 });
+        }
         document.moveDown(1);
         const signatureY = document.y;
         document.image(input.signatureImage, 341, signatureY, { fit: [200, 80], align: "right", valign: "center" });

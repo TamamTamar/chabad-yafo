@@ -1,4 +1,5 @@
 export type DaycareAgreementVersionStatus = "draft" | "published" | "archived";
+export type DaycareCorrectionDisposition = "preserveVersion" | "discardFileAfterReplacement";
 export interface DaycareDocumentListItem { id: string; text: string; }
 export type DaycareDocumentBlock = { id: string; type: "paragraph"; text: string } | { id: string; type: "bulletList" | "numberedList"; items: DaycareDocumentListItem[] };
 export interface DaycareDocumentSection { id: string; title: string; blocks: DaycareDocumentBlock[]; }
@@ -17,6 +18,7 @@ export interface DaycareAgreementVersion extends DaycareStructuredDocument {
 
 export interface DaycareAgreementSubmission {
     id: string;
+    revision: number;
     status: "pendingReview" | "completed" | "requiresCorrection";
     signingMethod?: "online" | "uploadedPdf";
     signedBy?: string;
@@ -25,6 +27,7 @@ export interface DaycareAgreementSubmission {
     documentId?: string;
     version?: string;
     parentMessage?: string;
+    correctionDisposition?: DaycareCorrectionDisposition;
     hasSignature: boolean;
     hasSignedPdf: boolean;
 }
@@ -41,6 +44,7 @@ export type PublicDaycareAgreement =
           acceptanceStatement: string;
           version: Omit<DaycareAgreementVersion, "id" | "createdAt" | "updatedAt">;
           agreement: Omit<DaycareAgreementSubmission, "id"> | null;
+          parentDocuments: { version: string; menuAvailable: boolean };
       };
 
 export interface AdminAgreementByOnboarding {

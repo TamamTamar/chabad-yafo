@@ -1,9 +1,11 @@
 import type { Types } from "mongoose";
+import type { DaycareParentDocumentBundle } from "../config/daycareParentDocuments";
 
 export type DaycareAgreementVersionStatus = "draft" | "published" | "archived";
 export type DaycareAgreementStatus = "notStarted" | "pendingReview" | "completed" | "requiresCorrection";
 export type DaycareAgreementSigningMethod = "online" | "uploadedPdf" | "physicalDocument";
 export type DaycareAgreementSignerRole = "mother" | "father" | "guardian";
+export type DaycareCorrectionDisposition = "preserveVersion" | "discardFileAfterReplacement";
 export type DaycareDocumentBlockType = "paragraph" | "bulletList" | "numberedList";
 
 export interface IDaycareDocumentListItem { id: string; text: string; }
@@ -58,12 +60,17 @@ export interface IStoredPrivateFile {
 
 export interface IDaycareAgreement {
     onboardingId: Types.ObjectId;
+    revision: number;
     versionId: Types.ObjectId;
     documentId?: string;
     documentKey?: "daycareAgreement";
     version?: string;
     contentHash?: string;
     contentSnapshot?: IDaycareAgreementContentSnapshot;
+    parentDocumentsVersion?: string;
+    parentDocumentsHash?: string;
+    parentDocumentsSnapshot?: DaycareParentDocumentBundle;
+    parentDocumentsAccepted?: boolean;
     status: DaycareAgreementStatus;
     signingMethod?: DaycareAgreementSigningMethod;
     signedBy?: string;
@@ -79,6 +86,9 @@ export interface IDaycareAgreement {
     signatureFile?: IStoredPrivateFile;
     signedPdfFile?: IStoredPrivateFile;
     parentMessage?: string;
+    correctionDisposition?: DaycareCorrectionDisposition;
+    supersededAt?: Date;
+    fileDiscardedAt?: Date;
     reviewedAt?: Date;
     reviewedBy?: string;
     createdAt: Date;

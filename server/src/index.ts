@@ -19,8 +19,14 @@ import {
 } from "./routes/daycareOnboardingRoutes";
 import { ensureDaycareOnboardingIndexes } from "./services/daycareOnboardingIndexService";
 import { daycareAgreementAdminRoutes, daycareAgreementPublicRoutes } from "./routes/daycareAgreementRoutes";
-import { ensureDefaultAgreementDraft } from "./services/daycareAgreementService";
+import { ensureDefaultAgreementDraft, reconcileAgreementOnboardingSteps } from "./services/daycareAgreementService";
 import { projectRoutes } from "./routes/projectRoutes";
+import { daycareParentDocumentAdminRoutes, daycareParentDocumentRoutes } from "./routes/daycareParentDocumentRoutes";
+import { backfillParentDocumentSnapshots } from "./services/daycareParentDocumentService";
+import { daycareHealthDeclarationAdminRoutes, daycareHealthDeclarationPublicRoutes } from "./routes/daycareHealthDeclarationRoutes";
+import { syncDaycareOnboardingStepTitles } from "./services/daycareOnboardingTitleSyncService";
+import { ensureDaycareAgreementIndexes } from "./services/daycareAgreementIndexService";
+import { daycarePickupAuthorizationAdminRoutes, daycarePickupAuthorizationPublicRoutes } from "./routes/daycarePickupAuthorizationRoutes";
 
 dotenv.config();
 
@@ -59,6 +65,12 @@ app.use(
     daycareOnboardingPublicRoutes
 );
 app.use("/api/daycare/agreements/public", daycareAgreementPublicRoutes);
+app.use("/api/daycare/parent-documents", daycareParentDocumentRoutes);
+app.use("/api/daycare/health-declarations/public", daycareHealthDeclarationPublicRoutes);
+app.use("/api/daycare/pickup-authorizations/public", daycarePickupAuthorizationPublicRoutes);
+app.use("/api/admin/daycare/parent-documents", daycareParentDocumentAdminRoutes);
+app.use("/api/admin/daycare/health-declarations", daycareHealthDeclarationAdminRoutes);
+app.use("/api/admin/daycare/pickup-authorizations", daycarePickupAuthorizationAdminRoutes);
 app.use("/api/admin/daycare/agreements", daycareAgreementAdminRoutes);
 app.use(
     "/api/admin/daycare/onboarding",
@@ -79,7 +91,11 @@ const startServer = async () => {
         logger.log("Connecting to Mongo...");
         await connectDB();
         await ensureDaycareOnboardingIndexes();
+        await ensureDaycareAgreementIndexes();
+        await syncDaycareOnboardingStepTitles();
         await ensureDefaultAgreementDraft();
+        await reconcileAgreementOnboardingSteps();
+        await backfillParentDocumentSnapshots();
         logger.log("Mongo finished");
 
         app.listen(port, () => {

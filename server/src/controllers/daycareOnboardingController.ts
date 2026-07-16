@@ -4,15 +4,16 @@ import {
     parseAdminOverallStatusPatch,
     parseAdminStepPatch,
     parseCreateOnboardingFromInquiry,
+    parseDeleteOnboarding,
     parseLegacyOnboardingImport,
     parsePublicDaycareProfile,
 } from "../schemas/daycareOnboardingValidation";
-import { DaycareLead } from "../models/DaycareLead";
 import { DaycareRegistration } from "../models/DaycareRegistration";
 import { Types } from "mongoose";
 import { createDaycareOnboardingFromInquiry } from "../services/daycareOnboardingCreationService";
 import {
     buildParentAccessUrl,
+    deleteDaycareOnboarding,
     DaycareOnboardingServiceError,
     getAdminOnboarding,
     getPublicOnboardingByToken,
@@ -220,6 +221,8 @@ export const createDaycareOnboardingFromRegistration = async (
                 type: "daycareRegistration",
                 recordId: registration._id,
             },
+            familyId: registration.daycareFamilyId,
+            childId: registration.daycareChildId,
         });
 
         return sendCreatedOnboarding(res, result, req.get("origin"));
@@ -232,58 +235,26 @@ export const createDaycareOnboardingFromRegistration = async (
     }
 };
 
-export const createDaycareOnboardingFromLead = async (
+export const deleteAdminDaycareOnboarding = async (
     req: Request,
     res: Response
 ) => {
-    const creation = parseCreationOrRespond(req, res);
-
-    if (!creation) {
-        return;
-    }
-
-    if (!Types.ObjectId.isValid(req.params.leadId)) {
-        return res.status(404).json({
+    const parsed = parseDeleteOnboarding(req.body as unknown);
+    if (!parsed.success) {
+        return res.status(400).json({
             success: false,
-            message: "Lead not found",
+            message: parsed.message,
         });
     }
 
     try {
-        const lead = await DaycareLead.findById(req.params.leadId).exec();
-
-        if (!lead) {
-            return res.status(404).json({
-                success: false,
-                message: "Lead not found",
-            });
-        }
-
-        if (!isOnboardingEligibleStatus(lead.status)) {
-            return res.status(409).json({
-                success: false,
-                code: "REGISTRATION_NOT_READY_FOR_ONBOARDING",
-                message: "Registration is not ready for onboarding",
-            });
-        }
-
-        const result = await createDaycareOnboardingFromInquiry({
-            ...creation,
-            temporaryParentName: lead.parentName,
-            temporaryParentPhone: lead.phone,
-            temporaryChildAge: lead.childAge,
-            origin: {
-                type: "daycareLead",
-                recordId: lead._id,
-            },
-        });
-
-        return sendCreatedOnboarding(res, result, req.get("origin"));
+        const data = await deleteDaycareOnboarding(req.params.id);
+        return res.json({ success: true, data });
     } catch (error: unknown) {
         return sendControllerError(
             res,
             error,
-            "Failed to create onboarding from lead"
+            "Failed to delete daycare onboarding"
         );
     }
 };

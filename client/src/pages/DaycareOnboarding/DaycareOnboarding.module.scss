@@ -409,6 +409,12 @@
 .documentList { display: grid; gap: 6px; margin: 0; padding-inline-start: 24px; }
 .documentListItem { padding-inline-start: 4px; }
 .signatureForm { display: grid; gap: 15px; padding-top: 5px; }
+.preSigningInfo { display: grid; gap: 9px; padding: 16px; border: 1px solid rgba($brand-secondary, .75); border-radius: $radius-md; background: rgba($brand-secondary, .12); }
+.preSigningInfoTitle { margin: 0; color: $brand-primary-deep; font-size: 1.05rem; }
+.preSigningInfoText { margin: 0; color: $brand-text; font-size: .9rem; font-weight: 700; line-height: 1.55; }
+.preSigningLinks { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: .9rem; font-weight: 800; }
+.preSigningLinks a { color: $brand-primary; text-underline-offset: 3px; }
+.preSigningLinks span { color: $ui-text-muted; }
 .signatureField { display: grid; gap: 8px; }
 .signatureLabel { color: $brand-text; font-size: .9rem; font-weight: 800; }
 .signatureCanvas { width: 100%; height: 160px; touch-action: none; border: 2px dashed $ui-border-strong; border-radius: 10px; background: #fff; cursor: crosshair; }
@@ -778,6 +784,30 @@
     clip: rect(0 0 0 0);
     clip-path: inset(50%);
     white-space: nowrap;
+}
+
+.formsGroup {
+    display: grid;
+    gap: 18px;
+    margin-top: 34px;
+}
+
+.formsGroupHeader {
+    padding-inline: 4px;
+}
+
+.formsGroupTitle {
+    margin: 4px 0 6px;
+    color: $brand-primary-deep;
+    font-size: clamp(1.45rem, 5vw, 1.9rem);
+    font-weight: 900;
+}
+
+.formsGroupText {
+    margin: 0;
+    color: $ui-text-muted;
+    font-weight: 600;
+    line-height: 1.65;
 }
 
 @keyframes loading-spin {

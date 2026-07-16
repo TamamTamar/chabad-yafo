@@ -107,6 +107,16 @@ export const daycareRegistrationSchema = new Schema(
             trim: true,
             maxlength: 1000,
         },
+        daycareFamilyId: {
+            type: Schema.Types.ObjectId,
+            ref: "DaycareFamily",
+            required: false,
+        },
+        daycareChildId: {
+            type: Schema.Types.ObjectId,
+            ref: "DaycareChild",
+            required: false,
+        },
     },
     {
         timestamps: true,

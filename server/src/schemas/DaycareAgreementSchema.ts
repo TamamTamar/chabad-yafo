@@ -31,13 +31,18 @@ const contentSnapshotSchema = new Schema({
 }, { _id: false });
 
 export const daycareAgreementSchema = new Schema<IDaycareAgreement>({
-    onboardingId: { type: Schema.Types.ObjectId, ref: "DaycareOnboarding", required: true, unique: true, immutable: true },
+    onboardingId: { type: Schema.Types.ObjectId, ref: "DaycareOnboarding", required: true, index: true, immutable: true },
+    revision: { type: Number, required: true, min: 1, default: 1, immutable: true },
     versionId: { type: Schema.Types.ObjectId, ref: "DaycareAgreementVersion", required: true, immutable: true },
     documentId: { type: String, maxlength: 80, unique: true, sparse: true, immutable: true },
     documentKey: { type: String, enum: ["daycareAgreement"], immutable: true },
     version: { type: String, maxlength: 60, immutable: true },
     contentHash: { type: String, match: /^[a-f0-9]{64}$/, immutable: true },
     contentSnapshot: { type: contentSnapshotSchema, select: false },
+    parentDocumentsVersion: { type: String, maxlength: 60, immutable: true },
+    parentDocumentsHash: { type: String, match: /^[a-f0-9]{64}$/, immutable: true },
+    parentDocumentsSnapshot: { type: Schema.Types.Mixed, select: false, immutable: true },
+    parentDocumentsAccepted: { type: Boolean, immutable: true },
     status: { type: String, enum: ["notStarted", "pendingReview", "completed", "requiresCorrection"], default: "notStarted", index: true },
     signingMethod: { type: String, enum: ["online", "uploadedPdf", "physicalDocument"] },
     signedBy: { type: String, trim: true, maxlength: 160 },
@@ -53,6 +58,11 @@ export const daycareAgreementSchema = new Schema<IDaycareAgreement>({
     signatureFile: storedFileSchema,
     signedPdfFile: storedFileSchema,
     parentMessage: { type: String, trim: true, maxlength: 1000 },
+    correctionDisposition: { type: String, enum: ["preserveVersion", "discardFileAfterReplacement"] },
+    supersededAt: Date,
+    fileDiscardedAt: Date,
     reviewedAt: Date,
     reviewedBy: { type: String, maxlength: 120 },
 }, { timestamps: true });
+
+daycareAgreementSchema.index({ onboardingId: 1, revision: 1 }, { unique: true });

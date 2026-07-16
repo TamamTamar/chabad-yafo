@@ -1,13 +1,13 @@
 import type {
     DaycareDocumentStatus,
     DaycareInterestLevel,
-    DaycareLeadStatus,
     DaycarePriority,
     DaycarePriceFit,
     DaycareTaskCategory,
     DaycareTaskStage,
     DaycareTaskStatus,
 } from "./types";
+import type { DaycareInterestStatus } from "../../../types/daycareRegistration";
 
 export const daycareTaskCategories: DaycareTaskCategory[] = [
     "תכנון",
@@ -40,7 +40,7 @@ export const daycareTaskStages: DaycareTaskStage[] = [
     "התרחבות",
 ];
 
-export const daycareLeadStatuses: DaycareLeadStatus[] = [
+export const daycareRegistrationStatuses: DaycareInterestStatus[] = [
     "מתעניין",
     "שיחה בוצעה",
     "הגיע לראות",

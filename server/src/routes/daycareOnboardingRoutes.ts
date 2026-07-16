@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
     createLegacyDaycareOnboarding,
-    createDaycareOnboardingFromLead,
     createDaycareOnboardingFromRegistration,
+    deleteAdminDaycareOnboarding,
     getAdminDaycareOnboarding,
     getAdminDaycareOnboardingAudit,
     getPublicDaycareOnboarding,
@@ -47,9 +47,9 @@ adminRouter.post(
     "/from-registration/:registrationId",
     createDaycareOnboardingFromRegistration
 );
-adminRouter.post("/from-lead/:leadId", createDaycareOnboardingFromLead);
 adminRouter.get("/:id/audit", getAdminDaycareOnboardingAudit);
 adminRouter.get("/:id", getAdminDaycareOnboarding);
+adminRouter.delete("/:id", deleteAdminDaycareOnboarding);
 adminRouter.patch("/:id", patchAdminDaycareOnboarding);
 adminRouter.patch(
     "/:id/steps/:stepKey",

@@ -1,14 +1,12 @@
 import axios from "axios";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { daycareLeadStatuses } from "../daycareAdminConfig";
+import { daycareRegistrationStatuses } from "../daycareAdminConfig";
 import {
     getDaycareRegistrations,
-    updateDaycareLead,
     updateDaycarePublicRegistration,
 } from "../daycareAdminService";
 import {
-    createOnboardingFromLead,
     createOnboardingFromRegistration,
 } from "../../../../services/daycareOnboardingService";
 import {
@@ -18,17 +16,14 @@ import {
 } from "../../../../types/daycareOnboarding";
 import type { DaycareInterestStatus } from "../../../../types/daycareRegistration";
 import styles from "../DaycareAdmin.module.scss";
-import type { DaycareLead, DaycareRegistrationsResponse } from "../types";
+import type { DaycareRegistrationsResponse } from "../types";
 
 type DaycareRegistrationsProps = {
     onChanged: () => void;
 };
 
-type RegistrationSourceType = "daycareRegistration" | "daycareLead";
-
 type UnifiedRegistration = {
     key: string;
-    sourceType: RegistrationSourceType;
     sourceId: string;
     sourceLabel: string;
     parentName: string;
@@ -45,7 +40,6 @@ type UnifiedRegistration = {
 };
 
 type OnboardingDraft = CreateOnboardingFromInquiryPayload & {
-    sourceType: RegistrationSourceType;
     sourceId: string;
     sourceLabel: string;
     parentName: string;
@@ -100,12 +94,11 @@ const getCreateErrorMessage = (error: unknown) => {
 const toUnifiedRegistrations = (
     data: DaycareRegistrationsResponse
 ): UnifiedRegistration[] => {
-    const publicRows: UnifiedRegistration[] = data.publicRegistrations.map(
+    const rows: UnifiedRegistration[] = data.registrations.map(
         (registration) => ({
             key: `daycareRegistration:${registration._id}`,
-            sourceType: "daycareRegistration",
             sourceId: registration._id,
-            sourceLabel: "טופס ציבורי",
+            sourceLabel: "טופס הרשמה",
             parentName: registration.parentName,
             phone: registration.phone,
             email: registration.email,
@@ -123,23 +116,9 @@ const toUnifiedRegistrations = (
             onboardingSummary: registration.onboardingSummary,
         })
     );
-    const leadRows: UnifiedRegistration[] = data.leads.map((lead) => ({
-        key: `daycareLead:${lead._id}`,
-        sourceType: "daycareLead",
-        sourceId: lead._id,
-        sourceLabel: "פנייה ידנית",
-        parentName: lead.parentName,
-        phone: lead.phone,
-        childName: lead.childName,
-        childAge: lead.childAge,
-        status: lead.status,
-        callNotes: lead.callNotes,
-        createdAt: lead.inquiryDate ?? lead.createdAt,
-        onboardingSummary: lead.onboardingSummary,
-    }));
     const uniqueRows = new Map<string, UnifiedRegistration>();
 
-    for (const row of [...publicRows, ...leadRows]) {
+    for (const row of rows) {
         const deduplicationKey = row.onboardingSummary
             ? `onboarding:${row.onboardingSummary.id}`
             : row.key;
@@ -157,7 +136,6 @@ const toUnifiedRegistrations = (
 };
 
 const createDraft = (registration: UnifiedRegistration): OnboardingDraft => ({
-    sourceType: registration.sourceType,
     sourceId: registration.sourceId,
     sourceLabel: registration.sourceLabel,
     parentName: registration.parentName,
@@ -169,8 +147,7 @@ const createDraft = (registration: UnifiedRegistration): OnboardingDraft => ({
 const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     const navigate = useNavigate();
     const [data, setData] = useState<DaycareRegistrationsResponse>({
-        leads: [],
-        publicRegistrations: [],
+        registrations: [],
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -181,8 +158,21 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     const [draft, setDraft] = useState<OnboardingDraft | null>(null);
     const [creating, setCreating] = useState(false);
     const [createError, setCreateError] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState<DaycareInterestStatus | "all">("all");
 
     const rows = useMemo(() => toUnifiedRegistrations(data), [data]);
+    const filteredRows = useMemo(() => {
+        const query = searchQuery.trim().toLocaleLowerCase("he");
+        return rows.filter((row) => {
+            const matchesStatus = statusFilter === "all" || row.status === statusFilter;
+            const matchesSearch = !query || [row.parentName, row.phone, row.childName, row.childAge]
+                .filter(Boolean)
+                .some((value) => value!.toLocaleLowerCase("he").includes(query));
+            return matchesStatus && matchesSearch;
+        });
+    }, [rows, searchQuery, statusFilter]);
+    const activeCasesCount = rows.filter((row) => Boolean(row.onboardingSummary)).length;
     useEffect(() => {
         void getDaycareRegistrations()
             .then((registrations) => {
@@ -204,19 +194,12 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     }, []);
 
     const updateRow = (
-        sourceType: RegistrationSourceType,
         sourceId: string,
         updates: Partial<UnifiedRegistration>
     ) => {
         setData((current) => ({
-            leads: current.leads.map((lead) =>
-                sourceType === "daycareLead" && lead._id === sourceId
-                    ? ({ ...lead, ...updates } as DaycareLead)
-                    : lead
-            ),
-            publicRegistrations: current.publicRegistrations.map(
+            registrations: current.registrations.map(
                 (registration) =>
-                    sourceType === "daycareRegistration" &&
                     registration._id === sourceId
                         ? { ...registration, ...updates }
                         : registration
@@ -231,13 +214,9 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         setUpdatingKey(row.key);
 
         try {
-            if (row.sourceType === "daycareRegistration") {
-                await updateDaycarePublicRegistration(row.sourceId, { status });
-            } else {
-                await updateDaycareLead(row.sourceId, { status });
-            }
+            await updateDaycarePublicRegistration(row.sourceId, { status });
 
-            updateRow(row.sourceType, row.sourceId, { status });
+            updateRow(row.sourceId, { status });
             await onChanged();
         } catch {
             setError("לא הצלחנו לעדכן את סטטוס הפנייה");
@@ -258,13 +237,9 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         try {
             const callNotes = noteDrafts[row.key]?.trim() || undefined;
 
-            if (row.sourceType === "daycareRegistration") {
-                await updateDaycarePublicRegistration(row.sourceId, { callNotes });
-            } else {
-                await updateDaycareLead(row.sourceId, { callNotes });
-            }
+            await updateDaycarePublicRegistration(row.sourceId, { callNotes });
 
-            updateRow(row.sourceType, row.sourceId, { callNotes });
+            updateRow(row.sourceId, { callNotes });
             setExpandedNoteKeys((keys) => keys.filter((key) => key !== row.key));
             await onChanged();
         } catch {
@@ -292,17 +267,14 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         setCreating(true);
         setCreateError("");
 
-        const { sourceType, sourceId } = draft;
+        const { sourceId } = draft;
         const payload: CreateOnboardingFromInquiryPayload = {
             schoolYear: draft.schoolYear,
             internalNote: draft.internalNote,
         };
 
         try {
-            const result =
-                sourceType === "daycareRegistration" && sourceId
-                    ? await createOnboardingFromRegistration(sourceId, payload)
-                    : await createOnboardingFromLead(sourceId, payload);
+            const result = await createOnboardingFromRegistration(sourceId, payload);
 
             navigate(`/admin/daycare-onboarding/${result.data.id}`, {
                 state: { parentAccessUrl: result.parentAccessUrl },
@@ -322,27 +294,49 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                         רישום ופניות למעון
                     </h2>
                     <p className={styles.sectionDescription}>
-                        פניות מהטופס הציבורי ופניות ידניות מוצגות כאן בזרימה אחת.
+                        כל הפניות מגיעות מטופס ההרשמה ומטופלות כאן במקום אחד.
                     </p>
                 </div>
             </div>
 
-            <div className={styles.notice}>
-                אין צורך למלא הכול מראש: בכל פנייה מעדכנים סטטוס, שומרים הערת
-                שיחה, ומתקדמים לפעולה הבאה.
+            <div className={styles.registrationSummaryBar}>
+                <div><strong>{rows.length}</strong><span>פניות בסך הכול</span></div>
+                <div><strong>{activeCasesCount}</strong><span>תיקי הצטרפות פתוחים</span></div>
+                <div><strong>{rows.filter((row) => row.status === "נרשם").length}</strong><span>ילדים רשומים</span></div>
             </div>
 
-            <ol className={styles.registrationWorkflow} aria-label="שלבי הטיפול בפנייה">
-                {registrationWorkflow.map((step, index) => (
-                    <li className={styles.registrationWorkflowStep} key={step.title}>
-                        <span className={styles.registrationWorkflowNumber}>{index + 1}</span>
-                        <div>
-                            <strong>{step.title}</strong>
-                            <p>{step.text}</p>
-                        </div>
-                    </li>
-                ))}
-            </ol>
+            <div className={styles.registrationToolbar}>
+                <label className={styles.compactField}>
+                    <span>חיפוש משפחה</span>
+                    <input
+                        className={styles.compactInput}
+                        placeholder="שם הורה, ילד או טלפון"
+                        type="search"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                    />
+                </label>
+                <label className={styles.compactField}>
+                    <span>סינון לפי סטטוס</span>
+                    <select className={styles.statusSelect} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as DaycareInterestStatus | "all")}>
+                        <option value="all">כל הסטטוסים</option>
+                        {daycareRegistrationStatuses.map((status) => <option key={status} value={status}>{status}</option>)}
+                    </select>
+                </label>
+                <span className={styles.registrationResultCount}>{filteredRows.length} תוצאות</span>
+            </div>
+
+            <details className={styles.workflowHelp}>
+                <summary>איך מטפלים בפנייה?</summary>
+                <ol className={styles.registrationWorkflow} aria-label="שלבי הטיפול בפנייה">
+                    {registrationWorkflow.map((step, index) => (
+                        <li className={styles.registrationWorkflowStep} key={step.title}>
+                            <span className={styles.registrationWorkflowNumber}>{index + 1}</span>
+                            <div><strong>{step.title}</strong><p>{step.text}</p></div>
+                        </li>
+                    ))}
+                </ol>
+            </details>
 
             {error ? (
                 <p className={styles.formErrorMessage} role="alert">
@@ -356,12 +350,13 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                 </div>
             ) : rows.length === 0 ? (
                 <div className={styles.emptyState}>עדיין אין פניות ברישום.</div>
+            ) : filteredRows.length === 0 ? (
+                <div className={styles.emptyState}>לא נמצאו פניות שמתאימות לחיפוש.</div>
             ) : (
                 <div className={styles.tableWrapper}>
                     <table className={styles.tableCompact}>
                         <thead>
                             <tr>
-                                <th className={styles.tableHeader}>מקור</th>
                                 <th className={styles.tableHeader}>שם הורה</th>
                                 <th className={styles.tableHeader}>טלפון</th>
                                 <th className={styles.tableHeader}>ילד/ה</th>
@@ -372,16 +367,13 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {rows.map((row) => {
+                            {filteredRows.map((row) => {
                                 const summary = row.onboardingSummary;
                                 const canCreate = eligibleStatuses.includes(row.status);
                                 const nextStatus = nextStatusByStatus[row.status];
 
                                 return (
                                     <tr className={styles.tableRow} key={row.key}>
-                                        <td className={styles.tableCell} data-label="מקור">
-                                            {row.sourceLabel}
-                                        </td>
                                         <td className={styles.tableCell} data-label="שם הורה">
                                             {row.parentName}
                                         </td>
@@ -404,7 +396,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                                     )
                                                 }
                                             >
-                                                {daycareLeadStatuses.map((status) => (
+                                                {daycareRegistrationStatuses.map((status) => (
                                                     <option key={status} value={status}>
                                                         {status}
                                                     </option>
@@ -475,16 +467,13 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                         <td className={styles.tableCell} data-label="תיק הצטרפות">
                                             {summary ? (
                                                 <div className={styles.onboardingSummary}>
-                                                    <span>{summary.schoolYear}</span>
-                                                    <span>{summary.progress.percentage}%</span>
-                                                    <span>
+                                                    <span className={styles.onboardingStatusLine}>
                                                         {onboardingOverallStatusLabels[
                                                             summary.overallStatus
                                                         ]}
                                                     </span>
-                                                    <span>
-                                                        {summary.missingStepTitle ?? "אין שלב חסר"}
-                                                    </span>
+                                                    <span>{summary.progress.percentage}% הושלם · {summary.schoolYear}</span>
+                                                    <strong className={styles.onboardingNextAction}>הפעולה הבאה: {summary.missingStepTitle ?? "התיק הושלם"}</strong>
                                                     <button
                                                         className={styles.primaryButton}
                                                         type="button"
@@ -494,7 +483,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                                             )
                                                         }
                                                     >
-                                                        פתיחת תיק
+                                                        פתיחת התיק והמשך טיפול
                                                     </button>
                                                 </div>
                                             ) : canCreate ? (

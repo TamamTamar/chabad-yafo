@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { DaycareDocument } from "../models/DaycareDocument";
 import { DaycareFinanceSettings } from "../models/DaycareFinanceSettings";
-import { DaycareLead } from "../models/DaycareLead";
 import { DaycareRegistration } from "../models/DaycareRegistration";
 import { DaycareTask } from "../models/DaycareTask";
 import { Family } from "../models/Family";
@@ -1132,10 +1131,8 @@ router.get("/daycare/overview", requireAdmin, async (_req, res) => {
         await Promise.all([ensureDefaultTasks(), ensureDefaultDocuments()]);
 
         const [
-            publicRegisteredCount,
-            publicInterestedCount,
-            registeredLeadCount,
-            interestedLeadCount,
+            registeredCount,
+            interestedCount,
             openTasks,
             completedTasks,
             urgentOpenTasks,
@@ -1147,8 +1144,6 @@ router.get("/daycare/overview", requireAdmin, async (_req, res) => {
             DaycareRegistration.countDocuments({
                 $or: [{ status: { $ne: "נרשם" } }, { status: { $exists: false } }],
             }),
-            DaycareLead.countDocuments({ status: "נרשם" }),
-            DaycareLead.countDocuments({ status: { $ne: "נרשם" } }),
             DaycareTask.countDocuments({ status: { $ne: "הושלם" } }),
             DaycareTask.countDocuments({ status: "הושלם" }),
             DaycareTask.countDocuments({
@@ -1160,8 +1155,7 @@ router.get("/daycare/overview", requireAdmin, async (_req, res) => {
             getFinanceSettings(),
         ]);
 
-        const actualRegistrations = publicRegisteredCount + registeredLeadCount;
-        const interestedCount = publicInterestedCount + interestedLeadCount;
+        const actualRegistrations = registeredCount;
         const trackedChildren = Math.max(
             actualRegistrations,
             financeSettings.currentChildren
@@ -1225,7 +1219,7 @@ router.get("/daycare/overview", requireAdmin, async (_req, res) => {
                 ),
                 targetOpeningDate: getUpcomingSeptemberLabel(),
                 linkedPublicRegistrations:
-                    publicRegisteredCount + publicInterestedCount,
+                    registeredCount + interestedCount,
                 expansion: {
                     thresholdChildren: 7,
                     trackedChildren,
@@ -1387,8 +1381,7 @@ router.delete("/daycare/tasks/:id", requireAdmin, async (req, res) => {
 
 router.get("/daycare/registrations", requireAdmin, async (_req, res) => {
     try {
-        const [leads, publicRegistrations, onboardings] = await Promise.all([
-            DaycareLead.find().sort({ createdAt: -1 }),
+        const [registrations, onboardings] = await Promise.all([
             DaycareRegistration.find().sort({ createdAt: -1 }),
             listAdminOnboardings(),
         ]);
@@ -1410,7 +1403,7 @@ router.get("/daycare/registrations", requireAdmin, async (_req, res) => {
         }
         const withOnboardingSummary = <T extends { id: string; toObject(): object }>(
             record: T,
-            sourceType: "daycareRegistration" | "daycareLead"
+            sourceType: "daycareRegistration"
         ) => ({
             ...record.toObject(),
             onboardingSummary:
@@ -1420,10 +1413,7 @@ router.get("/daycare/registrations", requireAdmin, async (_req, res) => {
         return res.json({
             success: true,
             data: {
-                leads: leads.map((lead) =>
-                    withOnboardingSummary(lead, "daycareLead")
-                ),
-                publicRegistrations: publicRegistrations.map((registration) =>
+                registrations: registrations.map((registration) =>
                     withOnboardingSummary(
                         registration,
                         "daycareRegistration"
@@ -1465,64 +1455,6 @@ router.patch("/daycare/public-registrations/:id", requireAdmin, async (req, res)
         return res.status(400).json({
             success: false,
             message: "Failed to update daycare registration",
-        });
-    }
-});
-
-router.post("/daycare/registrations", requireAdmin, async (req, res) => {
-    try {
-        const lead = await DaycareLead.create(req.body);
-
-        return res.status(201).json({
-            success: true,
-            data: lead,
-        });
-    } catch (error) {
-        return res.status(400).json({
-            success: false,
-            message: "Failed to create daycare registration",
-        });
-    }
-});
-
-router.patch("/daycare/registrations/:id", requireAdmin, async (req, res) => {
-    try {
-        const lead = await DaycareLead.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true,
-        });
-
-        if (!lead) {
-            return res.status(404).json({
-                success: false,
-                message: "Registration not found",
-            });
-        }
-
-        return res.json({
-            success: true,
-            data: lead,
-        });
-    } catch (error) {
-        return res.status(400).json({
-            success: false,
-            message: "Failed to update daycare registration",
-        });
-    }
-});
-
-router.delete("/daycare/registrations/:id", requireAdmin, async (req, res) => {
-    try {
-        await DaycareLead.findByIdAndDelete(req.params.id);
-
-        return res.json({
-            success: true,
-            data: { id: req.params.id },
-        });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Failed to delete daycare registration",
         });
     }
 });

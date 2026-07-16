@@ -5,6 +5,7 @@ import type {
     DaycareAgreementVersion,
     PublicDaycareAgreement,
     DaycareStructuredDocument,
+    DaycareCorrectionDisposition,
 } from "../types/daycareAgreement";
 import http from "./http";
 
@@ -24,6 +25,7 @@ export const signPublicDaycareAgreement = async (
         signerRole: "mother" | "father" | "guardian";
         signerIsraeliId: string;
         signature: Blob;
+        parentDocumentsAccepted: boolean;
     }
 ) => {
     const formData = new FormData();
@@ -31,6 +33,7 @@ export const signPublicDaycareAgreement = async (
     formData.append("signerRole", input.signerRole);
     formData.append("signerIsraeliId", input.signerIsraeliId);
     formData.append("acceptedTerms", "true");
+    formData.append("parentDocumentsAccepted", String(input.parentDocumentsAccepted));
     formData.append("signature", input.signature, "signature.png");
     const response = await http.post<ApiResponse<Omit<DaycareAgreementSubmission, "id">>>(
         `/daycare/agreements/public/${encode(token)}/sign`,
@@ -115,11 +118,12 @@ export const getAdminAgreementByOnboarding = async (onboardingId: string) => {
 export const reviewAdminAgreement = async (
     agreementId: string,
     status: "completed" | "requiresCorrection",
-    parentMessage?: string
+    parentMessage?: string,
+    correctionDisposition?: DaycareCorrectionDisposition
 ) => {
     const response = await http.patch<ApiResponse<DaycareAgreementSubmission>>(
         `/admin/daycare/agreements/${encode(agreementId)}/review`,
-        { status, parentMessage }
+        { status, parentMessage, correctionDisposition }
     );
     return response.data.data;
 };
