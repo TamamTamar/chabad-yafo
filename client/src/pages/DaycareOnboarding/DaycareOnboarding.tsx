@@ -270,6 +270,42 @@ const DaycareOnboarding = () => {
     ].every(
         (step) => step?.status === "completed" || step?.status === "notRequired"
     );
+    const parentDocumentSteps = [
+        profileStep,
+        agreementStep,
+        healthStep,
+        pickupStep,
+    ].filter((step): step is NonNullable<typeof step> => Boolean(step));
+    const parentStageWasSubmitted = (step: (typeof parentDocumentSteps)[number]) =>
+        step.status === "pendingReview" ||
+        step.status === "completed" ||
+        step.status === "notRequired";
+    const currentParentStepIndex = parentDocumentSteps.findIndex(
+        (step) => !parentStageWasSubmitted(step)
+    );
+    const revealedParentSteps =
+        currentParentStepIndex >= 0
+            ? parentDocumentSteps.slice(0, currentParentStepIndex + 1)
+            : parentDocumentSteps;
+    const revealedStepKeys = new Set(
+        revealedParentSteps.map((step) => step.key)
+    );
+
+    if (allDocumentsApproved && paymentStep) {
+        revealedStepKeys.add(paymentStep.key);
+    }
+
+    if (
+        (paymentStep?.status === "completed" ||
+            paymentStep?.status === "notRequired") &&
+        placementStep
+    ) {
+        revealedStepKeys.add(placementStep.key);
+    }
+
+    const revealedSteps = orderedSteps.filter((step) =>
+        revealedStepKeys.has(step.key)
+    );
     const waitingAdminStage = allDocumentsApproved && paymentStep?.status !== "completed" && paymentStep?.status !== "notRequired"
         ? {
               title: "ממתין להסדרת תשלום",
@@ -399,17 +435,19 @@ const DaycareOnboarding = () => {
                             שלבי ההצטרפות
                         </h2>
                         <p className={styles.stepsIntro}>
-                            הסטטוס מתעדכן בהתאם למסמכים ולבדיקות של צוות המעון.
+                            בכל פעם שמסיימים שלב, השלב הבא נפתח ומופיע כאן.
                         </p>
                     </div>
 
-                    {orderedSteps.length > 0 ? (
+                    {revealedSteps.length > 0 ? (
                         <div className={styles.stepsList}>
-                            {orderedSteps.map((step, index) => (
+                            {revealedSteps.map((step) => (
                                 <OnboardingStepCard
                                     key={step.key}
                                     step={step}
-                                    position={index + 1}
+                                    position={orderedSteps.findIndex(
+                                        (orderedStep) => orderedStep.key === step.key
+                                    ) + 1}
                                 />
                             ))}
                         </div>
