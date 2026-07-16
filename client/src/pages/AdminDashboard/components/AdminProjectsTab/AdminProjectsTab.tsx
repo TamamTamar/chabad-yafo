@@ -257,7 +257,7 @@ const AdminProjectsTab = () => {
                                 maxLength={160}
                                 autoFocus
                             />
-                            {formErrors.name ? <span className={styles.error}>{formErrors.name.message}</span> : null}
+                            <span className={styles.fieldError}>{formErrors.name?.message || ""}</span>
                         </label>
                         <label>
                             <span>מה היעד? *</span>
@@ -270,7 +270,7 @@ const AdminProjectsTab = () => {
                                 maxLength={2000}
                                 rows={2}
                             />
-                            {formErrors.goal ? <span className={styles.error}>{formErrors.goal.message}</span> : null}
+                            <span className={styles.fieldError}>{formErrors.goal?.message || ""}</span>
                         </label>
                     </div>
                     <button className={styles.submitButton} disabled={isSubmitting}>

@@ -40,6 +40,15 @@ export const submitPublicDaycareProfile = async (
     return response.data.data;
 };
 
+export const submitPublicDaycareOnboarding = async (token: string) => {
+    const response = await http.post<ApiResponse<PublicDaycareOnboarding>>(
+        `/daycare/onboarding/public/${encodePathSegment(token)}/submit`,
+        {}
+    );
+
+    return response.data.data;
+};
+
 export const getAdminDaycareOnboardings = async () => {
     const response = await http.get<ApiResponse<AdminDaycareOnboardingListItem[]>>(
         "/admin/daycare/onboarding"

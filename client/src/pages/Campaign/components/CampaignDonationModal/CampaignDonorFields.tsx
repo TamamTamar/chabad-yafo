@@ -59,9 +59,7 @@ const CampaignDonorFields = ({
               minLength: { value: 2, message: "מינימום 2 תווים" },
             })}
           />
-          {errors.firstName && (
-            <span className={styles.errorText}>{errors.firstName.message}</span>
-          )}
+          <span className={styles.errorText}>{errors.firstName?.message || ""}</span>
         </div>
 
         <div className={styles.field}>
@@ -73,9 +71,7 @@ const CampaignDonorFields = ({
               minLength: { value: 2, message: "מינימום 2 תווים" },
             })}
           />
-          {errors.lastName && (
-            <span className={styles.errorText}>{errors.lastName.message}</span>
-          )}
+          <span className={styles.errorText}>{errors.lastName?.message || ""}</span>
         </div>
 
         <div className={styles.field}>
@@ -88,9 +84,7 @@ const CampaignDonorFields = ({
               onChange: keepDigitsOnly,
             })}
           />
-          {errors.phone && (
-            <span className={styles.errorText}>{errors.phone.message}</span>
-          )}
+          <span className={styles.errorText}>{errors.phone?.message || ""}</span>
         </div>
 
         <div className={styles.field}>
@@ -105,9 +99,7 @@ const CampaignDonorFields = ({
               },
             })}
           />
-          {errors.email && (
-            <span className={styles.errorText}>{errors.email.message}</span>
-          )}
+          <span className={styles.errorText}>{errors.email?.message || ""}</span>
         </div>
       </div>
     </div>

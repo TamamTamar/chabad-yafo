@@ -18,6 +18,7 @@ type Props = {
     notice: string;
     error: string;
     reviewChecklist: readonly ReviewChecklistItem[];
+    allDocumentsReady: boolean;
     allDocumentsSubmitted: boolean;
     allDocumentsApproved: boolean;
     nextStep?: AdminOnboardingStep;
@@ -26,7 +27,7 @@ type Props = {
 
 const OnboardingOverview = ({
     onboarding, adminProgressPercentage, adminCompletedSteps, manageableStepCount,
-    notice, error, reviewChecklist, allDocumentsSubmitted, allDocumentsApproved,
+    notice, error, reviewChecklist, allDocumentsReady, allDocumentsSubmitted, allDocumentsApproved,
     nextStep, scrollToCaseSection,
 }: Props) => (
     <>
@@ -91,14 +92,18 @@ const OnboardingOverview = ({
                     <div className={styles.nextActionCopy}>
                         <span className={styles.eyebrow}>מה צריך לעשות עכשיו?</span>
                         <h2 className={styles.nextActionTitle} id="next-action-title">
-                            {allDocumentsSubmitted && !allDocumentsApproved
+                            {allDocumentsReady && !allDocumentsSubmitted
+                                ? "ממתינים לשליחה הסופית של ההורה"
+                                : allDocumentsSubmitted && !allDocumentsApproved
                                 ? "אישור כל הפרטים והמסמכים"
                                 : nextStep
                                   ? nextStep.title
                                   : "כל שלבי ההרשמה הושלמו"}
                         </h2>
                         <p className={styles.nextActionText}>
-                            {allDocumentsSubmitted && !allDocumentsApproved
+                            {allDocumentsReady && !allDocumentsSubmitted
+                                ? "כל הטפסים מולאו ונשמרו, אך ההורה עדיין לא לחץ על ״סיום ושליחה לצוות המעון״. רק לאחר הלחיצה התיק יעבור לבדיקה מרוכזת."
+                                : allDocumentsSubmitted && !allDocumentsApproved
                                 ? "כל הטפסים הוגשו. עברי עליהם ואשרי את כולם יחד באזור הבדיקה המרוכזת."
                                 : nextStep
                                 ? nextStep.responsibleParty === "parent" && nextStep.status === "notStarted"
@@ -112,23 +117,11 @@ const OnboardingOverview = ({
                                 <span>{onboardingResponsiblePartyLabels[nextStep.responsibleParty]}</span>
                             </div>
                         ) : null}
-                        {(allDocumentsSubmitted && !allDocumentsApproved) || nextStep ? (
+                        {allDocumentsSubmitted && !allDocumentsApproved ? (
                             <button
                                 className={styles.primaryButton}
                                 type="button"
-                                onClick={() => scrollToCaseSection(
-                                    allDocumentsSubmitted && !allDocumentsApproved
-                                        ? "documents-approval"
-                                        : nextStep?.key === "childAndGuardianDetails"
-                                          ? "profile-details"
-                                          : nextStep?.key === "agreementSigned"
-                                            ? "agreement-review"
-                                            : nextStep?.key === "healthDeclarationSubmitted"
-                                              ? "health-declaration"
-                                              : nextStep?.key === "pickupAuthorizationSubmitted"
-                                                ? "pickup-authorization"
-                                                : "payment-and-placement"
-                                )}
+                                onClick={() => scrollToCaseSection("documents-approval")}
                             >
                                 מעבר לפעולה
                             </button>

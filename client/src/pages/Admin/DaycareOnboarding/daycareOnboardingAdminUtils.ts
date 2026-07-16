@@ -1,9 +1,7 @@
 import {
-    onboardingOverallStatusLabels,
     onboardingStepSourceLabels,
     onboardingStepStatusLabels,
     type AdminOnboardingStep,
-    type OnboardingOverallStatus,
     type OnboardingResponsibleParty,
     type OnboardingStepSource,
     type OnboardingStepStatus,
@@ -29,10 +27,6 @@ export const stepStatuses = Object.keys(
 export const stepSources = Object.keys(
     onboardingStepSourceLabels
 ) as OnboardingStepSource[];
-export const overallStatuses = Object.keys(
-    onboardingOverallStatusLabels
-) as OnboardingOverallStatus[];
-
 export const formatDate = (value?: string) =>
     value
         ? new Date(value).toLocaleDateString("he-IL", {

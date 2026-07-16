@@ -26,12 +26,15 @@ import {
 import {
     applyAdminStepPatch,
     buildParentAccessUrl,
+    calculateParentSubmissionProgress,
     calculateOnboardingProgress,
     calculateOverallStatus,
+    canSubmitParentBundle,
     createDefaultOnboarding,
     getEffectiveOverallStatus,
     hashParentAccessToken,
     isParentAccessAllowed,
+    isParentBundleSubmitted,
     isParentAccessTokenFormatValid,
     parentTokenMatchesHash,
     regenerateParentAccess,
@@ -800,6 +803,44 @@ test("progress includes only visible required steps and rounds to an integer", (
     });
 });
 
+test("final parent submission progress includes only the four parent forms", () => {
+    const { onboarding } = createOnboardingFixture();
+    const parentStepKeys = new Set([
+        "childAndGuardianDetails",
+        "agreementSigned",
+        "healthDeclarationSubmitted",
+        "pickupAuthorizationSubmitted",
+    ]);
+
+    for (const step of onboarding.steps) {
+        if (parentStepKeys.has(step.key)) {
+            step.status = "pendingReview";
+        } else {
+            step.status = "notStarted";
+        }
+    }
+
+    assert.deepEqual(calculateParentSubmissionProgress(onboarding.steps), {
+        completedSteps: 4,
+        totalSteps: 4,
+        percentage: 100,
+    });
+    assert.equal(canSubmitParentBundle(onboarding.steps), true);
+    assert.equal(isParentBundleSubmitted(onboarding), false);
+
+    onboarding.parentSubmittedAt = new Date("2026-07-16T12:00:00.000Z");
+    assert.equal(isParentBundleSubmitted(onboarding), true);
+    onboarding.parentSubmittedAt = undefined;
+
+    const agreementStep = onboarding.steps.find(
+        (step) => step.key === "agreementSigned"
+    );
+    assert.ok(agreementStep);
+    agreementStep.status = "requiresCorrection";
+    assert.equal(canSubmitParentBundle(onboarding.steps), false);
+    assert.equal(isParentBundleSubmitted(onboarding), false);
+});
+
 test("overall status distinguishes parent work, admin review and completion", () => {
     const { onboarding } = createOnboardingFixture();
 
@@ -992,23 +1033,42 @@ test("public DTO exposes only parent-safe fields and visible steps", () => {
     assert.equal(serialized.includes("audit"), false);
 });
 
-test("parent flow skips submitted reviews and admin-only steps", () => {
+test("parent flow keeps saved profile editable until the final submission", () => {
     const { onboarding } = createOnboardingFixture();
     const profileStep = onboarding.steps.find((step) => step.key === "childAndGuardianDetails");
     const agreementStep = onboarding.steps.find((step) => step.key === "agreementSigned");
     assert.ok(profileStep);
     assert.ok(agreementStep);
-    profileStep.status = "pendingReview";
+    profileStep.status = "completed";
     agreementStep.status = "pendingReview";
 
     const publicDto = toPublicOnboardingDto(onboarding);
 
-    assert.equal(publicDto.canEditProfile, false);
+    assert.equal(publicDto.canEditProfile, true);
+    assert.equal(publicDto.parentSubmission.isSubmitted, false);
+    assert.equal(publicDto.parentSubmission.canSubmit, false);
     assert.equal(publicDto.missingStepTitle, "בריאות והרשאות");
     assert.equal(
         publicDto.steps.find((step) => step.key === "pickupAuthorizationSubmitted")?.title,
         "מורשי איסוף"
     );
+
+    for (const step of onboarding.steps) {
+        if ([
+            "childAndGuardianDetails",
+            "agreementSigned",
+            "healthDeclarationSubmitted",
+            "pickupAuthorizationSubmitted",
+        ].includes(step.key)) {
+            step.status = "pendingReview";
+        }
+    }
+    onboarding.parentSubmittedAt = createdAt;
+
+    const submittedDto = toPublicOnboardingDto(onboarding);
+
+    assert.equal(submittedDto.canEditProfile, false);
+    assert.equal(submittedDto.parentSubmission.isSubmitted, true);
 });
 
 test("public profile serializes Mongoose address subdocuments without internal metadata", () => {

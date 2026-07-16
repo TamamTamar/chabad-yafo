@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import DaycareLogo from "../../components/DaycareLogo/DaycareLogo";
 import {
     getPublicDaycareOnboarding,
+    submitPublicDaycareOnboarding,
     submitPublicDaycareProfile,
 } from "../../services/daycareOnboardingService";
 import type { PublicDaycareOnboarding } from "../../types/daycareOnboarding";
@@ -100,6 +101,8 @@ const DaycareOnboarding = () => {
     const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
     const [profileError, setProfileError] = useState("");
     const [profileNotice, setProfileNotice] = useState("");
+    const [isSubmittingBundle, setIsSubmittingBundle] = useState(false);
+    const [bundleError, setBundleError] = useState("");
 
     usePrivatePageMetadata();
 
@@ -150,7 +153,7 @@ const DaycareOnboarding = () => {
                 profile
             );
             setPageState({ status: "ready", onboarding: updatedOnboarding });
-            setProfileNotice("הפרטים נשלחו בהצלחה וממתינים לבדיקה של צוות המעון.");
+            setProfileNotice("הפרטים נשמרו בהצלחה.");
         } catch (error: unknown) {
             const message = axios.isAxiosError<{ message?: string }>(error)
                 ? error.response?.data?.message
@@ -171,6 +174,28 @@ const DaycareOnboarding = () => {
             setPageState({ status: "ready", onboarding: updated });
         } catch {
             // The current data remains visible when a background refresh fails.
+        }
+    };
+
+    const handleFinalSubmit = async () => {
+        const normalizedToken = token?.trim();
+        if (!normalizedToken) return;
+
+        setIsSubmittingBundle(true);
+        setBundleError("");
+        try {
+            const updated = await submitPublicDaycareOnboarding(normalizedToken);
+            setPageState({ status: "ready", onboarding: updated });
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (error: unknown) {
+            const message = axios.isAxiosError<{ message?: string }>(error)
+                ? error.response?.data?.message
+                : undefined;
+            setBundleError(
+                message || "לא הצלחנו לשלוח את התיק לצוות המעון. נסו שוב."
+            );
+        } finally {
+            setIsSubmittingBundle(false);
         }
     };
 
@@ -306,6 +331,15 @@ const DaycareOnboarding = () => {
     const revealedSteps = orderedSteps.filter((step) =>
         revealedStepKeys.has(step.key)
     );
+    const completedParentSteps = revealedSteps.filter((step) =>
+        parentDocumentSteps.some((parentStep) => parentStep.key === step.key) &&
+        parentStageWasSubmitted(step)
+    );
+    const activeRevealedSteps = revealedSteps.filter(
+        (step) => !completedParentSteps.some((completedStep) => completedStep.key === step.key)
+    );
+    const parentWorkComplete = onboarding.progress.percentage === 100;
+    const parentBundleSubmitted = onboarding.parentSubmission.isSubmitted;
     const waitingAdminStage = allDocumentsApproved && paymentStep?.status !== "completed" && paymentStep?.status !== "notRequired"
         ? {
               title: "ממתין להסדרת תשלום",
@@ -347,7 +381,18 @@ const DaycareOnboarding = () => {
                     progress={onboarding.progress}
                 />
 
-                {nextStepTitle || waitingAdminStage ? (
+                {parentBundleSubmitted ? (
+                    <aside className={styles.finalSuccessCard} role="status">
+                        <span className={styles.finalSuccessIcon} aria-hidden="true">✓</span>
+                        <div>
+                            <strong className={styles.finalSuccessTitle}>התהליך נשלח לצוות המעון</strong>
+                            <p className={styles.finalSuccessText}>
+                                סיימתם את שלב מילוי הפרטים והמסמכים. אפשר לצאת מהעמוד;
+                                צוות המעון יעבור על התיק ויצור קשר אם יידרש תיקון.
+                            </p>
+                        </div>
+                    </aside>
+                ) : nextStepTitle || waitingAdminStage ? (
                     <aside className={styles.nextStepCard} aria-label="השלב הבא">
                         <span className={styles.nextStepLabel}>מה עכשיו?</span>
                         <strong className={styles.nextStepTitle}>
@@ -355,11 +400,11 @@ const DaycareOnboarding = () => {
                         </strong>
                         <span className={styles.nextStepText}>
                             {nextStepTitle
-                                ? "אפשר להמשיך לשלב הזה גם בזמן שצוות המעון בודק את המסמכים שכבר שלחתם."
+                                ? "השלב הקודם נשמר. אפשר להמשיך עכשיו לשלב הבא."
                                 : waitingAdminStage?.text}
                         </span>
                     </aside>
-                ) : (
+                ) : parentWorkComplete ? null : (
                     <aside
                         className={styles.completedCard}
                         aria-label={
@@ -391,7 +436,7 @@ const DaycareOnboarding = () => {
                     ) : null}
                 </div>
 
-                {onboarding.canEditProfile ? (
+                {!parentBundleSubmitted && onboarding.canEditProfile ? (
                     <IdentityProfileForm
                         key={onboarding.profile ? "existing-profile" : "new-profile"}
                         initialProfile={onboarding.profile}
@@ -402,14 +447,13 @@ const DaycareOnboarding = () => {
                     />
                 ) : null}
 
-                {token && canOpenAgreement ? (
+                {!parentBundleSubmitted && token && canOpenAgreement ? (
                     <AgreementSection token={token} onSubmitted={() => void refreshOnboarding()} />
                 ) : null}
 
-                {token && (canOpenHealthDeclaration || canOpenPickupAuthorization) ? (
+                {!parentBundleSubmitted && token && (canOpenHealthDeclaration || canOpenPickupAuthorization) ? (
                     <section className={styles.formsGroup} aria-labelledby="health-permissions-title">
                         <div className={styles.formsGroupHeader}>
-                            <span className={styles.eyebrow}>שלב אחד · שני חלקים</span>
                             <h2 className={styles.formsGroupTitle} id="health-permissions-title">
                                 בריאות והרשאות
                             </h2>
@@ -426,10 +470,33 @@ const DaycareOnboarding = () => {
                     </section>
                 ) : null}
 
-                <section
-                    className={styles.stepsSection}
-                    aria-labelledby="onboarding-steps-title"
-                >
+                {parentWorkComplete && !parentBundleSubmitted ? (
+                    <section className={styles.finalSubmissionCard} aria-labelledby="final-submit-title">
+                        <span className={styles.finalSubmissionEyebrow}>השלמתם את כל השלבים</span>
+                        <h2 className={styles.finalSubmissionTitle} id="final-submit-title">
+                            נשאר רק לשלוח לצוות המעון
+                        </h2>
+                        <p className={styles.finalSubmissionText}>
+                            עברו על הפרטים ואם הכול נכון, לחצו על הכפתור. רק לאחר הלחיצה
+                            התיק כולו יעבור לבדיקה של צוות המעון.
+                        </p>
+                        {bundleError ? <p className={styles.profileError} role="alert">{bundleError}</p> : null}
+                        <button
+                            className={styles.finalSubmissionButton}
+                            type="button"
+                            disabled={isSubmittingBundle || !onboarding.parentSubmission.canSubmit}
+                            onClick={() => void handleFinalSubmit()}
+                        >
+                            {isSubmittingBundle ? "שולחים לצוות המעון..." : "סיום ושליחה לצוות המעון"}
+                        </button>
+                    </section>
+                ) : null}
+
+                {activeRevealedSteps.length > 0 ? (
+                    <section
+                        className={styles.stepsSection}
+                        aria-labelledby="onboarding-steps-title"
+                    >
                     <div className={styles.stepsHeader}>
                         <h2 id="onboarding-steps-title" className={styles.stepsTitle}>
                             שלבי ההצטרפות
@@ -439,9 +506,8 @@ const DaycareOnboarding = () => {
                         </p>
                     </div>
 
-                    {revealedSteps.length > 0 ? (
                         <div className={styles.stepsList}>
-                            {revealedSteps.map((step) => (
+                            {activeRevealedSteps.map((step) => (
                                 <OnboardingStepCard
                                     key={step.key}
                                     step={step}
@@ -451,12 +517,27 @@ const DaycareOnboarding = () => {
                                 />
                             ))}
                         </div>
-                    ) : (
-                        <p className={styles.emptyStepsMessage}>
-                            השלבים עדיין בהכנה. צוות המעון יעדכן אתכם בהקדם.
-                        </p>
-                    )}
-                </section>
+                    </section>
+                ) : null}
+
+                {completedParentSteps.length > 0 && !parentWorkComplete ? (
+                    <details className={styles.completedStepsDetails}>
+                        <summary className={styles.completedStepsSummary}>
+                            השלבים שהשלמתי ({completedParentSteps.length})
+                        </summary>
+                        <div className={styles.stepsList}>
+                            {completedParentSteps.map((step) => (
+                                <OnboardingStepCard
+                                    key={step.key}
+                                    step={step}
+                                    position={orderedSteps.findIndex(
+                                        (orderedStep) => orderedStep.key === step.key
+                                    ) + 1}
+                                />
+                            ))}
+                        </div>
+                    </details>
+                ) : null}
 
                 <aside className={styles.privacyNote}>
                     <ShieldCheck size={22} aria-hidden="true" />

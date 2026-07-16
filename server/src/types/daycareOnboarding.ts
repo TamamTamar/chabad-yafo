@@ -138,6 +138,8 @@ export interface IDaycareOnboarding {
     internalNote?: string;
     overallStatus: OnboardingOverallStatus;
     overallStatusOverride?: OnboardingOverallStatus;
+    parentSubmissionRequired?: boolean;
+    parentSubmittedAt?: Date;
     steps: IOnboardingStep[];
     parentAccessTokenHash: string;
     parentAccessTokenCreatedAt: Date;
@@ -206,6 +208,11 @@ export interface PublicDaycareOnboardingDto {
     profileStatus: "incomplete" | "complete";
     overallStatus: OnboardingOverallStatus;
     progress: OnboardingProgress;
+    parentSubmission: {
+        submittedAt?: Date;
+        isSubmitted: boolean;
+        canSubmit: boolean;
+    };
     missingStepTitle?: string;
     canEditProfile: boolean;
     profilePrefill?: {
@@ -237,6 +244,8 @@ export interface AdminOnboardingListItemDto {
     }>;
     address?: DaycareFamilyAddressDto;
     overallStatus: OnboardingOverallStatus;
+    parentSubmittedAt?: Date;
+    parentSubmissionComplete: boolean;
     progress: OnboardingProgress;
     missingStepTitle?: string;
     hasPendingReview: boolean;
@@ -270,6 +279,8 @@ export interface AdminOnboardingDetailDto {
     }>;
     address?: DaycareFamilyAddressDto;
     overallStatus: OnboardingOverallStatus;
+    parentSubmittedAt?: Date;
+    parentSubmissionComplete: boolean;
     calculatedOverallStatus: OnboardingOverallStatus;
     overallStatusOverride?: OnboardingOverallStatus;
     steps: IOnboardingStep[];

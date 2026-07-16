@@ -89,6 +89,14 @@
     resize: vertical;
 }
 
+.fieldError {
+    min-height: 18px;
+    color: $ui-error;
+    font-size: $type-caption;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
 .error,
 .notice {
     margin-bottom: 14px;

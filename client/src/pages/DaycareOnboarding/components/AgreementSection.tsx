@@ -103,10 +103,11 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
     if (!agreement?.available) return null;
     const canSubmitOnline =
         agreement.signingAvailable &&
-        (!agreement.agreement || agreement.agreement.status === "requiresCorrection");
+        agreement.canSubmit;
     const canUploadPdf = agreement.signingAvailable && (
-        !agreement.agreement ||
-        (agreement.agreement.signingMethod === "uploadedPdf" && agreement.agreement.status === "requiresCorrection")
+        agreement.canSubmit && (
+            !agreement.agreement || agreement.agreement.signingMethod === "uploadedPdf"
+        )
     );
     const agreementStatusLabel = agreement.agreement?.status === "completed"
         ? "התקבל ואושר"
@@ -227,7 +228,7 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                 <div>
                     <span className={styles.agreementEyebrow}>השלב הבא</span>
                     <h2 id="agreement-title" className={styles.agreementTitle}>הסכם התקשרות</h2>
-                    <p className={styles.agreementIntro}>{agreement.agreement?.status === "requiresCorrection" ? "צוות המעון ביקש לתקן ולחתום מחדש. הגרסה הקודמת נשמרת בתיק." : agreement.agreement ? "ההסכם והמסמכים להורים נשארים זמינים כאן לצפייה ולהורדה." : "אפשר לבצע אישור וחתימה מקוונת, או להדפיס ולהעלות עותק חתום."}</p>
+                    <p className={styles.agreementIntro}>{agreement.agreement?.status === "requiresCorrection" ? "צוות המעון ביקש לתקן ולחתום מחדש. הגרסה הקודמת נשמרת בתיק." : agreement.agreement && agreement.canSubmit ? "ההסכם נשמר. עד לשליחה הסופית אפשר לפתוח אותו, לתקן ולחתום מחדש." : agreement.agreement ? "ההסכם והמסמכים להורים נשארים זמינים כאן לצפייה ולהורדה." : "אפשר לבצע אישור וחתימה מקוונת, או להדפיס ולהעלות עותק חתום."}</p>
                 </div>
                 {agreement.agreement ? <span className={styles.agreementStatus}>{agreementStatusLabel}</span> : null}
             </div>
@@ -236,7 +237,7 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                 <button className={styles.agreementPrimaryButton} type="button" onClick={() => setIsOpen((value) => !value)}>
                     {isOpen
                         ? "סגירת ההסכם"
-                        : agreement.agreement?.status === "requiresCorrection"
+                        : agreement.agreement && agreement.canSubmit
                           ? "תיקון וחתימה מחדש"
                           : agreement.agreement
                             ? "צפייה בהסכם"
@@ -297,7 +298,7 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                                 validate: (value) => value.trim().length > 1 || "יש למלא את השם המלא של החותם.",
                             })}
                         />
-                        {errors.signedBy ? <span className={styles.formFieldError} role="alert">{errors.signedBy.message}</span> : null}
+                        <span className={styles.formFieldError} role="alert">{errors.signedBy?.message || ""}</span>
                     </label>
                     <label className={styles.profileLabel}>
                         תפקיד
@@ -324,21 +325,21 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                                 event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 9);
                             }}
                         />
-                        {errors.signerIsraeliId ? <span className={styles.formFieldError} role="alert">{errors.signerIsraeliId.message}</span> : null}
+                        <span className={styles.formFieldError} role="alert">{errors.signerIsraeliId?.message || ""}</span>
                     </label>
                     <div className={styles.signatureField}>
                         <span className={styles.signatureLabel}>חתימה באמצעות העכבר או האצבע</span>
                         <canvas ref={canvasRef} className={styles.signatureCanvas} width="700" height="220" aria-label="אזור לציור חתימה" aria-invalid={Boolean(errors.signatureDataUrl)} onPointerDown={startDrawing} onPointerMove={draw} onPointerUp={stopDrawing} onPointerCancel={stopDrawing} />
                         <button className={styles.clearSignatureButton} type="button" onClick={clearSignature}>ניקוי חתימה</button>
-                        {errors.signatureDataUrl ? <span className={styles.formFieldError} role="alert">{errors.signatureDataUrl.message}</span> : null}
+                        <span className={styles.formFieldError} role="alert">{errors.signatureDataUrl?.message || ""}</span>
                     </div>
                     <div>
                         <label className={styles.acceptLabel}><input type="checkbox" {...register("accepted", { required: "יש לאשר שקראת והבנת את ההסכם." })} />{agreement.acceptanceStatement}</label>
-                        {errors.accepted ? <span className={styles.formFieldError} role="alert">{errors.accepted.message}</span> : null}
+                        <span className={styles.formFieldError} role="alert">{errors.accepted?.message || ""}</span>
                     </div>
                     <div>
                         <label className={styles.acceptLabel}><input type="checkbox" {...register("parentInfoAccepted", { required: "יש לאשר שקראת את המידע והמסמכים להורים." })} />קראתי את סדר היום ואת לוח החופשות, וידוע לי שהתפריט יפורסם בהמשך.</label>
-                        {errors.parentInfoAccepted ? <span className={styles.formFieldError} role="alert">{errors.parentInfoAccepted.message}</span> : null}
+                        <span className={styles.formFieldError} role="alert">{errors.parentInfoAccepted?.message || ""}</span>
                     </div>
                     <button className={styles.agreementPrimaryButton} type="submit" disabled={isBusy}>{isBusy ? "מאשר ושומר..." : "אישור וחתימה על ההסכם"}</button>
                 </form>

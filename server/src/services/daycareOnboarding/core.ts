@@ -110,6 +110,8 @@ export const cloneOnboarding = (
     internalNote: onboarding.internalNote,
     overallStatus: onboarding.overallStatus,
     overallStatusOverride: onboarding.overallStatusOverride,
+    parentSubmissionRequired: onboarding.parentSubmissionRequired,
+    parentSubmittedAt: cloneDate(onboarding.parentSubmittedAt),
     steps: onboarding.steps.map(cloneOnboardingStep),
     parentAccessTokenHash: onboarding.parentAccessTokenHash,
     parentAccessTokenCreatedAt: new Date(
@@ -208,6 +210,52 @@ export const calculateOnboardingProgress = (
     };
 };
 
+const isParentSubmissionStep = (step: IOnboardingStep) =>
+    step.isVisibleToParent &&
+    (step.responsibleParty === "parent" || step.responsibleParty === "both");
+
+const isParentStepFilled = (step: IOnboardingStep) =>
+    step.status === "pendingReview" ||
+    step.status === "completed" ||
+    step.status === "notRequired";
+
+export const calculateParentSubmissionProgress = (
+    steps: readonly IOnboardingStep[]
+): OnboardingProgress => {
+    const parentSteps = steps.filter(isParentSubmissionStep);
+    const completedSteps = parentSteps.filter(isParentStepFilled).length;
+    const totalSteps = parentSteps.length;
+
+    return {
+        completedSteps,
+        totalSteps,
+        percentage:
+            totalSteps === 0
+                ? 100
+                : Math.round((completedSteps / totalSteps) * 100),
+    };
+};
+
+export const canSubmitParentBundle = (steps: readonly IOnboardingStep[]) => {
+    const parentSteps = steps.filter(isParentSubmissionStep);
+    return parentSteps.length > 0 && parentSteps.every(isParentStepFilled);
+};
+
+export const isParentBundleSubmitted = (onboarding: IDaycareOnboarding) => {
+    const parentSteps = onboarding.steps.filter(isParentSubmissionStep);
+
+    if (parentSteps.some((step) => !isParentStepFilled(step))) {
+        return false;
+    }
+
+    if (onboarding.parentSubmissionRequired) {
+        return Boolean(onboarding.parentSubmittedAt);
+    }
+
+    return Boolean(onboarding.parentSubmittedAt) ||
+        parentSteps.some((step) => step.status === "completed");
+};
+
 const isIncomplete = (step: IOnboardingStep) =>
     step.status !== "completed" && step.status !== "notRequired";
 
@@ -258,7 +306,9 @@ export const getEffectiveOverallStatus = (
     onboarding: IDaycareOnboarding
 ) =>
     onboarding.overallStatusOverride ??
-    calculateOverallStatus(onboarding.steps);
+    (!isParentBundleSubmitted(onboarding) && canSubmitParentBundle(onboarding.steps)
+        ? "waitingForParent"
+        : calculateOverallStatus(onboarding.steps));
 
 export const synchronizeOverallStatus = (
     onboarding: IDaycareOnboarding
@@ -318,6 +368,7 @@ export const createDefaultOnboarding = (
         profileStatus: identity.profileStatus ?? "complete",
         internalNote: identity.internalNote,
         overallStatus: calculateOverallStatus(steps),
+        parentSubmissionRequired: true,
         steps,
         parentAccessTokenHash: credentials.tokenHash,
         parentAccessTokenCreatedAt: credentials.createdAt,

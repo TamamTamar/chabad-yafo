@@ -123,6 +123,11 @@ export type PublicDaycareOnboarding = {
     profileStatus: "incomplete" | "complete";
     overallStatus: OnboardingOverallStatus;
     progress: OnboardingProgress;
+    parentSubmission: {
+        submittedAt?: string;
+        isSubmitted: boolean;
+        canSubmit: boolean;
+    };
     missingStepTitle?: string;
     canEditProfile: boolean;
     profilePrefill?: {
@@ -192,6 +197,8 @@ export type AdminDaycareOnboardingListItem = {
     childName: string;
     guardians: DaycareGuardianSummary[];
     overallStatus: OnboardingOverallStatus;
+    parentSubmittedAt?: string;
+    parentSubmissionComplete: boolean;
     progress: OnboardingProgress;
     missingStepTitle?: string;
     hasPendingReview: boolean;
@@ -216,6 +223,8 @@ export type AdminDaycareOnboarding = {
     guardians: DaycareGuardianSummary[];
     address?: DaycareFamilyAddress;
     overallStatus: OnboardingOverallStatus;
+    parentSubmittedAt?: string;
+    parentSubmissionComplete: boolean;
     calculatedOverallStatus: OnboardingOverallStatus;
     overallStatusOverride?: OnboardingOverallStatus | null;
     steps: AdminOnboardingStep[];
@@ -331,8 +340,9 @@ export const onboardingOverallStatusLabels: Record<
 export const onboardingAuditActionLabels: Record<string, string> = {
     familyCreated: "נוצרה משפחה",
     childCreated: "נוצרה רשומת ילד",
-    identityProfileSubmitted: "פרטי הילד וההורים נשלחו לבדיקה",
+    identityProfileSubmitted: "פרטי הילד וההורים נשמרו",
     identityProfileUpdated: "פרטי הילד וההורים עודכנו",
+    parentBundleSubmitted: "התיק נשלח לצוות המעון לבדיקה",
     onboardingCreated: "נוצר תיק הצטרפות",
     legacyImported: "בוצע ייבוא מרשומת Legacy",
     registrationSourceLinked: "התיק קושר לרשומת רישום",

@@ -10,10 +10,13 @@ import type {
 } from "../../types/daycareOnboarding";
 import {
     calculateOnboardingProgress,
+    calculateParentSubmissionProgress,
+    canSubmitParentBundle,
     calculateOverallStatus,
     cloneOnboardingStep,
     cloneDate,
     getEffectiveOverallStatus,
+    isParentBundleSubmitted,
 } from "./core";
 
 type DaycareFamilyDocument = HydratedDocument<IDaycareFamily>;
@@ -86,9 +89,8 @@ export const toPublicOnboardingDto = (
     );
     const canEditProfile = Boolean(
         profileStep?.isVisibleToParent &&
-            profileStep.status !== "pendingReview" &&
-            profileStep.status !== "completed" &&
-            profileStep.status !== "notRequired"
+            profileStep.status !== "notRequired" &&
+            !isParentBundleSubmitted(onboarding)
     );
     const profile = child?.birthDate && family?.address
         ? {
@@ -108,6 +110,8 @@ export const toPublicOnboardingDto = (
           }
         : undefined;
 
+    const parentBundleSubmitted = isParentBundleSubmitted(onboarding);
+
     return {
         childName: child
             ? `${child.firstName} ${child.lastName}`.trim()
@@ -116,7 +120,14 @@ export const toPublicOnboardingDto = (
         profileStatus:
             onboarding.profileStatus ?? (child ? "complete" : "incomplete"),
         overallStatus: getEffectiveOverallStatus(onboarding),
-        progress: calculateOnboardingProgress(onboarding.steps),
+        progress: calculateParentSubmissionProgress(onboarding.steps),
+        parentSubmission: {
+            submittedAt: cloneDate(onboarding.parentSubmittedAt),
+            isSubmitted: parentBundleSubmitted,
+            canSubmit:
+                canSubmitParentBundle(onboarding.steps) &&
+                !parentBundleSubmitted,
+        },
         missingStepTitle: getMissingStepTitle(onboarding.steps),
         canEditProfile,
         profilePrefill:
@@ -178,7 +189,12 @@ export const toAdminOnboardingDetail = (
         ? toFamilyAddressDto(family.address)
         : undefined,
     overallStatus: getEffectiveOverallStatus(onboarding),
-    calculatedOverallStatus: calculateOverallStatus(onboarding.steps),
+    parentSubmittedAt: cloneDate(onboarding.parentSubmittedAt),
+    parentSubmissionComplete: isParentBundleSubmitted(onboarding),
+    calculatedOverallStatus:
+        !isParentBundleSubmitted(onboarding) && canSubmitParentBundle(onboarding.steps)
+            ? "waitingForParent"
+            : calculateOverallStatus(onboarding.steps),
     overallStatusOverride: onboarding.overallStatusOverride,
     steps: onboarding.steps
         .map((step) => ({

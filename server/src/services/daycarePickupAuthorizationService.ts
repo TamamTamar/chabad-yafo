@@ -9,7 +9,7 @@ import type { DaycareAuthorizedCollector, DaycarePickupAuthorizationPayload, Day
 import type { DaycareCorrectionDisposition } from "../types/daycareAgreement";
 import { convertPickupImageUploadToPdf, createBlankPickupAuthorizationPdf, createSignedPickupAuthorizationPdf } from "./daycarePickupAuthorizationPdfService";
 import { decryptDaycarePrivateValue, encryptDaycarePrivateValue, isDaycarePiiEncryptionConfigured, isValidIsraeliId, normalizeIsraeliId } from "./daycarePiiEncryptionService";
-import { calculateOverallStatus, createAuditEntries, DaycareOnboardingServiceError, getPublicOnboardingDocumentByToken, updateAdminOnboardingStep } from "./daycareOnboardingService";
+import { createAuditEntries, DaycareOnboardingServiceError, getPublicOnboardingDocumentByToken, isParentBundleSubmitted, updateAdminOnboardingStep } from "./daycareOnboardingService";
 import { getDaycareStorageProvider, isDaycareStorageConfigured } from "./daycareStorageService";
 import { logger } from "../utils/logger";
 
@@ -38,13 +38,13 @@ const guardiansFor = async (onboarding: InstanceType<typeof DaycareOnboarding>) 
 export const getPublicPickupAuthorization = async (token: string, now = new Date()) => {
     const onboarding = await getPublicOnboardingDocumentByToken(token, now); const latest = await latestFor(onboarding._id, true);
     if (!latest && !prerequisitesComplete(onboarding)) return { available: false as const, reason: "previousStepsIncomplete" as const };
-    return { available: true as const, canSubmit: !latest || latest.status === "requiresCorrection", guardians: await guardiansFor(onboarding), declaration: latest ? dto(latest, true) : null };
+    return { available: true as const, canSubmit: !isParentBundleSubmitted(onboarding), guardians: await guardiansFor(onboarding), declaration: latest ? dto(latest, true) : null };
 };
 
 const markPending = async (onboarding: InstanceType<typeof DaycareOnboarding>, recordId: Types.ObjectId, source: "online" | "uploadedFile", now: Date) => {
     const index = onboarding.steps.findIndex((step) => step.key === "pickupAuthorizationSubmitted"); if (index < 0) throw new DaycareOnboardingServiceError("שלב מורשי האיסוף לא נמצא.", 409, "PICKUP_STEP_NOT_FOUND");
     const previousStatus = onboarding.steps[index].status; onboarding.steps[index].status = "pendingReview"; onboarding.steps[index].source = source; onboarding.steps[index].updatedAt = now; onboarding.steps[index].updatedBy = "parent"; onboarding.steps[index].parentMessage = undefined; onboarding.steps[index].relatedRecord = { type: "daycarePickupAuthorization", recordId, formKey: formVersion };
-    onboarding.markModified("steps"); onboarding.overallStatus = calculateOverallStatus(onboarding.steps); await onboarding.save();
+    onboarding.markModified("steps"); onboarding.parentSubmittedAt = undefined; onboarding.overallStatus = "waitingForParent"; await onboarding.save();
     await createAuditEntries([{ onboardingId: onboarding._id, actorType: "parent", actorLabel: "parent-link", action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.stepStatusChanged, stepKey: "pickupAuthorizationSubmitted", previousValue: previousStatus, newValue: "pendingReview", createdAt: now }]);
 };
 
@@ -79,7 +79,7 @@ export const submitPickupAuthorization = async (token: string, input: Submission
     const collectors = normalizeCollectors(input.collectors); if (!validateCollectors(collectors) || input.signedBy.trim().length < 2 || input.signedBy.trim().length > 160) throw new DaycareOnboardingServiceError("יש לבדוק את פרטי מורשי האיסוף והחותם/ת.", 400, "INVALID_PICKUP_DETAILS");
     const onboarding = await getPublicOnboardingDocumentByToken(token, now); const latest = await latestFor(onboarding._id);
     if (!latest && !prerequisitesComplete(onboarding)) throw new DaycareOnboardingServiceError("יש להשלים תחילה את הצהרת הבריאות.", 409, "PICKUP_PREREQUISITES_INCOMPLETE");
-    if (latest && latest.status !== "requiresCorrection") throw new DaycareOnboardingServiceError("מורשי האיסוף כבר נשלחו וננעלו.", 409, "PICKUP_ALREADY_SUBMITTED");
+    if (isParentBundleSubmitted(onboarding)) throw new DaycareOnboardingServiceError("התיק כבר נשלח לצוות המעון ומורשי האיסוף ננעלו.", 409, "PICKUP_ALREADY_SUBMITTED");
     const payload: DaycarePickupAuthorizationPayload = { guardians: await guardiansFor(onboarding), collectors, informationConfirmed: true, signedBy: input.signedBy.trim(), signerRole: input.signerRole };
     const revision = (latest?.revision ?? 0) + 1; const documentId = randomUUID(); const contentHash = hashPayload(payload); const storage = getDaycareStorageProvider();
     const pdf = await createSignedPickupAuthorizationPdf({ documentId, revision, schoolYear: onboarding.schoolYear, childName: await childNameFor(onboarding), payload, contentHash, signatureImage: signature.buffer, submittedAt: now });
@@ -97,7 +97,7 @@ const isJpeg = (file: Express.Multer.File) => file.mimetype === "image/jpeg" && 
 export const downloadBlankPickupAuthorization = async (token: string, now = new Date()) => { const onboarding = await getPublicOnboardingDocumentByToken(token, now); if (!prerequisitesComplete(onboarding)) throw new DaycareOnboardingServiceError("יש להשלים תחילה את הצהרת הבריאות.", 409, "PICKUP_PREREQUISITES_INCOMPLETE"); return { bytes: await createBlankPickupAuthorizationPdf({ schoolYear: onboarding.schoolYear, childName: await childNameFor(onboarding), guardians: await guardiansFor(onboarding) }), mimeType: "application/pdf", filename: "pickup-authorization-blank.pdf" }; };
 export const submitUploadedPickupAuthorization = async (token: string, file: Express.Multer.File, now = new Date()) => {
     if (!isDaycareStorageConfigured()) throw new DaycareOnboardingServiceError("העלאת מורשי האיסוף אינה זמינה כרגע.", 503, "PICKUP_NOT_CONFIGURED"); if (!isPdf(file) && !isPng(file) && !isJpeg(file)) throw new DaycareOnboardingServiceError("יש להעלות PDF, JPG או PNG תקינים.", 400, "INVALID_PICKUP_UPLOAD");
-    const onboarding = await getPublicOnboardingDocumentByToken(token, now); const latest = await latestFor(onboarding._id); if (!latest && !prerequisitesComplete(onboarding)) throw new DaycareOnboardingServiceError("יש להשלים תחילה את הצהרת הבריאות.", 409, "PICKUP_PREREQUISITES_INCOMPLETE"); if (latest && latest.status !== "requiresCorrection") throw new DaycareOnboardingServiceError("מורשי האיסוף כבר נשלחו וננעלו.", 409, "PICKUP_ALREADY_SUBMITTED");
+    const onboarding = await getPublicOnboardingDocumentByToken(token, now); const latest = await latestFor(onboarding._id); if (!latest && !prerequisitesComplete(onboarding)) throw new DaycareOnboardingServiceError("יש להשלים תחילה את הצהרת הבריאות.", 409, "PICKUP_PREREQUISITES_INCOMPLETE"); if (isParentBundleSubmitted(onboarding)) throw new DaycareOnboardingServiceError("התיק כבר נשלח לצוות המעון ומורשי האיסוף ננעלו.", 409, "PICKUP_ALREADY_SUBMITTED");
     const revision = (latest?.revision ?? 0) + 1; const documentId = randomUUID(); const pdf = isPdf(file) ? file.buffer : await convertPickupImageUploadToPdf(file.buffer); const contentHash = createHash("sha256").update(pdf).digest("hex"); const storage = getDaycareStorageProvider(); const signedPdfFile = await storage.upload({ bytes: pdf, mimeType: "application/pdf", originalName: `pickup-authorization-${documentId}.pdf`, category: "pickup-authorizations" }); let declaration: InstanceType<typeof DaycarePickupAuthorization>;
     try { declaration = await DaycarePickupAuthorization.create({ onboardingId: onboarding._id, documentId, revision, formVersion, status: "pendingReview", signingMethod: "uploadedFile", contentHash, signedPdfFile, submittedAt: now }); } catch (error) { await storage.delete(signedPdfFile.storageKey).catch(() => undefined); throw error; }
     await markPending(onboarding, declaration._id, "uploadedFile", now); await finalizeReplacedAuthorization(latest, now); return dto(declaration, false);

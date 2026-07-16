@@ -241,6 +241,7 @@ export const updateAdminOnboardingStep = async (
             };
         }
         onboarding.overallStatusOverride = undefined;
+        onboarding.parentSubmittedAt = undefined;
     }
     onboarding.markModified("steps");
     onboarding.overallStatus = calculateOverallStatus(onboarding.steps);

@@ -254,6 +254,8 @@ export const daycareOnboardingSchema = new Schema<IDaycareOnboarding>(
             type: String,
             enum: onboardingOverallStatuses,
         },
+        parentSubmissionRequired: Boolean,
+        parentSubmittedAt: Date,
         steps: {
             type: [onboardingStepSchema],
             required: true,

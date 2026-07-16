@@ -13,6 +13,7 @@ import {
     patchAdminDaycareOnboardingStep,
     regenerateAdminDaycareOnboardingLink,
     submitPublicDaycareOnboardingProfile,
+    submitPublicDaycareOnboardingBundle,
 } from "../controllers/daycareOnboardingController";
 import { requireAdmin } from "../middleware/adminAuth";
 import { requireSecureAdminMutation } from "../middleware/adminMutationSecurity";
@@ -27,6 +28,7 @@ publicRouter.use(setPublicOnboardingSecurityHeaders);
 publicRouter.use(publicOnboardingRateLimit);
 publicRouter.get("/:token", getPublicDaycareOnboarding);
 publicRouter.put("/:token/profile", submitPublicDaycareOnboardingProfile);
+publicRouter.post("/:token/submit", submitPublicDaycareOnboardingBundle);
 
 const adminRouter = Router();
 

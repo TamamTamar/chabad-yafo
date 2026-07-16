@@ -8,7 +8,7 @@ import type { DaycareHealthDeclarationPayload, DaycareHealthDeclarationStatus } 
 import type { DaycareCorrectionDisposition } from "../types/daycareAgreement";
 import { convertHealthImageUploadToPdf, createBlankHealthDeclarationPdf, createSignedHealthDeclarationPdf } from "./daycareHealthDeclarationPdfService";
 import { decryptDaycarePrivateValue, encryptDaycarePrivateValue, isDaycarePiiEncryptionConfigured } from "./daycarePiiEncryptionService";
-import { createAuditEntries, calculateOverallStatus, DaycareOnboardingServiceError, getPublicOnboardingDocumentByToken, updateAdminOnboardingStep } from "./daycareOnboardingService";
+import { createAuditEntries, DaycareOnboardingServiceError, getPublicOnboardingDocumentByToken, isParentBundleSubmitted, updateAdminOnboardingStep } from "./daycareOnboardingService";
 import { getDaycareStorageProvider, isDaycareStorageConfigured } from "./daycareStorageService";
 import { logger } from "../utils/logger";
 
@@ -63,7 +63,7 @@ export const getPublicHealthDeclaration = async (token: string, now = new Date()
     }
     return {
         available: true as const,
-        canSubmit: !latest || latest.status === "requiresCorrection",
+        canSubmit: !isParentBundleSubmitted(onboarding),
         declaration: latest ? declarationDto(latest, true) : null,
     };
 };
@@ -79,7 +79,8 @@ const markHealthStepPendingReview = async (onboarding: InstanceType<typeof Dayca
     onboarding.steps[stepIndex].parentMessage = undefined;
     onboarding.steps[stepIndex].relatedRecord = { type: "daycareHealthDeclaration", recordId, formKey: formVersion };
     onboarding.markModified("steps");
-    onboarding.overallStatus = calculateOverallStatus(onboarding.steps);
+    onboarding.parentSubmittedAt = undefined;
+    onboarding.overallStatus = "waitingForParent";
     await onboarding.save();
     await createAuditEntries([{ onboardingId: onboarding._id, actorType: "parent", actorLabel: "parent-link", action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.stepStatusChanged, stepKey: "healthDeclarationSubmitted", previousValue: previousStatus, newValue: "pendingReview", createdAt: now }]);
 };
@@ -118,8 +119,8 @@ export const submitHealthDeclaration = async (token: string, payload: DaycareHea
     if (!latest && !prerequisitesComplete(onboarding)) {
         throw new DaycareOnboardingServiceError("יש להשלים תחילה את השלבים הקודמים.", 409, "HEALTH_PREREQUISITES_INCOMPLETE");
     }
-    if (latest && latest.status !== "requiresCorrection") {
-        throw new DaycareOnboardingServiceError("הצהרת הבריאות כבר נשלחה וננעלה.", 409, "HEALTH_DECLARATION_ALREADY_SUBMITTED");
+    if (isParentBundleSubmitted(onboarding)) {
+        throw new DaycareOnboardingServiceError("התיק כבר נשלח לצוות המעון והצהרת הבריאות ננעלה.", 409, "HEALTH_DECLARATION_ALREADY_SUBMITTED");
     }
 
     const revision = (latest?.revision ?? 0) + 1;
@@ -181,7 +182,7 @@ export const submitUploadedHealthDeclaration = async (token: string, file: Expre
     const onboarding = await getPublicOnboardingDocumentByToken(token, now);
     const latest = await latestForOnboarding(onboarding._id);
     if (!latest && !prerequisitesComplete(onboarding)) throw new DaycareOnboardingServiceError("יש להשלים תחילה את השלבים הקודמים.", 409, "HEALTH_PREREQUISITES_INCOMPLETE");
-    if (latest && latest.status !== "requiresCorrection") throw new DaycareOnboardingServiceError("הצהרת הבריאות כבר נשלחה וננעלה.", 409, "HEALTH_DECLARATION_ALREADY_SUBMITTED");
+    if (isParentBundleSubmitted(onboarding)) throw new DaycareOnboardingServiceError("התיק כבר נשלח לצוות המעון והצהרת הבריאות ננעלה.", 409, "HEALTH_DECLARATION_ALREADY_SUBMITTED");
 
     const revision = (latest?.revision ?? 0) + 1;
     const documentId = randomUUID();

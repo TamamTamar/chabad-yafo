@@ -23,6 +23,7 @@ import {
     regenerateOnboardingParentAccess,
     revokeParentAccess,
     submitPublicDaycareProfile,
+    submitPublicParentBundle,
     updateAdminOnboardingStep,
     updateAdminOverallStatus,
 } from "../services/daycareOnboardingService";
@@ -448,6 +449,36 @@ export const submitPublicDaycareOnboardingProfile = async (
             res,
             error,
             "לא הצלחנו לשמור את הפרטים. נסו שוב או פנו לצוות המעון."
+        );
+    }
+};
+
+export const submitPublicDaycareOnboardingBundle = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const data = await submitPublicParentBundle(req.params.token);
+        return res.json({
+            success: true,
+            message: "התיק נשלח לצוות המעון לבדיקה.",
+            data,
+        });
+    } catch (error: unknown) {
+        if (
+            error instanceof DaycareOnboardingServiceError &&
+            error.code === "PUBLIC_LINK_UNAVAILABLE"
+        ) {
+            return res.status(404).json({
+                success: false,
+                code: error.code,
+                message: "הקישור אינו תקין או שאינו פעיל עוד.",
+            });
+        }
+        return sendControllerError(
+            res,
+            error,
+            "לא הצלחנו לשלוח את התיק לצוות המעון. נסו שוב."
         );
     }
 };

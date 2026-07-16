@@ -115,9 +115,7 @@ const Shabbat = () => {
                                 })}
                                 className={fieldClass("fullName")}
                             />
-                            {errors.fullName && (
-                                <small className={styles.error}>{errors.fullName.message}</small>
-                            )}
+                            <small className={styles.error}>{errors.fullName?.message || ""}</small>
                         </label>
 
                         {/* טלפון */}
@@ -131,9 +129,7 @@ const Shabbat = () => {
                                 inputMode="tel"
                                 className={fieldClass("phone")}
                             />
-                            {errors.phone && (
-                                <small className={styles.error}>{errors.phone.message}</small>
-                            )}
+                            <small className={styles.error}>{errors.phone?.message || ""}</small>
                         </label>
 
                         {/* אימייל */}
@@ -147,9 +143,7 @@ const Shabbat = () => {
                                 inputMode="email"
                                 className={fieldClass("email")}
                             />
-                            {errors.email && (
-                                <small className={styles.error}>{errors.email.message}</small>
-                            )}
+                            <small className={styles.error}>{errors.email?.message || ""}</small>
                         </label>
 
                         {/* מבוגרים */}
@@ -165,9 +159,7 @@ const Shabbat = () => {
                                     <option key={n}>{n}</option>
                                 ))}
                             </select>
-                            {errors.adults && (
-                                <small className={styles.error}>{errors.adults.message}</small>
-                            )}
+                            <small className={styles.error}>{errors.adults?.message || ""}</small>
                         </label>
 
                         {/* ילדים */}
@@ -178,12 +170,14 @@ const Shabbat = () => {
                                     <option key={n}>{n}</option>
                                 ))}
                             </select>
+                            <small className={styles.error}>{""}</small>
                         </label>
 
                         {/* הערות */}
                         <label className={`${styles.field} ${styles.full}`}>
                             <span>הערות</span>
                             <textarea {...register("notes")} rows={4} />
+                            <small className={styles.error}>{""}</small>
                         </label>
                     </div>
 

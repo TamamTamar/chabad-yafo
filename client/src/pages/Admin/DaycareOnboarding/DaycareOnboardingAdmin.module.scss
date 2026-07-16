@@ -705,6 +705,22 @@
     box-shadow: 0 16px 38px $ui-shadow-blue-soft;
 }
 
+.parentSubmissionNotice {
+    display: grid;
+    gap: 6px;
+    margin-top: 22px;
+    padding: 18px 20px;
+    border: 1px solid rgba($brand-secondary, 0.7);
+    border-radius: $radius-lg;
+    background: rgba($brand-secondary, 0.1);
+    color: $brand-primary-deep;
+    line-height: 1.6;
+}
+
+.parentSubmissionNotice span {
+    color: $ui-text-muted;
+}
+
 .detailsGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

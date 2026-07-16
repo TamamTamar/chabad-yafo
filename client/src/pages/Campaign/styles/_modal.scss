@@ -227,6 +227,8 @@
 }
 
 .errorText {
+  display: block;
+  min-height: 18px;
   color: color.adjust($ui-danger-bright, $lightness: -8%);
   font-size: $type-micro;
   font-weight: 700;

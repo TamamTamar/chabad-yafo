@@ -136,11 +136,9 @@ const DonationAmountStep = ({
                     <CustomAmountField register={register} />
                 )}
 
-                {errors.amount?.message && (
-                    <p className={styles.errorText}>
-                        {errors.amount.message}
-                    </p>
-                )}
+                <p className={styles.errorText}>
+                    {errors.amount?.message || ""}
+                </p>
             </fieldset>
 
             <DonationTypeToggle

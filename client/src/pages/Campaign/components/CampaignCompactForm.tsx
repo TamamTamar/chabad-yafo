@@ -64,7 +64,7 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
           />
         </div>
         {/* שימוש באותו Class של שאר השדות */}
-        {errors.amount && <div className={styles.error}>{errors.amount.message}</div>}
+        <div className={styles.error}>{errors.amount?.message || ""}</div>
 
         {showCalculatorLink && (
           <button type="button" className={styles.calcLinkBtn} onClick={scrollToCalculator}>
@@ -84,10 +84,10 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
                 const value = String(v || "").trim();
                 return value.length >= 2 || "לפחות 2 אותיות";
               },
-              pattern: { value: /^[a-zA-Zא-ת\s\-]+$/, message: "שם לא תקין" }
+              pattern: { value: /^[a-zA-Zא-ת\s-]+$/, message: "שם לא תקין" }
             })}
           />
-          {errors.firstName && <div className={styles.error}>{errors.firstName.message}</div>}
+          <div className={styles.error}>{errors.firstName?.message || ""}</div>
         </div>
 
         <div className={styles.field}>
@@ -100,10 +100,10 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
                 const value = String(v || "").trim();
                 return value.length >= 2 || "לפחות 2 אותיות";
               },
-              pattern: { value: /^[a-zA-Zא-ת\s\-]+$/, message: "שם לא תקין" }
+              pattern: { value: /^[a-zA-Zא-ת\s-]+$/, message: "שם לא תקין" }
             })}
           />
-          {errors.lastName && <div className={styles.error}>{errors.lastName.message}</div>}
+          <div className={styles.error}>{errors.lastName?.message || ""}</div>
         </div>
 
         <div className={`${styles.field} ${styles.contactField}`}>
@@ -120,7 +120,7 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
               onChange: keepDigitsOnly,
             })}
           />
-          {errors.phone && <div className={styles.error}>{errors.phone.message}</div>}
+          <div className={styles.error}>{errors.phone?.message || ""}</div>
         </div>
 
         <div className={`${styles.field} ${styles.contactField}`}>
@@ -136,7 +136,7 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
               },
             })}
           />
-          {errors.email && <div className={styles.error}>{errors.email.message}</div>}
+          <div className={styles.error}>{errors.email?.message || ""}</div>
         </div>
       </div>
 

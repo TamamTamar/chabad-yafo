@@ -3,6 +3,7 @@ export const DAYCARE_ONBOARDING_AUDIT_ACTIONS = {
     childCreated: "childCreated",
     identityProfileSubmitted: "identityProfileSubmitted",
     identityProfileUpdated: "identityProfileUpdated",
+    parentBundleSubmitted: "parentBundleSubmitted",
     onboardingCreated: "onboardingCreated",
     legacyImported: "legacyImported",
     registrationSourceLinked: "registrationSourceLinked",

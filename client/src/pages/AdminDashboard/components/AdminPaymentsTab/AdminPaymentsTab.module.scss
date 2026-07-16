@@ -223,6 +223,14 @@
     opacity: 0.65;
 }
 
+.fieldError {
+    min-height: 18px;
+    color: #9a2d2d;
+    font-size: $type-caption;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
 .error {
     padding: 12px 14px;
 

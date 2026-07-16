@@ -6,11 +6,13 @@ import { DaycareOnboarding } from "../../models/DaycareOnboarding";
 import { DaycareRegistration } from "../../models/DaycareRegistration";
 import type { PublicDaycareOnboardingDto, SubmitPublicDaycareProfileDto } from "../../types/daycareOnboarding";
 import {
+    canSubmitParentBundle,
     calculateOverallStatus,
     cloneOnboardingStep,
     DaycareOnboardingServiceError,
     hashParentAccessToken,
     isParentAccessAllowed,
+    isParentBundleSubmitted,
     isParentAccessTokenFormatValid,
     parentTokenMatchesHash,
     type NewAuditEntry,
@@ -96,8 +98,8 @@ export const submitPublicDaycareProfile = async (
             if (
                 stepIndex < 0 ||
                 !step.isVisibleToParent ||
-                step.status === "completed" ||
-                step.status === "notRequired"
+                step.status === "notRequired" ||
+                isParentBundleSubmitted(onboarding)
             ) {
                 throw new DaycareOnboardingServiceError(
                     "The profile cannot be changed at this stage",
@@ -175,7 +177,8 @@ export const submitPublicDaycareProfile = async (
                 },
             };
             onboarding.markModified("steps");
-            onboarding.overallStatus = calculateOverallStatus(onboarding.steps);
+            onboarding.parentSubmittedAt = undefined;
+            onboarding.overallStatus = "waitingForParent";
             onboarding.lastParentAccessAt = new Date(now);
             await onboarding.save({ session });
 
@@ -256,6 +259,63 @@ export const submitPublicDaycareProfile = async (
             "The profile could not be saved",
             500,
             "PROFILE_SAVE_FAILED"
+        );
+    }
+
+    return result;
+};
+
+export const submitPublicParentBundle = async (
+    rawToken: string,
+    now = new Date()
+) => {
+    const session = await startSession();
+    let result: PublicDaycareOnboardingDto | undefined;
+
+    try {
+        await session.withTransaction(async () => {
+            const onboarding = await getPublicOnboardingDocumentByToken(
+                rawToken,
+                now,
+                session
+            );
+            if (!canSubmitParentBundle(onboarding.steps)) {
+                throw new DaycareOnboardingServiceError(
+                    "יש להשלים את כל הפרטים והמסמכים לפני השליחה.",
+                    409,
+                    "PARENT_BUNDLE_INCOMPLETE"
+                );
+            }
+
+            const { child, family } = await getIdentityOrThrow(onboarding);
+            if (!onboarding.parentSubmittedAt) {
+                onboarding.parentSubmittedAt = now;
+                onboarding.overallStatus = calculateOverallStatus(onboarding.steps);
+                onboarding.lastParentAccessAt = now;
+                await onboarding.save({ session });
+                await createAuditEntries(
+                    [{
+                        onboardingId: onboarding._id,
+                        actorType: "parent",
+                        actorLabel: "parent-link",
+                        action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.parentBundleSubmitted,
+                        newValue: { submittedAt: now },
+                        createdAt: now,
+                    }],
+                    session
+                );
+            }
+            result = toPublicOnboardingDto(onboarding, child, family);
+        });
+    } finally {
+        await session.endSession();
+    }
+
+    if (!result) {
+        throw new DaycareOnboardingServiceError(
+            "לא הצלחנו לשלוח את התיק לצוות המעון.",
+            500,
+            "PARENT_BUNDLE_SUBMIT_FAILED"
         );
     }
 

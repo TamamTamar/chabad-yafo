@@ -221,7 +221,7 @@ const AdminPaymentsTab = () => {
                             {...register("title", { required: "יש להזין תיאור" })}
                             placeholder="לדוגמה: תרומה במזומן / קניית ציוד"
                         />
-                        {errors.title ? <span className={styles.error}>{errors.title.message}</span> : null}
+                        <span className={styles.fieldError}>{errors.title?.message || ""}</span>
                     </label>
 
                     <label>
@@ -235,7 +235,7 @@ const AdminPaymentsTab = () => {
                                 validate: (value) => Number(value) > 0 || "הסכום חייב להיות גדול מאפס",
                             })}
                         />
-                        {errors.amount ? <span className={styles.error}>{errors.amount.message}</span> : null}
+                        <span className={styles.fieldError}>{errors.amount?.message || ""}</span>
                     </label>
 
                     <label>

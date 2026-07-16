@@ -35,6 +35,7 @@ type Props = {
     reviewingPickup: boolean;
     handlePickupReview: (status: ReviewStatus) => Promise<void>;
     handlePickupDownload: () => Promise<void>;
+    parentSubmissionComplete: boolean;
     allDocumentsSubmitted: boolean;
     allDocumentsApproved: boolean;
     reviewingAllDocuments: boolean;
@@ -48,10 +49,16 @@ const DocumentReviewSections = ({
     setHealthMessage, healthCorrectionDisposition, setHealthCorrectionDisposition, reviewingHealth,
     handleHealthReview, handleHealthDownload, pickupAuthorization, pickupMessage,
     setPickupMessage, pickupCorrectionDisposition, setPickupCorrectionDisposition, reviewingPickup,
-    handlePickupReview, handlePickupDownload, allDocumentsSubmitted, allDocumentsApproved,
+    handlePickupReview, handlePickupDownload, parentSubmissionComplete, allDocumentsSubmitted, allDocumentsApproved,
     reviewingAllDocuments, handleApproveAllDocuments,
 }: Props) => (
     <>
+                {!parentSubmissionComplete ? (
+                    <section className={styles.parentSubmissionNotice} aria-live="polite">
+                        <strong>הטפסים עדיין לא נשלחו לבדיקה</strong>
+                        <span>אפשר לצפות במה שנשמר, אך פעולות האישור והתיקון ייפתחו רק אחרי שההורה ילחץ על ״סיום ושליחה לצוות המעון״.</span>
+                    </section>
+                ) : null}
 <section className={`${styles.agreementReviewCard} ${styles.caseSectionAnchor}`} id="agreement-review">
                     <div>
                         <span className={styles.eyebrow}>הסכם התקשרות</span>
@@ -88,7 +95,7 @@ const DocumentReviewSections = ({
                             </div>
                             {agreementData.agreement.status === "requiresCorrection" ? (
                                 <p className={styles.helperText}>{agreementData.agreement.correctionDisposition === "discardFileAfterReplacement" ? "ההסכם פתוח להעלאה מחדש. הקובץ השגוי יימחק רק לאחר שהגרסה החלופית תישמר בהצלחה." : "ההסכם פתוח כעת לחתימה או להעלאה מחדש. הגרסה הקודמת תישמר בתיק כגרסה לא־פעילה."}</p>
-                            ) : (
+                            ) : parentSubmissionComplete ? (
                                 <details className={styles.correctionPanel}>
                                     <summary className={styles.correctionSummary}>ההסכם אינו תקין או שצריך לעדכן אותו?</summary>
                                     {agreementData.agreement.status === "completed" ? (
@@ -116,7 +123,7 @@ const DocumentReviewSections = ({
                                         </button>
                                     </div>
                                 </details>
-                            )}
+                            ) : null}
                         </>
                     ) : <p className={styles.helperText}>{agreementData?.publishedVersion ? "ההסכם פורסם, אך ההורה עדיין לא שלח חתימה או PDF חתום." : `עדיין לא פורסם הסכם לשנת ${onboarding.schoolYear}.`}</p>}
                 </section>
@@ -138,7 +145,7 @@ const DocumentReviewSections = ({
                                 <p><strong>החותם/ת:</strong> {healthDeclaration.payload.signedBy} ({guardianRoleLabels[healthDeclaration.payload.signerRole]})</p>
                             </div> : <p className={styles.helperText}>המידע מולא בטופס הידני. יש לפתוח את הקובץ החתום ולבדוק את הפרטים.</p>}
                             <div className={styles.linkActions}><button className={styles.secondaryButton} type="button" onClick={() => void handleHealthDownload()}>הורדת הצהרה חתומה</button></div>
-                            {healthDeclaration.status !== "requiresCorrection" ? <details className={styles.correctionPanel}>
+                            {parentSubmissionComplete && healthDeclaration.status !== "requiresCorrection" ? <details className={styles.correctionPanel}>
                                 <summary className={styles.correctionSummary}>ההצהרה אינה תקינה או שצריך לעדכן אותה?</summary>
                                 <label className={styles.fieldLabel} htmlFor="health-parent-message">מה ההורה צריך לתקן בהצהרת הבריאות?</label>
                                 <textarea className={styles.textarea} id="health-parent-message" value={healthMessage} onChange={(event) => setHealthMessage(event.target.value)} />
@@ -155,7 +162,7 @@ const DocumentReviewSections = ({
                                         {reviewingHealth ? "פותח לתיקון..." : healthDeclaration.status === "completed" ? "פתיחה מחדש לתיקון" : "דרישת תיקון"}
                                     </button>
                                 </div>
-                            </details> : <p className={styles.helperText}>{healthDeclaration.correctionDisposition === "discardFileAfterReplacement" ? "ההצהרה פתוחה לתיקון. הקובץ השגוי יימחק רק לאחר שהגרסה החלופית תישמר בהצלחה." : "ההצהרה פתוחה לתיקון אצל ההורה. הגרסה הקודמת תישמר בתיק כגרסה לא־פעילה."}</p>}
+                            </details> : healthDeclaration.status === "requiresCorrection" ? <p className={styles.helperText}>{healthDeclaration.correctionDisposition === "discardFileAfterReplacement" ? "ההצהרה פתוחה לתיקון. הקובץ השגוי יימחק רק לאחר שהגרסה החלופית תישמר בהצלחה." : "ההצהרה פתוחה לתיקון אצל ההורה. הגרסה הקודמת תישמר בתיק כגרסה לא־פעילה."}</p> : null}
                         </>
                     ) : <p className={styles.helperText}>ההורה עדיין לא הגיש הצהרת בריאות.</p>}
                 </section>
@@ -172,7 +179,7 @@ const DocumentReviewSections = ({
                             <p className={styles.helperText}>החותם/ת: {pickupAuthorization.payload.signedBy} ({guardianRoleLabels[pickupAuthorization.payload.signerRole]})</p>
                         </> : <p className={styles.helperText}>הפרטים מולאו בטופס הידני. יש לפתוח את הקובץ החתום ולבדוק אותם.</p>}
                         <div className={styles.linkActions}><button className={styles.secondaryButton} type="button" onClick={() => void handlePickupDownload()}>הורדת טופס חתום</button></div>
-                        {pickupAuthorization.status !== "requiresCorrection" ? <details className={styles.correctionPanel}>
+                        {parentSubmissionComplete && pickupAuthorization.status !== "requiresCorrection" ? <details className={styles.correctionPanel}>
                             <summary className={styles.correctionSummary}>הטופס אינו תקין או שצריך לעדכן אותו?</summary>
                             <label className={styles.fieldLabel} htmlFor="pickup-parent-message">מה ההורה צריך לתקן במורשי האיסוף?</label>
                             <textarea className={styles.textarea} id="pickup-parent-message" value={pickupMessage} onChange={(event) => setPickupMessage(event.target.value)} />
@@ -185,7 +192,7 @@ const DocumentReviewSections = ({
                                 </select>
                             </label> : <p className={styles.helperText}>הטופס נחתם באתר ולכן הגרסה הקודמת תישמר כגרסה לא־פעילה.</p>}
                             <div className={styles.linkActions}><button className={styles.dangerButton} type="button" disabled={reviewingPickup || !pickupMessage.trim() || (pickupAuthorization.signingMethod === "uploadedFile" && !pickupCorrectionDisposition)} onClick={() => void handlePickupReview("requiresCorrection")}>{reviewingPickup ? "פותח לתיקון..." : pickupAuthorization.status === "completed" ? "פתיחה מחדש לתיקון" : "דרישת תיקון"}</button></div>
-                        </details> : <p className={styles.helperText}>{pickupAuthorization.correctionDisposition === "discardFileAfterReplacement" ? "הטופס פתוח לתיקון. הקובץ השגוי יימחק רק לאחר שהגרסה החלופית תישמר בהצלחה." : "הטופס פתוח לתיקון אצל ההורה. הגרסה הקודמת תישמר בתיק כגרסה לא־פעילה."}</p>}
+                        </details> : pickupAuthorization.status === "requiresCorrection" ? <p className={styles.helperText}>{pickupAuthorization.correctionDisposition === "discardFileAfterReplacement" ? "הטופס פתוח לתיקון. הקובץ השגוי יימחק רק לאחר שהגרסה החלופית תישמר בהצלחה." : "הטופס פתוח לתיקון אצל ההורה. הגרסה הקודמת תישמר בתיק כגרסה לא־פעילה."}</p> : null}
                     </> : <p className={styles.helperText}>ההורה עדיין לא הגיש מורשי איסוף.</p>}
                 </section>
 

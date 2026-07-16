@@ -41,6 +41,7 @@ export type PublicDaycareAgreement =
     | {
           available: true;
           signingAvailable: boolean;
+          canSubmit: boolean;
           acceptanceStatement: string;
           version: Omit<DaycareAgreementVersion, "id" | "createdAt" | "updatedAt">;
           agreement: Omit<DaycareAgreementSubmission, "id"> | null;

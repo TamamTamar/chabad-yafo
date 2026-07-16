@@ -94,6 +94,8 @@
 }
 
 .error {
+    display: block;
+    min-height: 18px;
     font-size: $type-micro;
     font-weight: 600;
     color: $ui-error;

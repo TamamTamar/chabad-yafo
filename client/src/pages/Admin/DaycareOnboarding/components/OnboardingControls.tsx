@@ -1,14 +1,11 @@
 import type { AdminDaycareOnboarding, AdminOnboardingStep } from "../../../../types/daycareOnboarding";
-import { onboardingOverallStatusLabels } from "../../../../types/daycareOnboarding";
-import { formatDate, guardianRoleLabels, overallStatuses } from "../daycareOnboardingAdminUtils";
+import { formatDate, guardianRoleLabels } from "../daycareOnboardingAdminUtils";
 import styles from "../DaycareOnboardingAdmin.module.scss";
 
 type LinkConfirmation = "disableAccess" | "regenerateLink" | null;
 
 type Props = {
     onboarding: AdminDaycareOnboarding;
-    updatingOverallStatus: boolean;
-    handleOverallStatusChange: (value: string) => Promise<void>;
     deletingOnboarding: boolean;
     isDirty: boolean;
     setDeleteConfirmationOpen: (open: boolean) => void;
@@ -17,6 +14,7 @@ type Props = {
     setProfileMessage: (message: string) => void;
     reviewingProfile: boolean;
     handleProfileCorrection: () => Promise<void>;
+    parentSubmissionComplete: boolean;
     updatingAccess: boolean;
     setLinkConfirmation: (confirmation: LinkConfirmation) => void;
     freshParentLink: string;
@@ -24,42 +22,17 @@ type Props = {
 };
 
 const OnboardingControls = ({
-    onboarding, updatingOverallStatus, handleOverallStatusChange, deletingOnboarding,
+    onboarding, deletingOnboarding,
     isDirty, setDeleteConfirmationOpen, profileReviewStep, profileMessage,
-    setProfileMessage, reviewingProfile, handleProfileCorrection, updatingAccess,
+    setProfileMessage, reviewingProfile, handleProfileCorrection, parentSubmissionComplete, updatingAccess,
     setLinkConfirmation, freshParentLink, copyParentLink,
 }: Props) => (
 <section className={styles.controlGrid}>
+                    {onboarding.origin?.type === "daycareRegistration" ? (
                     <details className={styles.controlCard}>
                         <summary className={styles.controlSummary}>
                             הגדרות מתקדמות של התיק
                         </summary>
-                        <h2 className={styles.controlTitle}>סטטוס כללי</h2>
-                        <label className={styles.fieldLabel} htmlFor="overall-status">
-                            מצב המסלול
-                        </label>
-                        <select
-                            className={styles.select}
-                            id="overall-status"
-                            value={onboarding.overallStatusOverride ?? "automatic"}
-                            disabled={updatingOverallStatus}
-                            onChange={(event) =>
-                                void handleOverallStatusChange(event.target.value)
-                            }
-                        >
-                            <option value="automatic">
-                                אוטומטי — {onboardingOverallStatusLabels[onboarding.calculatedOverallStatus]}
-                            </option>
-                            {overallStatuses.map((status) => (
-                                <option key={status} value={status}>
-                                    ידני — {onboardingOverallStatusLabels[status]}
-                                </option>
-                            ))}
-                        </select>
-                        <p className={styles.helperText}>
-                            הסטטוס שמוצג כעת: {onboardingOverallStatusLabels[onboarding.overallStatus]}
-                        </p>
-                        {onboarding.origin?.type === "daycareRegistration" ? (
                             <div className={styles.deleteCaseArea}>
                                 <h3>מחיקת תיק בדיקה</h3>
                                 <p>
@@ -81,8 +54,8 @@ const OnboardingControls = ({
                                     </p>
                                 ) : null}
                             </div>
-                        ) : null}
                     </details>
+                    ) : null}
 
                     <div className={`${styles.controlCard} ${styles.caseSectionAnchor}`} id="profile-details">
                         <h2 className={styles.controlTitle}>פרטי המשפחה</h2>
@@ -142,7 +115,7 @@ const OnboardingControls = ({
                                 הערה פנימית: {onboarding.internalNote}
                             </p>
                         ) : null}
-                        {profileReviewStep?.status === "pendingReview" ||
+                        {(parentSubmissionComplete && profileReviewStep?.status === "pendingReview") ||
                         profileReviewStep?.status === "completed" ? (
                             <details className={styles.correctionPanel}>
                                 <summary className={styles.correctionSummary}>יש טעות בפרטי המשפחה?</summary>

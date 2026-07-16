@@ -15,6 +15,7 @@ import {
     cloneDate,
     DaycareOnboardingServiceError,
     getEffectiveOverallStatus,
+    isParentBundleSubmitted,
 } from "./core";
 import { getMissingStepTitle, toAdminOnboardingDetail } from "./dto";
 
@@ -334,6 +335,8 @@ export const listAdminOnboardings = async () => {
                     ]
                   : [],
             overallStatus: getEffectiveOverallStatus(onboarding),
+            parentSubmittedAt: cloneDate(onboarding.parentSubmittedAt),
+            parentSubmissionComplete: isParentBundleSubmitted(onboarding),
             progress: calculateOnboardingProgress(onboarding.steps),
             missingStepTitle: getMissingStepTitle(onboarding.steps),
             hasPendingReview: onboarding.steps.some(

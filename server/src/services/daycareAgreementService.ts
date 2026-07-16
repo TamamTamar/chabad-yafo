@@ -4,7 +4,7 @@ import { DaycareAgreement } from "../models/DaycareAgreement";
 import { DaycareAgreementVersion } from "../models/DaycareAgreementVersion";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
 import { DAYCARE_ONBOARDING_AUDIT_ACTIONS } from "../config/daycareOnboardingAuditActions";
-import { createAuditEntries, getPublicOnboardingDocumentByToken, calculateOverallStatus, DaycareOnboardingServiceError, updateAdminOnboardingStep } from "./daycareOnboardingService";
+import { createAuditEntries, getPublicOnboardingDocumentByToken, calculateOverallStatus, DaycareOnboardingServiceError, isParentBundleSubmitted, updateAdminOnboardingStep } from "./daycareOnboardingService";
 import { getDaycareStorageProvider, isDaycareStorageConfigured } from "./daycareStorageService";
 import { createAgreementPdf, createSignedAgreementPdf } from "./daycareAgreementPdfService";
 import {
@@ -229,7 +229,7 @@ export const getPublicAgreement = async (token: string, now = new Date()) => {
     if (!version) return { available: false, reason: "agreementNotPublished", signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured() };
     const agreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 }).select("+parentDocumentsSnapshot");
     const parentDocuments = agreement?.parentDocumentsSnapshot ?? await getPublishedParentDocumentBundle(onboarding.schoolYear);
-    return { available: true, signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured(), acceptanceStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, version: publicVersionDto(version), agreement: publicAgreementDto(agreement), parentDocuments: { version: parentDocuments.version, menuAvailable: parentDocuments.documents.menu.items.length > 0 } };
+    return { available: true, signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured(), canSubmit: !isParentBundleSubmitted(onboarding), acceptanceStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, version: publicVersionDto(version), agreement: publicAgreementDto(agreement), parentDocuments: { version: parentDocuments.version, menuAvailable: parentDocuments.documents.menu.items.length > 0 } };
 };
 
 const getSignableContext = async (token: string, now: Date) => {
@@ -264,7 +264,8 @@ const markPendingReview = async (onboarding: InstanceType<typeof DaycareOnboardi
     onboarding.steps[stepIndex].updatedBy = "parent";
     onboarding.steps[stepIndex].relatedRecord = { type: "daycareAgreement", recordId: agreementId, documentKey: "daycareAgreement" };
     onboarding.markModified("steps");
-    onboarding.overallStatus = calculateOverallStatus(onboarding.steps);
+    onboarding.parentSubmittedAt = undefined;
+    onboarding.overallStatus = "waitingForParent";
     await onboarding.save();
     await createAuditEntries([
         { onboardingId: onboarding._id, actorType: "parent", actorLabel: "parent-link", action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.stepStatusChanged, stepKey: "agreementSigned", previousValue: previousStatus, newValue: "pendingReview", createdAt: now },
@@ -306,8 +307,8 @@ export const submitOnlineAgreement = async (token: string, input: { signedBy: st
     }
     const { onboarding, version, stepIndex } = await getSignableContext(token, now);
     const previousAgreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 });
-    if (previousAgreement && previousAgreement.status !== "requiresCorrection") {
-        throw new DaycareOnboardingServiceError("ההסכם כבר אושר וננעל.", 409, "AGREEMENT_ALREADY_SIGNED");
+    if (isParentBundleSubmitted(onboarding)) {
+        throw new DaycareOnboardingServiceError("התיק כבר נשלח לצוות המעון וההסכם ננעל.", 409, "AGREEMENT_ALREADY_SIGNED");
     }
     const revision = (previousAgreement?.revision ?? 0) + 1;
     const documentId = randomUUID();
@@ -404,8 +405,8 @@ export const submitSignedAgreementPdf = async (token: string, file: Express.Mult
     if (!file.originalname.toLowerCase().endsWith(".pdf") || file.buffer.subarray(0, 5).toString("ascii") !== "%PDF-") throw new DaycareOnboardingServiceError("PDF file is invalid", 400, "INVALID_AGREEMENT_FILE");
     const { onboarding, version, stepIndex } = await getSignableContext(token, now);
     const existingAgreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 });
-    if (existingAgreement && existingAgreement.status !== "requiresCorrection") {
-        throw new DaycareOnboardingServiceError("ההסכם כבר נשלח וננעל.", 409, "AGREEMENT_ALREADY_SIGNED");
+    if (isParentBundleSubmitted(onboarding)) {
+        throw new DaycareOnboardingServiceError("התיק כבר נשלח לצוות המעון וההסכם ננעל.", 409, "AGREEMENT_ALREADY_SIGNED");
     }
     const revision = (existingAgreement?.revision ?? 0) + 1;
     const stored = await getDaycareStorageProvider().upload({ bytes: file.buffer, mimeType: "application/pdf", originalName: file.originalname, category: "signed-agreements" });

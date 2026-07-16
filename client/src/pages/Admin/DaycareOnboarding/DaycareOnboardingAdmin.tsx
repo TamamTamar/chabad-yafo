@@ -11,13 +11,9 @@ import {
     getAdminDaycareOnboarding,
     regenerateAdminOnboardingLink,
     updateAdminOnboardingAccess,
-    updateAdminOnboardingOverallStatus,
     updateAdminOnboardingStep,
 } from "../../../services/daycareOnboardingService";
-import {
-    type AdminDaycareOnboarding,
-    type OnboardingOverallStatus,
-} from "../../../types/daycareOnboarding";
+import type { AdminDaycareOnboarding } from "../../../types/daycareOnboarding";
 import DocumentReviewSections from "./components/DocumentReviewSections";
 import OnboardingControls from "./components/OnboardingControls";
 import OnboardingDialogs from "./components/OnboardingDialogs";
@@ -49,7 +45,6 @@ const DaycareOnboardingAdmin = () => {
     const [notice, setNotice] = useState("");
     const [savingStepKey, setSavingStepKey] = useState<string | null>(null);
     const [updatingAccess, setUpdatingAccess] = useState(false);
-    const [updatingOverallStatus, setUpdatingOverallStatus] = useState(false);
     const [freshParentLink, setFreshParentLink] = useState(
         locationState?.parentAccessUrl ?? ""
     );
@@ -204,9 +199,13 @@ const DaycareOnboardingAdmin = () => {
         healthDeclaration?.status,
         pickupAuthorization?.status,
     ];
-    const allDocumentsSubmitted = reviewStatuses.every(
+    const allDocumentsReady = reviewStatuses.every(
         (status) => status === "pendingReview" || status === "completed" || status === "notRequired"
     );
+    const parentSubmissionComplete =
+        onboarding?.parentSubmissionComplete ??
+        Boolean(onboarding?.parentSubmittedAt);
+    const allDocumentsSubmitted = allDocumentsReady && parentSubmissionComplete;
     const allDocumentsApproved = reviewStatuses.every(
         (status) => status === "completed" || status === "notRequired"
     );
@@ -288,31 +287,6 @@ const DaycareOnboardingAdmin = () => {
             setError("שמירת השלב נכשלה. נסו שוב.");
         } finally {
             setSavingStepKey(null);
-        }
-    };
-
-    const handleOverallStatusChange = async (value: string) => {
-        if (!id) {
-            return;
-        }
-
-        setUpdatingOverallStatus(true);
-        setError("");
-        try {
-            const updated = await updateAdminOnboardingOverallStatus(
-                id,
-                value === "automatic" ? null : (value as OnboardingOverallStatus)
-            );
-            setOnboarding(updated);
-            setNotice(
-                value === "automatic"
-                    ? "הסטטוס הכללי חזר לחישוב אוטומטי"
-                    : "הסטטוס הכללי עודכן ידנית"
-            );
-        } catch {
-            setError("עדכון הסטטוס הכללי נכשל");
-        } finally {
-            setUpdatingOverallStatus(false);
         }
     };
 
@@ -448,6 +422,7 @@ const DaycareOnboardingAdmin = () => {
                     notice={notice}
                     error={error}
                     reviewChecklist={reviewChecklist}
+                    allDocumentsReady={allDocumentsReady}
                     allDocumentsSubmitted={allDocumentsSubmitted}
                     allDocumentsApproved={allDocumentsApproved}
                     nextStep={nextStep}
@@ -456,8 +431,6 @@ const DaycareOnboardingAdmin = () => {
 
                 <OnboardingControls
                     onboarding={onboarding}
-                    updatingOverallStatus={updatingOverallStatus}
-                    handleOverallStatusChange={handleOverallStatusChange}
                     deletingOnboarding={deletingOnboarding}
                     isDirty={isDirty}
                     setDeleteConfirmationOpen={setDeleteConfirmationOpen}
@@ -466,6 +439,7 @@ const DaycareOnboardingAdmin = () => {
                     setProfileMessage={setProfileMessage}
                     reviewingProfile={reviewingProfile}
                     handleProfileCorrection={handleProfileCorrection}
+                    parentSubmissionComplete={parentSubmissionComplete}
                     updatingAccess={updatingAccess}
                     setLinkConfirmation={setLinkConfirmation}
                     freshParentLink={freshParentLink}
@@ -498,6 +472,7 @@ const DaycareOnboardingAdmin = () => {
                     reviewingPickup={reviewingPickup}
                     handlePickupReview={handlePickupReview}
                     handlePickupDownload={handlePickupDownload}
+                    parentSubmissionComplete={parentSubmissionComplete}
                     allDocumentsSubmitted={allDocumentsSubmitted}
                     allDocumentsApproved={allDocumentsApproved}
                     reviewingAllDocuments={reviewingAllDocuments}

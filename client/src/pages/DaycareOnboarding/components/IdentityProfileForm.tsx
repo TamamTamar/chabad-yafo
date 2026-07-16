@@ -35,6 +35,20 @@ const relationshipOptions = [
     { value: "other", label: "אחר" },
 ];
 
+const RequiredFieldLabel = ({ children }: { children: string }) => (
+    <span className={styles.profileLabelText}>
+        {children}
+        <span className={styles.fieldQualifierText}>(חובה)</span>
+    </span>
+);
+
+const OptionalFieldLabel = ({ children }: { children: string }) => (
+    <span className={styles.profileLabelText}>
+        {children}
+        <span className={styles.fieldQualifierText}>(אופציונלי)</span>
+    </span>
+);
+
 const normalizeInitialProfile = (
     profile?: DaycareIdentityProfile,
     prefill?: IdentityProfileFormProps["prefill"]
@@ -89,6 +103,7 @@ const IdentityProfileForm = ({
     });
     const guardians = watch("guardians");
     const showSecondGuardian = guardianFields.length > 1;
+    const isEditingSavedProfile = Boolean(initialProfile);
 
     useEffect(() => {
         reset(initialValue);
@@ -123,13 +138,15 @@ const IdentityProfileForm = ({
     return (
         <section className={styles.profileFormCard} aria-labelledby="profile-form-title">
             <div className={styles.profileFormHeader}>
-                <span className={styles.profileFormEyebrow}>השלב הבא</span>
+                <span className={styles.profileFormEyebrow}>
+                    {isEditingSavedProfile ? "אפשר לערוך עד השליחה הסופית" : "השלב הבא"}
+                </span>
                 <h2 className={styles.profileFormTitle} id="profile-form-title">
                     מילוי פרטי הילד וההורים
                 </h2>
                 <p className={styles.profileFormIntro}>
-                    מלאו את הפרטים ושלחו אותם לצוות המעון לבדיקה. שדות המסומנים
-                    בכוכבית הם שדות חובה.
+                    מלאו את הפרטים ושלחו אותם לצוות המעון לבדיקה. שדות החובה
+                    מסומנים לצד שם השדה.
                 </p>
             </div>
 
@@ -138,7 +155,7 @@ const IdentityProfileForm = ({
                     <legend className={styles.profileLegend}>פרטי הילד</legend>
                     <div className={styles.profileFieldsGrid}>
                         <label className={styles.profileLabel}>
-                            שם פרטי <span aria-hidden="true">*</span>
+                            <RequiredFieldLabel>שם פרטי</RequiredFieldLabel>
                             <input
                                 className={styles.profileInput}
                                 type="text"
@@ -146,10 +163,10 @@ const IdentityProfileForm = ({
                                 maxLength={100}
                                 {...register("child.firstName", { required: "יש להזין שם פרטי" })}
                             />
-                            {errors.child?.firstName ? <span className={styles.profileError}>{errors.child.firstName.message}</span> : null}
+                            <span className={styles.formFieldError} role="alert">{errors.child?.firstName?.message || ""}</span>
                         </label>
                         <label className={styles.profileLabel}>
-                            שם משפחה <span aria-hidden="true">*</span>
+                            <RequiredFieldLabel>שם משפחה</RequiredFieldLabel>
                             <input
                                 className={styles.profileInput}
                                 type="text"
@@ -157,17 +174,17 @@ const IdentityProfileForm = ({
                                 maxLength={100}
                                 {...register("child.lastName", { required: "יש להזין שם משפחה" })}
                             />
-                            {errors.child?.lastName ? <span className={styles.profileError}>{errors.child.lastName.message}</span> : null}
+                            <span className={styles.formFieldError} role="alert">{errors.child?.lastName?.message || ""}</span>
                         </label>
                         <label className={styles.profileLabel}>
-                            תאריך לידה <span aria-hidden="true">*</span>
+                            <RequiredFieldLabel>תאריך לידה</RequiredFieldLabel>
                             <input
                                 className={styles.profileInput}
                                 type="date"
                                 max={new Date().toISOString().slice(0, 10)}
                                 {...register("child.birthDate", { required: "יש לבחור תאריך לידה" })}
                             />
-                            {errors.child?.birthDate ? <span className={styles.profileError}>{errors.child.birthDate.message}</span> : null}
+                            <span className={styles.formFieldError} role="alert">{errors.child?.birthDate?.message || ""}</span>
                         </label>
                     </div>
                 </fieldset>
@@ -176,23 +193,24 @@ const IdentityProfileForm = ({
                     <legend className={styles.profileLegend}>כתובת מגורים</legend>
                     <div className={styles.profileFieldsGrid}>
                         <label className={styles.profileLabel}>
-                            עיר <span aria-hidden="true">*</span>
+                            <RequiredFieldLabel>עיר</RequiredFieldLabel>
                             <input className={styles.profileInput} type="text" autoComplete="address-level2" maxLength={100} {...register("address.city", { required: "יש להזין עיר" })} />
-                            {errors.address?.city ? <span className={styles.profileError}>{errors.address.city.message}</span> : null}
+                            <span className={styles.formFieldError} role="alert">{errors.address?.city?.message || ""}</span>
                         </label>
                         <label className={styles.profileLabel}>
-                            רחוב <span aria-hidden="true">*</span>
+                            <RequiredFieldLabel>רחוב</RequiredFieldLabel>
                             <input className={styles.profileInput} type="text" autoComplete="address-line1" maxLength={160} {...register("address.street", { required: "יש להזין רחוב" })} />
-                            {errors.address?.street ? <span className={styles.profileError}>{errors.address.street.message}</span> : null}
+                            <span className={styles.formFieldError} role="alert">{errors.address?.street?.message || ""}</span>
                         </label>
                         <label className={styles.profileLabel}>
-                            מספר בית <span aria-hidden="true">*</span>
+                            <RequiredFieldLabel>מספר בית</RequiredFieldLabel>
                             <input className={styles.profileInput} type="text" inputMode="numeric" maxLength={20} {...register("address.houseNumber", { required: "יש להזין מספר בית" })} />
-                            {errors.address?.houseNumber ? <span className={styles.profileError}>{errors.address.houseNumber.message}</span> : null}
+                            <span className={styles.formFieldError} role="alert">{errors.address?.houseNumber?.message || ""}</span>
                         </label>
                         <label className={styles.profileLabel}>
-                            דירה (אופציונלי)
+                            <OptionalFieldLabel>דירה</OptionalFieldLabel>
                             <input className={styles.profileInput} type="text" inputMode="numeric" maxLength={20} {...register("address.apartment")} />
+                            <span className={styles.formFieldError}>{""}</span>
                         </label>
                     </div>
                 </fieldset>
@@ -200,38 +218,39 @@ const IdentityProfileForm = ({
                 {guardianFields.map((guardian, index) => (
                     <fieldset className={styles.profileFieldset} disabled={isSubmitting} key={guardian.id}>
                         <legend className={styles.profileLegend}>
-                            הורה/אפוטרופוס {index + 1}{index === 1 ? " — אופציונלי" : ""}
+                            הורה/אפוטרופוס {index + 1}
+                            {index === 1 ? <span className={styles.fieldQualifierText}> (אופציונלי)</span> : null}
                         </legend>
                         <div className={styles.profileFieldsGrid}>
                             <label className={styles.profileLabel}>
-                                שם מלא <span aria-hidden="true">*</span>
+                                <RequiredFieldLabel>שם מלא</RequiredFieldLabel>
                                 <input className={styles.profileInput} type="text" autoComplete="name" maxLength={160} {...register(`guardians.${index}.fullName`, { required: "יש להזין שם מלא" })} />
-                                {errors.guardians?.[index]?.fullName ? <span className={styles.profileError}>{errors.guardians[index]?.fullName?.message}</span> : null}
+                                <span className={styles.formFieldError} role="alert">{errors.guardians?.[index]?.fullName?.message || ""}</span>
                             </label>
                             <label className={styles.profileLabel}>
-                                קרבה לילד <span aria-hidden="true">*</span>
+                                <RequiredFieldLabel>קרבה לילד</RequiredFieldLabel>
                                 <select className={styles.profileSelect} {...register(`guardians.${index}.role`, { required: "יש לבחור קרבה" })}>
                                     <option value="">בחירת קרבה</option>
                                     {relationshipOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                                 </select>
-                                {errors.guardians?.[index]?.role ? <span className={styles.profileError}>{errors.guardians[index]?.role?.message}</span> : null}
+                                <span className={styles.formFieldError} role="alert">{errors.guardians?.[index]?.role?.message || ""}</span>
                             </label>
                             {guardians?.[index]?.role === "other" ? (
                                 <label className={styles.profileLabel}>
-                                    מה הקרבה? <span aria-hidden="true">*</span>
+                                    <RequiredFieldLabel>מה הקרבה?</RequiredFieldLabel>
                                     <input className={styles.profileInput} type="text" maxLength={100} {...register(`guardians.${index}.roleDetails`, { required: "יש לפרט את הקרבה" })} />
-                                    {errors.guardians?.[index]?.roleDetails ? <span className={styles.profileError}>{errors.guardians[index]?.roleDetails?.message}</span> : null}
+                                    <span className={styles.formFieldError} role="alert">{errors.guardians?.[index]?.roleDetails?.message || ""}</span>
                                 </label>
                             ) : null}
                             <label className={styles.profileLabel}>
-                                טלפון <span aria-hidden="true">*</span>
+                                <RequiredFieldLabel>טלפון</RequiredFieldLabel>
                                 <input className={styles.profileInput} type="tel" dir="ltr" autoComplete="tel" maxLength={30} {...register(`guardians.${index}.phone`, { required: "יש להזין טלפון", validate: (value) => value.replace(/\D/g, "").length >= 9 || "יש להזין טלפון תקין" })} />
-                                {errors.guardians?.[index]?.phone ? <span className={styles.profileError}>{errors.guardians[index]?.phone?.message}</span> : null}
+                                <span className={styles.formFieldError} role="alert">{errors.guardians?.[index]?.phone?.message || ""}</span>
                             </label>
                             <label className={styles.profileLabel}>
-                                אימייל (אופציונלי)
+                                <OptionalFieldLabel>אימייל</OptionalFieldLabel>
                                 <input className={styles.profileInput} type="email" dir="ltr" autoComplete="email" maxLength={254} {...register(`guardians.${index}.email`, { pattern: { value: /^\S+@\S+\.\S+$/, message: "יש להזין אימייל תקין" } })} />
-                                {errors.guardians?.[index]?.email ? <span className={styles.profileError}>{errors.guardians[index]?.email?.message}</span> : null}
+                                <span className={styles.formFieldError} role="alert">{errors.guardians?.[index]?.email?.message || ""}</span>
                             </label>
                         </div>
                     </fieldset>
@@ -246,7 +265,11 @@ const IdentityProfileForm = ({
                 </div>
 
                 <button className={styles.submitProfileButton} type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "שולחים את הפרטים..." : "שליחת הפרטים לבדיקה"}
+                    {isSubmitting
+                        ? "שומרים את הפרטים..."
+                        : isEditingSavedProfile
+                          ? "שמירת הפרטים המתוקנים"
+                          : "שליחת הפרטים לבדיקה"}
                 </button>
             </form>
         </section>
