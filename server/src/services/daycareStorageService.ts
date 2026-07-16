@@ -25,11 +25,27 @@ const createStorageKey = (input: StoredFileInput) =>
     `daycare/${input.category}/${randomUUID()}${extensionForMime(input.mimeType)}`;
 
 const getS3Configuration = () => {
-    const endpoint = process.env.BUCKET_ENDPOINT ?? process.env.ENDPOINT;
-    const accessKeyId = process.env.BUCKET_ACCESS_KEY_ID ?? process.env.ACCESS_KEY_ID;
-    const secretAccessKey = process.env.BUCKET_SECRET_ACCESS_KEY ?? process.env.SECRET_ACCESS_KEY;
-    const bucket = process.env.BUCKET_NAME ?? process.env.BUCKET;
-    const region = process.env.BUCKET_REGION ?? process.env.REGION ?? "auto";
+    const endpoint =
+        process.env.BUCKET_ENDPOINT ??
+        process.env.ENDPOINT ??
+        process.env.AWS_ENDPOINT_URL;
+    const accessKeyId =
+        process.env.BUCKET_ACCESS_KEY_ID ??
+        process.env.ACCESS_KEY_ID ??
+        process.env.AWS_ACCESS_KEY_ID;
+    const secretAccessKey =
+        process.env.BUCKET_SECRET_ACCESS_KEY ??
+        process.env.SECRET_ACCESS_KEY ??
+        process.env.AWS_SECRET_ACCESS_KEY;
+    const bucket =
+        process.env.BUCKET_NAME ??
+        process.env.BUCKET ??
+        process.env.AWS_S3_BUCKET_NAME;
+    const region =
+        process.env.BUCKET_REGION ??
+        process.env.REGION ??
+        process.env.AWS_DEFAULT_REGION ??
+        "auto";
     return endpoint && accessKeyId && secretAccessKey && bucket
         ? { endpoint, accessKeyId, secretAccessKey, bucket, region }
         : null;
