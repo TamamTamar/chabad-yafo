@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Link2Off, RefreshCw, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import DaycareLogo from "../../components/DaycareLogo/DaycareLogo";
 import {
@@ -23,6 +23,26 @@ type PageState =
     | { status: "invalid" }
     | { status: "rateLimited" }
     | { status: "error" };
+
+type CollapsibleSavedStepProps = {
+    children: ReactNode;
+    isSaved: boolean;
+    title: string;
+};
+
+const CollapsibleSavedStep = ({ children, isSaved, title }: CollapsibleSavedStepProps) => {
+    if (!isSaved) return children;
+
+    return (
+        <details className={styles.savedStepDetails}>
+            <summary className={styles.savedStepSummary}>
+                <span className={styles.savedStepTitle}>{title}</span>
+                <span className={styles.savedStepHint}>נשמר · לחצו לפתיחה ועריכה</span>
+            </summary>
+            <div className={styles.savedStepContent}>{children}</div>
+        </details>
+    );
+};
 
 const setPrivateMetaTag = (name: string, content: string) => {
     const existingMeta = document.querySelector<HTMLMetaElement>(
@@ -305,6 +325,25 @@ const DaycareOnboarding = () => {
         step.status === "pendingReview" ||
         step.status === "completed" ||
         step.status === "notRequired";
+    const fullProcessSteps = [
+        ...parentDocumentSteps.map((step) => ({ step, isParentTask: true })),
+        ...[paymentStep, placementStep]
+            .filter((step): step is NonNullable<typeof step> => Boolean(step))
+            .map((step) => ({ step, isParentTask: false })),
+    ];
+    const completedProcessSteps = fullProcessSteps.filter(({ step, isParentTask }) =>
+        isParentTask
+            ? parentStageWasSubmitted(step)
+            : step.status === "completed" || step.status === "notRequired"
+    ).length;
+    const fullProcessProgress = {
+        completedSteps: completedProcessSteps,
+        totalSteps: fullProcessSteps.length,
+        percentage:
+            fullProcessSteps.length === 0
+                ? 100
+                : Math.round((completedProcessSteps / fullProcessSteps.length) * 100),
+    };
     const currentParentStepIndex = parentDocumentSteps.findIndex(
         (step) => !parentStageWasSubmitted(step)
     );
@@ -343,12 +382,12 @@ const DaycareOnboarding = () => {
     const waitingAdminStage = allDocumentsApproved && paymentStep?.status !== "completed" && paymentStep?.status !== "notRequired"
         ? {
               title: "ממתין להסדרת תשלום",
-              text: "כל הפרטים והמסמכים אושרו. צוות המעון מטפל כעת בהסדרת התשלום ואמצעי התשלום.",
+              text: "צוות המעון אישר את כל הפרטים והטפסים. נשארו עוד 2 משימות לצוות: הסדרת התשלום ושיבוץ בקבוצה.",
           }
         : allDocumentsApproved && placementStep?.status !== "completed" && placementStep?.status !== "notRequired"
           ? {
                 title: "ממתין לשיבוץ בקבוצה",
-                text: "התשלום אושר. צוות המעון ישבץ את הילד/ה בקבוצה המתאימה וישלים את הרישום.",
+                text: "התשלום אושר. נשארה עוד משימה אחת לצוות המעון: שיבוץ הילד/ה בקבוצה והשלמת הרישום.",
             }
           : null;
     const canOpenPickupAuthorization =
@@ -378,10 +417,21 @@ const DaycareOnboarding = () => {
 
                 <OnboardingProgress
                     overallStatus={onboarding.overallStatus}
-                    progress={onboarding.progress}
+                    progress={fullProcessProgress}
                 />
 
-                {parentBundleSubmitted ? (
+                {waitingAdminStage || (!parentBundleSubmitted && nextStepTitle) ? (
+                    <aside className={styles.nextStepCard} aria-label="השלב הבא">
+                        <span className={styles.nextStepLabel}>מה עכשיו?</span>
+                        <strong className={styles.nextStepTitle}>
+                            {waitingAdminStage?.title ?? nextStepTitle}
+                        </strong>
+                        <span className={styles.nextStepText}>
+                            {waitingAdminStage?.text ??
+                                "השלב הקודם נשמר. אפשר להמשיך עכשיו לשלב הבא."}
+                        </span>
+                    </aside>
+                ) : parentBundleSubmitted ? (
                     <aside className={styles.finalSuccessCard} role="status">
                         <span className={styles.finalSuccessIcon} aria-hidden="true">✓</span>
                         <div>
@@ -391,18 +441,6 @@ const DaycareOnboarding = () => {
                                 צוות המעון יעבור על התיק ויצור קשר אם יידרש תיקון.
                             </p>
                         </div>
-                    </aside>
-                ) : nextStepTitle || waitingAdminStage ? (
-                    <aside className={styles.nextStepCard} aria-label="השלב הבא">
-                        <span className={styles.nextStepLabel}>מה עכשיו?</span>
-                        <strong className={styles.nextStepTitle}>
-                            {nextStepTitle ?? waitingAdminStage?.title}
-                        </strong>
-                        <span className={styles.nextStepText}>
-                            {nextStepTitle
-                                ? "השלב הקודם נשמר. אפשר להמשיך עכשיו לשלב הבא."
-                                : waitingAdminStage?.text}
-                        </span>
                     </aside>
                 ) : parentWorkComplete ? null : (
                     <aside
@@ -437,18 +475,28 @@ const DaycareOnboarding = () => {
                 </div>
 
                 {!parentBundleSubmitted && onboarding.canEditProfile ? (
-                    <IdentityProfileForm
-                        key={onboarding.profile ? "existing-profile" : "new-profile"}
-                        initialProfile={onboarding.profile}
-                        prefill={onboarding.profilePrefill}
-                        isSubmitting={isSubmittingProfile}
-                        errorMessage={profileError}
-                        onSubmit={handleProfileSubmit}
-                    />
+                    <CollapsibleSavedStep
+                        isSaved={Boolean(profileStep && parentStageWasSubmitted(profileStep))}
+                        title="פרטי הילד וההורים"
+                    >
+                        <IdentityProfileForm
+                            key={onboarding.profile ? "existing-profile" : "new-profile"}
+                            initialProfile={onboarding.profile}
+                            prefill={onboarding.profilePrefill}
+                            isSubmitting={isSubmittingProfile}
+                            errorMessage={profileError}
+                            onSubmit={handleProfileSubmit}
+                        />
+                    </CollapsibleSavedStep>
                 ) : null}
 
                 {!parentBundleSubmitted && token && canOpenAgreement ? (
-                    <AgreementSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                    <CollapsibleSavedStep
+                        isSaved={Boolean(agreementStep && parentStageWasSubmitted(agreementStep))}
+                        title="הסכם התקשרות"
+                    >
+                        <AgreementSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                    </CollapsibleSavedStep>
                 ) : null}
 
                 {!parentBundleSubmitted && token && (canOpenHealthDeclaration || canOpenPickupAuthorization) ? (
@@ -462,10 +510,20 @@ const DaycareOnboarding = () => {
                             </p>
                         </div>
                         {canOpenHealthDeclaration ? (
-                            <HealthDeclarationSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                            <CollapsibleSavedStep
+                                isSaved={Boolean(healthStep && parentStageWasSubmitted(healthStep))}
+                                title="הצהרת בריאות"
+                            >
+                                <HealthDeclarationSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                            </CollapsibleSavedStep>
                         ) : null}
                         {canOpenPickupAuthorization ? (
-                            <PickupAuthorizationSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                            <CollapsibleSavedStep
+                                isSaved={Boolean(pickupStep && parentStageWasSubmitted(pickupStep))}
+                                title="מורשי איסוף"
+                            >
+                                <PickupAuthorizationSection token={token} onSubmitted={() => void refreshOnboarding()} />
+                            </CollapsibleSavedStep>
                         ) : null}
                     </section>
                 ) : null}
@@ -518,25 +576,6 @@ const DaycareOnboarding = () => {
                             ))}
                         </div>
                     </section>
-                ) : null}
-
-                {completedParentSteps.length > 0 && !parentWorkComplete ? (
-                    <details className={styles.completedStepsDetails}>
-                        <summary className={styles.completedStepsSummary}>
-                            השלבים שהשלמתי ({completedParentSteps.length})
-                        </summary>
-                        <div className={styles.stepsList}>
-                            {completedParentSteps.map((step) => (
-                                <OnboardingStepCard
-                                    key={step.key}
-                                    step={step}
-                                    position={orderedSteps.findIndex(
-                                        (orderedStep) => orderedStep.key === step.key
-                                    ) + 1}
-                                />
-                            ))}
-                        </div>
-                    </details>
                 ) : null}
 
                 <aside className={styles.privacyNote}>

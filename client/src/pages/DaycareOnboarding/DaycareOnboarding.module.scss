@@ -293,22 +293,55 @@
     font-weight: 900;
 }
 
-.completedStepsDetails {
-    margin-top: 24px;
-    padding: 16px;
-    border: 1px solid $ui-border-soft;
+.savedStepDetails {
+    margin-top: 18px;
+    overflow: hidden;
+    border: 1px solid rgba($brand-primary, 0.2);
     border-radius: $radius-md;
-    background: rgba($brand-bg, 0.82);
+    background: $brand-bg;
+    box-shadow: 0 8px 24px rgba($brand-primary, 0.06);
 }
 
-.completedStepsSummary {
+.savedStepSummary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
     color: $brand-primary-deep;
-    font-weight: 900;
     cursor: pointer;
 }
 
-.completedStepsDetails[open] .completedStepsSummary {
-    margin-bottom: 16px;
+.savedStepSummary::before {
+    content: "⌄";
+    color: $brand-gold-dark;
+    font-size: 1.15rem;
+    font-weight: 900;
+    transition: transform 0.2s ease;
+}
+
+.savedStepDetails[open] .savedStepSummary::before {
+    transform: rotate(180deg);
+}
+
+.savedStepDetails[open] .savedStepSummary {
+    border-bottom: 1px solid $ui-border-soft;
+}
+
+.savedStepTitle {
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.savedStepHint {
+    color: $ui-text-muted;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.savedStepContent {
+    padding: 0 14px 14px;
 }
 
 .profileNoticeRegion {

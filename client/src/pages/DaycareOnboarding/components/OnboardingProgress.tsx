@@ -35,10 +35,10 @@ const OnboardingProgress = ({
                         id="onboarding-progress-title"
                         className={styles.progressTitle}
                     >
-                        ההתקדמות שלכם
+                        ההתקדמות בתהליך
                     </h2>
                     <p className={styles.progressCount}>
-                        {progress.completedSteps} מתוך {progress.totalSteps} שלבים
+                        {progress.completedSteps} מתוך {progress.totalSteps} משימות
                         הושלמו
                     </p>
                 </div>

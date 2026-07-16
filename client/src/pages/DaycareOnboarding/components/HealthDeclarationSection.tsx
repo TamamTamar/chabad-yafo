@@ -69,11 +69,29 @@ const HealthDeclarationSection = ({ token, onSubmitted }: Props) => {
     const draw = (event: React.PointerEvent<HTMLCanvasElement>) => { if (!drawingRef.current) return; const context = event.currentTarget.getContext("2d"); if (!context) return; const current = point(event); context.lineTo(current.x, current.y); context.stroke(); setHasSignature(true); };
     const stop = () => { drawingRef.current = false; };
     const clear = () => { const canvas = canvasRef.current; canvas?.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height); setHasSignature(false); };
-    const valid = healthCondition.trim() && medicationSensitivities.trim() && healthFund && signedBy.trim() && (!hasAllergies || (allergyDetails.trim() && exposureInstructions.trim())) && informationConfirmed && responsibilityAccepted && hasSignature;
+    const validationError = !healthCondition.trim()
+        ? "יש למלא את המצב הבריאותי."
+        : !medicationSensitivities.trim()
+          ? "יש למלא רגישויות לתרופות, או לכתוב שאין."
+          : !healthFund
+            ? "יש לבחור קופת חולים."
+            : hasAllergies && (!allergyDetails.trim() || !exposureInstructions.trim())
+              ? "יש להשלים את פרטי האלרגיה והנחיות החשיפה."
+              : !signedBy.trim()
+                ? "יש למלא את השם המלא של החותם/ת."
+                : !informationConfirmed
+                  ? "יש לאשר שהמידע שנמסר נכון ומלא."
+                  : !responsibilityAccepted
+                    ? "יש לאשר את סעיף האחריות למידע הרפואי."
+                    : !hasSignature
+                      ? "יש לחתום באמצעות העכבר או האצבע."
+                      : "";
 
     const submit = async () => {
-        if (!canvasRef.current || !valid) return;
-        setBusy(true); setError(""); setNotice("");
+        if (!canvasRef.current) return;
+        setError(""); setNotice("");
+        if (validationError) { setError(validationError); return; }
+        setBusy(true);
         try {
             const signature = await canvasToBlob(canvasRef.current);
             await submitPublicDaycareHealthDeclaration(token, { healthCondition: healthCondition.trim(), medicationSensitivities: medicationSensitivities.trim(), healthFund, hasAllergies, allergyDetails: hasAllergies ? allergyDetails.trim() : undefined, exposureInstructions: hasAllergies ? exposureInstructions.trim() : undefined, informationConfirmed: true, allergyResponsibilityAccepted: true, signedBy: signedBy.trim(), signerRole }, signature);
@@ -117,7 +135,7 @@ const HealthDeclarationSection = ({ token, onSubmitted }: Props) => {
                 <label className={styles.label}>קופת חולים<select className={styles.select} value={healthFund} onChange={(e) => setHealthFund(e.target.value)}><option value="">בחירה</option>{healthFunds.map((item) => <option key={item}>{item}</option>)}</select></label>
             </div></div>
             <div className={styles.section}><h3 className={styles.sectionTitle}>אלרגיות ורגישויות</h3><div className={styles.radioRow}><label className={styles.radio}><input type="radio" checked={!hasAllergies} onChange={() => setHasAllergies(false)} />אין אלרגיה או רגישות ידועה</label><label className={styles.radio}><input type="radio" checked={hasAllergies} onChange={() => setHasAllergies(true)} />קיימת אלרגיה או רגישות</label></div>{hasAllergies ? <div className={styles.grid}><label className={styles.label}>למה הילד/ה רגיש/ה?<textarea className={styles.textarea} value={allergyDetails} onChange={(e) => setAllergyDetails(e.target.value)} /></label><label className={styles.label}>מה יש לעשות במקרה של חשיפה?<textarea className={styles.textarea} value={exposureInstructions} onChange={(e) => setExposureInstructions(e.target.value)} /></label></div> : null}</div>
-            <div className={styles.section}><h3 className={styles.sectionTitle}>הצהרה וחתימה</h3><label className={styles.consent}><input type="checkbox" checked={informationConfirmed} onChange={(e) => setInformationConfirmed(e.target.checked)} />אני מאשר/ת שהמידע שמסרתי נכון ומלא ומתחייב/ת לעדכן את המעון בכל שינוי.</label><label className={styles.consent}><input type="checkbox" checked={responsibilityAccepted} onChange={(e) => setResponsibilityAccepted(e.target.checked)} />ידוע לי כי האחריות למסירת מידע מלא ועדכני ולהשלכות הנובעות מאי-מסירתו חלה עליי.</label><div className={styles.grid}><label className={styles.label}>שם מלא של החותם/ת<input className={styles.input} value={signedBy} onChange={(e) => setSignedBy(e.target.value)} /></label><label className={styles.label}>תפקיד<select className={styles.select} value={signerRole} onChange={(e) => setSignerRole(e.target.value as DaycareHealthSignerRole)}><option value="mother">אם</option><option value="father">אב</option><option value="guardian">אפוטרופוס/ית</option></select></label></div><span className={styles.helper}>חתימה באמצעות העכבר או האצבע</span><canvas ref={canvasRef} className={styles.signatureCanvas} width="700" height="220" onPointerDown={start} onPointerMove={draw} onPointerUp={stop} onPointerCancel={stop} /><div className={styles.actions}><button className={styles.secondary} type="button" onClick={clear}>ניקוי חתימה</button><button className={styles.primary} type="button" disabled={busy || !valid} onClick={() => void submit()}>{busy ? "שולח..." : declaration ? "שליחת הצהרה מתוקנת" : "חתימה ושליחת ההצהרה"}</button></div></div>
+            <div className={styles.section}><h3 className={styles.sectionTitle}>הצהרה וחתימה</h3><label className={styles.consent}><input type="checkbox" checked={informationConfirmed} onChange={(e) => setInformationConfirmed(e.target.checked)} />אני מאשר/ת שהמידע שמסרתי נכון ומלא ומתחייב/ת לעדכן את המעון בכל שינוי.</label><label className={styles.consent}><input type="checkbox" checked={responsibilityAccepted} onChange={(e) => setResponsibilityAccepted(e.target.checked)} />ידוע לי כי האחריות למסירת מידע מלא ועדכני ולהשלכות הנובעות מאי-מסירתו חלה עליי.</label><div className={styles.grid}><label className={styles.label}>שם מלא של החותם/ת<input className={styles.input} value={signedBy} onChange={(e) => setSignedBy(e.target.value)} /></label><label className={styles.label}>תפקיד<select className={styles.select} value={signerRole} onChange={(e) => setSignerRole(e.target.value as DaycareHealthSignerRole)}><option value="mother">אם</option><option value="father">אב</option><option value="guardian">אפוטרופוס/ית</option></select></label></div><span className={styles.helper}>חתימה באמצעות העכבר או האצבע</span><canvas ref={canvasRef} className={styles.signatureCanvas} width="700" height="220" onPointerDown={start} onPointerMove={draw} onPointerUp={stop} onPointerCancel={stop} /><div className={styles.actions}><button className={styles.secondary} type="button" onClick={clear}>ניקוי חתימה</button><button className={styles.primary} type="button" disabled={busy} onClick={() => void submit()}>{busy ? "שולח..." : declaration ? "שליחת הצהרה מתוקנת" : "חתימה ושליחת ההצהרה"}</button></div></div>
         </div> : declaration ? <div className={styles.actions}><button className={styles.secondary} type="button" onClick={() => void download()}>הורדת ההצהרה החתומה</button></div> : null}
         <div aria-live="polite">{notice ? <p className={styles.success}>{notice}</p> : null}{error ? <p className={styles.error}>{error}</p> : null}</div>
     </section>;
