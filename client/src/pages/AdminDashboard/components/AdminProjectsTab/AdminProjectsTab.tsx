@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
 import {
     createProject,
@@ -49,17 +50,21 @@ const getProgress = (project: ProjectAdmin) => {
 
 const AdminProjectsTab = () => {
     const [projects, setProjects] = useState<ProjectAdmin[]>([]);
-    const [draft, setDraft] = useState<ProjectPayload>(emptyProject);
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
     const [overviewFilter, setOverviewFilter] = useState<OverviewFilter>("active");
     const [expandedTaskIndex, setExpandedTaskIndex] = useState<number | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [savingId, setSavingId] = useState<string | null>(null);
     const [error, setError] = useState("");
     const [notice, setNotice] = useState("");
     const [projectPendingDeletion, setProjectPendingDeletion] = useState<ProjectAdmin | null>(null);
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors: formErrors, isSubmitting },
+    } = useForm<ProjectPayload>({ defaultValues: emptyProject(), mode: "onBlur" });
 
     useEffect(() => {
         const loadProjects = async () => {
@@ -116,28 +121,18 @@ const AdminProjectsTab = () => {
         setError("");
     };
 
-    const submitProject = async (event: React.FormEvent) => {
-        event.preventDefault();
+    const submitProject: SubmitHandler<ProjectPayload> = async (draft) => {
         setError("");
         setNotice("");
-
-        if (!draft.name.trim() || !draft.goal.trim()) {
-            setError("יש למלא שם פרויקט ויעד.");
-            return;
-        }
-
-        setSaving(true);
         try {
             const project = await createProject(draft);
             setProjects((current) => [project, ...current]);
-            setDraft(emptyProject());
+            reset(emptyProject());
             setShowForm(false);
             setSelectedProjectId(project._id);
             setNotice("הפרויקט נוצר. עכשיו אפשר להוסיף לו משימות.");
         } catch {
             setError("לא הצלחנו ליצור את הפרויקט. כדאי לנסות שוב.");
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -245,7 +240,7 @@ const AdminProjectsTab = () => {
             {notice && <div className={styles.notice} role="status">{notice}</div>}
 
             {showForm && (
-                <form className={styles.createCard} onSubmit={submitProject}>
+                <form className={styles.createCard} noValidate onSubmit={handleSubmit(submitProject)}>
                     <div className={styles.formHeading}>
                         <h3>פרויקט חדש</h3>
                         <span>מתחילים בשם וביעד; את המשימות מוסיפים במסך הבא.</span>
@@ -254,26 +249,32 @@ const AdminProjectsTab = () => {
                         <label>
                             <span>שם הפרויקט *</span>
                             <input
-                                value={draft.name}
-                                onChange={(event) => setDraft({ ...draft, name: event.target.value })}
+                                {...register("name", {
+                                    required: "יש להזין שם לפרויקט",
+                                    validate: (value) => value.trim().length > 0 || "יש להזין שם לפרויקט",
+                                })}
                                 placeholder="לדוגמה: אירוע ל״ג בעומר"
                                 maxLength={160}
                                 autoFocus
                             />
+                            {formErrors.name ? <span className={styles.error}>{formErrors.name.message}</span> : null}
                         </label>
                         <label>
                             <span>מה היעד? *</span>
                             <textarea
-                                value={draft.goal}
-                                onChange={(event) => setDraft({ ...draft, goal: event.target.value })}
+                                {...register("goal", {
+                                    required: "יש להזין יעד לפרויקט",
+                                    validate: (value) => value.trim().length > 0 || "יש להזין יעד לפרויקט",
+                                })}
                                 placeholder="מה רוצים להשיג ואיך נדע שהצלחנו?"
                                 maxLength={2000}
                                 rows={2}
                             />
+                            {formErrors.goal ? <span className={styles.error}>{formErrors.goal.message}</span> : null}
                         </label>
                     </div>
-                    <button className={styles.submitButton} disabled={saving}>
-                        {saving ? "יוצר..." : "יצירת הפרויקט והמשך למשימות"}
+                    <button className={styles.submitButton} disabled={isSubmitting}>
+                        {isSubmitting ? "יוצר..." : "יצירת הפרויקט והמשך למשימות"}
                     </button>
                 </form>
             )}

@@ -1,6 +1,7 @@
 import axios from "axios";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { daycareRegistrationStatuses } from "../daycareAdminConfig";
 import {
     getDaycareRegistrations,
@@ -156,10 +157,18 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     const [expandedNoteKeys, setExpandedNoteKeys] = useState<string[]>([]);
     const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
     const [draft, setDraft] = useState<OnboardingDraft | null>(null);
-    const [creating, setCreating] = useState(false);
     const [createError, setCreateError] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<DaycareInterestStatus | "all">("all");
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors: createFormErrors, isSubmitting: creating },
+    } = useForm<CreateOnboardingFromInquiryPayload>({
+        defaultValues: { schoolYear: getSuggestedSchoolYear(), internalNote: "" },
+        mode: "onBlur",
+    });
 
     const rows = useMemo(() => toUnifiedRegistrations(data), [data]);
     const filteredRows = useMemo(() => {
@@ -227,7 +236,9 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
 
     const openCreateDialog = (registration: UnifiedRegistration) => {
         setCreateError("");
-        setDraft(createDraft(registration));
+        const nextDraft = createDraft(registration);
+        reset({ schoolYear: nextDraft.schoolYear, internalNote: nextDraft.internalNote ?? "" });
+        setDraft(nextDraft);
     };
 
     const handleNoteSave = async (row: UnifiedRegistration) => {
@@ -249,28 +260,17 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         }
     };
 
-    const updateDraft = <K extends keyof OnboardingDraft>(
-        field: K,
-        value: OnboardingDraft[K]
-    ) => {
-        setCreateError("");
-        setDraft((current) => (current ? { ...current, [field]: value } : current));
-    };
-
-    const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
+    const handleCreate: SubmitHandler<CreateOnboardingFromInquiryPayload> = async (form) => {
         if (!draft) {
             return;
         }
 
-        setCreating(true);
         setCreateError("");
 
         const { sourceId } = draft;
         const payload: CreateOnboardingFromInquiryPayload = {
-            schoolYear: draft.schoolYear,
-            internalNote: draft.internalNote,
+            schoolYear: form.schoolYear,
+            internalNote: form.internalNote?.trim() || undefined,
         };
 
         try {
@@ -281,8 +281,6 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
             });
         } catch (error: unknown) {
             setCreateError(getCreateErrorMessage(error));
-        } finally {
-            setCreating(false);
         }
     };
 
@@ -536,7 +534,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                             </button>
                         </div>
 
-                        <form className={styles.onboardingForm} onSubmit={handleCreate}>
+                        <form className={styles.onboardingForm} noValidate onSubmit={handleSubmit(handleCreate)}>
                             <label className={styles.compactField}>
                                 <span>שם ההורה</span>
                                 <input
@@ -567,25 +565,19 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                     className={styles.compactInput}
                                     pattern="[0-9]{4}-[0-9]{4}"
                                     placeholder="2026-2027"
-                                    required
-                                    value={draft.schoolYear}
-                                    onChange={(event) =>
-                                        updateDraft("schoolYear", event.target.value)
-                                    }
+                                    {...register("schoolYear", {
+                                        required: "יש להזין שנת לימודים",
+                                        pattern: { value: /^[0-9]{4}-[0-9]{4}$/, message: "יש להזין שנה בפורמט 2026-2027" },
+                                    })}
                                 />
+                                {createFormErrors.schoolYear ? <span className={styles.formErrorMessage}>{createFormErrors.schoolYear.message}</span> : null}
                             </label>
                             <label className={styles.compactField}>
                                 <span>הערה פנימית — אופציונלית</span>
                                 <textarea
                                     className={styles.compactTextarea}
                                     maxLength={2000}
-                                    value={draft.internalNote ?? ""}
-                                    onChange={(event) =>
-                                        updateDraft(
-                                            "internalNote",
-                                            event.target.value || undefined
-                                        )
-                                    }
+                                    {...register("internalNote")}
                                 />
                             </label>
                             <p className={styles.modalHint}>

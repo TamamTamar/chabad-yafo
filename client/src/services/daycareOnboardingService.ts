@@ -147,6 +147,8 @@ export const deleteAdminDaycareOnboarding = async (onboardingId: string) => {
         onboardingId: string;
         registrationId: string;
         identityPreserved: boolean;
+        childDeleted: boolean;
+        familyDeleted: boolean;
         filesCleanupFailed: number;
     }>>(`/admin/daycare/onboarding/${encodePathSegment(onboardingId)}`, {
         data: { confirmation: "מחיקת תיק" },

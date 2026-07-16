@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import BaseDialog from "../../components/BaseDialog/BaseDialog";
 import dialogStyles from "../../components/BaseDialog/BaseDialog.module.scss";
 import styles from "./Shabbat.module.scss";
@@ -25,53 +26,22 @@ const initialForm: FormState = {
 };
 
 const Shabbat = () => {
-    const [form, setForm] = useState<FormState>(initialForm);
-    const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({});
     const [submitted, setSubmitted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-    const errors = useMemo(() => {
-        const e: Partial<Record<keyof FormState, string>> = {};
-
-        if (form.fullName.trim().length < 2) e.fullName = "נא להזין שם מלא.";
-        if (form.phone.replace(/\D/g, "").length < 9) e.phone = "נא להזין מספר טלפון תקין.";
-        if (!/^\S+@\S+\.\S+$/.test(form.email)) e.email = "נא להזין אימייל תקין.";
-        if (Number(form.adults) < 1) e.adults = "חובה לבחור לפחות מבוגר אחד.";
-
-        return e;
-    }, [form]);
-
-    const isValid = Object.keys(errors).length === 0;
-
-    const onChange =
-        (key: keyof FormState) =>
-            (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-                setForm((prev) => ({ ...prev, [key]: e.target.value }));
-            };
-
-    const onBlur = (key: keyof FormState) => () => {
-        setTouched((prev) => ({ ...prev, [key]: true }));
-    };
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, touchedFields, isSubmitting },
+    } = useForm<FormState>({ defaultValues: initialForm, mode: "onBlur" });
 
     const fieldClass = (key: keyof FormState) => {
-        if (!touched[key]) return undefined;
+        if (!touchedFields[key]) return undefined;
         if (errors[key]) return styles.invalid;
         return styles.valid;
     };
 
-    const onSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!isValid) {
-            setTouched({
-                fullName: true,
-                phone: true,
-                email: true,
-                adults: true,
-            });
-            return;
-        }
-
+    const onSubmit: SubmitHandler<FormState> = async (form) => {
         try {
             await createShabbatRegistration({
                 fullName: form.fullName,
@@ -111,9 +81,8 @@ const Shabbat = () => {
                         <button
                             className={styles.secondary}
                             onClick={() => {
-                                setForm(initialForm);
-                                setTouched({});
-                                setSubmitted(false);
+                reset(initialForm);
+                setSubmitted(false);
                             }}
                         >
                             רישום נוסף
@@ -134,19 +103,20 @@ const Shabbat = () => {
                 <h1 className={styles.h1}>רישום לסעודת שבת וחג</h1>
                 <p className={styles.p}>נשמח לארח אתכם בבית חב״ד יפו. אנא מלאו את הפרטים ונחזור אליכם.</p>
 
-                <form className={styles.form} onSubmit={onSubmit} noValidate>
+                <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
                     <div className={styles.grid}>
                         {/* שם */}
                         <label className={styles.field}>
                             <span>שם מלא *</span>
                             <input
-                                value={form.fullName}
-                                onChange={onChange("fullName")}
-                                onBlur={onBlur("fullName")}
+                                {...register("fullName", {
+                                    required: "נא להזין שם מלא.",
+                                    validate: (value) => value.trim().length >= 2 || "נא להזין שם מלא.",
+                                })}
                                 className={fieldClass("fullName")}
                             />
-                            {touched.fullName && errors.fullName && (
-                                <small className={styles.error}>{errors.fullName}</small>
+                            {errors.fullName && (
+                                <small className={styles.error}>{errors.fullName.message}</small>
                             )}
                         </label>
 
@@ -154,14 +124,15 @@ const Shabbat = () => {
                         <label className={styles.field}>
                             <span>טלפון *</span>
                             <input
-                                value={form.phone}
-                                onChange={onChange("phone")}
-                                onBlur={onBlur("phone")}
+                                {...register("phone", {
+                                    required: "נא להזין מספר טלפון.",
+                                    validate: (value) => value.replace(/\D/g, "").length >= 9 || "נא להזין מספר טלפון תקין.",
+                                })}
                                 inputMode="tel"
                                 className={fieldClass("phone")}
                             />
-                            {touched.phone && errors.phone && (
-                                <small className={styles.error}>{errors.phone}</small>
+                            {errors.phone && (
+                                <small className={styles.error}>{errors.phone.message}</small>
                             )}
                         </label>
 
@@ -169,14 +140,15 @@ const Shabbat = () => {
                         <label className={styles.field}>
                             <span>אימייל *</span>
                             <input
-                                value={form.email}
-                                onChange={onChange("email")}
-                                onBlur={onBlur("email")}
+                                {...register("email", {
+                                    required: "נא להזין אימייל.",
+                                    pattern: { value: /^\S+@\S+\.\S+$/, message: "נא להזין אימייל תקין." },
+                                })}
                                 inputMode="email"
                                 className={fieldClass("email")}
                             />
-                            {touched.email && errors.email && (
-                                <small className={styles.error}>{errors.email}</small>
+                            {errors.email && (
+                                <small className={styles.error}>{errors.email.message}</small>
                             )}
                         </label>
 
@@ -184,24 +156,24 @@ const Shabbat = () => {
                         <label className={styles.field}>
                             <span>מבוגרים *</span>
                             <select
-                                value={form.adults}
-                                onChange={onChange("adults")}
-                                onBlur={onBlur("adults")}
+                                {...register("adults", {
+                                    validate: (value) => Number(value) >= 1 || "חובה לבחור לפחות מבוגר אחד.",
+                                })}
                                 className={fieldClass("adults")}
                             >
                                 {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                                     <option key={n}>{n}</option>
                                 ))}
                             </select>
-                            {touched.adults && errors.adults && (
-                                <small className={styles.error}>{errors.adults}</small>
+                            {errors.adults && (
+                                <small className={styles.error}>{errors.adults.message}</small>
                             )}
                         </label>
 
                         {/* ילדים */}
                         <label className={styles.field}>
                             <span>ילדים</span>
-                            <select value={form.children} onChange={onChange("children")}>
+                            <select {...register("children")}>
                                 {Array.from({ length: 11 }, (_, i) => i).map((n) => (
                                     <option key={n}>{n}</option>
                                 ))}
@@ -211,13 +183,13 @@ const Shabbat = () => {
                         {/* הערות */}
                         <label className={`${styles.field} ${styles.full}`}>
                             <span>הערות</span>
-                            <textarea value={form.notes} onChange={onChange("notes")} rows={4} />
+                            <textarea {...register("notes")} rows={4} />
                         </label>
                     </div>
 
                     <div className={styles.actions}>
-                        <button className={styles.primary} disabled={!isValid}>
-                            שליחת רישום
+                        <button className={styles.primary} disabled={isSubmitting}>
+                            {isSubmitting ? "שולחים..." : "שליחת רישום"}
                         </button>
                         <a href="https://www.matara.pro/nedarimplus/online/?S=aVIw" className={styles.secondary}>
                             לקחת חלק בפעילות

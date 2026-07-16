@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import {
     downloadPublicDaycareAgreementPdf,
     getPublicDaycareAgreement,
@@ -18,15 +19,44 @@ interface AgreementSectionProps {
     onSubmitted: () => void;
 }
 
+type AgreementSignatureFormValues = {
+    signedBy: string;
+    signerRole: "mother" | "father" | "guardian";
+    signerIsraeliId: string;
+    accepted: boolean;
+    parentInfoAccepted: boolean;
+    signatureDataUrl: string;
+};
+
+const isValidIsraeliId = (value: string) => {
+    const normalized = value.replace(/\D/g, "").padStart(9, "0");
+    if (!/^\d{9}$/.test(normalized)) return false;
+
+    const sum = [...normalized].reduce((total, character, index) => {
+        const multiplied = Number(character) * ((index % 2) + 1);
+        return total + (multiplied > 9 ? multiplied - 9 : multiplied);
+    }, 0);
+
+    return sum % 10 === 0;
+};
+
 const messageFromError = (error: unknown) =>
     axios.isAxiosError<{ message?: string }>(error)
         ? error.response?.data?.message || "לא הצלחנו לשמור את ההסכם."
         : "לא הצלחנו לשמור את ההסכם.";
 
-const canvasToBlob = (canvas: HTMLCanvasElement) =>
-    new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Signature is empty")), "image/png");
-    });
+const signatureDataUrlToBlob = (signatureDataUrl: string) => {
+    const [metadata, encodedData] = signatureDataUrl.split(",");
+    const mimeType = metadata.match(/^data:(.*?);base64$/)?.[1] ?? "image/png";
+    const binaryData = atob(encodedData);
+    const bytes = new Uint8Array(binaryData.length);
+
+    for (let index = 0; index < binaryData.length; index += 1) {
+        bytes[index] = binaryData.charCodeAt(index);
+    }
+
+    return new Blob([bytes], { type: mimeType });
+};
 
 const AgreementBlock = ({ block }: { block: DaycareDocumentBlock }) => {
     if (block.type === "paragraph") return <p className={styles.documentParagraph}>{block.text}</p>;
@@ -37,23 +67,38 @@ const AgreementBlock = ({ block }: { block: DaycareDocumentBlock }) => {
 const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
     const [agreement, setAgreement] = useState<PublicDaycareAgreement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const [signedBy, setSignedBy] = useState("");
-    const [signerRole, setSignerRole] = useState<"mother" | "father" | "guardian">("mother");
-    const [signerIsraeliId, setSignerIsraeliId] = useState("");
-    const [accepted, setAccepted] = useState(false);
-    const [parentInfoAccepted, setParentInfoAccepted] = useState(false);
-    const [hasSignature, setHasSignature] = useState(false);
     const [isBusy, setIsBusy] = useState(false);
     const [notice, setNotice] = useState("");
     const [error, setError] = useState("");
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const drawingRef = useRef(false);
+    const signatureDrawnRef = useRef(false);
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors },
+    } = useForm<AgreementSignatureFormValues>({
+        defaultValues: {
+            signedBy: "",
+            signerRole: "mother",
+            signerIsraeliId: "",
+            accepted: false,
+            parentInfoAccepted: false,
+            signatureDataUrl: "",
+        },
+    });
 
     const load = useCallback(
         () => getPublicDaycareAgreement(token).then(setAgreement).catch(() => setAgreement(null)),
         [token]
     );
     useEffect(() => { void load(); }, [load]);
+    useEffect(() => {
+        register("signatureDataUrl", {
+            validate: (value) => Boolean(value) || "יש לחתום באמצעות העכבר או האצבע.",
+        });
+    }, [register]);
 
     if (!agreement?.available) return null;
     const canSubmitOnline =
@@ -99,27 +144,35 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
         const current = point(event);
         context.lineTo(current.x, current.y);
         context.stroke();
-        setHasSignature(true);
+        signatureDrawnRef.current = true;
     };
 
-    const stopDrawing = () => { drawingRef.current = false; };
+    const stopDrawing = () => {
+        drawingRef.current = false;
+        const canvas = canvasRef.current;
+        if (canvas && signatureDrawnRef.current) {
+            setValue("signatureDataUrl", canvas.toDataURL("image/png"), {
+                shouldValidate: true,
+            });
+        }
+    };
     const clearSignature = () => {
         const canvas = canvasRef.current;
         canvas?.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
-        setHasSignature(false);
+        signatureDrawnRef.current = false;
+        setValue("signatureDataUrl", "", { shouldValidate: true });
     };
 
-    const submitOnline = async () => {
-        if (!canvasRef.current || !hasSignature || !accepted || !parentInfoAccepted || !signedBy.trim()) return;
+    const submitOnline = async (values: AgreementSignatureFormValues) => {
         setIsBusy(true); setError(""); setNotice("");
         try {
-            const signature = await canvasToBlob(canvasRef.current);
+            const signature = signatureDataUrlToBlob(values.signatureDataUrl);
             await signPublicDaycareAgreement(token, {
-                signedBy,
-                signerRole,
-                signerIsraeliId,
+                signedBy: values.signedBy.trim(),
+                signerRole: values.signerRole,
+                signerIsraeliId: values.signerIsraeliId,
                 signature,
-                parentDocumentsAccepted: parentInfoAccepted,
+                parentDocumentsAccepted: values.parentInfoAccepted,
             });
             setNotice("ההסכם נחתם ונשלח בהצלחה. הוא ממתין כעת לאישור צוות המעון.");
             await load();
@@ -234,19 +287,61 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
             </article>
 
             {isOpen && canSubmitOnline ? (
-                <div className={styles.signatureForm}>
-                    <label className={styles.profileLabel}>שם מלא של החותם<input className={styles.profileInput} value={signedBy} onChange={(event) => setSignedBy(event.target.value)} /></label>
-                    <label className={styles.profileLabel}>תפקיד<select className={styles.profileSelect} value={signerRole} onChange={(event) => setSignerRole(event.target.value as "mother" | "father" | "guardian")}><option value="mother">אם</option><option value="father">אב</option><option value="guardian">אפוטרופוס/ית</option></select></label>
-                    <label className={styles.profileLabel}>מספר תעודת זהות של החותם<input className={styles.profileInput} value={signerIsraeliId} inputMode="numeric" autoComplete="off" maxLength={9} onChange={(event) => setSignerIsraeliId(event.target.value.replace(/\D/g, "").slice(0, 9))} /></label>
+                <form className={styles.signatureForm} noValidate onSubmit={handleSubmit(submitOnline)}>
+                    <label className={styles.profileLabel}>
+                        שם מלא של החותם
+                        <input
+                            className={styles.profileInput}
+                            aria-invalid={Boolean(errors.signedBy)}
+                            {...register("signedBy", {
+                                validate: (value) => value.trim().length > 1 || "יש למלא את השם המלא של החותם.",
+                            })}
+                        />
+                        {errors.signedBy ? <span className={styles.formFieldError} role="alert">{errors.signedBy.message}</span> : null}
+                    </label>
+                    <label className={styles.profileLabel}>
+                        תפקיד
+                        <select className={styles.profileSelect} {...register("signerRole")}>
+                            <option value="mother">אם</option>
+                            <option value="father">אב</option>
+                            <option value="guardian">אפוטרופוס/ית</option>
+                        </select>
+                    </label>
+                    <label className={styles.profileLabel}>
+                        מספר תעודת זהות של החותם
+                        <input
+                            className={styles.profileInput}
+                            inputMode="numeric"
+                            autoComplete="off"
+                            maxLength={9}
+                            aria-invalid={Boolean(errors.signerIsraeliId)}
+                            {...register("signerIsraeliId", {
+                                required: "יש למלא מספר תעודת זהות.",
+                                minLength: { value: 9, message: "מספר תעודת זהות חייב לכלול 9 ספרות." },
+                                validate: (value) => isValidIsraeliId(value) || "מספר תעודת הזהות אינו תקין.",
+                            })}
+                            onInput={(event) => {
+                                event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 9);
+                            }}
+                        />
+                        {errors.signerIsraeliId ? <span className={styles.formFieldError} role="alert">{errors.signerIsraeliId.message}</span> : null}
+                    </label>
                     <div className={styles.signatureField}>
                         <span className={styles.signatureLabel}>חתימה באמצעות העכבר או האצבע</span>
-                        <canvas ref={canvasRef} className={styles.signatureCanvas} width="700" height="220" aria-label="אזור לציור חתימה" onPointerDown={startDrawing} onPointerMove={draw} onPointerUp={stopDrawing} onPointerCancel={stopDrawing} />
+                        <canvas ref={canvasRef} className={styles.signatureCanvas} width="700" height="220" aria-label="אזור לציור חתימה" aria-invalid={Boolean(errors.signatureDataUrl)} onPointerDown={startDrawing} onPointerMove={draw} onPointerUp={stopDrawing} onPointerCancel={stopDrawing} />
                         <button className={styles.clearSignatureButton} type="button" onClick={clearSignature}>ניקוי חתימה</button>
+                        {errors.signatureDataUrl ? <span className={styles.formFieldError} role="alert">{errors.signatureDataUrl.message}</span> : null}
                     </div>
-                    <label className={styles.acceptLabel}><input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} />{agreement.acceptanceStatement}</label>
-                    <label className={styles.acceptLabel}><input type="checkbox" checked={parentInfoAccepted} onChange={(event) => setParentInfoAccepted(event.target.checked)} />קראתי את סדר היום ואת לוח החופשות, וידוע לי שהתפריט יפורסם בהמשך.</label>
-                    <button className={styles.agreementPrimaryButton} type="button" disabled={isBusy || !accepted || !parentInfoAccepted || !signedBy.trim() || signerIsraeliId.length !== 9 || !hasSignature} onClick={() => void submitOnline()}>{isBusy ? "מאשר ושומר..." : "אישור וחתימה על ההסכם"}</button>
-                </div>
+                    <div>
+                        <label className={styles.acceptLabel}><input type="checkbox" {...register("accepted", { required: "יש לאשר שקראת והבנת את ההסכם." })} />{agreement.acceptanceStatement}</label>
+                        {errors.accepted ? <span className={styles.formFieldError} role="alert">{errors.accepted.message}</span> : null}
+                    </div>
+                    <div>
+                        <label className={styles.acceptLabel}><input type="checkbox" {...register("parentInfoAccepted", { required: "יש לאשר שקראת את המידע והמסמכים להורים." })} />קראתי את סדר היום ואת לוח החופשות, וידוע לי שהתפריט יפורסם בהמשך.</label>
+                        {errors.parentInfoAccepted ? <span className={styles.formFieldError} role="alert">{errors.parentInfoAccepted.message}</span> : null}
+                    </div>
+                    <button className={styles.agreementPrimaryButton} type="submit" disabled={isBusy}>{isBusy ? "מאשר ושומר..." : "אישור וחתימה על ההסכם"}</button>
+                </form>
             ) : null}
 
             {agreement.agreement?.parentMessage ? (

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import type { FormEvent } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import {
     createFinanceEntry,
     getFinanceOverview,
@@ -69,6 +69,7 @@ const initialForm = {
     donorName: "",
     notes: "",
 };
+type FinanceFormValues = typeof initialForm;
 
 const getCurrentMonth = () => new Date().toISOString().slice(0, 7);
 
@@ -86,10 +87,17 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 const AdminPaymentsTab = () => {
     const [finance, setFinance] = useState<FinanceOverview | null>(null);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
-    const [form, setForm] = useState(initialForm);
     const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth);
+    const {
+        register,
+        handleSubmit,
+        reset,
+        setValue,
+        watch,
+        formState: { errors, isSubmitting },
+    } = useForm<FinanceFormValues>({ defaultValues: initialForm, mode: "onBlur" });
+    const type = watch("type");
 
     const entries = useMemo(() => finance?.entries ?? [], [finance]);
 
@@ -109,9 +117,7 @@ const AdminPaymentsTab = () => {
         fetchFinance();
     }, [selectedMonth]);
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setSaving(true);
+    const submitFinanceEntry: SubmitHandler<FinanceFormValues> = async (form) => {
         setError("");
 
         try {
@@ -119,7 +125,7 @@ const AdminPaymentsTab = () => {
                 ...form,
                 amount: Number(form.amount),
             });
-            setForm({
+            reset({
                 ...initialForm,
                 type: form.type,
                 source: "cash",
@@ -129,25 +135,13 @@ const AdminPaymentsTab = () => {
             setError(
                 getErrorMessage(caughtError, "לא הצלחנו לשמור את התנועה")
             );
-        } finally {
-            setSaving(false);
         }
     };
 
-    const updateForm = (field: keyof typeof form, value: string) => {
-        setForm((currentForm) => ({
-            ...currentForm,
-            [field]: value,
-        }));
-    };
-
     const updateType = (type: FinanceEntryType) => {
-        setForm((currentForm) => ({
-            ...currentForm,
-            type,
-            source: "cash",
-            category: "כללי",
-        }));
+        setValue("type", type, { shouldDirty: true });
+        setValue("source", "cash", { shouldDirty: true });
+        setValue("category", "כללי", { shouldDirty: true });
     };
 
     if (loading) {
@@ -187,7 +181,7 @@ const AdminPaymentsTab = () => {
                 <SummaryItem label="יתרה" value={summary.balance} emphasize />
             </div>
 
-            <form className={styles.form} onSubmit={handleSubmit}>
+            <form className={styles.form} noValidate onSubmit={handleSubmit(submitFinanceEntry)}>
                 <div className={styles.formHeader}>
                     <div>
                         <h2>הוספת תנועה</h2>
@@ -199,7 +193,7 @@ const AdminPaymentsTab = () => {
                     <button
                         type="button"
                         className={
-                            form.type === "income"
+                            type === "income"
                                 ? styles.segmentActive
                                 : styles.segment
                         }
@@ -210,7 +204,7 @@ const AdminPaymentsTab = () => {
                     <button
                         type="button"
                         className={
-                            form.type === "expense"
+                            type === "expense"
                                 ? styles.segmentActive
                                 : styles.segment
                         }
@@ -224,38 +218,32 @@ const AdminPaymentsTab = () => {
                     <label>
                         תיאור
                         <input
-                            required
-                            value={form.title}
-                            onChange={(event) =>
-                                updateForm("title", event.target.value)
-                            }
+                            {...register("title", { required: "יש להזין תיאור" })}
                             placeholder="לדוגמה: תרומה במזומן / קניית ציוד"
                         />
+                        {errors.title ? <span className={styles.error}>{errors.title.message}</span> : null}
                     </label>
 
                     <label>
                         סכום
                         <input
-                            required
                             min="0"
                             step="1"
                             type="number"
-                            value={form.amount}
-                            onChange={(event) =>
-                                updateForm("amount", event.target.value)
-                            }
+                            {...register("amount", {
+                                required: "יש להזין סכום",
+                                validate: (value) => Number(value) > 0 || "הסכום חייב להיות גדול מאפס",
+                            })}
                         />
+                        {errors.amount ? <span className={styles.error}>{errors.amount.message}</span> : null}
                     </label>
 
                     <label>
                         אמצעי
                         <select
-                            value={form.source}
-                            onChange={(event) =>
-                                updateForm("source", event.target.value)
-                            }
+                            {...register("source")}
                         >
-                            {sourceOptions[form.type].map((option) => (
+                            {sourceOptions[type].map((option) => (
                                 <option value={option.value} key={option.value}>
                                     {option.label}
                                 </option>
@@ -266,16 +254,13 @@ const AdminPaymentsTab = () => {
                     <label>
                         קטגוריה
                         <select
-                            value={form.category}
-                            onChange={(event) =>
-                                updateForm("category", event.target.value)
-                            }
+                            {...register("category")}
                         >
                             {categoryOptions
                                 .filter(
                                     (category) =>
                                         category !== "תרומות מהאתר" ||
-                                        form.type === "income"
+                                        type === "income"
                                 )
                                 .map((category) => (
                                     <option value={category} key={category}>
@@ -288,10 +273,7 @@ const AdminPaymentsTab = () => {
                     <label>
                         שם תורם / ספק
                         <input
-                            value={form.donorName}
-                            onChange={(event) =>
-                                updateForm("donorName", event.target.value)
-                            }
+                            {...register("donorName")}
                         />
                     </label>
 
@@ -299,10 +281,7 @@ const AdminPaymentsTab = () => {
                         הערה
                         <textarea
                             rows={3}
-                            value={form.notes}
-                            onChange={(event) =>
-                                updateForm("notes", event.target.value)
-                            }
+                            {...register("notes")}
                         />
                     </label>
                 </div>
@@ -312,9 +291,9 @@ const AdminPaymentsTab = () => {
                 <button
                     type="submit"
                     className={styles.saveButton}
-                    disabled={saving}
+                    disabled={isSubmitting}
                 >
-                    {saving ? "שומר..." : "שמירת תנועה"}
+                    {isSubmitting ? "שומר..." : "שמירת תנועה"}
                 </button>
             </form>
 

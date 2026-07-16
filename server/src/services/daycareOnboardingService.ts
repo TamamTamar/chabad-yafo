@@ -733,6 +733,8 @@ export const deleteDaycareOnboarding = async (onboardingId: string) => {
         ...pickupAuthorizations,
     ])));
 
+    let childDeleted = false;
+    let familyDeleted = false;
     const session = await startSession();
     try {
         await session.withTransaction(async () => {
@@ -757,15 +759,12 @@ export const deleteDaycareOnboarding = async (onboardingId: string) => {
                 );
             }
 
-            const registrationUpdate: Record<string, unknown> = {
-                status: "רוצה להירשם",
-            };
-            if (current.familyId) registrationUpdate.daycareFamilyId = current.familyId;
-            if (current.childId) registrationUpdate.daycareChildId = current.childId;
-
             const registration = await DaycareRegistration.findOneAndUpdate(
                 { _id: current.origin.recordId },
-                { $set: registrationUpdate },
+                {
+                    $set: { status: "רוצה להירשם" },
+                    $unset: { daycareFamilyId: 1, daycareChildId: 1 },
+                },
                 { new: true, session }
             ).exec();
             if (!registration) {
@@ -781,6 +780,29 @@ export const deleteDaycareOnboarding = async (onboardingId: string) => {
             await DaycarePickupAuthorization.deleteMany({ onboardingId: current._id }).session(session);
             await DaycareOnboardingAudit.deleteMany({ onboardingId: current._id }).session(session);
             await DaycareOnboarding.deleteOne({ _id: current._id }).session(session);
+
+            if (current.childId) {
+                const [otherOnboarding, otherRegistration] = await Promise.all([
+                    DaycareOnboarding.exists({ childId: current.childId }).session(session).exec(),
+                    DaycareRegistration.exists({ daycareChildId: current.childId }).session(session).exec(),
+                ]);
+                if (!otherOnboarding && !otherRegistration) {
+                    const result = await DaycareChild.deleteOne({ _id: current.childId }).session(session);
+                    childDeleted = result.deletedCount === 1;
+                }
+            }
+
+            if (current.familyId) {
+                const [remainingChild, otherOnboarding, otherRegistration] = await Promise.all([
+                    DaycareChild.exists({ familyId: current.familyId }).session(session).exec(),
+                    DaycareOnboarding.exists({ familyId: current.familyId }).session(session).exec(),
+                    DaycareRegistration.exists({ daycareFamilyId: current.familyId }).session(session).exec(),
+                ]);
+                if (!remainingChild && !otherOnboarding && !otherRegistration) {
+                    const result = await DaycareFamily.deleteOne({ _id: current.familyId }).session(session);
+                    familyDeleted = result.deletedCount === 1;
+                }
+            }
         });
     } finally {
         await session.endSession();
@@ -815,7 +837,12 @@ export const deleteDaycareOnboarding = async (onboardingId: string) => {
     return {
         onboardingId,
         registrationId: onboarding.origin.recordId.toString(),
-        identityPreserved: Boolean(onboarding.familyId && onboarding.childId),
+        identityPreserved:
+            Boolean(onboarding.familyId && onboarding.childId) &&
+            !childDeleted &&
+            !familyDeleted,
+        childDeleted,
+        familyDeleted,
         filesCleanupFailed,
     };
 };
