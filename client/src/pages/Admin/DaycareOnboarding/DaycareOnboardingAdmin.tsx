@@ -6,6 +6,8 @@ import {
     useParams,
 } from "react-router-dom";
 import ConfirmDialog from "../../../components/ConfirmDialog/ConfirmDialog";
+import BaseDialog from "../../../components/BaseDialog/BaseDialog";
+import dialogStyles from "../../../components/BaseDialog/BaseDialog.module.scss";
 import Container from "../../../components/Container/Container";
 import {
     downloadAdminAgreementFile,
@@ -161,6 +163,9 @@ const DaycareOnboardingAdmin = () => {
     const [updatingOverallStatus, setUpdatingOverallStatus] = useState(false);
     const [freshParentLink, setFreshParentLink] = useState(
         locationState?.parentAccessUrl ?? ""
+    );
+    const [freshLinkDialogOpen, setFreshLinkDialogOpen] = useState(
+        Boolean(locationState?.parentAccessUrl)
     );
     const [agreementData, setAgreementData] =
         useState<AdminAgreementByOnboarding | null>(null);
@@ -644,6 +649,7 @@ const DaycareOnboardingAdmin = () => {
             const result = await regenerateAdminOnboardingLink(id);
             setOnboarding(result.data);
             setFreshParentLink(result.parentAccessUrl ?? "");
+            setFreshLinkDialogOpen(Boolean(result.parentAccessUrl));
             setNotice("נוצר קישור אישי חדש והקישור הקודם בוטל");
         } catch {
             setError("יצירת קישור חדש נכשלה");
@@ -1534,6 +1540,45 @@ const DaycareOnboardingAdmin = () => {
                 }}
                 onClose={() => setLinkConfirmation(null)}
             />
+
+            <BaseDialog
+                open={freshLinkDialogOpen && Boolean(freshParentLink)}
+                title="התיק נפתח — הקישור להורה מוכן"
+                maxWidth={640}
+                onClose={() => setFreshLinkDialogOpen(false)}
+            >
+                <p className={dialogStyles.text}>
+                    העתיקי עכשיו את הקישור ושמרי או שלחי אותו להורה. מטעמי אבטחה,
+                    לאחר רענון העמוד לא ניתן יהיה להציג שוב את אותו קישור.
+                </p>
+                <label className={styles.freshLinkDialogField} htmlFor="fresh-parent-link-dialog">
+                    הקישור האישי
+                    <input
+                        id="fresh-parent-link-dialog"
+                        type="text"
+                        value={freshParentLink}
+                        readOnly
+                        dir="ltr"
+                        onFocus={(event) => event.currentTarget.select()}
+                    />
+                </label>
+                <div className={dialogStyles.actions}>
+                    <button
+                        className={dialogStyles.cta}
+                        type="button"
+                        onClick={() => void copyParentLink()}
+                    >
+                        העתקת הקישור
+                    </button>
+                    <button
+                        className={dialogStyles.ghost}
+                        type="button"
+                        onClick={() => setFreshLinkDialogOpen(false)}
+                    >
+                        שמרתי, סגירה
+                    </button>
+                </div>
+            </BaseDialog>
 
             <ConfirmDialog
                 key={deleteConfirmationOpen ? "delete-open" : "delete-closed"}
