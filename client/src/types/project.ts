@@ -11,6 +11,8 @@ export interface ProjectSubtask {
     _id?: string;
     title: string;
     completed: boolean;
+    status: ProjectTaskStatus;
+    assignee: string;
 }
 
 export interface ProjectTask {

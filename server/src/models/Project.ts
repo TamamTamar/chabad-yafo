@@ -6,6 +6,8 @@ const projectSubtaskSchema = new Schema(
     {
         title: { type: String, required: true, trim: true, maxlength: 200 },
         completed: { type: Boolean, default: false },
+        status: { type: String, enum: projectTaskStatuses },
+        assignee: { type: String, trim: true, maxlength: 120, default: "" },
     },
     { _id: true }
 );

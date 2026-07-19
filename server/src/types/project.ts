@@ -10,6 +10,8 @@ export type ProjectTaskStatus = (typeof projectTaskStatuses)[number];
 export interface IProjectSubtask {
     title: string;
     completed: boolean;
+    status: ProjectTaskStatus;
+    assignee: string;
 }
 
 export interface IProjectTask {

@@ -62,7 +62,7 @@
 
 .primaryButton:disabled,
 .submitButton:disabled {
-    cursor: wait;
+    cursor: default;
     opacity: 0.65;
 }
 
@@ -477,6 +477,61 @@
     }
 }
 
+.taskFilters {
+    display: grid;
+    grid-template-columns: minmax(230px, 1.35fr) minmax(150px, 0.7fr) minmax(150px, 0.7fr) auto;
+    align-items: end;
+    gap: 9px;
+    margin-bottom: 7px;
+    padding: 12px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius;
+    background: rgba($brand-primary, 0.03);
+
+    label {
+        display: grid;
+        gap: 4px;
+
+        > span {
+            color: $ui-text-muted;
+            font-size: $type-caption;
+            font-weight: 800;
+        }
+    }
+
+    input,
+    select {
+        padding: 8px 10px;
+        background: $color-white;
+    }
+}
+
+.clearFilters {
+    min-height: 39px;
+    padding: 7px 11px;
+    border: 0;
+    background: transparent;
+    color: $brand-primary;
+    font: inherit;
+    font-size: $type-body-sm;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.filterResults {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 2px 9px;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+
+    span:last-child:not(:first-child) {
+        color: $brand-gold-dark;
+    }
+}
+
 .savedTasks {
     display: grid;
     gap: 7px;
@@ -493,6 +548,62 @@
 .savedTaskExpanded {
     border-color: rgba($brand-primary, 0.25);
     background: $color-white;
+}
+
+.taskDragging {
+    opacity: 0.45;
+}
+
+.taskDragTarget {
+    border-color: $brand-gold-rich;
+    box-shadow: 0 0 0 3px rgba($brand-gold-rich, 0.16);
+}
+
+.taskSummaryRow {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 58px;
+    align-items: center;
+}
+
+.dragHandle {
+    align-self: stretch;
+    border: 0;
+    border-left: 1px solid $ui-border-soft;
+    background: transparent;
+    color: $ui-text-muted;
+    font: inherit;
+    font-size: 1.15rem;
+    cursor: grab;
+    touch-action: none;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.orderButtons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    padding-left: 8px;
+
+    button {
+        width: 25px;
+        height: 27px;
+        padding: 0;
+        border: 1px solid $ui-border-soft;
+        border-radius: 7px;
+        background: $color-white;
+        color: $brand-primary;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: default;
+            opacity: 0.28;
+        }
+    }
 }
 
 .taskSummary {
@@ -573,22 +684,26 @@
     margin-top: 12px;
 }
 
+.subtaskColumnsHeader {
+    display: grid;
+    grid-template-columns: minmax(190px, 1.4fr) minmax(125px, 0.65fr) minmax(150px, 0.8fr) 28px;
+    gap: 7px;
+    padding: 0 9px;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 800;
+}
+
 .savedSubtask {
     display: grid;
-    grid-template-columns: 20px minmax(0, 1fr) 28px;
+    grid-template-columns: minmax(190px, 1.4fr) minmax(125px, 0.65fr) minmax(150px, 0.8fr) 28px;
     align-items: center;
     gap: 7px;
 
-    input[type="checkbox"] {
-        width: 17px;
-        height: 17px;
-        accent-color: $ui-success-dark;
-    }
-
-    input:not([type="checkbox"]) {
-        border-color: transparent;
-        padding: 6px 8px;
-        background: transparent;
+    input,
+    select {
+        padding: 7px 9px;
+        font-size: $type-body-sm;
     }
 
     button {
@@ -634,13 +749,64 @@
     text-align: center;
 }
 
+.noFilterResults {
+    display: grid;
+    justify-items: center;
+    gap: 5px;
+    padding: 28px 16px;
+    border: 1px dashed $ui-border-strong;
+    border-radius: $radius;
+    color: $ui-text-muted;
+    text-align: center;
+
+    strong {
+        color: $brand-primary;
+    }
+
+    button {
+        margin-top: 5px;
+        border: 0;
+        background: transparent;
+        color: $brand-primary;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+    }
+}
+
+.bottomAddTask {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 11px;
+    border: 1px dashed rgba($brand-primary, 0.3);
+    border-radius: $radius;
+    background: rgba($brand-primary, 0.035);
+    color: $brand-primary;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:hover {
+        border-style: solid;
+        background: rgba($brand-primary, 0.07);
+    }
+}
+
 .projectActions {
     margin-top: 18px;
 
     > div {
         display: flex;
+        align-items: center;
         gap: 9px;
     }
+}
+
+.unsavedNotice {
+    color: $brand-gold-dark;
+    font-size: $type-caption;
+    font-weight: 800;
 }
 
 .deleteButton {
@@ -697,6 +863,25 @@
         grid-template-columns: 1fr;
     }
 
+    .taskFilters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .searchFilter {
+        grid-column: 1 / -1;
+    }
+
+    .clearFilters {
+        grid-column: 1 / -1;
+        min-height: auto;
+        padding: 4px;
+    }
+
+    .filterResults {
+        display: grid;
+        gap: 2px;
+    }
+
     .summaryCards {
         grid-template-columns: repeat(3, 1fr);
         gap: 6px;
@@ -736,16 +921,70 @@
 
     .taskSummary {
         grid-template-columns: 22px minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
         gap: 7px;
+        padding-right: 9px;
+
+        > strong {
+            grid-column: 2;
+            grid-row: 1;
+        }
     }
 
-    .taskSummary .assignee,
+    .taskSummaryRow {
+        grid-template-columns: 32px minmax(0, 1fr) 54px;
+    }
+
+    .taskSummary .chevron {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+    }
+
+    .taskSummary .statusPill {
+        grid-column: 3;
+        grid-row: 1;
+    }
+
+    .taskSummary .assignee {
+        grid-column: 2;
+        grid-row: 2;
+        font-size: $type-caption;
+    }
+
     .taskSummary .subtaskCount {
-        display: none;
+        grid-column: 3;
+        grid-row: 2;
+        font-size: $type-caption;
+        text-align: left;
     }
 
     .statusPill {
         white-space: nowrap;
+    }
+
+    .savedSubtask {
+        grid-template-columns: minmax(0, 1fr) 28px;
+        padding: 8px;
+        border: 1px solid $ui-border-soft;
+        border-radius: $radius-sm;
+
+        input:first-child {
+            grid-column: 1 / 2;
+        }
+
+        select,
+        input:nth-of-type(2) {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            grid-column: 2;
+            grid-row: 1;
+        }
+    }
+
+    .subtaskColumnsHeader {
+        display: none;
     }
 
     .completedBanner,
@@ -758,5 +997,10 @@
     .projectActions > div {
         display: grid;
         grid-template-columns: 1fr 1fr;
+    }
+
+    .unsavedNotice {
+        grid-column: 1 / -1;
+        text-align: center;
     }
 }

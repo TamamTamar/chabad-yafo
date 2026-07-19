@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type DragEvent } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
 import {
@@ -16,12 +16,33 @@ import {
 import styles from "./AdminProjectsTab.module.scss";
 
 type OverviewFilter = "active" | "completed" | "archived";
+type TaskStatusFilter = "all" | ProjectTask["status"];
 
 const emptyTask = (): ProjectTask => ({
+    _id: `new-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     title: "משימה חדשה",
     status: "לא התחילה",
     assignee: "",
     subtasks: [],
+});
+
+const normalizeProject = (project: ProjectAdmin): ProjectAdmin => ({
+    ...project,
+    tasks: project.tasks.map((task) => ({
+        ...task,
+        subtasks: task.subtasks.map((subtask) => {
+            const status = subtask.status ?? (
+                subtask.completed ? "הושלמה" : "לא התחילה"
+            );
+
+            return {
+                ...subtask,
+                status,
+                completed: status === "הושלמה",
+                assignee: subtask.assignee ?? "",
+            };
+        }),
+    })),
 });
 
 const emptyProject = (): ProjectPayload => ({
@@ -48,14 +69,28 @@ const getProgress = (project: ProjectAdmin) => {
     };
 };
 
+const getAssigneeNames = (value: string) =>
+    value
+        .split(/[/,+،]+/)
+        .map((name) => name.trim())
+        .filter(Boolean);
+
 const AdminProjectsTab = () => {
     const [projects, setProjects] = useState<ProjectAdmin[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
     const [overviewFilter, setOverviewFilter] = useState<OverviewFilter>("active");
     const [expandedTaskIndex, setExpandedTaskIndex] = useState<number | null>(null);
+    const [draggedTaskIndex, setDraggedTaskIndex] = useState<number | null>(null);
+    const [dragOverTaskIndex, setDragOverTaskIndex] = useState<number | null>(null);
+    const [taskSearch, setTaskSearch] = useState("");
+    const [taskStatusFilter, setTaskStatusFilter] = useState<TaskStatusFilter>("all");
+    const [taskAssigneeFilter, setTaskAssigneeFilter] = useState("all");
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
     const [savingId, setSavingId] = useState<string | null>(null);
+    const [dirtyProjectIds, setDirtyProjectIds] = useState<Set<string>>(
+        () => new Set()
+    );
     const [error, setError] = useState("");
     const [notice, setNotice] = useState("");
     const [projectPendingDeletion, setProjectPendingDeletion] = useState<ProjectAdmin | null>(null);
@@ -69,7 +104,8 @@ const AdminProjectsTab = () => {
     useEffect(() => {
         const loadProjects = async () => {
             try {
-                setProjects(await getProjects());
+                const loadedProjects = await getProjects();
+                setProjects(loadedProjects.map(normalizeProject));
             } catch {
                 setError("לא הצלחנו לטעון את הפרויקטים. אפשר לנסות לרענן את העמוד.");
             } finally {
@@ -107,16 +143,63 @@ const AdminProjectsTab = () => {
         !tabProjects.some((project) => project._id === selectedProject._id)
             ? [selectedProject, ...tabProjects]
             : tabProjects;
+    const assigneeOptions = selectedProject
+        ? Array.from(new Set(
+            selectedProject.tasks.flatMap((task) => [
+                ...getAssigneeNames(task.assignee),
+                ...task.subtasks.flatMap((subtask) =>
+                    getAssigneeNames(subtask.assignee)
+                ),
+            ])
+        )).sort((left, right) => left.localeCompare(right, "he"))
+        : [];
+    const hasTaskFilters =
+        taskSearch.trim() !== "" ||
+        taskStatusFilter !== "all" ||
+        taskAssigneeFilter !== "all";
+    const query = taskSearch.trim().toLocaleLowerCase("he");
+    const filteredTaskEntries = selectedProject
+        ? selectedProject.tasks
+            .map((task, originalIndex) => ({ task, originalIndex }))
+            .filter(({ task }) => {
+                const searchableText = [
+                    task.title,
+                    task.assignee,
+                    ...task.subtasks.flatMap((subtask) => [
+                        subtask.title,
+                        subtask.assignee,
+                    ]),
+                ].join(" ").toLocaleLowerCase("he");
+                const matchesSearch = !query || searchableText.includes(query);
+                const matchesStatus =
+                    taskStatusFilter === "all" || task.status === taskStatusFilter;
+                const matchesAssignee =
+                    taskAssigneeFilter === "all" ||
+                    getAssigneeNames(task.assignee).includes(taskAssigneeFilter) ||
+                    task.subtasks.some(
+                        (subtask) => getAssigneeNames(subtask.assignee).includes(taskAssigneeFilter)
+                    );
+                return matchesSearch && matchesStatus && matchesAssignee;
+            })
+        : [];
+
+    const clearTaskFilters = () => {
+        setTaskSearch("");
+        setTaskStatusFilter("all");
+        setTaskAssigneeFilter("all");
+    };
 
     const showOverview = (filter: OverviewFilter = overviewFilter) => {
         setSelectedProjectId(null);
         setOverviewFilter(filter);
         setExpandedTaskIndex(null);
+        clearTaskFilters();
     };
 
     const openProject = (projectId: string) => {
         setSelectedProjectId(projectId);
         setExpandedTaskIndex(null);
+        clearTaskFilters();
         setNotice("");
         setError("");
     };
@@ -142,6 +225,11 @@ const AdminProjectsTab = () => {
                 project._id === nextProject._id ? nextProject : project
             )
         );
+        setDirtyProjectIds((current) => {
+            const next = new Set(current);
+            next.add(nextProject._id);
+            return next;
+        });
     };
 
     const persistProject = async (
@@ -158,7 +246,14 @@ const AdminProjectsTab = () => {
                 tasks: project.tasks,
                 archived: project.archived,
             });
-            changeProject(updated);
+            setProjects((current) =>
+                current.map((item) => item._id === updated._id ? updated : item)
+            );
+            setDirtyProjectIds((current) => {
+                const next = new Set(current);
+                next.delete(updated._id);
+                return next;
+            });
             setNotice(successMessage);
             return updated;
         } catch {
@@ -187,6 +282,11 @@ const AdminProjectsTab = () => {
         try {
             await deleteProject(project._id);
             setProjects((current) => current.filter((item) => item._id !== project._id));
+            setDirtyProjectIds((current) => {
+                const next = new Set(current);
+                next.delete(project._id);
+                return next;
+            });
             showOverview("active");
             setNotice("הפרויקט נמחק.");
         } catch {
@@ -208,8 +308,52 @@ const AdminProjectsTab = () => {
     };
 
     const addTask = (project: ProjectAdmin) => {
+        clearTaskFilters();
         changeProject({ ...project, tasks: [...project.tasks, emptyTask()] });
         setExpandedTaskIndex(project.tasks.length);
+    };
+
+    const reorderTasks = (
+        project: ProjectAdmin,
+        sourceIndex: number,
+        destinationIndex: number
+    ) => {
+        if (sourceIndex === destinationIndex) {
+            return;
+        }
+
+        const tasks = [...project.tasks];
+        const [movedTask] = tasks.splice(sourceIndex, 1);
+        tasks.splice(destinationIndex, 0, movedTask);
+        changeProject({ ...project, tasks });
+        setExpandedTaskIndex((current) => {
+            if (current === null) return null;
+            if (current === sourceIndex) return destinationIndex;
+            if (
+                sourceIndex < destinationIndex &&
+                current > sourceIndex &&
+                current <= destinationIndex
+            ) return current - 1;
+            if (
+                sourceIndex > destinationIndex &&
+                current >= destinationIndex &&
+                current < sourceIndex
+            ) return current + 1;
+            return current;
+        });
+    };
+
+    const handleTaskDrop = (
+        event: DragEvent<HTMLDivElement>,
+        project: ProjectAdmin,
+        destinationIndex: number
+    ) => {
+        event.preventDefault();
+        if (draggedTaskIndex !== null) {
+            reorderTasks(project, draggedTaskIndex, destinationIndex);
+        }
+        setDraggedTaskIndex(null);
+        setDragOverTaskIndex(null);
     };
 
     if (loading) {
@@ -219,6 +363,9 @@ const AdminProjectsTab = () => {
     const selectedProgress = selectedProject
         ? getProgress(selectedProject)
         : null;
+    const selectedProjectDirty = selectedProject
+        ? dirtyProjectIds.has(selectedProject._id)
+        : false;
 
     return (
         <section className={styles.section}>
@@ -386,26 +533,102 @@ const AdminProjectsTab = () => {
                     <div className={styles.progressTrack}><span style={{ width: `${selectedProgress?.percent ?? 0}%` }} /></div>
 
                     <div className={styles.tasksHeading}>
-                        <div><h3>משימות</h3><span>פותחים רק את המשימה שרוצים לערוך</span></div>
+                        <div><h3>משימות</h3><span>מחפשים, מסננים ופותחים רק את המשימה שרוצים לערוך</span></div>
                         <button type="button" className={styles.secondaryButton} onClick={() => addTask(selectedProject)}>+ משימה</button>
                     </div>
 
+                    {selectedProject.tasks.length > 0 && (
+                        <div className={styles.taskFilters}>
+                            <label className={styles.searchFilter}>
+                                <span>חיפוש</span>
+                                <input
+                                    type="search"
+                                    value={taskSearch}
+                                    placeholder="שם משימה, תת־משימה או אחראי..."
+                                    onChange={(event) => setTaskSearch(event.target.value)}
+                                />
+                            </label>
+                            <label>
+                                <span>סטטוס משימה</span>
+                                <select value={taskStatusFilter} onChange={(event) => setTaskStatusFilter(event.target.value as TaskStatusFilter)}>
+                                    <option value="all">כל הסטטוסים</option>
+                                    {PROJECT_TASK_STATUSES.map((status) => <option value={status} key={status}>{status}</option>)}
+                                </select>
+                            </label>
+                            <label>
+                                <span>מי מטפל?</span>
+                                <select value={taskAssigneeFilter} onChange={(event) => setTaskAssigneeFilter(event.target.value)}>
+                                    <option value="all">כל האחראים</option>
+                                    {assigneeOptions.map((assignee) => <option value={assignee} key={assignee}>{assignee}</option>)}
+                                </select>
+                            </label>
+                            {hasTaskFilters && <button type="button" className={styles.clearFilters} onClick={clearTaskFilters}>ניקוי סינון</button>}
+                        </div>
+                    )}
+
+                    {selectedProject.tasks.length > 0 && (
+                        <div className={styles.filterResults} aria-live="polite">
+                            <span>מוצגות {filteredTaskEntries.length} מתוך {selectedProject.tasks.length} משימות</span>
+                            {hasTaskFilters && <span>כדי לשנות את סדר המשימות יש לנקות את הסינון.</span>}
+                        </div>
+                    )}
+
                     {selectedProject.tasks.length === 0 ? (
                         <div className={styles.noTasks}>עדיין אין משימות בפרויקט. לחצו על „+ משימה” כדי להתחיל.</div>
+                    ) : filteredTaskEntries.length === 0 ? (
+                        <div className={styles.noFilterResults}>
+                            <strong>לא נמצאו משימות מתאימות</strong>
+                            <span>אפשר לשנות את החיפוש או לנקות את הסינון.</span>
+                            <button type="button" onClick={clearTaskFilters}>ניקוי הסינון</button>
+                        </div>
                     ) : (
                         <div className={styles.savedTasks}>
-                            {selectedProject.tasks.map((task, taskIndex) => {
+                            {filteredTaskEntries.map(({ task, originalIndex: taskIndex }) => {
                                 const isExpanded = expandedTaskIndex === taskIndex;
                                 const completedSubtasks = task.subtasks.filter((subtask) => subtask.completed).length;
                                 return (
-                                    <div className={isExpanded ? styles.savedTaskExpanded : styles.savedTask} key={task._id ?? taskIndex}>
-                                        <button type="button" className={styles.taskSummary} onClick={() => setExpandedTaskIndex(isExpanded ? null : taskIndex)} aria-expanded={isExpanded}>
-                                            <span className={styles.chevron}>{isExpanded ? "−" : "+"}</span>
-                                            <strong>{task.title || "משימה ללא שם"}</strong>
-                                            <span className={styles.statusPill} data-status={task.status}>{task.status}</span>
-                                            <span className={styles.assignee}>{task.assignee || "ללא אחראי"}</span>
-                                            <span className={styles.subtaskCount}>{completedSubtasks}/{task.subtasks.length} תתי־משימות</span>
-                                        </button>
+                                    <div
+                                        className={`${isExpanded ? styles.savedTaskExpanded : styles.savedTask} ${draggedTaskIndex === taskIndex ? styles.taskDragging : ""} ${dragOverTaskIndex === taskIndex && draggedTaskIndex !== taskIndex ? styles.taskDragTarget : ""}`}
+                                        key={task._id ?? taskIndex}
+                                        onDragOver={(event) => {
+                                            event.preventDefault();
+                                            setDragOverTaskIndex(taskIndex);
+                                        }}
+                                        onDragLeave={() => setDragOverTaskIndex((current) => current === taskIndex ? null : current)}
+                                        onDrop={(event) => handleTaskDrop(event, selectedProject, taskIndex)}
+                                    >
+                                        <div className={styles.taskSummaryRow}>
+                                            <button
+                                                type="button"
+                                                className={styles.dragHandle}
+                                                draggable={!hasTaskFilters}
+                                                disabled={hasTaskFilters}
+                                                title={hasTaskFilters ? "יש לנקות את הסינון לפני שינוי הסדר" : "גרירת המשימה למיקום אחר"}
+                                                aria-label={`גרירת המשימה ${task.title}`}
+                                                onDragStart={(event) => {
+                                                    setDraggedTaskIndex(taskIndex);
+                                                    event.dataTransfer.effectAllowed = "move";
+                                                    event.dataTransfer.setData("text/plain", String(taskIndex));
+                                                }}
+                                                onDragEnd={() => {
+                                                    setDraggedTaskIndex(null);
+                                                    setDragOverTaskIndex(null);
+                                                }}
+                                            >
+                                                ⋮⋮
+                                            </button>
+                                            <button type="button" className={styles.taskSummary} onClick={() => setExpandedTaskIndex(isExpanded ? null : taskIndex)} aria-expanded={isExpanded}>
+                                                <span className={styles.chevron}>{isExpanded ? "−" : "+"}</span>
+                                                <strong>{task.title || "משימה ללא שם"}</strong>
+                                                <span className={styles.statusPill} data-status={task.status}>{task.status}</span>
+                                                <span className={styles.assignee}>{task.assignee || "ללא אחראי"}</span>
+                                                <span className={styles.subtaskCount}>{completedSubtasks}/{task.subtasks.length} תתי־משימות</span>
+                                            </button>
+                                            <div className={styles.orderButtons} aria-label="שינוי סדר המשימה">
+                                                <button type="button" disabled={hasTaskFilters || taskIndex === 0} aria-label="העברת המשימה למעלה" title={hasTaskFilters ? "יש לנקות את הסינון לפני שינוי הסדר" : "העברה למעלה"} onClick={() => reorderTasks(selectedProject, taskIndex, taskIndex - 1)}>↑</button>
+                                                <button type="button" disabled={hasTaskFilters || taskIndex === selectedProject.tasks.length - 1} aria-label="העברת המשימה למטה" title={hasTaskFilters ? "יש לנקות את הסינון לפני שינוי הסדר" : "העברה למטה"} onClick={() => reorderTasks(selectedProject, taskIndex, taskIndex + 1)}>↓</button>
+                                            </div>
+                                        </div>
 
                                         {isExpanded && (
                                             <div className={styles.taskDetails}>
@@ -415,14 +638,28 @@ const AdminProjectsTab = () => {
                                                     <label><span>מי מטפל?</span><input value={task.assignee} placeholder="שם האחראי/ת" onChange={(event) => changeTask(selectedProject, taskIndex, { ...task, assignee: event.target.value })} /></label>
                                                 </div>
                                                 <div className={styles.subtasks}>
+                                                    {task.subtasks.length > 0 && (
+                                                        <div className={styles.subtaskColumnsHeader} aria-hidden="true">
+                                                            <span>תת־משימה</span>
+                                                            <span>סטטוס</span>
+                                                            <span>מי מטפל?</span>
+                                                            <span />
+                                                        </div>
+                                                    )}
                                                     {task.subtasks.map((subtask, subtaskIndex) => (
                                                         <div className={styles.savedSubtask} key={subtask._id ?? subtaskIndex}>
-                                                            <input type="checkbox" checked={subtask.completed} aria-label={`סימון ${subtask.title} כהושלמה`} onChange={(event) => changeTask(selectedProject, taskIndex, { ...task, subtasks: task.subtasks.map((item, index) => index === subtaskIndex ? { ...item, completed: event.target.checked } : item) })} />
-                                                            <input value={subtask.title} className={subtask.completed ? styles.completedText : ""} onChange={(event) => changeTask(selectedProject, taskIndex, { ...task, subtasks: task.subtasks.map((item, index) => index === subtaskIndex ? { ...item, title: event.target.value } : item) })} />
+                                                            <input aria-label="שם תת־המשימה" value={subtask.title} className={subtask.completed ? styles.completedText : ""} onChange={(event) => changeTask(selectedProject, taskIndex, { ...task, subtasks: task.subtasks.map((item, index) => index === subtaskIndex ? { ...item, title: event.target.value } : item) })} />
+                                                            <select aria-label={`סטטוס תת־המשימה ${subtask.title}`} value={subtask.status} onChange={(event) => {
+                                                                const status = event.target.value as ProjectTask["status"];
+                                                                changeTask(selectedProject, taskIndex, { ...task, subtasks: task.subtasks.map((item, index) => index === subtaskIndex ? { ...item, status, completed: status === "הושלמה" } : item) });
+                                                            }}>
+                                                                {PROJECT_TASK_STATUSES.map((status) => <option key={status}>{status}</option>)}
+                                                            </select>
+                                                            <input aria-label={`מי מטפל בתת־המשימה ${subtask.title}`} value={subtask.assignee} placeholder="מי מטפל?" onChange={(event) => changeTask(selectedProject, taskIndex, { ...task, subtasks: task.subtasks.map((item, index) => index === subtaskIndex ? { ...item, assignee: event.target.value } : item) })} />
                                                             <button type="button" aria-label="מחיקת תת־משימה" onClick={() => changeTask(selectedProject, taskIndex, { ...task, subtasks: task.subtasks.filter((_, index) => index !== subtaskIndex) })}>×</button>
                                                         </div>
                                                     ))}
-                                                    <button type="button" className={styles.addSubtask} onClick={() => changeTask(selectedProject, taskIndex, { ...task, subtasks: [...task.subtasks, { title: "תת־משימה חדשה", completed: false }] })}>+ הוספת תת־משימה</button>
+                                                    <button type="button" className={styles.addSubtask} onClick={() => changeTask(selectedProject, taskIndex, { ...task, subtasks: [...task.subtasks, { title: "תת־משימה חדשה", completed: false, status: "לא התחילה", assignee: "" }] })}>+ הוספת תת־משימה</button>
                                                 </div>
                                                 <button type="button" className={styles.removeTask} onClick={() => { changeProject({ ...selectedProject, tasks: selectedProject.tasks.filter((_, index) => index !== taskIndex) }); setExpandedTaskIndex(null); }}>מחיקת המשימה</button>
                                             </div>
@@ -433,11 +670,14 @@ const AdminProjectsTab = () => {
                         </div>
                     )}
 
+                    <button type="button" className={styles.bottomAddTask} onClick={() => addTask(selectedProject)}>+ הוספת משימה נוספת</button>
+
                     <div className={styles.projectActions}>
                         <button type="button" className={styles.deleteButton} onClick={() => setProjectPendingDeletion(selectedProject)}>מחיקת פרויקט</button>
                         <div>
+                            {selectedProjectDirty && <span className={styles.unsavedNotice}>יש שינויים שלא נשמרו</span>}
                             {!selectedProject.archived && !isCompleted(selectedProject) && <button type="button" className={styles.archiveButton} onClick={() => toggleArchive(selectedProject)}>העברה לארכיון</button>}
-                            <button type="button" className={styles.primaryButton} disabled={savingId === selectedProject._id} onClick={() => persistProject(selectedProject)}>{savingId === selectedProject._id ? "שומר..." : "שמירת שינויים"}</button>
+                            <button type="button" className={styles.primaryButton} disabled={savingId === selectedProject._id || !selectedProjectDirty} onClick={() => persistProject(selectedProject)}>{savingId === selectedProject._id ? "שומר..." : selectedProjectDirty ? "שמירת שינויים" : "הכול שמור"}</button>
                         </div>
                     </div>
                 </article>

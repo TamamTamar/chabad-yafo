@@ -32,9 +32,25 @@ const cleanTask = (value: unknown): IProjectTask | null => {
 
                   const item = subtask as Record<string, unknown>;
                   const subtaskTitle = cleanText(item.title);
+                  const requestedSubtaskStatus = cleanText(
+                      item.status
+                  ) as ProjectTaskStatus;
+                  const completed = Boolean(item.completed);
+                  const subtaskStatus = projectTaskStatuses.includes(
+                      requestedSubtaskStatus
+                  )
+                      ? requestedSubtaskStatus
+                      : completed
+                        ? "הושלמה"
+                        : "לא התחילה";
 
                   return subtaskTitle
-                      ? { title: subtaskTitle, completed: Boolean(item.completed) }
+                      ? {
+                            title: subtaskTitle,
+                            completed: subtaskStatus === "הושלמה",
+                            status: subtaskStatus,
+                            assignee: cleanText(item.assignee),
+                        }
                       : null;
               })
               .filter((subtask): subtask is NonNullable<typeof subtask> => Boolean(subtask))
