@@ -222,7 +222,11 @@ export const createDaycareOnboardingFromRegistration = async (
                 type: "daycareRegistration",
                 recordId: registration._id,
             },
-            familyId: registration.daycareFamilyId,
+            familyId:
+                registration.daycareFamilyId ??
+                (creation.existingFamilyId
+                    ? new Types.ObjectId(creation.existingFamilyId)
+                    : undefined),
             childId: registration.daycareChildId,
         });
 

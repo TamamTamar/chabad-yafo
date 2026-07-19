@@ -21,6 +21,27 @@ import { toPublicOnboardingDto } from "./dto";
 import { createAuditEntries } from "./adminMutations";
 import { getIdentityOrThrow } from "./persistence";
 
+const normalizedPhone = (value: string) => value.replace(/\D/g, "");
+export const mergeGuardiansForSibling = (
+    existing: SubmitPublicDaycareProfileDto["guardians"],
+    submitted: SubmitPublicDaycareProfileDto["guardians"]
+) => {
+    const merged = existing.map((guardian) => ({ ...guardian }));
+    for (const guardian of submitted) {
+        const matchingIndex = merged.findIndex(
+            (candidate) =>
+                normalizedPhone(candidate.phone) === normalizedPhone(guardian.phone) ||
+                (["mother", "father"].includes(candidate.role) && candidate.role === guardian.role)
+        );
+        if (matchingIndex >= 0) {
+            merged[matchingIndex] = { ...merged[matchingIndex], ...guardian };
+        } else {
+            merged.push({ ...guardian });
+        }
+    }
+    return merged;
+};
+
 const inaccessiblePublicLinkError = () =>
     new DaycareOnboardingServiceError(
         "The onboarding link is invalid or unavailable",
@@ -125,13 +146,16 @@ export const submitPublicDaycareProfile = async (
             }
 
             const familyWasCreated = !family;
+            const linkingNewChildToExistingFamily = Boolean(family && !child && onboarding.familyId);
             if (!family) {
                 family = new DaycareFamily({
                     guardians: profile.guardians,
                     address: profile.address,
                 });
             } else {
-                family.guardians = profile.guardians;
+                family.guardians = linkingNewChildToExistingFamily
+                    ? mergeGuardiansForSibling(family.guardians, profile.guardians)
+                    : profile.guardians;
                 family.address = profile.address;
             }
             await family.save({ session });

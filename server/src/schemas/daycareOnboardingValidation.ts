@@ -31,6 +31,7 @@ export interface LegacyOnboardingImportDto {
 export interface CreateOnboardingFromInquiryDto {
     schoolYear: string;
     internalNote?: string;
+    existingFamilyId?: string;
 }
 
 export interface DeleteOnboardingDto {
@@ -456,6 +457,7 @@ export const parseCreateOnboardingFromInquiry = (
     const allowedFields = new Set([
         "schoolYear",
         "internalNote",
+        "existingFamilyId",
     ]);
     const unsupportedField = Object.keys(value).find(
         (field) => !allowedFields.has(field)
@@ -496,6 +498,14 @@ export const parseCreateOnboardingFromInquiry = (
         return { success: false, message: "internalNote is too long" };
     }
 
+    if (
+        value.existingFamilyId !== undefined &&
+        (typeof value.existingFamilyId !== "string" ||
+            !/^[a-f\d]{24}$/i.test(value.existingFamilyId.trim()))
+    ) {
+        return { success: false, message: "existingFamilyId must be a valid ID" };
+    }
+
     return {
         success: true,
         data: {
@@ -503,6 +513,10 @@ export const parseCreateOnboardingFromInquiry = (
             internalNote:
                 typeof value.internalNote === "string"
                     ? value.internalNote.trim() || undefined
+                    : undefined,
+            existingFamilyId:
+                typeof value.existingFamilyId === "string"
+                    ? value.existingFamilyId.trim()
                     : undefined,
         },
     };

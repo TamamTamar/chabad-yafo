@@ -257,6 +257,7 @@ export type ImportLegacyOnboardingPayload = {
 export type CreateOnboardingFromInquiryPayload = {
     schoolYear: string;
     internalNote?: string;
+    existingFamilyId?: string;
 };
 
 export type AdminOnboardingLinkResponse = {
@@ -339,6 +340,7 @@ export const onboardingOverallStatusLabels: Record<
 
 export const onboardingAuditActionLabels: Record<string, string> = {
     familyCreated: "נוצרה משפחה",
+    familyGuardianAdded: "אבא נוסף למשפחה ממורשי האיסוף",
     childCreated: "נוצרה רשומת ילד",
     identityProfileSubmitted: "פרטי הילד וההורים נשמרו",
     identityProfileUpdated: "פרטי הילד וההורים עודכנו",

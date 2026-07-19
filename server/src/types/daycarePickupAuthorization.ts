@@ -15,6 +15,7 @@ export interface DaycarePickupGuardianSnapshot {
 export interface DaycareAuthorizedCollector {
     fullName: string;
     relationship: string;
+    relationshipType?: "father" | "other";
     phone: string;
     israeliId: string;
 }

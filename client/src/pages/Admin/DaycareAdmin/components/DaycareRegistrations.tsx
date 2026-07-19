@@ -9,9 +9,11 @@ import {
 } from "../daycareAdminService";
 import {
     createOnboardingFromRegistration,
+    getAdminDaycareFamilies,
 } from "../../../../services/daycareOnboardingService";
 import {
     onboardingOverallStatusLabels,
+    type AdminDaycareFamilyOption,
     type AdminDaycareOnboardingListItem,
     type CreateOnboardingFromInquiryPayload,
 } from "../../../../types/daycareOnboarding";
@@ -21,6 +23,19 @@ import type { DaycareRegistrationsResponse } from "../types";
 
 type DaycareRegistrationsProps = {
     onChanged: () => void;
+};
+
+const normalizedPhone = (value: string) => value.replace(/\D/g, "");
+const familyMatchesPhone = (family: AdminDaycareFamilyOption, phone: string) =>
+    family.guardians.some(
+        (guardian) => normalizedPhone(guardian.phone) === normalizedPhone(phone)
+    );
+const familyOptionLabel = (family: AdminDaycareFamilyOption) => {
+    const children = family.childNames.length > 0
+        ? family.childNames.join(", ")
+        : "ללא ילדים רשומים";
+    const guardians = family.guardians.map((guardian) => guardian.fullName).join(", ");
+    return `${children} · ${guardians}`;
 };
 
 type UnifiedRegistration = {
@@ -150,6 +165,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     const [data, setData] = useState<DaycareRegistrationsResponse>({
         registrations: [],
     });
+    const [families, setFamilies] = useState<AdminDaycareFamilyOption[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [updatingKey, setUpdatingKey] = useState<string | null>(null);
@@ -166,7 +182,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         reset,
         formState: { errors: createFormErrors, isSubmitting: creating },
     } = useForm<CreateOnboardingFromInquiryPayload>({
-        defaultValues: { schoolYear: getSuggestedSchoolYear(), internalNote: "" },
+        defaultValues: { schoolYear: getSuggestedSchoolYear(), internalNote: "", existingFamilyId: "" },
         mode: "onBlur",
     });
 
@@ -200,6 +216,9 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                 setError("לא הצלחנו לטעון את רשימת הרישום");
             })
             .finally(() => setLoading(false));
+        void getAdminDaycareFamilies()
+            .then(setFamilies)
+            .catch(() => setFamilies([]));
     }, []);
 
     const updateRow = (
@@ -237,7 +256,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     const openCreateDialog = (registration: UnifiedRegistration) => {
         setCreateError("");
         const nextDraft = createDraft(registration);
-        reset({ schoolYear: nextDraft.schoolYear, internalNote: nextDraft.internalNote ?? "" });
+        reset({ schoolYear: nextDraft.schoolYear, internalNote: nextDraft.internalNote ?? "", existingFamilyId: "" });
         setDraft(nextDraft);
     };
 
@@ -271,6 +290,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         const payload: CreateOnboardingFromInquiryPayload = {
             schoolYear: form.schoolYear,
             internalNote: form.internalNote?.trim() || undefined,
+            existingFamilyId: form.existingFamilyId || undefined,
         };
 
         try {
@@ -580,8 +600,22 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                     {...register("internalNote")}
                                 />
                             </label>
+                            <label className={styles.compactField}>
+                                <span>קישור למשפחה קיימת — אם זה אח/ות</span>
+                                <select className={styles.compactInput} {...register("existingFamilyId")}>
+                                    <option value="">ילד/ה ראשון/ה במשפחה</option>
+                                    {[...families]
+                                        .sort((left, right) => Number(familyMatchesPhone(right, draft.phone)) - Number(familyMatchesPhone(left, draft.phone)))
+                                        .map((family) => (
+                                            <option value={family.id} key={family.id}>
+                                                {familyMatchesPhone(family, draft.phone) ? "התאמה לפי טלפון · " : ""}{familyOptionLabel(family)}
+                                            </option>
+                                        ))}
+                                </select>
+                            </label>
                             <p className={styles.modalHint}>
-                                פרטי הילד וההורים יושלמו בהמשך. בשלב זה לא נוצרת רשומת ילד או משפחה חדשה.
+                                פרטי הילד וההורים יושלמו בהמשך. אם נבחרה משפחה קיימת,
+                                הילד/ה החדש/ה יקושר/תקושר אליה כאח/ות לאחר שמירת הפרטים.
                             </p>
                             {createError ? (
                                 <p className={styles.formErrorMessage} role="alert">

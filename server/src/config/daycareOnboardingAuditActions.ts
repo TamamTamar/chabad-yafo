@@ -1,5 +1,6 @@
 export const DAYCARE_ONBOARDING_AUDIT_ACTIONS = {
     familyCreated: "familyCreated",
+    familyGuardianAdded: "familyGuardianAdded",
     childCreated: "childCreated",
     identityProfileSubmitted: "identityProfileSubmitted",
     identityProfileUpdated: "identityProfileUpdated",

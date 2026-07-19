@@ -72,6 +72,50 @@ const finalizeReplacedAuthorization = async (previous: InstanceType<typeof Dayca
 
 const normalizeCollectors = (collectors: DaycareAuthorizedCollector[]) => collectors.map((collector) => ({ ...collector, fullName: collector.fullName.trim(), relationship: collector.relationship.trim(), phone: collector.phone.trim(), israeliId: normalizeIsraeliId(collector.israeliId) }));
 const validateCollectors = (collectors: DaycareAuthorizedCollector[]) => collectors.length <= 10 && collectors.every((collector) => collector.fullName.length >= 2 && collector.fullName.length <= 160 && collector.relationship.length >= 2 && collector.relationship.length <= 100 && collector.phone.length >= 7 && collector.phone.length <= 30 && isValidIsraeliId(collector.israeliId));
+const normalizedPersonName = (value: string) => value.trim().replace(/\s+/g, " ").toLocaleLowerCase("he");
+const normalizedPhone = (value: string) => value.replace(/\D/g, "");
+export const isFatherCollectorForFamily = (collector: DaycareAuthorizedCollector) =>
+    collector.relationshipType === "father" || ["אבא", "אב"].includes(collector.relationship.trim());
+
+const addApprovedFatherToFamily = async (
+    declaration: InstanceType<typeof DaycarePickupAuthorization>,
+    now: Date
+) => {
+    const payload = decryptPayload(declaration);
+    const father = payload?.collectors.find(isFatherCollectorForFamily);
+    if (!father) return;
+
+    const onboarding = await DaycareOnboarding.findById(declaration.onboardingId).select("familyId");
+    if (!onboarding?.familyId) return;
+    const family = await DaycareFamily.findById(onboarding.familyId);
+    if (!family || family.guardians.some((guardian) => guardian.role === "father")) return;
+
+    const matchingGuardian = family.guardians.find(
+        (guardian) =>
+            normalizedPhone(guardian.phone) === normalizedPhone(father.phone) ||
+            normalizedPersonName(guardian.fullName) === normalizedPersonName(father.fullName)
+    );
+    if (matchingGuardian) {
+        matchingGuardian.role = "father";
+        matchingGuardian.roleDetails = undefined;
+    } else {
+        family.guardians.push({
+            fullName: father.fullName,
+            role: "father",
+            phone: father.phone,
+        });
+    }
+    await family.save();
+    await createAuditEntries([{
+        onboardingId: onboarding._id,
+        actorType: "automatic",
+        actorLabel: "system",
+        action: DAYCARE_ONBOARDING_AUDIT_ACTIONS.familyGuardianAdded,
+        stepKey: "pickupAuthorizationSubmitted",
+        newValue: { role: "father", fullName: father.fullName, familyId: family.id },
+        createdAt: now,
+    }]);
+};
 
 export const submitPickupAuthorization = async (token: string, input: SubmissionInput, signature: Express.Multer.File, now = new Date()) => {
     if (!isDaycarePiiEncryptionConfigured() || !isDaycareStorageConfigured()) throw new DaycareOnboardingServiceError("שליחת מורשי האיסוף אינה זמינה כרגע.", 503, "PICKUP_NOT_CONFIGURED");
@@ -104,7 +148,7 @@ export const submitUploadedPickupAuthorization = async (token: string, file: Exp
 };
 
 export const getAdminPickupAuthorization = async (onboardingId: string) => { if (!Types.ObjectId.isValid(onboardingId)) throw new DaycareOnboardingServiceError("תיק ההצטרפות לא נמצא.", 404, "ONBOARDING_NOT_FOUND"); const latest = await latestFor(onboardingId, true); return latest ? dto(latest, true) : null; };
-export const reviewPickupAuthorization = async (id: string, status: Exclude<DaycarePickupAuthorizationStatus, "pendingReview">, parentMessage?: string, correctionDisposition?: DaycareCorrectionDisposition, now = new Date()) => { if (!Types.ObjectId.isValid(id)) throw new DaycareOnboardingServiceError("מסמך מורשי האיסוף לא נמצא.", 404, "PICKUP_NOT_FOUND"); const declaration = await DaycarePickupAuthorization.findById(id); if (!declaration) throw new DaycareOnboardingServiceError("מסמך מורשי האיסוף לא נמצא.", 404, "PICKUP_NOT_FOUND"); if (declaration.supersededAt) throw new DaycareOnboardingServiceError("גרסת מורשי האיסוף הוחלפה ואינה ניתנת לאישור.", 409, "PICKUP_SUPERSEDED"); if (status === "requiresCorrection" && !parentMessage?.trim()) throw new DaycareOnboardingServiceError("יש לכתוב להורה מה נדרש לתקן.", 400, "PICKUP_CORRECTION_MESSAGE_REQUIRED"); if (status === "requiresCorrection" && correctionDisposition === "discardFileAfterReplacement" && declaration.signingMethod !== "uploadedFile") throw new DaycareOnboardingServiceError("ניתן למחוק לאחר החלפה רק קובץ שהועלה ידנית.", 400, "PICKUP_CORRECTION_DISPOSITION_INVALID"); declaration.status = status; declaration.parentMessage = parentMessage?.trim() || undefined; declaration.correctionDisposition = status === "requiresCorrection" ? correctionDisposition ?? "preserveVersion" : undefined; declaration.reviewedAt = now; declaration.reviewedBy = "shared-admin"; await declaration.save(); await updateAdminOnboardingStep(declaration.onboardingId.toString(), "pickupAuthorizationSubmitted", { status, parentMessage: declaration.parentMessage ?? null }, now); return dto(declaration, false); };
+export const reviewPickupAuthorization = async (id: string, status: Exclude<DaycarePickupAuthorizationStatus, "pendingReview">, parentMessage?: string, correctionDisposition?: DaycareCorrectionDisposition, now = new Date()) => { if (!Types.ObjectId.isValid(id)) throw new DaycareOnboardingServiceError("מסמך מורשי האיסוף לא נמצא.", 404, "PICKUP_NOT_FOUND"); const declaration = await DaycarePickupAuthorization.findById(id).select("+encryptedPayload"); if (!declaration) throw new DaycareOnboardingServiceError("מסמך מורשי האיסוף לא נמצא.", 404, "PICKUP_NOT_FOUND"); if (declaration.supersededAt) throw new DaycareOnboardingServiceError("גרסת מורשי האיסוף הוחלפה ואינה ניתנת לאישור.", 409, "PICKUP_SUPERSEDED"); if (status === "requiresCorrection" && !parentMessage?.trim()) throw new DaycareOnboardingServiceError("יש לכתוב להורה מה נדרש לתקן.", 400, "PICKUP_CORRECTION_MESSAGE_REQUIRED"); if (status === "requiresCorrection" && correctionDisposition === "discardFileAfterReplacement" && declaration.signingMethod !== "uploadedFile") throw new DaycareOnboardingServiceError("ניתן למחוק לאחר החלפה רק קובץ שהועלה ידנית.", 400, "PICKUP_CORRECTION_DISPOSITION_INVALID"); declaration.status = status; declaration.parentMessage = parentMessage?.trim() || undefined; declaration.correctionDisposition = status === "requiresCorrection" ? correctionDisposition ?? "preserveVersion" : undefined; declaration.reviewedAt = now; declaration.reviewedBy = "shared-admin"; await declaration.save(); if (status === "completed" && declaration.encryptedPayload) await addApprovedFatherToFamily(declaration, now); await updateAdminOnboardingStep(declaration.onboardingId.toString(), "pickupAuthorizationSubmitted", { status, parentMessage: declaration.parentMessage ?? null }, now); return dto(declaration, false); };
 const downloadStored = async (declaration: InstanceType<typeof DaycarePickupAuthorization>) => { if (!declaration.signedPdfFile) throw new DaycareOnboardingServiceError("קובץ מורשי האיסוף כבר הוחלף והוסר.", 404, "PICKUP_FILE_NOT_FOUND"); const bytes = await getDaycareStorageProvider().download(declaration.signedPdfFile.storageKey); if (createHash("sha256").update(bytes).digest("hex") !== declaration.signedPdfFile.sha256) throw new DaycareOnboardingServiceError("קובץ מורשי האיסוף נכשל בבדיקת תקינות.", 409, "PICKUP_FILE_INTEGRITY_FAILED"); return { bytes, mimeType: "application/pdf", filename: `pickup-authorization-${declaration.documentId}.pdf` }; };
 export const downloadPickupAuthorizationForParent = async (token: string, now = new Date()) => { const onboarding = await getPublicOnboardingDocumentByToken(token, now); const latest = await latestFor(onboarding._id); if (!latest) throw new DaycareOnboardingServiceError("מסמך מורשי האיסוף לא נמצא.", 404, "PICKUP_NOT_FOUND"); return downloadStored(latest); };
 export const downloadPickupAuthorizationForAdmin = async (id: string) => { if (!Types.ObjectId.isValid(id)) throw new DaycareOnboardingServiceError("מסמך מורשי האיסוף לא נמצא.", 404, "PICKUP_NOT_FOUND"); const declaration = await DaycarePickupAuthorization.findById(id); if (!declaration) throw new DaycareOnboardingServiceError("מסמך מורשי האיסוף לא נמצא.", 404, "PICKUP_NOT_FOUND"); return downloadStored(declaration); };

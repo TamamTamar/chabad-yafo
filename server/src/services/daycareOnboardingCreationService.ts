@@ -33,7 +33,7 @@ export const createDaycareOnboardingFromInquiry = async (
     input: CreateDaycareOnboardingFromInquiryInput,
     now = new Date()
 ) => {
-    if (Boolean(input.familyId) !== Boolean(input.childId)) {
+    if (input.childId && !input.familyId) {
         throw new DaycareOnboardingServiceError(
             "פרטי המשפחה השמורים אינם שלמים.",
             409,
@@ -41,12 +41,12 @@ export const createDaycareOnboardingFromInquiry = async (
         );
     }
 
-    if (input.familyId && input.childId) {
-        const [family, child] = await Promise.all([
-            DaycareFamily.findById(input.familyId).select("_id").exec(),
-            DaycareChild.findById(input.childId).select("familyId").exec(),
-        ]);
-        if (!family || !child || !child.familyId.equals(family._id)) {
+    if (input.familyId) {
+        const family = await DaycareFamily.findById(input.familyId).select("_id").exec();
+        const child = input.childId
+            ? await DaycareChild.findById(input.childId).select("familyId").exec()
+            : null;
+        if (!family || (input.childId && (!child || !child.familyId.equals(family._id)))) {
             throw new DaycareOnboardingServiceError(
                 "לא ניתן לחבר את המשפחה השמורה לתיק החדש.",
                 409,
