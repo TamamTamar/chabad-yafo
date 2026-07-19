@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request } from "express";
 import jwt from "jsonwebtoken";
 import { requireAdmin } from "../middleware/adminAuth";
 
@@ -6,9 +6,25 @@ const router = Router();
 const adminCookieName = "admin_token";
 const adminTokenMaxAgeMs = 7 * 24 * 60 * 60 * 1000;
 
-const isProduction =
-    process.env.NODE_ENV === "production" ||
-    process.env.RAILWAY_ENVIRONMENT === "production";
+const isLocalAdminRequest = (req: Request) => {
+    const origin = req.get("origin") ?? "";
+    const localHostnames = new Set(["localhost", "127.0.0.1", "::1"]);
+
+    return localHostnames.has(req.hostname) ||
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:");
+};
+
+const getAdminCookieOptions = (req: Request) => {
+    const isSecureRequest = !isLocalAdminRequest(req) && req.secure;
+
+    return {
+        httpOnly: true,
+        secure: isSecureRequest,
+        sameSite: isSecureRequest ? "none" as const : "lax" as const,
+        path: "/",
+    };
+};
 
 router.post("/login", (req, res) => {
     const { password } = req.body;
@@ -34,15 +50,13 @@ router.post("/login", (req, res) => {
     );
 
     res.cookie(adminCookieName, token, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
-        path: "/",
+        ...getAdminCookieOptions(req),
         maxAge: adminTokenMaxAgeMs,
     });
 
     res.json({
         success: true,
+        token: isLocalAdminRequest(req) ? token : undefined,
     });
 });
 
@@ -53,13 +67,8 @@ router.get("/me", requireAdmin, (_req, res) => {
     });
 });
 
-router.post("/logout", (_req, res) => {
-    res.clearCookie(adminCookieName, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
-        path: "/",
-    });
+router.post("/logout", (req, res) => {
+    res.clearCookie(adminCookieName, getAdminCookieOptions(req));
 
     res.json({
         success: true,

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const apiBaseUrl = import.meta.env.VITE_API_URL
-    ?? (import.meta.env.PROD ? "/api" : "http://localhost:4000/api");
+    ?? "/api";
 
 const http = axios.create({
     baseURL: apiBaseUrl,
@@ -9,6 +9,16 @@ const http = axios.create({
         "Content-Type": "application/json",
     },
     withCredentials: true,
+});
+
+http.interceptors.request.use((config) => {
+    const localAdminToken = window.sessionStorage.getItem("local_admin_token");
+
+    if (localAdminToken) {
+        config.headers.Authorization = `Bearer ${localAdminToken}`;
+    }
+
+    return config;
 });
 
 http.interceptors.response.use(
