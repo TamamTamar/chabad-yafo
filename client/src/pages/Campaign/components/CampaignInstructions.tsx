@@ -1,3 +1,5 @@
+import { ArrowLeft, ChevronDown, ExternalLink } from "lucide-react";
+
 import styles from "../DonationCampaignPage.module.scss";
 import type { CampaignInstructionSection } from "../types";
 
@@ -22,10 +24,42 @@ const CampaignInstructions = ({ section }: Props) => (
           <div>
             <h3>{item.title}</h3>
             <p dangerouslySetInnerHTML={{ __html: item.text }} />
+            {item.expandedContent ? (
+              <details className={styles.instructionDetails}>
+                <summary>
+                  <span>{item.expandedContent.label}</span>
+                  <ChevronDown aria-hidden="true" size={20} strokeWidth={2.4} />
+                </summary>
+                <div className={styles.instructionDetailsContent}>
+                  <h4>{item.expandedContent.title}</h4>
+                  {item.expandedContent.paragraphs.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                  {item.expandedContent.note ? (
+                    <p className={styles.instructionDetailsNote}>
+                      {item.expandedContent.note}
+                    </p>
+                  ) : null}
+                </div>
+              </details>
+            ) : null}
             {item.cta ? (
-              <a className={styles.instructionCta} href={item.cta.href}>
+              <a
+                className={`${styles.instructionCta} ${
+                  item.cta.variant === "secondary"
+                    ? styles.instructionCtaSecondary
+                    : ""
+                }`}
+                href={item.cta.href}
+                target={item.cta.external ? "_blank" : undefined}
+                rel={item.cta.external ? "noreferrer" : undefined}
+              >
                 {item.cta.label}
-                <span aria-hidden="true">←</span>
+                {item.cta.external ? (
+                  <ExternalLink aria-hidden="true" size={17} strokeWidth={2.25} />
+                ) : (
+                  <ArrowLeft aria-hidden="true" size={18} strokeWidth={2.4} />
+                )}
               </a>
             ) : null}
           </div>

@@ -10,9 +10,17 @@ export type CampaignInstructionSection = {
   items: Array<{
     title: string;
     text: string;
+    expandedContent?: {
+      label: string;
+      title: string;
+      paragraphs: string[];
+      note?: string;
+    };
     cta?: {
       label: string;
       href: string;
+      external?: boolean;
+      variant?: "primary" | "secondary";
     };
   }>;
   note?: string;

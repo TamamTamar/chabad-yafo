@@ -136,6 +136,10 @@
   box-shadow: 0 7px 18px rgba($brand-primary, 0.2);
   transition: transform 0.2s ease, background-color 0.2s ease;
 
+  svg {
+    flex: 0 0 auto;
+  }
+
   &:hover {
     background: $brand-primary-rich;
     transform: translateY(-1px);
@@ -153,4 +157,92 @@
     font-size: $type-body;
     white-space: nowrap;
   }
+}
+
+.instructionCtaSecondary {
+  border: 1px solid rgba($brand-primary, 0.25);
+  background: rgba($brand-primary, 0.05);
+  color: $brand-primary;
+  box-shadow: none;
+
+  &:hover {
+    background: rgba($brand-primary, 0.1);
+    color: $brand-primary-deep;
+  }
+}
+
+.instructionDetails {
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid rgba($brand-primary, 0.2);
+  border-radius: $radius-sm;
+  background: $color-white;
+
+  summary {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    svg {
+      flex: 0 0 auto;
+      transition: transform 0.2s ease;
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($brand-secondary, 0.65);
+      outline-offset: -3px;
+    }
+  }
+
+  &[open] summary svg {
+    transform: rotate(180deg);
+  }
+}
+
+.instructionDetailsContent {
+  padding: 18px 20px 20px;
+  border-top: 1px solid $ui-border-soft;
+  background: rgba($brand-secondary, 0.04);
+
+  h4 {
+    margin: 0 0 12px;
+    color: $brand-text;
+    font-size: $type-body-lg;
+    text-align: center;
+  }
+
+  p {
+    margin: 0 0 14px;
+    color: $brand-text;
+    font-size: $type-body;
+    line-height: 2;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 16px 14px 18px;
+  }
+}
+
+.instructionDetailsNote {
+  padding-top: 12px;
+  border-top: 1px solid $ui-border-soft;
+  color: $ui-text-muted !important;
+  font-size: $type-body-sm !important;
+  line-height: 1.75 !important;
 }
