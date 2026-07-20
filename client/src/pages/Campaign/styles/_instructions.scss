@@ -140,4 +140,12 @@
     outline: 3px solid rgba($brand-secondary, 0.65);
     outline-offset: 3px;
   }
+
+  @media (max-width: 640px) {
+    width: 100%;
+    justify-content: center;
+    padding: 13px 16px;
+    font-size: $type-body;
+    white-space: nowrap;
+  }
 }
