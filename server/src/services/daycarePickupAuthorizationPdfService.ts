@@ -71,7 +71,7 @@ export const createSignedPickupAuthorizationPdf = (input: SignedInput) => new Pr
 export const createBlankPickupAuthorizationPdf = (input: BlankInput) => new Promise<Buffer>((resolve, reject) => {
     const document = setup(`מורשי איסוף למילוי - ${input.childName}`); const chunks: Buffer[] = [];
     document.on("data", (chunk: Buffer) => chunks.push(chunk)); document.on("error", reject);
-    document.font("AssistantBold").fontSize(20).fillColor("#0b3158"); rtl(document, "מורשי איסוף — למילוי ידני");
+    document.font("AssistantBold").fontSize(20).fillColor("#0b3158"); rtl(document, "מורשי איסוף - למילוי ידני");
     document.moveDown(.25).font("Assistant").fontSize(10).fillColor("#526174"); rtl(document, `שם הילד/ה: ${input.childName} | שנת לימודים: ${input.schoolYear}`);
     document.moveDown(.75).font("AssistantBold").fontSize(13).fillColor("#0b3158"); rtl(document, "הורים ואפוטרופוסים המורשים לאסוף");
     document.moveDown(.3).font("Assistant").fontSize(10.5).fillColor("#172033"); input.guardians.forEach((guardian) => { rtl(document, `• ${guardianText(guardian)}`); document.moveDown(.2); });

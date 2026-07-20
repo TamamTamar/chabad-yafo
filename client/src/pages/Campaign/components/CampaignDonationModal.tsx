@@ -30,6 +30,7 @@ type Props = {
   nedarim: DonationCampaignConfig["nedarim"];
   prefilledDonor?: DonorForm;
   initialStep?: CampaignDonationStep;
+  collectBlessingNames?: boolean;
 };
 
 const EMPTY_DONOR: DonorForm = {
@@ -37,6 +38,7 @@ const EMPTY_DONOR: DonorForm = {
   lastName: "",
   phone: "",
   email: "",
+  blessingNames: "",
 };
 
 const CampaignDonationModal: React.FC<Props> = ({
@@ -50,6 +52,7 @@ const CampaignDonationModal: React.FC<Props> = ({
   nedarim,
   prefilledDonor,
   initialStep,
+  collectBlessingNames = false,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const customInputRef = useRef<HTMLInputElement>(null);
@@ -141,7 +144,9 @@ const CampaignDonationModal: React.FC<Props> = ({
       lastName: (watchedDonor.lastName || "").trim(),
       phone: (watchedDonor.phone || "").trim(),
       email: (watchedDonor.email || "").trim(),
-      Comment: nedarim.Comment,
+      Comment: watchedDonor.blessingNames?.trim()
+        ? `${nedarim.Comment} | לברכה: ${watchedDonor.blessingNames.trim()}`
+        : nedarim.Comment,
       PaymentType: nedarim.PaymentType,
     });
 
@@ -220,6 +225,7 @@ const CampaignDonationModal: React.FC<Props> = ({
               errors={errors}
               register={register}
               setCustomRaw={setCustomRaw}
+              collectBlessingNames={collectBlessingNames}
             />
           ) : (
             <CampaignPaymentFrame

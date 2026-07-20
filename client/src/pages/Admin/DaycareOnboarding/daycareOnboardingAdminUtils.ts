@@ -30,11 +30,11 @@ export const stepSources = Object.keys(
 export const formatDate = (value?: string) =>
     value
         ? new Date(value).toLocaleDateString("he-IL", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-          })
-        : "—";
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        })
+        : "-";
 
 export const formatDateTime = (value: string) =>
     new Date(value).toLocaleString("he-IL", {

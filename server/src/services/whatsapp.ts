@@ -20,7 +20,7 @@ export const sendShabbatRegistrationWhatsApp = async (args: {
         `אימייל: ${email}\n` +
         `מבוגרים: ${adults}\n` +
         `ילדים: ${children || "0"}\n` +
-        `הערות: ${notes || "—"}`;
+        `הערות: ${notes || "-"}`;
 
     await client.messages.create({
         from: env.TWILIO_WHATSAPP_FROM, // למשל: whatsapp:+14155238886
@@ -55,9 +55,9 @@ export const sendRebbeLetterWhatsApp = async (args: {
         `✍️ מכתב חדש לרבי\n\n` +
         `🎯 סיבת כתיבה: ${occasionLabels[occasion] || "כללי"}\n\n` +
         `👤 שם: ${fullName}\n` +
-        `👩 שם האם: ${motherName || "—"}\n` +
-        `📞 טלפון: ${phone || "—"}\n` +
-        `📧 אימייל: ${email || "—"}\n\n` +
+        `👩 שם האם: ${motherName || "-"}\n` +
+        `📞 טלפון: ${phone || "-"}\n` +
+        `📧 אימייל: ${email || "-"}\n\n` +
         `📝 תוכן המכתב:\n${letter}`;
 
     await client.messages.create({
@@ -97,9 +97,9 @@ export const sendDaycareRegistrationWhatsApp = async (args: {
         `🏫 רישום מוקדם חדש למעון בצפון יפו\n\n` +
         `👤 הורה: ${parentName}\n` +
         `📞 טלפון: ${phone}\n` +
-        `👶 גיל הילד/ה: ${childAge || "—"}\n` +
+        `👶 גיל הילד/ה: ${childAge || "-"}\n` +
         `שעות מועדפות: ${requiredHoursText}\n\n` +
-        `הערות: ${notes || "—"}`;
+        `הערות: ${notes || "-"}`;
 
     await client.messages.create({
         from: env.TWILIO_WHATSAPP_FROM,

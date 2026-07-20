@@ -149,7 +149,7 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
                     <h3>לוח חופשות</h3>
                     <label className={styles.label}>כותרת משנה<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.holidays.subtitle} onChange={(event) => setDocuments({ ...documents, holidays: { ...documents.holidays, subtitle: event.target.value } })} /></label>
                     <label className={styles.label}>כל מועד בשורה: מועד | תאריך עברי | תאריכי חופשה<textarea className={styles.textarea} disabled={Boolean(lockedAt)} value={holidayRows} onChange={(event) => setHolidayRows(event.target.value)} /></label>
-                    <label className={styles.label}>הבהרות — כל הבהרה בשורה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={clarifications} onChange={(event) => setClarifications(event.target.value)} /></label>
+                    <label className={styles.label}>הבהרות - כל הבהרה בשורה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={clarifications} onChange={(event) => setClarifications(event.target.value)} /></label>
                 </article> : null}
 
                 {visibleDocument === "menu" ? <article className={styles.card}>

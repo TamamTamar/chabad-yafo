@@ -54,7 +54,7 @@ const getStepDisplayTitle = (step: IOnboardingStep) => {
 
     if (step.key === "registrationApproved") {
         return step.status === "completed"
-            ? "שובץ בקבוצה — הרישום הושלם"
+            ? "שובץ בקבוצה - הרישום הושלם"
             : "ממתין לשיבוץ בקבוצה";
     }
 
@@ -89,25 +89,25 @@ export const toPublicOnboardingDto = (
     );
     const canEditProfile = Boolean(
         profileStep?.isVisibleToParent &&
-            profileStep.status !== "notRequired" &&
-            !isParentBundleSubmitted(onboarding)
+        profileStep.status !== "notRequired" &&
+        !isParentBundleSubmitted(onboarding)
     );
     const profile = child?.birthDate && family?.address
         ? {
-              child: {
-                  firstName: child.firstName,
-                  lastName: child.lastName,
-                  birthDate: new Date(child.birthDate as Date),
-              },
-              guardians: family.guardians.map((guardian) => ({
-                  fullName: guardian.fullName,
-                  role: guardian.role,
-                  roleDetails: guardian.roleDetails,
-                  phone: guardian.phone,
-                  email: guardian.email,
-              })),
-              address: toFamilyAddressDto(family.address),
-          }
+            child: {
+                firstName: child.firstName,
+                lastName: child.lastName,
+                birthDate: new Date(child.birthDate as Date),
+            },
+            guardians: family.guardians.map((guardian) => ({
+                fullName: guardian.fullName,
+                role: guardian.role,
+                roleDetails: guardian.roleDetails,
+                phone: guardian.phone,
+                email: guardian.email,
+            })),
+            address: toFamilyAddressDto(family.address),
+        }
         : undefined;
 
     const parentBundleSubmitted = isParentBundleSubmitted(onboarding);
@@ -133,9 +133,9 @@ export const toPublicOnboardingDto = (
         profilePrefill:
             onboarding.temporaryParentName || onboarding.temporaryParentPhone
                 ? {
-                      guardianFullName: onboarding.temporaryParentName,
-                      guardianPhone: onboarding.temporaryParentPhone,
-                  }
+                    guardianFullName: onboarding.temporaryParentName,
+                    guardianPhone: onboarding.temporaryParentPhone,
+                }
                 : undefined,
         profile,
         steps: visibleSteps,
@@ -158,9 +158,9 @@ export const toAdminOnboardingDetail = (
     legacyEnrollmentId: child?.legacySource?.recordId.toString(),
     origin: onboarding.origin
         ? {
-              type: onboarding.origin.type,
-              recordId: onboarding.origin.recordId?.toString(),
-          }
+            type: onboarding.origin.type,
+            recordId: onboarding.origin.recordId?.toString(),
+        }
         : undefined,
     schoolYear: onboarding.schoolYear,
     child: {
@@ -170,21 +170,21 @@ export const toAdminOnboardingDetail = (
     },
     guardians: family
         ? family.guardians.map((guardian) => ({
-              fullName: guardian.fullName,
-              role: guardian.role,
-              roleDetails: guardian.roleDetails,
-              phone: guardian.phone,
-              email: guardian.email,
-          }))
+            fullName: guardian.fullName,
+            role: guardian.role,
+            roleDetails: guardian.roleDetails,
+            phone: guardian.phone,
+            email: guardian.email,
+        }))
         : onboarding.temporaryParentName && onboarding.temporaryParentPhone
-          ? [
+            ? [
                 {
                     fullName: onboarding.temporaryParentName,
                     role: "guardian",
                     phone: onboarding.temporaryParentPhone,
                 },
             ]
-          : [],
+            : [],
     address: family?.address
         ? toFamilyAddressDto(family.address)
         : undefined,

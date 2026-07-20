@@ -10,6 +10,7 @@
 @use "./styles/intro";
 @use "./styles/calculator";
 @use "./styles/carousel";
+@use "./styles/instructions";
 
 .page {
   background-color: $body-bg;
@@ -84,6 +85,75 @@
   @media (max-width: 900px) {
     max-width: 100%; // במובייל שייקח את כל הרווח
   }
+}
+
+.sequentialIntro {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.sequentialDonationSection {
+  scroll-margin-top: calc(#{$header-height} + 18px);
+  width: calc(100% - 24px);
+  max-width: 1060px;
+  margin: 22px auto 34px;
+  padding: 42px;
+  border: 1px solid rgba($brand-secondary, 0.45);
+  border-radius: $radius-card-lg;
+  background:
+    radial-gradient(circle at 100% 0, rgba($brand-secondary, 0.22), transparent 38%),
+    $brand-bg;
+  box-shadow: 0 16px 45px $ui-shadow-blue-soft;
+
+  @media (max-width: 640px) {
+    padding: 26px 16px;
+    border-radius: $radius-md;
+  }
+}
+
+.donationStage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 450px);
+  gap: 48px;
+  align-items: start;
+  max-width: 940px;
+  margin: 0 auto;
+
+  @media (max-width: 820px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.donationStageHeading {
+  h2 {
+    margin: 6px 0 8px;
+    color: $brand-primary;
+    font-size: $type-section-title-sm;
+    line-height: $line-title;
+  }
+
+  span {
+    color: $brand-gold-muted;
+    font-size: $type-eyebrow;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: $type-body-lg;
+  }
+
+  @media (max-width: 820px) {
+    text-align: center;
+  }
+}
+
+.sequentialDonate {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
 }
 
 /* --- הכפתור הגדול בתחתית --- */

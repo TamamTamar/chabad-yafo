@@ -3,13 +3,22 @@ import styles from "../DonationCampaignPage.module.scss";
 
 type Props = {
   onSelectAmount: (amount: number) => void;
+  title?: string;
+  subtitle?: string;
+  rate?: number;
+  rateLabel?: string;
 };
 
-const CampaignCalculator: React.FC<Props> = ({ onSelectAmount }) => {
+const CampaignCalculator: React.FC<Props> = ({
+  onSelectAmount,
+  title = "מחשבון מחצית השקל",
+  subtitle = "הזינו את מספר הנפשות במשפחה",
+  rate = 86,
+  rateLabel = "עבור כל נפש",
+}) => {
   const [peopleCount, setPeopleCount] = useState<number>(1);
-  const RATE = 86;
 
-  const total = useMemo(() => peopleCount * RATE, [peopleCount]);
+  const total = useMemo(() => peopleCount * rate, [peopleCount, rate]);
 
 
 const handleApply = () => {
@@ -28,8 +37,8 @@ const handleApply = () => {
 
   return (
     <div id="calculator-section" className={styles.calculatorCard}>
-      <h2 className={styles.calcTitle}>מחשבון מחצית השקל</h2>
-      <p className={styles.calcSubtitle}>הזינו את מספר הנפשות במשפחה</p>
+      <h2 className={styles.calcTitle}>{title}</h2>
+      <p className={styles.calcSubtitle}>{subtitle}</p>
 
       <div className={styles.calcContent}>
         <div className={styles.inputGroup}>
@@ -43,7 +52,7 @@ const handleApply = () => {
             />
             <button type="button" className={styles.stepBtn} onClick={() => setPeopleCount(p => p + 1)}>+</button>
           </div>
-          <div className={styles.rateInfo}>(86 ₪ עבור כל נפש)</div>
+          <div className={styles.rateInfo}>({rate} ₪ {rateLabel})</div>
         </div>
 
         <div className={styles.resultSection}>

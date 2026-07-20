@@ -133,7 +133,7 @@ export const createBlankHealthDeclarationPdf = (input: BlankHealthDeclarationPdf
         document.registerFont("AssistantBold", boldFontPath);
 
         document.font("AssistantBold").fontSize(20).fillColor("#0b3158");
-        rtl(document, "הצהרת בריאות לילד/ה — למילוי ידני");
+        rtl(document, "הצהרת בריאות לילד/ה - למילוי ידני");
         document.moveDown(0.3).font("Assistant").fontSize(10).fillColor("#526174");
         rtl(document, `שם הילד/ה: ${input.childName} | שנת לימודים: ${input.schoolYear}`);
         document.moveDown(0.8);
@@ -141,7 +141,7 @@ export const createBlankHealthDeclarationPdf = (input: BlankHealthDeclarationPdf
         blankLine(document, "רגישויות לתרופות");
         blankLine(document, "קופת חולים");
         blankLine(document, "האם קיימת אלרגיה או רגישות כלשהי, כולל למזון? כן / לא");
-        blankLine(document, "אם כן — פירוט האלרגיה או הרגישות", 48);
+        blankLine(document, "אם כן - פירוט האלרגיה או הרגישות", 48);
         blankLine(document, "הנחיות במקרה של חשיפה", 48);
 
         document.font("AssistantBold").fontSize(13).fillColor("#0b3158");

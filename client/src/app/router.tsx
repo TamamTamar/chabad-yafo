@@ -22,6 +22,7 @@ const GalleryCategoryPage = lazy(() => import("../pages/Gallery/GalleryCategoryP
 const GalleryPage = lazy(() => import("../pages/Gallery/GalleryPage"));
 const Home = lazy(() => import("../pages/Home/Home"));
 const MachatzitHashekel = lazy(() => import("../pages/MachatzitHashekel/MachatzitHashekel"));
+const Kaparot = lazy(() => import("../pages/Kaparot/Kaparot"));
 const PurimMatanotLaEvyonim = lazy(
     () => import("../pages/PurimMatanotLaEvyonim/PurimMatanotLaEvyonim")
 );
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
             { index: true, element: <Home /> },
             { path: "purim", element: <PurimMatanotLaEvyonim /> },
             { path: "machatzit-hashekel", element: <MachatzitHashekel /> },
+            { path: "kaparot", element: <Kaparot /> },
             { path: "taanit", element: <Taanit /> },
             { path: "*", element: <ErrorPage /> },
             {

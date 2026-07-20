@@ -19,7 +19,7 @@ const ErrorPage = () => {
                     </p>
 
                     <p className={styles.subText}>
-                        בינתיים — אנחנו זמינים עבורכם לכל שאלה:
+                        בינתיים - אנחנו זמינים עבורכם לכל שאלה:
                     </p>
                 </div>
 
@@ -34,7 +34,7 @@ const ErrorPage = () => {
 
                 <footer className={styles.footer}>
                     <p className={styles.note}>
-                        <strong>בית חב״ד יפו</strong> — הכתובת שלך לכל עניין יהודי
+                        <strong>בית חב״ד יפו</strong> - הכתובת שלך לכל עניין יהודי
                     </p>
                 </footer>
             </section>

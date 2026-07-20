@@ -4,6 +4,20 @@ export type CampaignFaqItem = {
   open?: boolean;
 };
 
+export type CampaignInstructionSection = {
+  title: string;
+  intro?: string;
+  items: Array<{
+    title: string;
+    text: string;
+    cta?: {
+      label: string;
+      href: string;
+    };
+  }>;
+  note?: string;
+};
+
 export type CampaignPrimaryButton = {
   label: string;
   href: string;
@@ -39,6 +53,15 @@ export type DonationCampaignConfig = {
 
   isCompact?: boolean; // <-- תוסיפי את השורה הזו
   showCalculator?: boolean;
+  calculator?: {
+    title: string;
+    subtitle: string;
+    rate: number;
+    rateLabel: string;
+  };
+  collectBlessingNames?: boolean;
+  instructions?: CampaignInstructionSection;
+  instructionsBeforeDonation?: boolean;
 
   // nedarim settings
   nedarim: {
@@ -55,4 +78,5 @@ export type DonorForm = {
   lastName: string;
   phone: string;
   email: string;
+  blessingNames?: string;
 };

@@ -14,13 +14,13 @@ type AdminTab = "projects" | "families" | "daycareRegistrations" | "rebbeLetters
 const AdminDashboard = () => {
     const [searchParams] = useSearchParams();
     const initialTab: AdminTab =
-        searchParams.get("tab") === "projects"
-            ? "projects"
+        searchParams.get("tab") === "families"
+            ? "families"
             : searchParams.get("tab") === "daycareRegistrations"
             ? "daycareRegistrations"
             : searchParams.get("tab") === "payments"
               ? "payments"
-            : "families";
+            : "projects";
     const [activeTab, setActiveTab] = useState<AdminTab>(initialTab);
     const navigate = useNavigate();
 
@@ -66,18 +66,6 @@ const AdminDashboard = () => {
                         onClick={() => navigate("/admin/daycare")}
                     >
                         ניהול מעון
-                    </button>
-
-                    <button
-                        type="button"
-                        className={
-                            activeTab === "families"
-                                ? styles.tabActive
-                                : styles.tab
-                        }
-                        onClick={() => setActiveTab("families")}
-                    >
-                        משפחות
                     </button>
 
                     <button

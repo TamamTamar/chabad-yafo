@@ -55,7 +55,7 @@ export const sendShabbatRegistrationMail = async (args: {
         `אימייל: ${email}\n` +
         `מבוגרים: ${adults}\n` +
         `ילדים: ${children || "0"}\n` +
-        `הערות: ${notes || "—"}\n`;
+        `הערות: ${notes || "-"}\n`;
 
     await transporter.sendMail({
         from: `Chabad Yafo <${env.SMTP_USER!}>`,
@@ -93,11 +93,11 @@ export const sendRebbeLetterMail = async (args: {
         `✍️ מכתב חדש לרבי\n\n` +
         `סיבת כתיבה: ${occasionLabels[occasion] || "כללי"}\n` +
         `שם מלא: ${fullName}\n` +
-        `שם האם: ${motherName || "—"}\n` +
-        `טלפון: ${phone || "—"}\n` +
-        `אימייל: ${email || "—"}\n` +
+        `שם האם: ${motherName || "-"}\n` +
+        `טלפון: ${phone || "-"}\n` +
+        `אימייל: ${email || "-"}\n` +
         `מעוניין/ת בעדכונים: ${wantsUpdates ? "כן" : "לא"}\n\n` +
-        `תוכן המכתב:\n${letter || "—"}\n`;
+        `תוכן המכתב:\n${letter || "-"}\n`;
 
     await transporter.sendMail({
         from: `Chabad Yafo <${env.SMTP_USER!}>`,

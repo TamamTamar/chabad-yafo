@@ -5,7 +5,7 @@ const DaycareLogo = () => (
     <img
         className={styles.logo}
         src={daycareLogo}
-        alt="מעון חב״ד יפו — גדלים באהבה, בערכים ובשמחה"
+        alt="מעון חב״ד יפו - גדלים באהבה, בערכים ובשמחה"
         width="156"
         height="156"
         decoding="async"

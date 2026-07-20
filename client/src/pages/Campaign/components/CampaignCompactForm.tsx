@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 type Props = {
   externalAmount?: number;
   showCalculatorLink?: boolean;
+  collectBlessingNames?: boolean;
   onSubmit: (amount: number, donor: DonorForm) => void;
 };
 
@@ -13,7 +14,12 @@ interface FormInputs extends DonorForm {
   amount: string;
 }
 
-const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLink = true, onSubmit }) => {
+const CampaignCompactForm: React.FC<Props> = ({
+  externalAmount,
+  showCalculatorLink = true,
+  collectBlessingNames = false,
+  onSubmit,
+}) => {
   const {
     register,
     handleSubmit,
@@ -139,6 +145,21 @@ const CampaignCompactForm: React.FC<Props> = ({ externalAmount, showCalculatorLi
           <div className={styles.error}>{errors.email?.message || ""}</div>
         </div>
       </div>
+
+      {collectBlessingNames && (
+        <div className={`${styles.field} ${styles.blessingField}`}>
+          <label className={styles.label} htmlFor="blessing-names">
+            שמות בני המשפחה לברכה לחתימה טובה (לא חובה)
+          </label>
+          <textarea
+            id="blessing-names"
+            className={styles.textarea}
+            rows={3}
+            placeholder="לדוגמה: ישראל בן שרה, רחל בת לאה"
+            {...register("blessingNames")}
+          />
+        </div>
+      )}
 
       <button type="submit" className={styles.compactSubmitBtn}>
         אני רוצה לתרום

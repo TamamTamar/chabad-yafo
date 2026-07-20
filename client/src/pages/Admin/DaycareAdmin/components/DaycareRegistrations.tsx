@@ -86,7 +86,7 @@ const getSuggestedSchoolYear = () => {
 };
 
 const formatDate = (date?: string) =>
-    date ? new Date(date).toLocaleDateString("he-IL") : "—";
+    date ? new Date(date).toLocaleDateString("he-IL") : "-";
 
 const getCreateErrorMessage = (error: unknown) => {
     if (!axios.isAxiosError<{ code?: string; message?: string }>(error)) {
@@ -123,8 +123,8 @@ const toUnifiedRegistrations = (
             birthDate: registration.birthDate,
             requiredHours:
                 registration.requiredHours === "אחר" &&
-                registration.requiredHoursOther
-                    ? `אחר — ${registration.requiredHoursOther}`
+                    registration.requiredHoursOther
+                    ? `אחר - ${registration.requiredHoursOther}`
                     : registration.requiredHours,
             status: registration.status ?? "מתעניין",
             callNotes: registration.callNotes,
@@ -593,7 +593,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                 {createFormErrors.schoolYear ? <span className={styles.formErrorMessage}>{createFormErrors.schoolYear.message}</span> : null}
                             </label>
                             <label className={styles.compactField}>
-                                <span>הערה פנימית — אופציונלית</span>
+                                <span>הערה פנימית - אופציונלית</span>
                                 <textarea
                                     className={styles.compactTextarea}
                                     maxLength={2000}
@@ -601,7 +601,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                 />
                             </label>
                             <label className={styles.compactField}>
-                                <span>קישור למשפחה קיימת — אם זה אח/ות</span>
+                                <span>קישור למשפחה קיימת - אם זה אח/ות</span>
                                 <select className={styles.compactInput} {...register("existingFamilyId")}>
                                     <option value="">ילד/ה ראשון/ה במשפחה</option>
                                     {[...families]

@@ -12,6 +12,7 @@ type CampaignDonorFieldsProps = {
   errors: FieldErrors<DonorForm>;
   register: UseFormRegister<DonorForm>;
   setCustomRaw: (value: string) => void;
+  collectBlessingNames?: boolean;
 };
 
 const CampaignDonorFields = ({
@@ -22,6 +23,7 @@ const CampaignDonorFields = ({
   errors,
   register,
   setCustomRaw,
+  collectBlessingNames = false,
 }: CampaignDonorFieldsProps) => {
   const keepDigitsOnly = (event: ChangeEvent<HTMLInputElement>) => {
     event.target.value = event.target.value.replace(/\D/g, "");
@@ -102,6 +104,21 @@ const CampaignDonorFields = ({
           <span className={styles.errorText}>{errors.email?.message || ""}</span>
         </div>
       </div>
+
+      {collectBlessingNames && (
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="modal-blessing-names">
+            שמות בני המשפחה לברכה לחתימה טובה (לא חובה)
+          </label>
+          <textarea
+            id="modal-blessing-names"
+            className={styles.input}
+            rows={3}
+            placeholder="לדוגמה: ישראל בן שרה, רחל בת לאה"
+            {...register("blessingNames")}
+          />
+        </div>
+      )}
     </div>
   );
 };
