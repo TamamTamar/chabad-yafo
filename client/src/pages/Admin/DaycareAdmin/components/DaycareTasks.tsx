@@ -271,13 +271,11 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
         const cleanSubtasks = (draft.subtasks || [])
             .map((subtask) => ({ ...subtask, title: subtask.title.trim() }))
             .filter((subtask) => subtask.title);
-        const taskToSave = cleanSubtasks.length
-            ? {
-                  ...draft,
-                  subtasks: cleanSubtasks,
-                  status: getStatusFromSubtasks(cleanSubtasks),
-              }
-            : draft;
+        const taskToSave = {
+            ...draft,
+            subtasks: cleanSubtasks,
+            status: getStatusFromSubtasks(cleanSubtasks),
+        };
 
         if (editingId) {
             await updateDaycareTask(editingId, taskToSave);

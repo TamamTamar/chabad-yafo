@@ -204,6 +204,10 @@ export const daycareDocumentSchema = new Schema(
 
 export const daycareFinanceSettingsSchema = new Schema(
     {
+        taskDefaultsInitialized: {
+            type: Boolean,
+            default: false,
+        },
         pricePerChild: {
             type: Number,
             required: true,

@@ -76,6 +76,7 @@ export interface IDaycareDocument {
 }
 
 export interface IDaycareFinanceSettings {
+    taskDefaultsInitialized?: boolean;
     pricePerChild: number;
     currentChildren: number;
     targetChildren: number;

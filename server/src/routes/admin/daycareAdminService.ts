@@ -6,174 +6,24 @@ import {
     defaultDaycareDocuments,
     defaultDaycareTasks,
     defaultFinanceSettings,
-    obsoleteDefaultTaskTitles,
     openingTargetChildren,
 } from "./daycareDefaults";
-import { openingEquipmentSubtasks } from "./daycareTaskPresets";
-import { createFallbackSubtasks, getTaskStatusFromSubtasks } from "./daycareTaskStatus";
-
-const getTaskDefaultUpdatePayload = (task: IDaycareTask) => {
-    const payload: Partial<IDaycareTask> = {};
-
-    if (task.resourceLabel) {
-        payload.resourceLabel = task.resourceLabel;
-    }
-
-    if (task.resourceUrl) {
-        payload.resourceUrl = task.resourceUrl;
-    }
-
-    if (task.notes) {
-        payload.notes = task.notes;
-    }
-
-    if (task.stage) {
-        payload.stage = task.stage;
-    }
-
-    return payload;
-};
 
 export const ensureDefaultTasks = async () => {
-    await DaycareTask.deleteMany({
-        title: { $in: obsoleteDefaultTaskTitles },
-        status: { $ne: "הושלם" },
-    });
+    const financeSettings = await getFinanceSettings();
 
-    const equipmentTaskExists = await DaycareTask.exists({
-        title: "רשימת ציוד לקנייה לפתיחת המעון",
-    });
-
-    if (!equipmentTaskExists) {
-        await DaycareTask.updateOne(
-            {
-                title: "הכנת רשימת ציוד מינימלית לפתיחה",
-                status: { $ne: "הושלם" },
-            },
-            {
-                $set: {
-                    title: "רשימת ציוד לקנייה לפתיחת המעון",
-                    category: "ציוד",
-                    priority: "דחופה",
-                    stage: "לפני פתיחה",
-                    notes: "סמני כל פריט שנקנה. כשהכל מסומן המשימה תושלם.",
-                    subtasks: openingEquipmentSubtasks,
-                },
-            }
-        );
+    if (financeSettings.taskDefaultsInitialized) {
+        return;
     }
 
-    const existingTasks = await DaycareTask.find().select("title");
-    const existingTitles = new Set(existingTasks.map((task) => task.title));
-    const missingTasks = defaultDaycareTasks.filter(
-        (task) => !existingTitles.has(task.title)
-    );
+    const existingTask = await DaycareTask.exists({});
 
-    if (missingTasks.length > 0) {
-        await DaycareTask.insertMany(missingTasks);
+    if (!existingTask) {
+        await DaycareTask.insertMany(defaultDaycareTasks);
     }
 
-    await Promise.all(
-        defaultDaycareTasks
-            .filter((task) => task.resourceUrl || task.notes)
-            .map((task) => {
-                const updateConditions: Record<string, unknown>[] = [
-                    { resourceUrl: { $exists: false } },
-                    { resourceUrl: "" },
-                    { notes: { $exists: false } },
-                    { notes: "" },
-                    { stage: { $exists: false } },
-                ];
-
-                if (task.subtasks) {
-                    updateConditions.push(
-                        { subtasks: { $exists: false } },
-                        { subtasks: { $size: 0 } }
-                    );
-                }
-
-                return DaycareTask.updateOne(
-                    {
-                        title: task.title,
-                        $or: updateConditions,
-                    },
-                    {
-                        $set: getTaskDefaultUpdatePayload(task),
-                    }
-                );
-            })
-    );
-
-    await Promise.all(
-        defaultDaycareTasks
-            .filter((task) => task.subtasks && task.subtasks.length > 0)
-            .map(async (defaultTask) => {
-                const existingTask = await DaycareTask.findOne({
-                    title: defaultTask.title,
-                });
-
-                if (!existingTask || !defaultTask.subtasks) {
-                    return;
-                }
-
-                const existingSubtasks = existingTask.subtasks || [];
-                const existingTitles = new Set(
-                    existingSubtasks.map((subtask) => subtask.title)
-                );
-                const missingSubtasks = defaultTask.subtasks.filter(
-                    (subtask) => !existingTitles.has(subtask.title)
-                );
-
-                if (missingSubtasks.length === 0) {
-                    return;
-                }
-
-                await DaycareTask.updateOne(
-                    { _id: existingTask._id },
-                    {
-                        $set: {
-                            subtasks: [...existingSubtasks, ...missingSubtasks],
-                        },
-                    }
-                );
-            })
-    );
-
-    const tasksWithoutSubtasks = await DaycareTask.find({
-        $or: [
-            { subtasks: { $exists: false } },
-            { subtasks: { $size: 0 } },
-        ],
-    });
-
-    await Promise.all(
-        tasksWithoutSubtasks.map(async (task) => {
-            task.subtasks = createFallbackSubtasks(task.status);
-            task.status = getTaskStatusFromSubtasks(task.subtasks, task.status);
-            task.markModified("subtasks");
-            await task.save();
-        })
-    );
-
-    const tasksWithSubtasks = await DaycareTask.find({
-        "subtasks.0": { $exists: true },
-    });
-
-    await Promise.all(
-        tasksWithSubtasks.map(async (task) => {
-            const nextStatus = getTaskStatusFromSubtasks(
-                task.subtasks,
-                task.status
-            );
-
-            if (task.status === nextStatus) {
-                return;
-            }
-
-            task.status = nextStatus;
-            await task.save();
-        })
-    );
+    financeSettings.taskDefaultsInitialized = true;
+    await financeSettings.save();
 };
 
 export const ensureDefaultDocuments = async () => {
