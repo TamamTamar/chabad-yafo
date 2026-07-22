@@ -60,5 +60,5 @@ const fastDayConfigs: Record<FastDayKey, DonationCampaignConfig> = {
   },
 };
 
-export const activeFastDay: FastDayKey = "shivaaAsarBetammuz";
+export const activeFastDay: FastDayKey = "tishaBeav";
 export const taanitConfig = fastDayConfigs[activeFastDay];
