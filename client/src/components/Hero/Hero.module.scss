@@ -3,22 +3,37 @@
 .hero {
     position: relative;
     min-height: 500px;
-    padding: 34px 0 24px;
-    display: flex;
-    align-items: center;
     overflow: hidden;
     isolation: isolate;
 }
 
-.bg {
+.swiper,
+.slide {
+    width: 100%;
+    min-height: 500px;
+}
+
+.slide {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 34px 0 60px;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.background {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background-image: url("../../assets/hero-mobile.webp");
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-    animation: softFade 700ms ease both;
+    display: block;
+}
+
+.background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .overlay {
@@ -26,63 +41,87 @@
     inset: 0;
     z-index: -1;
     background:
-        linear-gradient(90deg,
-            rgba($color-black, 0.14) 0%,
+        linear-gradient(
+            90deg,
+            rgba($color-black, 0.12) 0%,
             rgba($color-black, 0.22) 38%,
-            rgba($color-black, 0.42) 72%,
-            rgba($color-black, 0.54) 100%),
-        linear-gradient(to bottom,
-            rgba($color-black, 0.08),
-            rgba($color-black, 0.22));
+            rgba($color-black, 0.48) 72%,
+            rgba($color-black, 0.62) 100%
+        ),
+        linear-gradient(to bottom, rgba($color-black, 0.08), rgba($color-black, 0.28));
 }
 
 .inner {
     position: relative;
     z-index: 1;
+    width: 100%;
 }
 
 .card {
-    max-width: 560px;
+    max-width: 590px;
     margin-right: auto;
     margin-left: 0;
-    padding: 42px 24px 20px;
-    padding-top: 70px;
+    padding: 64px 24px 24px;
+    color: $color-white;
+}
+
+.eyebrow {
+    display: inline-flex;
+    margin-bottom: 12px;
+    padding: 7px 13px;
+    border: 1px solid rgba($color-white, 0.32);
+    border-radius: $radius-pill;
+    background: rgba($brand-blue-night, 0.38);
+    font-size: $type-eyebrow;
+    font-weight: 800;
+    backdrop-filter: blur(7px);
 }
 
 .title {
-    max-width: 520px;
-    margin: 0 0 22px;
-    line-height: 1.14;
-    font-weight: 900;
+    max-width: 560px;
+    margin: 0 0 18px;
     color: $hero-title-color;
-    text-shadow:
-        0 3px 12px rgba($color-black, .45),
-        0 8px 30px rgba($color-black, .35);
-    animation: softRise 650ms ease 120ms both;
     font-size: $type-hero-title;
+    font-weight: 900;
     line-height: $line-title;
+    text-shadow:
+        0 3px 12px rgba($color-black, 0.48),
+        0 8px 30px rgba($color-black, 0.36);
+}
+
+.title span {
+    display: block;
+}
+
+.description {
+    max-width: 520px;
+    margin: 0 0 24px;
+    color: rgba($color-white, 0.95);
+    font-size: $type-hero-subtitle;
+    font-weight: 600;
+    line-height: 1.65;
+    text-shadow: 0 2px 12px rgba($color-black, 0.52);
 }
 
 .actions {
     display: flex;
-    gap: 12px;
     flex-wrap: wrap;
     justify-content: flex-start;
+    gap: 12px;
     margin: 0;
-    animation: softRise 650ms ease 260ms both;
 }
 
 .primary,
 .secondary {
     display: inline-flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     min-width: $hero-cta-min-width;
     padding: 13px 18px;
     border-radius: $radius-sm;
-    text-decoration: none;
     font-weight: 900;
     line-height: 1;
+    text-decoration: none;
     transition:
         transform 0.22s ease,
         box-shadow 0.22s ease,
@@ -111,23 +150,108 @@
     color: $ui-btn-secondary-text;
 }
 
-@media (min-width: 768px) {
-    .bg {
-        background-image: url("../../assets/hero-desktop.webp");
-        background-position: center;
+.controls {
+    position: absolute;
+    right: 50%;
+    bottom: 56px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 9px;
+    border: 1px solid rgba($color-white, 0.22);
+    border-radius: $radius-pill;
+    background: rgba($brand-blue-night, 0.46);
+    box-shadow: 0 8px 22px rgba($color-black, 0.18);
+    backdrop-filter: blur(8px);
+    transform: translateX(50%);
+}
+
+.arrow,
+.dot {
+    border: 0;
+    color: $color-white;
+    cursor: pointer;
+}
+
+.arrow {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
+    place-items: center;
+    transition: background 0.2s ease;
+}
+
+.arrow:hover {
+    background: rgba($color-white, 0.16);
+}
+
+.dots {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: $radius-pill;
+    background: rgba($color-white, 0.48);
+    transition:
+        width 0.25s ease,
+        background 0.25s ease;
+}
+
+.dotActive {
+    width: 24px;
+    background: $brand-secondary;
+}
+
+.arrow:focus-visible,
+.dot:focus-visible,
+.primary:focus-visible,
+.secondary:focus-visible {
+    outline: 3px solid $color-white;
+    outline-offset: 3px;
+}
+
+.slide:global(.swiper-slide-active) .card {
+    animation: softRise 600ms ease 100ms both;
+}
+
+@keyframes softRise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
 @media (max-width: 640px) {
-    .hero {
-        min-height: 390px;
-        padding: 22px 0 18px;
+    .hero,
+    .swiper,
+    .slide {
+        min-height: 430px;
+    }
+
+    .slide {
+        padding: 22px 0 68px;
     }
 
     .overlay {
-        background: linear-gradient(to bottom,
-                rgba($color-black, 0.34),
-                rgba($color-black, 0.48));
+        background: linear-gradient(
+            to bottom,
+            rgba($color-black, 0.28),
+            rgba($color-black, 0.58)
+        );
     }
 
     .card {
@@ -135,10 +259,21 @@
         padding: 24px 16px;
     }
 
+    .eyebrow {
+        margin-bottom: 10px;
+        font-size: 0.82rem;
+    }
+
     .title {
         max-width: 100%;
-        margin-bottom: 22px;
-        font-size: $type-hero-title-compact;
+        margin-bottom: 14px;
+        font-size: clamp(2rem, 9vw, 2.75rem);
+    }
+
+    .description {
+        margin-bottom: 20px;
+        font-size: 1rem;
+        line-height: 1.55;
     }
 
     .actions {
@@ -149,5 +284,22 @@
     .secondary {
         width: 100%;
         min-width: unset;
+    }
+
+    .controls {
+        bottom: 42px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .slide:global(.swiper-slide-active) .card {
+        animation: none;
+    }
+
+    .primary,
+    .secondary,
+    .arrow,
+    .dot {
+        transition: none;
     }
 }
