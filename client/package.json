@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@fontsource/assistant": "^5.2.9",
+    "@hebcal/core": "^6.8.2",
+    "@hebcal/hdate": "^0.22.5",
     "axios": "^1.13.2",
     "framer-motion": "^12.40.0",
     "lucide-react": "^0.562.0",
