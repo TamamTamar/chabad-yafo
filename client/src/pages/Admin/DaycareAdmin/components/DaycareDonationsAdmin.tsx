@@ -48,8 +48,24 @@ const auditLabels: Record<string, string> = {
     "intent.created": "הוכן תשלום באתר",
     "intent.failed": "תשלום לא אושר",
     "payment.confirmed": "תשלום נדרים פלוס אושר",
+    "diagnostic.intentCreated": "הוכנה עסקת בדיקה",
+    "diagnostic.paymentObserved": "עסקת הבדיקה התקבלה",
     "diagnostics.cleared": "נתוני האבחון נמחקו",
 };
+
+type AdminView = "overview" | "records" | "manual" | "items" | "history";
+
+const adminViews: Array<{
+    id: AdminView;
+    label: string;
+    description: string;
+}> = [
+    { id: "overview", label: "סקירה", description: "מצב הקמפיין" },
+    { id: "records", label: "תרומות", description: "רשומות ושיוכים" },
+    { id: "manual", label: "הזנה ידנית", description: "תרומה מחוץ לאתר" },
+    { id: "items", label: "סעיפים ויעדים", description: "יעדים ומצבים" },
+    { id: "history", label: "היסטוריה", description: "שינויים וכלים" },
+];
 
 const DaycareDonationsAdmin = () => {
     const [campaign, setCampaign] =
@@ -64,6 +80,11 @@ const DaycareDonationsAdmin = () => {
     const [diagnosticPaymentOpen, setDiagnosticPaymentOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [activeView, setActiveView] = useState<AdminView>("overview");
+    const [recordQuery, setRecordQuery] = useState("");
+    const [recordStatus, setRecordStatus] = useState<
+        "all" | DaycareDonationRecord["status"]
+    >("all");
 
     const loadData = useCallback(async () => {
         const [campaignData, recordData, auditData, diagnosticData] =
@@ -95,6 +116,28 @@ const DaycareDonationsAdmin = () => {
         () => records.filter((record) => record.status === "confirmed").length,
         [records]
     );
+
+    const filteredRecords = useMemo(() => {
+        const normalizedQuery = recordQuery.trim().toLocaleLowerCase("he");
+        return records.filter((record) => {
+            const matchesStatus =
+                recordStatus === "all" || record.status === recordStatus;
+            const matchesQuery =
+                !normalizedQuery ||
+                [
+                    record.donorName,
+                    record.email,
+                    record.phone,
+                    record.externalTransactionId,
+                    record.reference,
+                ].some((value) =>
+                    String(value ?? "")
+                        .toLocaleLowerCase("he")
+                        .includes(normalizedQuery)
+                );
+            return matchesStatus && matchesQuery;
+        });
+    }, [recordQuery, recordStatus, records]);
 
     const handleManualDonation = async (
         event: React.FormEvent<HTMLFormElement>
@@ -128,6 +171,7 @@ const DaycareDonationsAdmin = () => {
             });
             form.reset();
             await loadData();
+            setActiveView("records");
             setMessage("התרומה הידנית נשמרה והמדדים עודכנו.");
         } catch (saveError) {
             console.error("Failed to save manual donation:", saveError);
@@ -316,14 +360,36 @@ const DaycareDonationsAdmin = () => {
                 </p>
             )}
 
-            <section className={`${styles.panel} ${styles.diagnosticPanel}`}>
-                <header className={styles.sectionHeader}>
+            <nav className={styles.adminViewNav} aria-label="אזורי ניהול התרומות">
+                {adminViews.map((view) => (
+                    <button
+                        key={view.id}
+                        type="button"
+                        className={
+                            activeView === view.id ? styles.activeView : ""
+                        }
+                        aria-pressed={activeView === view.id}
+                        onClick={() => {
+                            setActiveView(view.id);
+                            setError("");
+                            setMessage("");
+                        }}
+                    >
+                        <strong>{view.label}</strong>
+                        <small>{view.description}</small>
+                        {view.id === "records" && records.length > 0 && (
+                            <span>{records.length}</span>
+                        )}
+                    </button>
+                ))}
+            </nav>
+
+            {activeView === "history" && (
+            <details className={styles.technicalTools}>
+                <summary>
                     <div>
-                        <h2>אבחון זמני — נדרים פלוס</h2>
-                        <p>
-                            מיועד לעסקת הניסיון בלבד. לא נשמרים כאן פרטי
-                            אשראי או פרטים אישיים.
-                        </p>
+                        <strong>כלים טכניים ואבחון זמני</strong>
+                        <span>לשימוש רק במקרה של תקלה או בדיקת חיבור</span>
                     </div>
                     <span
                         className={
@@ -336,7 +402,8 @@ const DaycareDonationsAdmin = () => {
                             ? "האבחון פעיל"
                             : "האבחון כבוי"}
                     </span>
-                </header>
+                </summary>
+                <div className={styles.technicalToolsBody}>
                 {!diagnostics?.enabled && (
                     <p className={styles.diagnosticInstruction}>
                         כדי להפעיל לעסקת הניסיון בלבד, הגדירו ב־Railway:
@@ -410,8 +477,12 @@ const DaycareDonationsAdmin = () => {
                         </button>
                     </>
                 )}
-            </section>
+                </div>
+            </details>
+            )}
 
+            {activeView === "overview" && (
+            <>
             <section className={styles.panel}>
                 <header>
                     <h2>הגדרות ויעדים</h2>
@@ -473,7 +544,77 @@ const DaycareDonationsAdmin = () => {
                     ))}
                 </div>
             </section>
+            <section className={styles.panel}>
+                <header>
+                    <h2>עבודה שוטפת</h2>
+                    <p>הפעולות הנפוצות נמצאות במרחק לחיצה אחת.</p>
+                </header>
+                <div className={styles.quickActions}>
+                    <button
+                        type="button"
+                        onClick={() => setActiveView("records")}
+                    >
+                        <strong>צפייה בתרומות</strong>
+                        <small>{records.length} רשומות</small>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveView("manual")}
+                    >
+                        <strong>הוספת תרומה ידנית</strong>
+                        <small>מזומן, צ׳ק או העברה</small>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveView("items")}
+                    >
+                        <strong>עריכת סעיפים</strong>
+                        <small>{campaign.items.length} סעיפים</small>
+                    </button>
+                </div>
+                <div className={styles.recentRecords}>
+                    <div>
+                        <h3>תרומות אחרונות</h3>
+                        {records.length > 5 && (
+                            <button
+                                type="button"
+                                onClick={() => setActiveView("records")}
+                            >
+                                לכל התרומות
+                            </button>
+                        )}
+                    </div>
+                    {records.length === 0 ? (
+                        <p className={styles.emptyState}>
+                            התרומה הראשונה שתתקבל תופיע כאן.
+                        </p>
+                    ) : (
+                        <ul>
+                            {records.slice(0, 5).map((record) => (
+                                <li key={record._id}>
+                                    <div>
+                                        <strong>
+                                            {record.donorName ||
+                                                "תורם אנונימי"}
+                                        </strong>
+                                        <span>
+                                            {formatDate(record.receivedAt)}
+                                        </span>
+                                    </div>
+                                    <strong>
+                                        ₪{formatCurrency(record.amount)}
+                                    </strong>
+                                    <span>{statusLabels[record.status]}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </section>
+            </>
+            )}
 
+            {activeView === "manual" && (
             <section className={styles.panel}>
                 <header>
                     <h2>הזנת תרומה ידנית</h2>
@@ -568,70 +709,126 @@ const DaycareDonationsAdmin = () => {
                     </button>
                 </form>
             </section>
+            )}
 
+            {activeView === "items" && (
             <section className={styles.panel}>
                 <header>
-                    <h2>יעדים ומצב הסעיפים</h2>
+                    <h2>סעיפים ויעדים</h2>
                     <p>
-                        מצב אוטומטי נסגר ב־100%. ניתן לפתוח או לסגור סעיף
-                        ידנית.
+                        הסעיפים מקובצים לפי קטגוריות. פתחו רק את הקבוצה
+                        שתרצו לערוך.
                     </p>
                 </header>
-                <div className={styles.itemList}>
-                    {campaign.items.map((item) => (
-                        <form
-                            className={styles.itemRow}
-                            key={item.id}
-                            onSubmit={(event) =>
-                                handleItemUpdate(event, item.id)
-                            }
+                <div className={styles.categoryEditors}>
+                    {campaign.categories.map((category, categoryIndex) => (
+                        <details
+                            className={styles.categoryEditor}
+                            key={category.id}
+                            open={categoryIndex === 0}
                         >
-                            <div>
-                                <strong>{item.title}</strong>
-                                <span>
-                                    גויסו ₪{formatCurrency(item.raised)}
-                                    {(item.overflow ?? 0) > 0 &&
-                                        ` · חריגה ₪${formatCurrency(
-                                            item.overflow ?? 0
-                                        )}`}
-                                </span>
+                            <summary>
+                                <div>
+                                    <strong>{category.title}</strong>
+                                    <span>
+                                        {
+                                            campaign.items.filter(
+                                                (item) =>
+                                                    item.categoryId ===
+                                                    category.id
+                                            ).length
+                                        }{" "}
+                                        סעיפים
+                                    </span>
+                                </div>
+                                <strong>
+                                    יעד ₪{formatCurrency(category.goal)}
+                                </strong>
+                            </summary>
+                            <div className={styles.itemList}>
+                                {campaign.items
+                                    .filter(
+                                        (item) =>
+                                            item.categoryId === category.id
+                                    )
+                                    .map((item) => (
+                                        <form
+                                            className={styles.itemRow}
+                                            key={item.id}
+                                            onSubmit={(event) =>
+                                                handleItemUpdate(
+                                                    event,
+                                                    item.id
+                                                )
+                                            }
+                                        >
+                                            <div>
+                                                <strong>{item.title}</strong>
+                                                <span>
+                                                    גויסו ₪
+                                                    {formatCurrency(
+                                                        item.raised
+                                                    )}
+                                                    {(item.overflow ?? 0) >
+                                                        0 &&
+                                                        ` · חריגה ₪${formatCurrency(
+                                                            item.overflow ?? 0
+                                                        )}`}
+                                                </span>
+                                            </div>
+                                            <label>
+                                                יעד
+                                                <input
+                                                    name="goal"
+                                                    type="number"
+                                                    min="0"
+                                                    defaultValue={item.goal}
+                                                />
+                                            </label>
+                                            <label>
+                                                מצב
+                                                <select
+                                                    name="statusOverride"
+                                                    defaultValue={
+                                                        item.statusOverride ??
+                                                        "auto"
+                                                    }
+                                                >
+                                                    <option value="auto">
+                                                        אוטומטי
+                                                    </option>
+                                                    <option value="open">
+                                                        פתוח ידנית
+                                                    </option>
+                                                    <option value="closed">
+                                                        סגור ידנית
+                                                    </option>
+                                                </select>
+                                            </label>
+                                            <label>
+                                                סיבת השינוי
+                                                <input
+                                                    name="reason"
+                                                    type="text"
+                                                    required
+                                                />
+                                            </label>
+                                            <button
+                                                type="submit"
+                                                disabled={saving}
+                                            >
+                                                שמירה
+                                            </button>
+                                        </form>
+                                    ))}
                             </div>
-                            <label>
-                                יעד
-                                <input
-                                    name="goal"
-                                    type="number"
-                                    min="0"
-                                    defaultValue={item.goal}
-                                />
-                            </label>
-                            <label>
-                                סיבת השינוי
-                                <input
-                                    name="reason"
-                                    type="text"
-                                    required
-                                />
-                            </label>
-                            <label>
-                                מצב
-                                <select
-                                    name="statusOverride"
-                                    defaultValue={item.statusOverride ?? "auto"}
-                                >
-                                    <option value="auto">אוטומטי</option>
-                                    <option value="open">פתוח ידנית</option>
-                                    <option value="closed">סגור ידנית</option>
-                                </select>
-                            </label>
-                            <button type="submit" disabled={saving}>
-                                שמירה
-                            </button>
-                        </form>
+                        </details>
                     ))}
                 </div>
             </section>
+            )}
 
+            {activeView === "records" && (
             <section className={styles.panel}>
                 <header>
                     <h2>רשומות תרומה</h2>
@@ -640,9 +837,51 @@ const DaycareDonationsAdmin = () => {
                         מבלי למחוק את הרשומה.
                     </p>
                 </header>
+                <div className={styles.recordFilters}>
+                    <label>
+                        חיפוש
+                        <input
+                            type="search"
+                            value={recordQuery}
+                            placeholder="שם, טלפון, דוא״ל או מספר עסקה"
+                            onChange={(event) =>
+                                setRecordQuery(event.target.value)
+                            }
+                        />
+                    </label>
+                    <label>
+                        מצב
+                        <select
+                            value={recordStatus}
+                            onChange={(event) =>
+                                setRecordStatus(
+                                    event.target.value as
+                                        | "all"
+                                        | DaycareDonationRecord["status"]
+                                )
+                            }
+                        >
+                            <option value="all">כל המצבים</option>
+                            {Object.entries(statusLabels).map(
+                                ([value, label]) => (
+                                    <option key={value} value={value}>
+                                        {label}
+                                    </option>
+                                )
+                            )}
+                        </select>
+                    </label>
+                    <span>
+                        מוצגות {filteredRecords.length} מתוך {records.length}
+                    </span>
+                </div>
                 {records.length === 0 ? (
                     <p className={styles.emptyState}>
                         עדיין לא הוזנו תרומות אמיתיות.
+                    </p>
+                ) : filteredRecords.length === 0 ? (
+                    <p className={styles.emptyState}>
+                        לא נמצאו תרומות שמתאימות לחיפוש.
                     </p>
                 ) : (
                     <div className={styles.recordsTableWrap}>
@@ -651,16 +890,34 @@ const DaycareDonationsAdmin = () => {
                                 <tr>
                                     <th>תאריך</th>
                                     <th>תורם</th>
+                                    <th>מקור</th>
                                     <th>סכום</th>
                                     <th>שיוך</th>
                                     <th>מצב</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {records.map((record) => (
+                                {filteredRecords.map((record) => (
                                     <tr key={record._id}>
                                         <td>{formatDate(record.receivedAt)}</td>
-                                        <td>{record.donorName || "לא צוין"}</td>
+                                        <td>
+                                            <div className={styles.recordDonor}>
+                                                <strong>
+                                                    {record.donorName ||
+                                                        "לא צוין"}
+                                                </strong>
+                                                <small>
+                                                    {record.email ||
+                                                        record.phone ||
+                                                        ""}
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {record.source === "nedarim"
+                                                ? "נדרים פלוס"
+                                                : "ידנית"}
+                                        </td>
                                         <td>
                                             ₪{formatCurrency(record.amount)}
                                         </td>
@@ -739,7 +996,9 @@ const DaycareDonationsAdmin = () => {
                     </div>
                 )}
             </section>
+            )}
 
+            {activeView === "history" && (
             <section className={styles.panel}>
                 <header>
                     <h2>היסטוריית שינויים</h2>
@@ -778,6 +1037,7 @@ const DaycareDonationsAdmin = () => {
                     </ol>
                 )}
             </section>
+            )}
             <ConfirmDialog
                 open={clearDiagnosticsOpen}
                 title="מחיקת נתוני אבחון"
