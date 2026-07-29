@@ -156,6 +156,19 @@ const DonationModalPreview = ({
             });
             const [firstName = "", ...lastNameParts] = fullName.trim().split(/\s+/);
             const lastName = lastNameParts.join(" ") || firstName;
+            const campaignLabel = diagnosticMode
+                ? "עסקת ניסיון — קמפיין המעון"
+                : "תרומה — קמפיין המעון";
+            const providerComment = [
+                campaignLabel,
+                `יעד: ${selectedTitle}`,
+                dedication.trim()
+                    ? `הקדשה: ${dedication.trim()}`
+                    : "",
+            ]
+                .filter(Boolean)
+                .join(" | ")
+                .slice(0, 300);
             setPaymentPayload(
                 buildNedarimPayload({
                     Mosad: import.meta.env.VITE_NEDARIM_MOSAD,
@@ -166,12 +179,13 @@ const DonationModalPreview = ({
                     Description: diagnosticMode
                         ? `עסקת ניסיון למעון — ${selectedTitle}`
                         : `תרומה למעון — ${selectedTitle}`,
+                    Groupe: "קמפיין המעון",
                     firstName,
                     lastName,
                     phone: phone.trim(),
                     email: email.trim(),
                     PaymentType: "Ragil",
-                    Comment: dedication.trim(),
+                    Comment: providerComment,
                     CallBack: intent.callbackUrl,
                     Param1: intent.param1,
                     Param2: intent.param2,

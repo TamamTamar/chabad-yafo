@@ -166,9 +166,15 @@ test("manual donation requires source and note or reference", async () => {
     await validManualDonation.validate();
 });
 
-test("real payments stay fail-closed until official provider verification exists", () => {
-    const previous = process.env.DAYCARE_DONATIONS_PAYMENT_ENABLED;
+test("unsigned Nedarim callbacks require an explicit production opt-in", () => {
+    const previousPayment =
+        process.env.DAYCARE_DONATIONS_PAYMENT_ENABLED;
+    const previousUnsigned =
+        process.env
+            .DAYCARE_DONATIONS_ACCEPT_UNSIGNED_NEDARIM_CALLBACKS;
     process.env.DAYCARE_DONATIONS_PAYMENT_ENABLED = "true";
+    delete process.env
+        .DAYCARE_DONATIONS_ACCEPT_UNSIGNED_NEDARIM_CALLBACKS;
 
     try {
         assert.equal(
@@ -176,11 +182,24 @@ test("real payments stay fail-closed until official provider verification exists
             false
         );
         assert.equal(areDaycareDonationPaymentsEnabled(), false);
+
+        process.env
+            .DAYCARE_DONATIONS_ACCEPT_UNSIGNED_NEDARIM_CALLBACKS = "true";
+        assert.equal(areDaycareDonationPaymentsEnabled(), true);
     } finally {
-        if (previous === undefined) {
+        if (previousPayment === undefined) {
             delete process.env.DAYCARE_DONATIONS_PAYMENT_ENABLED;
         } else {
-            process.env.DAYCARE_DONATIONS_PAYMENT_ENABLED = previous;
+            process.env.DAYCARE_DONATIONS_PAYMENT_ENABLED =
+                previousPayment;
+        }
+        if (previousUnsigned === undefined) {
+            delete process.env
+                .DAYCARE_DONATIONS_ACCEPT_UNSIGNED_NEDARIM_CALLBACKS;
+        } else {
+            process.env
+                .DAYCARE_DONATIONS_ACCEPT_UNSIGNED_NEDARIM_CALLBACKS =
+                previousUnsigned;
         }
     }
 });

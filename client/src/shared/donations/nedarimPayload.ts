@@ -7,6 +7,7 @@ export type BuildNedarimPayloadArgs = {
   Tashlumim: number;
   Currency: Currency;
   Description: string;
+  Groupe?: string;
 
   firstName?: string;
   lastName?: string;
@@ -40,6 +41,7 @@ export const buildNedarimPayload = (args: BuildNedarimPayloadArgs) => {
     Tashlumim: args.Tashlumim,
     Currency: args.Currency,
     Description: args.Description,
+    Groupe: args.Groupe ?? "",
     FirstName: args.firstName ?? "",
     LastName: args.lastName ?? "",
     Phone: args.phone ?? "",

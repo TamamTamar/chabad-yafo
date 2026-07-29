@@ -2,10 +2,19 @@
 
 ## Release state
 
-Real payments are fail-closed in code. The public page may be reviewed, but
-the server will not create payment intents until the official Nedarim Plus
-server-side verification flow has been documented, implemented and tested.
-The public campaign content is also hidden unless
+Nedarim Plus callback delivery was confirmed with a real ILS 1 transaction on
+2026-07-29. The available iframe documentation does not provide an official
+callback signature or server-side transaction lookup. Production therefore
+requires two independent, explicit flags:
+
+```text
+DAYCARE_DONATIONS_PAYMENT_ENABLED=true
+DAYCARE_DONATIONS_ACCEPT_UNSIGNED_NEDARIM_CALLBACKS=true
+```
+
+The second flag records the campaign owner's decision to accept this residual
+risk; it must not be described as official provider verification. The public
+campaign content remains hidden unless
 `DAYCARE_DONATIONS_PUBLIC_VISIBLE=true`.
 
 Do not change
