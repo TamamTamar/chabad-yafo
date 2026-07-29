@@ -1,6 +1,10 @@
 # macOS
 .DS_Store
 
+# Local source archives and accidental lockfile copies
+*.zip
+*package-lock 2.json
+
 # Environment variables
 .env
 .env.*

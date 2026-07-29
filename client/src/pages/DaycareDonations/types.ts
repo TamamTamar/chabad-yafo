@@ -1,0 +1,117 @@
+export type DonationItemStatus = "open" | "almost" | "complete" | "closed";
+
+export type DonationVisual = {
+    src?: string;
+    alt: string;
+    placeholderLabel: string;
+    caption?: string;
+    tone: "blue" | "gold" | "sage" | "sand" | "sky";
+};
+
+export type DonationItem = {
+    id: string;
+    categoryId: string;
+    title: string;
+    description: string;
+    goal: number;
+    raised: number;
+    remaining?: number;
+    overflow?: number;
+    order?: number;
+    openingPriority?: number;
+    acceptingDonations: boolean;
+    statusOverride?: "auto" | "open" | "closed";
+    visual: DonationVisual;
+};
+
+export type DonationCategory = {
+    id: string;
+    title: string;
+    description: string;
+    goal: number;
+    raised?: number;
+    remaining?: number;
+    overflow?: number;
+    order?: number;
+    shortTitle?: string;
+    visual: DonationVisual;
+};
+
+export type DaycareDonationCampaignData = {
+    slug: string;
+    title: string;
+    goal: number;
+    active: boolean;
+    publicVisible: boolean;
+    paymentsEnabled: boolean;
+    raised: number;
+    remaining?: number;
+    overflow?: number;
+    generalRaised: number;
+    categories: DonationCategory[];
+    items: DonationItem[];
+    updatedAt?: string;
+};
+
+export type DaycareDonationRecord = {
+    _id: string;
+    campaignSlug: string;
+    source: "manual" | "nedarim";
+    status: "confirmed" | "refunded" | "cancelled";
+    amount: number;
+    itemId?: string;
+    donorName?: string;
+    phone?: string;
+    email?: string;
+    dedication?: string;
+    note?: string;
+    manualSource?: "bank_transfer" | "cash" | "check" | "other";
+    reference?: string;
+    enteredById?: string;
+    enteredByLabel?: string;
+    providerIntentId?: string;
+    externalTransactionId?: string;
+    receivedAt: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type DaycareDonationAudit = {
+    _id: string;
+    action: string;
+    entityType: "campaign" | "category" | "item" | "record" | "intent";
+    entityId: string;
+    actor: "admin" | "nedarim" | "system";
+    actorId?: string;
+    actorLabel?: string;
+    reason?: string;
+    before?: unknown;
+    after?: unknown;
+    createdAt: string;
+};
+
+export type DaycareDonationDiagnostic = {
+    _id: string;
+    intentPublicId: string;
+    status: string;
+    fields: string[];
+    values: Record<string, string>;
+    receivedAt: string;
+    expiresAt: string;
+};
+
+export type DaycareDonationDiagnostics = {
+    enabled: boolean;
+    diagnostics: DaycareDonationDiagnostic[];
+};
+
+export type FieldGalleryItem = {
+    id: string;
+    title: string;
+    caption: string;
+    visual: DonationVisual;
+};
+
+export type DonationSelection =
+    | { kind: "general"; id: "general"; title: string }
+    | { kind: "item"; id: string; title: string };

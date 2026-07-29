@@ -58,6 +58,8 @@
 }
 
 .card {
+    position: relative;
+    left: clamp(120px, 13vw, 240px);
     max-width: 590px;
     margin-right: auto;
     margin-left: 0;
@@ -255,6 +257,7 @@
     }
 
     .card {
+        left: 0;
         max-width: 100%;
         padding: 24px 16px;
     }
@@ -288,6 +291,12 @@
 
     .controls {
         bottom: 42px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+    .card {
+        left: 48px;
     }
 }
 

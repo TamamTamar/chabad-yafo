@@ -44,7 +44,11 @@ router.post("/login", (req, res) => {
     }
 
     const token = jwt.sign(
-        { role: "admin" },
+        {
+            role: "admin",
+            sub: process.env.ADMIN_USER_ID?.trim() || "primary-admin",
+            label: process.env.ADMIN_DISPLAY_NAME?.trim() || "מנהל ראשי",
+        },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
     );
@@ -64,6 +68,7 @@ router.get("/me", requireAdmin, (_req, res) => {
     res.json({
         success: true,
         admin: true,
+        user: res.locals.adminActor,
     });
 });
 

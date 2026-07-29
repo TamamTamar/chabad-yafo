@@ -3,6 +3,13 @@ import jwt from "jsonwebtoken";
 
 type AdminPayload = {
     role: "admin";
+    sub: string;
+    label: string;
+};
+
+export type AdminActor = {
+    id: string;
+    label: string;
 };
 
 const adminCookieName = "admin_token";
@@ -54,6 +61,10 @@ export const requireAdmin = (
             });
         }
 
+        res.locals.adminActor = {
+            id: decoded.sub || "primary-admin",
+            label: decoded.label || "מנהל ראשי",
+        } satisfies AdminActor;
         next();
     } catch {
         return res.status(401).json({

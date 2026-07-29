@@ -27,6 +27,8 @@ import { daycareHealthDeclarationAdminRoutes, daycareHealthDeclarationPublicRout
 import { syncDaycareOnboardingStepTitles } from "./services/daycareOnboardingTitleSyncService";
 import { ensureDaycareAgreementIndexes } from "./services/daycareAgreementIndexService";
 import { daycarePickupAuthorizationAdminRoutes, daycarePickupAuthorizationPublicRoutes } from "./routes/daycarePickupAuthorizationRoutes";
+import { daycareDonationRoutes } from "./routes/daycareDonationRoutes";
+import { daycareDonationAdminRoutes } from "./routes/admin/daycareDonationAdminRoutes";
 
 dotenv.config();
 
@@ -68,6 +70,8 @@ app.use("/api/daycare/agreements/public", daycareAgreementPublicRoutes);
 app.use("/api/daycare/parent-documents", daycareParentDocumentRoutes);
 app.use("/api/daycare/health-declarations/public", daycareHealthDeclarationPublicRoutes);
 app.use("/api/daycare/pickup-authorizations/public", daycarePickupAuthorizationPublicRoutes);
+app.use("/api/daycare-donations", daycareDonationRoutes);
+app.use("/api/admin/daycare/donations", daycareDonationAdminRoutes);
 app.use("/api/admin/daycare/parent-documents", daycareParentDocumentAdminRoutes);
 app.use("/api/admin/daycare/health-declarations", daycareHealthDeclarationAdminRoutes);
 app.use("/api/admin/daycare/pickup-authorizations", daycarePickupAuthorizationAdminRoutes);

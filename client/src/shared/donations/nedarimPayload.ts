@@ -16,6 +16,8 @@ export type BuildNedarimPayloadArgs = {
   Comment: string
   CallBack?: string;
   CallBackMailError?: string;
+  Param1?: string;
+  Param2?: string;
 
 };
 
@@ -41,10 +43,12 @@ export const buildNedarimPayload = (args: BuildNedarimPayloadArgs) => {
     FirstName: args.firstName ?? "",
     LastName: args.lastName ?? "",
     Phone: args.phone ?? "",
-    Email: args.email ?? "",
+    Mail: args.email ?? "",
     Comment: args.Comment ?? "",
     PaymentType: args.PaymentType ?? "",
     CallBack: args.CallBack ?? getNedarimCallbackUrl(),
     CallBackMailError: args.CallBackMailError ?? "lchabadyaffo@gmail.com",
+    Param1: args.Param1 ?? "",
+    Param2: args.Param2 ?? "",
   };
 };

@@ -11,7 +11,6 @@ import daycareDesktop from "../../assets/families-hero.webp";
 import daycareMobile from "../../assets/families-hero-mobile.webp";
 import mainDesktop from "../../assets/hero-desktop.webp";
 import mainMobile from "../../assets/hero-mobile.webp";
-import taanitImage from "../../assets/taanit-hero.png";
 import Container from "../Container/Container";
 import styles from "./Hero.module.scss";
 
@@ -43,19 +42,6 @@ const slides: HeroSlide[] = [
                 to: "/donate#donate-form",
                 variant: "secondary",
             },
-        ],
-    },
-    {
-        id: "taanit",
-        eyebrow: "יום צום • מוסיפים בצדקה",
-        title: "אגרא דתעניתא – צדקתא",
-        description:
-            "את עלות הארוחות שנחסכו ביום הצום הופכים לצדקה, חסד ואור למשפחות ביפו.",
-        desktopImage: taanitImage,
-        mobileImage: taanitImage,
-        imagePosition: "center",
-        actions: [
-            { label: "לתרומה ליום התענית", to: "/taanit", variant: "primary" },
         ],
     },
     {

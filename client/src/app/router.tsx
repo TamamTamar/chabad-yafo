@@ -15,6 +15,7 @@ const DaycareOnboarding = lazy(
 );
 const DaycareParentInfo = lazy(() => import("../pages/DaycareParentInfo/DaycareParentInfo"));
 const DaycareRegistration = lazy(() => import("../pages/DaycareRegistration/DaycareRegistration"));
+const DaycareDonations = lazy(() => import("../pages/DaycareDonations/DaycareDonations"));
 const DonatePage = lazy(() => import("../pages/DonatePage/DonatePage"));
 const ErrorPage = lazy(() => import("../pages/ErrorPage/ErrorPage"));
 const Families = lazy(() => import("../pages/Families/Families"));
@@ -54,6 +55,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: "daycare-registration", element: <DaycareRegistration />
+            },
+            {
+                path: "daycare-donations", element: <DaycareDonations />
             },
             {
                 path: "daycare-parent-info", element: <DaycareParentInfo />

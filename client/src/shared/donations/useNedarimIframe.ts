@@ -10,6 +10,11 @@ type UseNedarimIframeArgs = {
   successDelay?: number; // הוספנו אפשרות לשלוט בזמן הסגירה
 };
 
+const NEDARIM_ORIGINS = new Set([
+  "https://matara.pro",
+  "https://www.matara.pro",
+]);
+
 export const useNedarimIframe = ({ 
   enabled, 
   iframeRef, 
@@ -27,7 +32,10 @@ export const useNedarimIframe = ({
   const postToIframe = useCallback(
     (data: object) => {
       const win = iframeRef.current?.contentWindow;
-      if (win) win.postMessage(data, "*");
+      const origin = iframeRef.current?.src
+        ? new URL(iframeRef.current.src).origin
+        : "";
+      if (win && NEDARIM_ORIGINS.has(origin)) win.postMessage(data, origin);
     },
     [iframeRef]
   );
@@ -36,6 +44,8 @@ export const useNedarimIframe = ({
     if (!enabled) return;
 
     const onMessage = (event: MessageEvent) => {
+      if (!NEDARIM_ORIGINS.has(event.origin)) return;
+      if (event.source !== iframeRef.current?.contentWindow) return;
       const data = event.data;
       if (!data || typeof data !== "object") return;
 
@@ -82,13 +92,14 @@ export const useNedarimIframe = ({
     };
 
     const onIframeLoad = () => postToIframe({ Name: "GetHeight" });
+    const iframe = iframeRef.current;
 
     window.addEventListener("message", onMessage);
-    iframeRef.current?.addEventListener("load", onIframeLoad);
+    iframe?.addEventListener("load", onIframeLoad);
 
     return () => {
       window.removeEventListener("message", onMessage);
-      iframeRef.current?.removeEventListener("load", onIframeLoad);
+      iframe?.removeEventListener("load", onIframeLoad);
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     };
@@ -107,7 +118,15 @@ export const useNedarimIframe = ({
       setOk(false);
       setIsPaying(true);
 
-      win.postMessage({ Name: "FinishTransaction2", Value: payload }, "*");
+      const origin = iframeRef.current?.src
+        ? new URL(iframeRef.current.src).origin
+        : "";
+      if (!NEDARIM_ORIGINS.has(origin)) {
+        setIsPaying(false);
+        setErrorText("חלון התשלום אינו זמין כרגע.");
+        return;
+      }
+      win.postMessage({ Name: "FinishTransaction2", Value: payload }, origin);
 
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       timeoutRef.current = window.setTimeout(() => {

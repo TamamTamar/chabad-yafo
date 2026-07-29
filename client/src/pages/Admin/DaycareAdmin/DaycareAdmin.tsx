@@ -8,11 +8,17 @@ import DaycareRegistrations from "./components/DaycareRegistrations";
 import DaycareTasks from "./components/DaycareTasks";
 import DaycareAgreements from "./components/DaycareAgreements";
 import DaycareParentDocuments from "./components/DaycareParentDocuments";
+import DaycareDonationsAdmin from "./components/DaycareDonationsAdmin";
 import { getDaycareOverview } from "./daycareAdminService";
 import styles from "./DaycareAdmin.module.scss";
 import type { DaycareOverview } from "./types";
 
-type DaycareAdminTab = "tasks" | "registrations" | "finance" | "parent-info";
+type DaycareAdminTab =
+    | "tasks"
+    | "registrations"
+    | "finance"
+    | "donations"
+    | "parent-info";
 type ParentInfoTab = "routine" | "holidays" | "menu" | "agreements";
 
 const parentInfoTabs: Array<{ id: ParentInfoTab; label: string }> = [
@@ -29,6 +35,7 @@ const daycareAdminTabs: Array<{
     { id: "tasks", label: "משימות" },
     { id: "registrations", label: "רישום" },
     { id: "finance", label: "כספים" },
+    { id: "donations", label: "תרומות" },
     { id: "parent-info", label: "מידע להורים" },
 ];
 
@@ -39,7 +46,10 @@ const DaycareAdmin = () => {
     const requestedTab = searchParams.get("tab");
     const requestedParentInfoTab = searchParams.get("section");
     const [activeTab, setActiveTab] = useState<DaycareAdminTab>(
-        requestedTab === "registrations" || requestedTab === "finance" || requestedTab === "parent-info"
+        requestedTab === "registrations" ||
+        requestedTab === "finance" ||
+        requestedTab === "donations" ||
+        requestedTab === "parent-info"
             ? requestedTab
             : requestedTab === "agreements"
                 ? "parent-info"
@@ -143,6 +153,12 @@ const DaycareAdmin = () => {
                             onChanged={handleDataChanged}
                             refreshKey={financeRefreshKey}
                         />
+                    </div>
+                )}
+
+                {activeTab === "donations" && (
+                    <div className={styles.tabPanel}>
+                        <DaycareDonationsAdmin />
                     </div>
                 )}
 
