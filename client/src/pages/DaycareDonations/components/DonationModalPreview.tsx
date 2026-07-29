@@ -14,6 +14,10 @@ import {
     useState,
 } from "react";
 import { createDaycareDonationIntent } from "../../../services/daycareDonationService";
+import type {
+    DaycareDonationIntentInput,
+    DaycareDonationIntentResponse,
+} from "../../../services/daycareDonationService";
 import { buildNedarimPayload } from "../../../shared/donations/nedarimPayload";
 import { useNedarimIframe } from "../../../shared/donations/useNedarimIframe";
 import type { DonationItem, DonationSelection } from "../types";
@@ -24,11 +28,15 @@ type DonationModalProps = {
     initialSelection: DonationSelection;
     donationItems: DonationItem[];
     paymentsEnabled: boolean;
+    diagnosticMode?: boolean;
+    createIntent?: (
+        input: DaycareDonationIntentInput
+    ) => Promise<DaycareDonationIntentResponse>;
     onClose: () => void;
     onPaymentComplete?: () => void;
 };
 
-type AmountChoice = 180 | 360 | 770 | "complete" | "custom";
+type AmountChoice = 1 | 5 | 180 | 360 | 770 | "complete" | "custom";
 type DonationStep = 1 | 2 | 3 | 4;
 
 const formatCurrency = (value: number) =>
@@ -39,6 +47,8 @@ const DonationModalPreview = ({
     initialSelection,
     donationItems,
     paymentsEnabled,
+    diagnosticMode = false,
+    createIntent = createDaycareDonationIntent,
     onClose,
     onPaymentComplete,
 }: DonationModalProps) => {
@@ -46,7 +56,9 @@ const DonationModalPreview = ({
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const [step, setStep] = useState<DonationStep>(1);
     const [selectedId, setSelectedId] = useState(initialSelection.id);
-    const [amountChoice, setAmountChoice] = useState<AmountChoice>(360);
+    const [amountChoice, setAmountChoice] = useState<AmountChoice>(
+        diagnosticMode ? 1 : 360
+    );
     const [customAmount, setCustomAmount] = useState("");
     const [fullName, setFullName] = useState("");
     const [phone, setPhone] = useState("");
@@ -96,13 +108,20 @@ const DonationModalPreview = ({
               ? remaining ?? 0
               : amountChoice;
 
-    const amountOptions: { value: AmountChoice; label: string }[] = [
-        { value: 180, label: "₪180" },
-        { value: 360, label: "₪360" },
-        { value: 770, label: "₪770" },
-        { value: "complete", label: "השלמת הסכום" },
-        { value: "custom", label: "סכום אחר" },
-    ];
+    const amountOptions: { value: AmountChoice; label: string }[] =
+        diagnosticMode
+            ? [
+                  { value: 1, label: "₪1" },
+                  { value: 5, label: "₪5" },
+                  { value: "custom", label: "סכום אחר (עד ₪10)" },
+              ]
+            : [
+                  { value: 180, label: "₪180" },
+                  { value: 360, label: "₪360" },
+                  { value: 770, label: "₪770" },
+                  { value: "complete", label: "השלמת הסכום" },
+                  { value: "custom", label: "סכום אחר" },
+              ];
 
     const preparePayment = async () => {
         setFormError("");
@@ -127,7 +146,7 @@ const DonationModalPreview = ({
 
         setPreparing(true);
         try {
-            const intent = await createDaycareDonationIntent({
+            const intent = await createIntent({
                 amount,
                 itemId: selectedId === "general" ? undefined : selectedId,
                 donorName: fullName.trim(),
@@ -144,7 +163,9 @@ const DonationModalPreview = ({
                     Amount: amount,
                     Tashlumim: 1,
                     Currency: "1",
-                    Description: `תרומה למעון — ${selectedTitle}`,
+                    Description: diagnosticMode
+                        ? `עסקת ניסיון למעון — ${selectedTitle}`
+                        : `תרומה למעון — ${selectedTitle}`,
                     firstName,
                     lastName,
                     phone: phone.trim(),
@@ -405,10 +426,15 @@ const DonationModalPreview = ({
                     {step === 4 && (
                         <div className={styles.paymentSuccess}>
                             <Check aria-hidden="true" />
-                            <strong>התרומה בוצעה בהצלחה</strong>
+                            <strong>
+                                {diagnosticMode
+                                    ? "עסקת הניסיון התקבלה"
+                                    : "התרומה בוצעה בהצלחה"}
+                            </strong>
                             <p>
-                                תודה שאתם שותפים בהקמת מקום חם, בטוח ושמח לילדי
-                                המעון.
+                                {diagnosticMode
+                                    ? "העסקה לא נוספה למדדי הקמפיין. עכשיו בודקים את ה־callback באדמין."
+                                    : "תודה שאתם שותפים בהקמת מקום חם, בטוח ושמח לילדי המעון."}
                             </p>
                         </div>
                     )}

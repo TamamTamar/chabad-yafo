@@ -54,6 +54,15 @@ export const createDaycareDonationIntent = async (
     return response.data.data;
 };
 
+export const createAdminDiagnosticDonationIntent = async (
+    input: DaycareDonationIntentInput
+) => {
+    const response = await http.post<
+        ApiResponse<DaycareDonationIntentResponse>
+    >("/admin/daycare/donations/diagnostic-intents", input);
+    return response.data.data;
+};
+
 export const getAdminDaycareDonationCampaign = async () => {
     const response = await http.get<ApiResponse<DaycareDonationCampaignData>>(
         "/admin/daycare/donations/campaign"

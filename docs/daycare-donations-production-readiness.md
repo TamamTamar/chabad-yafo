@@ -13,6 +13,29 @@ Do not change
 It is a code-level assertion that the missing provider verification was
 actually implemented.
 
+## Temporary diagnostic transaction
+
+An admin-only diagnostic transaction can be enabled without opening the public
+campaign or enabling live campaign payments:
+
+```text
+DAYCARE_DONATION_DIAGNOSTICS=true
+DAYCARE_DONATION_DIAGNOSTIC_PAYMENT_ENABLED=true
+DAYCARE_DONATIONS_PUBLIC_VISIBLE=false
+DAYCARE_DONATIONS_PAYMENT_ENABLED=false
+DAYCARE_DONATION_CALLBACK_SECRET=<random server secret>
+PUBLIC_API_URL=https://<server-domain>/api
+```
+
+The diagnostic flow accepts only ILS 1–10. Its intent is marked
+`mode=diagnostic`, and a successful callback confirms only that intent. It
+never creates a donation record and never changes campaign, category or item
+totals. The callback stores only an allowlisted set of safe values and a list
+of non-sensitive field names; the diagnostic document expires automatically.
+
+Disable `DAYCARE_DONATION_DIAGNOSTIC_PAYMENT_ENABLED` immediately after the
+test and clear the diagnostics from the admin screen.
+
 ## Required provider answers
 
 Obtain written technical documentation from Nedarim Plus for:

@@ -102,6 +102,7 @@ export type DaycareDonationDiagnostic = {
 
 export type DaycareDonationDiagnostics = {
     enabled: boolean;
+    paymentTestEnabled: boolean;
     diagnostics: DaycareDonationDiagnostic[];
 };
 

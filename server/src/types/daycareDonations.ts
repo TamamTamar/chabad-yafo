@@ -15,6 +15,7 @@ export type DaycareDonationIntentStatus =
     | "confirmed"
     | "failed"
     | "expired";
+export type DaycareDonationIntentMode = "live" | "diagnostic";
 
 export type DaycareDonationVisual = {
     src?: string;
@@ -80,6 +81,7 @@ export type DaycareDonationRecordDocument = {
 export type DaycareDonationIntentDocument = {
     publicId: string;
     campaignSlug: string;
+    mode: DaycareDonationIntentMode;
     status: DaycareDonationIntentStatus;
     amount: number;
     itemId?: string;

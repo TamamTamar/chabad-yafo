@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Router } from "express";
 import { DAYCARE_DONATION_CAMPAIGN_SLUG } from "../../config/daycareDonationDefaults";
 import { requireAdmin } from "../../middleware/adminAuth";
@@ -6,6 +7,7 @@ import { requireSecureAdminMutation } from "../../middleware/adminMutationSecuri
 import { DaycareDonationCampaign } from "../../models/DaycareDonationCampaign";
 import { DaycareDonationAudit } from "../../models/DaycareDonationAudit";
 import { DaycareDonationDiagnostic } from "../../models/DaycareDonationDiagnostic";
+import { DaycareDonationIntent } from "../../models/DaycareDonationIntent";
 import { DaycareDonationRecord } from "../../models/DaycareDonationRecord";
 import {
     ensureDefaultDaycareDonationCampaign,
@@ -13,6 +15,10 @@ import {
     synchronizeDaycareDonationGoals,
 } from "../../services/daycareDonationService";
 import { writeDaycareDonationAudit } from "../../services/daycareDonationAuditService";
+import {
+    buildDaycareDonationCallbackUrl,
+    isDaycareDonationCallbackConfigured,
+} from "../../services/daycareDonationCallbackSecurity";
 import type {
     DaycareDonationItemConfig,
     DaycareDonationRecordStatus,
@@ -147,6 +153,10 @@ router.get("/diagnostics", async (_req, res) => {
             data: {
                 enabled:
                     process.env.DAYCARE_DONATION_DIAGNOSTICS === "true",
+                paymentTestEnabled:
+                    process.env
+                        .DAYCARE_DONATION_DIAGNOSTIC_PAYMENT_ENABLED ===
+                    "true",
                 diagnostics,
             },
         });
@@ -182,6 +192,110 @@ router.delete("/diagnostics", async (_req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to clear donation diagnostics",
+        });
+    }
+});
+
+router.post("/diagnostic-intents", async (req, res) => {
+    try {
+        if (
+            process.env.DAYCARE_DONATION_DIAGNOSTIC_PAYMENT_ENABLED !==
+            "true"
+        ) {
+            return res.status(503).json({
+                success: false,
+                message: "Diagnostic payment is not enabled",
+            });
+        }
+        if (!isDaycareDonationCallbackConfigured()) {
+            return res.status(503).json({
+                success: false,
+                message: "Donation callback is not configured",
+            });
+        }
+
+        const campaign = await ensureDefaultDaycareDonationCampaign();
+        const amount = Number(req.body.amount);
+        const itemId = cleanText(req.body.itemId, 80) || undefined;
+        const donorName = cleanText(req.body.donorName, 160);
+        const phone = cleanText(req.body.phone, 40);
+        const email = cleanText(req.body.email, 180).toLowerCase();
+        const dedication =
+            cleanText(req.body.dedication, 600) || undefined;
+
+        if (!Number.isFinite(amount) || amount < 1 || amount > 10) {
+            return res.status(400).json({
+                success: false,
+                message: "Diagnostic payment must be between 1 and 10 ILS",
+            });
+        }
+        if (
+            !donorName ||
+            !phone ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Donor contact details are required",
+            });
+        }
+        if (
+            itemId &&
+            !campaign.items.some(
+                (item: DaycareDonationItemConfig) => item.id === itemId
+            )
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Donation item was not found",
+            });
+        }
+
+        const publicId = randomUUID();
+        const intent = await DaycareDonationIntent.create({
+            publicId,
+            campaignSlug: campaign.slug,
+            mode: "diagnostic",
+            status: "created",
+            amount,
+            itemId,
+            donorName,
+            phone,
+            email,
+            dedication,
+            expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+        });
+        const { callbackUrl, signature } =
+            buildDaycareDonationCallbackUrl(req, publicId);
+
+        await writeDaycareDonationAudit({
+            action: "diagnostic.intentCreated",
+            entityType: "intent",
+            entityId: publicId,
+            ...getAdminAuditActor(res.locals.adminActor),
+            after: {
+                amount,
+                itemId: itemId ?? null,
+                status: intent.status,
+                countedInCampaign: false,
+            },
+        });
+
+        return res.status(201).json({
+            success: true,
+            data: {
+                intentId: publicId,
+                callbackUrl,
+                param1: publicId,
+                param2: signature,
+                expiresAt: intent.expiresAt,
+            },
+        });
+    } catch (error) {
+        console.error("Failed to create diagnostic donation intent:", error);
+        return res.status(400).json({
+            success: false,
+            message: "Failed to prepare diagnostic payment",
         });
     }
 });

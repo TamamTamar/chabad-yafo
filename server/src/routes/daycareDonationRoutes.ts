@@ -1,4 +1,4 @@
-import { createHmac, randomUUID, timingSafeEqual } from "crypto";
+import { randomUUID } from "crypto";
 import express, { Router } from "express";
 import { DAYCARE_DONATION_CAMPAIGN_SLUG } from "../config/daycareDonationDefaults";
 import { areDaycareDonationPaymentsEnabled } from "../config/daycareDonationSecurity";
@@ -10,28 +10,17 @@ import {
     getDaycareDonationCampaignSnapshot,
 } from "../services/daycareDonationService";
 import { writeDaycareDonationAudit } from "../services/daycareDonationAuditService";
+import {
+    buildDaycareDonationCallbackUrl,
+    isDaycareDonationCallbackConfigured,
+    isValidDaycareDonationIntentSignature,
+} from "../services/daycareDonationCallbackSecurity";
 import type { DaycareDonationItemConfig } from "../types/daycareDonations";
 
 const router = Router();
 
 const cleanText = (value: unknown, maxLength: number) =>
     String(value ?? "").trim().slice(0, maxLength);
-
-const getCallbackSecret = () =>
-    process.env.DAYCARE_DONATION_CALLBACK_SECRET?.trim() || "";
-
-const signIntent = (publicId: string) =>
-    createHmac("sha256", getCallbackSecret()).update(publicId).digest("hex");
-
-const isValidSignature = (publicId: string, signature: string) => {
-    if (!getCallbackSecret() || !signature) return false;
-    const expected = Buffer.from(signIntent(publicId));
-    const received = Buffer.from(signature);
-    return (
-        expected.length === received.length &&
-        timingSafeEqual(expected, received)
-    );
-};
 
 const toAmount = (value: unknown) => {
     const amount = Number.parseFloat(
@@ -111,7 +100,7 @@ router.post("/intents", async (req, res) => {
             });
         }
 
-        if (!getCallbackSecret()) {
+        if (!isDaycareDonationCallbackConfigured()) {
             return res.status(503).json({
                 success: false,
                 message: "Donation payment is not configured",
@@ -162,10 +151,10 @@ router.post("/intents", async (req, res) => {
         }
 
         const publicId = randomUUID();
-        const signature = signIntent(publicId);
         const intent = await DaycareDonationIntent.create({
             publicId,
             campaignSlug: campaign.slug,
+            mode: "live",
             status: "created",
             amount,
             itemId,
@@ -176,12 +165,8 @@ router.post("/intents", async (req, res) => {
             expiresAt: new Date(Date.now() + 30 * 60 * 1000),
         });
 
-        const configuredApiUrl =
-            process.env.PUBLIC_API_URL?.trim().replace(/\/$/, "") || "";
-        const callbackBase = configuredApiUrl
-            ? `${configuredApiUrl}/daycare-donations/nedarim-callback`
-            : `${req.protocol}://${req.get("host")}${req.baseUrl}/nedarim-callback`;
-        const callbackUrl = `${callbackBase}/${encodeURIComponent(publicId)}/${encodeURIComponent(signature)}`;
+        const { callbackUrl, signature } =
+            buildDaycareDonationCallbackUrl(req, publicId);
 
         await writeDaycareDonationAudit({
             action: "intent.created",
@@ -230,7 +215,10 @@ router.post(
             128
         );
 
-        if (!publicId || !isValidSignature(publicId, signature)) {
+        if (
+            !publicId ||
+            !isValidDaycareDonationIntentSignature(publicId, signature)
+        ) {
             return res.status(401).send("INVALID");
         }
 
@@ -321,6 +309,31 @@ router.post(
                     after: { status: "failed" },
                 });
                 return res.status(409).send("TRANSACTION_ID_MISSING");
+            }
+
+            if (intent.mode === "diagnostic") {
+                intent.status = "confirmed";
+                intent.externalTransactionId = externalTransactionId;
+                intent.confirmedAt = new Date();
+                intent.providerMessage = providerMessage || undefined;
+                await intent.save();
+                await writeDaycareDonationAudit({
+                    action: "diagnostic.paymentObserved",
+                    entityType: "intent",
+                    entityId: publicId,
+                    actor: "nedarim",
+                    actorId: externalTransactionId,
+                    actorLabel: "נדרים פלוס",
+                    before: { status: previousIntentStatus },
+                    after: {
+                        status: "confirmed",
+                        amount: callbackAmount,
+                        externalTransactionId,
+                        itemId: intent.itemId ?? null,
+                        countedInCampaign: false,
+                    },
+                });
+                return res.status(200).send("OK");
             }
 
             const writeResult = await DaycareDonationRecord.updateOne(

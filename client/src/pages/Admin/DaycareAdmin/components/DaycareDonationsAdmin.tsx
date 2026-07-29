@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
 import {
     clearAdminDaycareDonationDiagnostics,
+    createAdminDiagnosticDonationIntent,
     createManualDaycareDonation,
     getAdminDaycareDonationAudit,
     getAdminDaycareDonationCampaign,
@@ -17,6 +18,7 @@ import type {
     DaycareDonationDiagnostics,
     DaycareDonationRecord,
 } from "../../../DaycareDonations/types";
+import DonationModalPreview from "../../../DaycareDonations/components/DonationModalPreview";
 import styles from "./DaycareDonationsAdmin.module.scss";
 
 const formatCurrency = (value: number) =>
@@ -59,6 +61,7 @@ const DaycareDonationsAdmin = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [clearDiagnosticsOpen, setClearDiagnosticsOpen] = useState(false);
+    const [diagnosticPaymentOpen, setDiagnosticPaymentOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
@@ -340,6 +343,15 @@ const DaycareDonationsAdmin = () => {
                         {" "}
                         <code>DAYCARE_DONATION_DIAGNOSTICS=true</code>
                     </p>
+                )}
+                {diagnostics?.enabled && diagnostics.paymentTestEnabled && (
+                    <button
+                        type="button"
+                        className={styles.clearDiagnostics}
+                        onClick={() => setDiagnosticPaymentOpen(true)}
+                    >
+                        פתיחת עסקת ניסיון מאובטחת
+                    </button>
                 )}
                 {!diagnostics?.diagnostics.length ? (
                     <p className={styles.emptyState}>
@@ -776,6 +788,24 @@ const DaycareDonationsAdmin = () => {
                 onConfirm={() => void handleClearDiagnostics()}
                 onClose={() => setClearDiagnosticsOpen(false)}
             />
+            {diagnosticPaymentOpen && (
+                <DonationModalPreview
+                    open
+                    initialSelection={{
+                        kind: "general",
+                        id: "general",
+                        title: "למקום שבו התרומה נדרשת ביותר",
+                    }}
+                    donationItems={campaign.items}
+                    paymentsEnabled
+                    diagnosticMode
+                    createIntent={createAdminDiagnosticDonationIntent}
+                    onClose={() => setDiagnosticPaymentOpen(false)}
+                    onPaymentComplete={() => {
+                        window.setTimeout(() => void loadData(), 1200);
+                    }}
+                />
+            )}
         </div>
     );
 };

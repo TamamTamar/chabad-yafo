@@ -17,6 +17,13 @@ const daycareDonationIntentSchema =
                 trim: true,
                 index: true,
             },
+            mode: {
+                type: String,
+                enum: ["live", "diagnostic"],
+                required: true,
+                default: "live",
+                index: true,
+            },
             status: {
                 type: String,
                 enum: ["created", "submitted", "confirmed", "failed", "expired"],

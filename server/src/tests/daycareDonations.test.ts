@@ -6,7 +6,12 @@ import {
     DAYCARE_NEDARIM_OFFICIAL_VERIFICATION_IMPLEMENTED,
 } from "../config/daycareDonationSecurity";
 import { DaycareDonationDiagnostic } from "../models/DaycareDonationDiagnostic";
+import { DaycareDonationIntent } from "../models/DaycareDonationIntent";
 import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
+import {
+    isValidDaycareDonationIntentSignature,
+    signDaycareDonationIntent,
+} from "../services/daycareDonationCallbackSecurity";
 import {
     calculateDaycareDonationTotals,
     deriveDaycareDonationGoals,
@@ -80,6 +85,61 @@ test("diagnostics have an automatic expiry index", () => {
 
     assert.ok(index);
     assert.equal(index[1].expireAfterSeconds, 0);
+});
+
+test("diagnostic intents are explicit and legacy intents remain live", async () => {
+    const legacyIntent = new DaycareDonationIntent({
+        publicId: "legacy-intent",
+        campaignSlug: "daycare-2026",
+        amount: 1,
+        donorName: "Test",
+        phone: "0500000000",
+        email: "test@example.com",
+        expiresAt: new Date(Date.now() + 60_000),
+    });
+    const diagnosticIntent = new DaycareDonationIntent({
+        publicId: "diagnostic-intent",
+        campaignSlug: "daycare-2026",
+        mode: "diagnostic",
+        amount: 1,
+        donorName: "Test",
+        phone: "0500000000",
+        email: "test@example.com",
+        expiresAt: new Date(Date.now() + 60_000),
+    });
+
+    await legacyIntent.validate();
+    await diagnosticIntent.validate();
+
+    assert.equal(legacyIntent.mode, "live");
+    assert.equal(diagnosticIntent.mode, "diagnostic");
+});
+
+test("diagnostic callback URLs require the intent-specific server signature", () => {
+    const previous = process.env.DAYCARE_DONATION_CALLBACK_SECRET;
+    process.env.DAYCARE_DONATION_CALLBACK_SECRET = "test-only-secret";
+
+    try {
+        const signature = signDaycareDonationIntent("intent-a");
+        assert.equal(
+            isValidDaycareDonationIntentSignature("intent-a", signature),
+            true
+        );
+        assert.equal(
+            isValidDaycareDonationIntentSignature("intent-b", signature),
+            false
+        );
+        assert.equal(
+            isValidDaycareDonationIntentSignature("intent-a", "bad"),
+            false
+        );
+    } finally {
+        if (previous === undefined) {
+            delete process.env.DAYCARE_DONATION_CALLBACK_SECRET;
+        } else {
+            process.env.DAYCARE_DONATION_CALLBACK_SECRET = previous;
+        }
+    }
 });
 
 test("manual donation requires source and note or reference", async () => {
