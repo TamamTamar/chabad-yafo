@@ -1,4 +1,8 @@
 import axios from "axios";
+import {
+    ChevronDown,
+    NotebookPen,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -63,7 +67,15 @@ type OnboardingDraft = CreateOnboardingFromInquiryPayload & {
     childAge?: string;
 };
 
+type RegistrationWorkflowDraft = {
+    note: string;
+    nextAction: string;
+    followUpDate: string;
+};
+
 const eligibleStatuses: DaycareInterestStatus[] = ["רוצה להירשם"];
+const workflowBlockPattern =
+    /\[\[DAYCARE_WORKFLOW\]\]\nפעולה הבאה: (.*)\nמועד חזרה: (.*)\n\[\[\/DAYCARE_WORKFLOW\]\]\n?/;
 
 const nextStatusByStatus: Partial<Record<DaycareInterestStatus, DaycareInterestStatus>> = {
     מתעניין: "שיחה בוצעה",
@@ -87,6 +99,53 @@ const getSuggestedSchoolYear = () => {
 
 const formatDate = (date?: string) =>
     date ? new Date(date).toLocaleDateString("he-IL") : "-";
+
+const getDefaultNextAction = (status: DaycareInterestStatus) => {
+    const nextStatus = nextStatusByStatus[status];
+
+    return nextStatus ? `להתקדם ל„${nextStatus}”` : "";
+};
+
+const parseWorkflowDraft = (
+    callNotes: string | undefined,
+    status: DaycareInterestStatus
+): RegistrationWorkflowDraft => {
+    const value = callNotes ?? "";
+    const match = value.match(workflowBlockPattern);
+
+    if (!match) {
+        return {
+            note: value,
+            nextAction: getDefaultNextAction(status),
+            followUpDate: "",
+        };
+    }
+
+    return {
+        note: value.replace(workflowBlockPattern, "").trim(),
+        nextAction: match[1]?.trim() || getDefaultNextAction(status),
+        followUpDate: match[2]?.trim() ?? "",
+    };
+};
+
+const serializeWorkflowDraft = (draft: RegistrationWorkflowDraft) => {
+    const nextAction = draft.nextAction.trim();
+    const followUpDate = draft.followUpDate.trim();
+    const note = draft.note.trim();
+
+    if (!nextAction && !followUpDate) {
+        return note || undefined;
+    }
+
+    const workflowBlock = [
+        "[[DAYCARE_WORKFLOW]]",
+        `פעולה הבאה: ${nextAction}`,
+        `מועד חזרה: ${followUpDate}`,
+        "[[/DAYCARE_WORKFLOW]]",
+    ].join("\n");
+
+    return note ? `${workflowBlock}\n${note}` : workflowBlock;
+};
 
 const getCreateErrorMessage = (error: unknown) => {
     if (!axios.isAxiosError<{ code?: string; message?: string }>(error)) {
@@ -170,8 +229,11 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
     const [error, setError] = useState("");
     const [updatingKey, setUpdatingKey] = useState<string | null>(null);
     const [savingNoteKey, setSavingNoteKey] = useState<string | null>(null);
-    const [expandedNoteKeys, setExpandedNoteKeys] = useState<string[]>([]);
-    const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
+    const [expandedTreatmentKeys, setExpandedTreatmentKeys] = useState<string[]>([]);
+    const [expandedDetailKeys, setExpandedDetailKeys] = useState<string[]>([]);
+    const [workflowDrafts, setWorkflowDrafts] = useState<
+        Record<string, RegistrationWorkflowDraft>
+    >({});
     const [draft, setDraft] = useState<OnboardingDraft | null>(null);
     const [createError, setCreateError] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
@@ -202,11 +264,11 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         void getDaycareRegistrations()
             .then((registrations) => {
                 setData(registrations);
-                setNoteDrafts(
+                setWorkflowDrafts(
                     Object.fromEntries(
                         toUnifiedRegistrations(registrations).map((row) => [
                             row.key,
-                            row.callNotes ?? "",
+                            parseWorkflowDraft(row.callNotes, row.status),
                         ])
                     )
                 );
@@ -223,7 +285,7 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
 
     const updateRow = (
         sourceId: string,
-        updates: Partial<UnifiedRegistration>
+        updates: Partial<Pick<UnifiedRegistration, "status" | "callNotes">>
     ) => {
         setData((current) => ({
             registrations: current.registrations.map(
@@ -245,6 +307,26 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
             await updateDaycarePublicRegistration(row.sourceId, { status });
 
             updateRow(row.sourceId, { status });
+            setWorkflowDrafts((current) => {
+                const currentDraft =
+                    current[row.key] ??
+                    parseWorkflowDraft(row.callNotes, row.status);
+
+                if (
+                    currentDraft.nextAction !==
+                    getDefaultNextAction(row.status)
+                ) {
+                    return current;
+                }
+
+                return {
+                    ...current,
+                    [row.key]: {
+                        ...currentDraft,
+                        nextAction: getDefaultNextAction(status),
+                    },
+                };
+            });
             await onChanged();
         } catch {
             setError("לא הצלחנו לעדכן את סטטוס הפנייה");
@@ -260,23 +342,106 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
         setDraft(nextDraft);
     };
 
-    const handleNoteSave = async (row: UnifiedRegistration) => {
+    const updateWorkflowDraft = (
+        key: string,
+        updates: Partial<RegistrationWorkflowDraft>
+    ) => {
+        setWorkflowDrafts((current) => ({
+            ...current,
+            [key]: {
+                ...(current[key] ?? {
+                    note: "",
+                    nextAction: "",
+                    followUpDate: "",
+                }),
+                ...updates,
+            },
+        }));
+    };
+
+    const cancelTreatmentEdit = (row: UnifiedRegistration) => {
+        setWorkflowDrafts((current) => ({
+            ...current,
+            [row.key]: parseWorkflowDraft(row.callNotes, row.status),
+        }));
+        setExpandedTreatmentKeys((keys) =>
+            keys.filter((key) => key !== row.key)
+        );
+    };
+
+    const handleTreatmentSave = async (row: UnifiedRegistration) => {
         setSavingNoteKey(row.key);
         setError("");
 
         try {
-            const callNotes = noteDrafts[row.key]?.trim() || undefined;
+            const currentDraft =
+                workflowDrafts[row.key] ??
+                parseWorkflowDraft(row.callNotes, row.status);
+            const callNotes = serializeWorkflowDraft(currentDraft);
 
             await updateDaycarePublicRegistration(row.sourceId, { callNotes });
 
             updateRow(row.sourceId, { callNotes });
-            setExpandedNoteKeys((keys) => keys.filter((key) => key !== row.key));
+            setExpandedTreatmentKeys((keys) =>
+                keys.filter((key) => key !== row.key)
+            );
             await onChanged();
         } catch {
-            setError("לא הצלחנו לשמור את הערת השיחה");
+            setError("לא הצלחנו לשמור את ההערה");
         } finally {
             setSavingNoteKey(null);
         }
+    };
+
+    const renderTreatmentPanel = (
+        row: UnifiedRegistration,
+        panelClassName = styles.registrationTreatmentPanel
+    ) => {
+        const workflowDraft =
+            workflowDrafts[row.key] ??
+            parseWorkflowDraft(row.callNotes, row.status);
+
+        return (
+            <div className={panelClassName}>
+                <label
+                    className={`${styles.registrationTreatmentField} ${styles.registrationTreatmentNoteField}`}
+                >
+                    <span className={styles.registrationTreatmentLabel}>
+                        הערה
+                    </span>
+                    <textarea
+                        className={styles.registrationTreatmentTextarea}
+                        maxLength={700}
+                        placeholder="כתיבת הערה..."
+                        value={workflowDraft.note}
+                        onChange={(event) =>
+                            updateWorkflowDraft(row.key, {
+                                note: event.target.value,
+                            })
+                        }
+                    />
+                </label>
+                <div className={styles.registrationTreatmentActions}>
+                    <button
+                        className={styles.secondaryButton}
+                        type="button"
+                        onClick={() => cancelTreatmentEdit(row)}
+                    >
+                        ביטול
+                    </button>
+                    <button
+                        className={styles.primaryButton}
+                        disabled={savingNoteKey === row.key}
+                        type="button"
+                        onClick={() => void handleTreatmentSave(row)}
+                    >
+                        {savingNoteKey === row.key
+                            ? "שומר..."
+                            : "שמירת הערה"}
+                    </button>
+                </div>
+            </div>
+        );
     };
 
     const handleCreate: SubmitHandler<CreateOnboardingFromInquiryPayload> = async (form) => {
@@ -371,37 +536,52 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
             ) : filteredRows.length === 0 ? (
                 <div className={styles.emptyState}>לא נמצאו פניות שמתאימות לחיפוש.</div>
             ) : (
-                <div className={styles.tableWrapper}>
+                <>
+                <div className={styles.registrationDesktopTable}>
                     <table className={styles.tableCompact}>
                         <thead>
                             <tr>
                                 <th className={styles.tableHeader}>שם הורה</th>
                                 <th className={styles.tableHeader}>טלפון</th>
                                 <th className={styles.tableHeader}>ילד/ה</th>
-                                <th className={styles.tableHeader}>סטטוס רישום</th>
-                                <th className={styles.tableHeader}>הערת שיחה</th>
+                                <th className={styles.tableHeader}>סטטוס</th>
+                                <th className={styles.tableHeader}>הערה</th>
                                 <th className={styles.tableHeader}>תיק הצטרפות</th>
                                 <th className={styles.tableHeader}>תאריך פנייה</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {filteredRows.map((row) => {
-                                const summary = row.onboardingSummary;
-                                const canCreate = eligibleStatuses.includes(row.status);
-                                const nextStatus = nextStatusByStatus[row.status];
+                        {filteredRows.map((row) => {
+                            const summary = row.onboardingSummary;
+                            const canCreate = eligibleStatuses.includes(row.status);
+                            const nextStatus = nextStatusByStatus[row.status];
+                            const workflowDraft =
+                                workflowDrafts[row.key] ??
+                                parseWorkflowDraft(row.callNotes, row.status);
+                            const isTreatmentExpanded =
+                                expandedTreatmentKeys.includes(row.key);
 
-                                return (
-                                    <tr className={styles.tableRow} key={row.key}>
-                                        <td className={styles.tableCell} data-label="שם הורה">
+                            return (
+                                <tbody className={styles.registrationDesktopRowGroup} key={row.key}>
+                                    <tr className={styles.tableRow}>
+                                        <td className={styles.tableCell}>
                                             {row.parentName}
                                         </td>
-                                        <td className={styles.tableCell} data-label="טלפון">
-                                            {row.phone}
+                                        <td className={styles.tableCell}>
+                                            <span className={styles.registrationDesktopPhone}>
+                                                {row.phone}
+                                            </span>
                                         </td>
-                                        <td className={styles.tableCell} data-label="ילד/ה">
-                                            {row.childName || row.childAge || "טרם הושלם"}
+                                        <td className={styles.tableCell}>
+                                            <div className={styles.registrationDesktopChild}>
+                                                <span className={styles.registrationDesktopChildName}>
+                                                    {row.childName || "שם טרם נמסר"}
+                                                </span>
+                                                <span className={styles.registrationDesktopChildAge}>
+                                                    {row.childAge || "גיל טרם נמסר"}
+                                                </span>
+                                            </div>
                                         </td>
-                                        <td className={styles.tableCell} data-label="סטטוס רישום">
+                                        <td className={styles.tableCell}>
                                             <select
                                                 aria-label={`סטטוס רישום עבור ${row.parentName}`}
                                                 className={styles.statusSelect}
@@ -429,69 +609,297 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                                         void handleStatusChange(row, nextStatus)
                                                     }
                                                 >
-                                                    הפעולה הבאה: {nextStatus}
+                                                    הבא: {nextStatus}
                                                 </button>
                                             ) : null}
                                         </td>
-                                        <td className={styles.tableCell} data-label="הערת שיחה">
+                                        <td className={styles.tableCell}>
                                             <button
                                                 className={styles.callSummaryToggle}
                                                 type="button"
+                                                aria-expanded={isTreatmentExpanded}
                                                 onClick={() =>
-                                                    setExpandedNoteKeys((keys) =>
+                                                    setExpandedTreatmentKeys((keys) =>
                                                         keys.includes(row.key)
                                                             ? keys.filter((key) => key !== row.key)
                                                             : [...keys, row.key]
                                                     )
                                                 }
                                             >
-                                                {expandedNoteKeys.includes(row.key)
-                                                    ? "סגירה"
-                                                    : "עריכה"}
+                                                {isTreatmentExpanded ? "סגירה" : "הערה"}
                                             </button>
-                                            {!expandedNoteKeys.includes(row.key) && row.callNotes ? (
+                                            {!isTreatmentExpanded && workflowDraft.note ? (
                                                 <p className={styles.callSummaryPreview}>
-                                                    {row.callNotes}
+                                                    {workflowDraft.note}
                                                 </p>
                                             ) : null}
-                                            {expandedNoteKeys.includes(row.key) ? (
-                                                <div className={styles.callSummaryPanel}>
-                                                    <label className={styles.compactField}>
-                                                        <span>הערה</span>
-                                                        <textarea
-                                                            className={styles.compactTextarea}
-                                                            value={noteDrafts[row.key] ?? ""}
-                                                            onChange={(event) =>
-                                                                setNoteDrafts((current) => ({
-                                                                    ...current,
-                                                                    [row.key]: event.target.value,
-                                                                }))
-                                                            }
-                                                        />
-                                                    </label>
-                                                    <button
-                                                        className={styles.secondaryButton}
-                                                        disabled={savingNoteKey === row.key}
-                                                        type="button"
-                                                        onClick={() => void handleNoteSave(row)}
-                                                    >
-                                                        {savingNoteKey === row.key
-                                                            ? "שומר..."
-                                                            : "שמירה"}
-                                                    </button>
-                                                </div>
-                                            ) : null}
                                         </td>
-                                        <td className={styles.tableCell} data-label="תיק הצטרפות">
+                                        <td className={styles.tableCell}>
                                             {summary ? (
                                                 <div className={styles.onboardingSummary}>
                                                     <span className={styles.onboardingStatusLine}>
-                                                        {onboardingOverallStatusLabels[
-                                                            summary.overallStatus
-                                                        ]}
+                                                        {onboardingOverallStatusLabels[summary.overallStatus]}
                                                     </span>
-                                                    <span>{summary.progress.percentage}% הושלם · {summary.schoolYear}</span>
-                                                    <strong className={styles.onboardingNextAction}>הפעולה הבאה: {summary.missingStepTitle ?? "התיק הושלם"}</strong>
+                                                    <span className={styles.registrationOnboardingMeta}>
+                                                        {summary.progress.percentage}% הושלם · {summary.schoolYear}
+                                                    </span>
+                                                    <button
+                                                        className={styles.primaryButton}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            navigate(`/admin/daycare-onboarding/${summary.id}`)
+                                                        }
+                                                    >
+                                                        פתיחת התיק
+                                                    </button>
+                                                </div>
+                                            ) : canCreate ? (
+                                                <button
+                                                    className={styles.primaryButton}
+                                                    type="button"
+                                                    onClick={() => openCreateDialog(row)}
+                                                >
+                                                    פתיחת תיק
+                                                </button>
+                                            ) : (
+                                                <span className={styles.onboardingUnavailable}>
+                                                    זמין לאחר החלטה להתקדם
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className={styles.tableCell}>
+                                            {formatDate(row.createdAt)}
+                                        </td>
+                                    </tr>
+                                    {isTreatmentExpanded ? (
+                                        <tr className={styles.registrationDesktopTreatmentRow}>
+                                            <td className={styles.registrationDesktopTreatmentCell} colSpan={7}>
+                                                {renderTreatmentPanel(
+                                                    row,
+                                                    `${styles.registrationTreatmentPanel} ${styles.registrationDesktopTreatmentPanel}`
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ) : null}
+                                </tbody>
+                            );
+                        })}
+                    </table>
+                </div>
+                <div className={styles.registrationMobileQueue}>
+                    {filteredRows.map((row) => {
+                        const summary = row.onboardingSummary;
+                        const canCreate = eligibleStatuses.includes(row.status);
+                        const workflowDraft =
+                            workflowDrafts[row.key] ??
+                            parseWorkflowDraft(row.callNotes, row.status);
+                        const isTreatmentExpanded =
+                            expandedTreatmentKeys.includes(row.key);
+                        const isDetailsExpanded =
+                            expandedDetailKeys.includes(row.key);
+
+                        return (
+                            <article className={styles.registrationCard} key={row.key}>
+                                <div className={styles.registrationCardHeader}>
+                                    <div className={styles.registrationIdentity}>
+                                        <h3 className={styles.registrationParentName}>
+                                            {row.parentName}
+                                        </h3>
+                                        <div className={styles.registrationChildSummary}>
+                                            <span className={styles.registrationChildName}>
+                                                {row.childName || "שם הילד/ה טרם נמסר"}
+                                            </span>
+                                            <span className={styles.registrationChildAge}>
+                                                {row.childAge || "גיל טרם נמסר"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.registrationMobileMeta}>
+                                        <span className={styles.registrationMobileStatus}>
+                                            {row.status}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div
+                                    className={styles.registrationQuickActions}
+                                    aria-label={`פעולות מהירות עבור ${row.parentName}`}
+                                >
+                                    <button
+                                        className={styles.registrationQuickButton}
+                                        type="button"
+                                        aria-expanded={isTreatmentExpanded}
+                                        onClick={() =>
+                                            setExpandedTreatmentKeys((keys) =>
+                                                keys.includes(row.key)
+                                                    ? keys.filter(
+                                                        (key) => key !== row.key
+                                                    )
+                                                    : [...keys, row.key]
+                                            )
+                                        }
+                                    >
+                                        <NotebookPen
+                                            aria-hidden="true"
+                                            className={styles.registrationQuickIcon}
+                                            size={18}
+                                        />
+                                        הוספת הערה
+                                    </button>
+                                </div>
+
+                                {isTreatmentExpanded
+                                    ? renderTreatmentPanel(row)
+                                    : null}
+
+                                <button
+                                    className={styles.registrationDetailsToggle}
+                                    type="button"
+                                    aria-expanded={isDetailsExpanded}
+                                    onClick={() =>
+                                        setExpandedDetailKeys((keys) =>
+                                            keys.includes(row.key)
+                                                ? keys.filter(
+                                                    (key) => key !== row.key
+                                                )
+                                                : [...keys, row.key]
+                                        )
+                                    }
+                                >
+                                    {isDetailsExpanded
+                                        ? "הסתרת פרטים"
+                                        : "הצגת פרטים"}
+                                    <ChevronDown
+                                        aria-hidden="true"
+                                        className={
+                                            isDetailsExpanded
+                                                ? styles.registrationDetailsIconOpen
+                                                : styles.registrationDetailsIcon
+                                        }
+                                        size={18}
+                                    />
+                                </button>
+
+                                {isDetailsExpanded ? (
+                                    <div className={styles.registrationDetails}>
+                                        <dl className={styles.registrationDetailsGrid}>
+                                            <div className={styles.registrationDetailItem}>
+                                                <dt
+                                                    className={
+                                                        styles.registrationDetailLabel
+                                                    }
+                                                >
+                                                    טלפון
+                                                </dt>
+                                                <dd
+                                                    className={
+                                                        styles.registrationDetailValue
+                                                    }
+                                                >
+                                                    {row.phone}
+                                                </dd>
+                                            </div>
+                                            <div className={styles.registrationDetailItem}>
+                                                <dt
+                                                    className={
+                                                        styles.registrationDetailLabel
+                                                    }
+                                                >
+                                                    שעות מבוקשות
+                                                </dt>
+                                                <dd
+                                                    className={
+                                                        styles.registrationDetailValue
+                                                    }
+                                                >
+                                                    {row.requiredHours || "לא צוין"}
+                                                </dd>
+                                            </div>
+                                            <div className={styles.registrationDetailItem}>
+                                                <dt
+                                                    className={
+                                                        styles.registrationDetailLabel
+                                                    }
+                                                >
+                                                    תאריך פנייה
+                                                </dt>
+                                                <dd
+                                                    className={
+                                                        styles.registrationDetailValue
+                                                    }
+                                                >
+                                                    {formatDate(row.createdAt)}
+                                                </dd>
+                                            </div>
+                                            <div className={styles.registrationDetailItem}>
+                                                <dt
+                                                    className={
+                                                        styles.registrationDetailLabel
+                                                    }
+                                                >
+                                                    דוא״ל
+                                                </dt>
+                                                <dd
+                                                    className={
+                                                        styles.registrationDetailValue
+                                                    }
+                                                >
+                                                    {row.email || "לא צוין"}
+                                                </dd>
+                                            </div>
+                                        </dl>
+
+                                        {workflowDraft.note ? (
+                                            <div className={styles.registrationSavedNote}>
+                                                <span
+                                                    className={
+                                                        styles.registrationSavedNoteLabel
+                                                    }
+                                                >
+                                                    הערה אחרונה
+                                                </span>
+                                                <p
+                                                    className={
+                                                        styles.registrationSavedNoteText
+                                                    }
+                                                >
+                                                    {workflowDraft.note}
+                                                </p>
+                                            </div>
+                                        ) : null}
+
+                                        <div className={styles.registrationOnboarding}>
+                                            {summary ? (
+                                                <div className={styles.onboardingSummary}>
+                                                    <span
+                                                        className={
+                                                            styles.onboardingStatusLine
+                                                        }
+                                                    >
+                                                        {
+                                                            onboardingOverallStatusLabels[
+                                                            summary.overallStatus
+                                                            ]
+                                                        }
+                                                    </span>
+                                                    <span
+                                                        className={
+                                                            styles.registrationOnboardingMeta
+                                                        }
+                                                    >
+                                                        {summary.progress.percentage}%
+                                                        הושלם · {summary.schoolYear}
+                                                    </span>
+                                                    <strong
+                                                        className={
+                                                            styles.onboardingNextAction
+                                                        }
+                                                    >
+                                                        הפעולה הבאה:{" "}
+                                                        {summary.missingStepTitle ??
+                                                            "התיק הושלם"}
+                                                    </strong>
                                                     <button
                                                         className={styles.primaryButton}
                                                         type="button"
@@ -501,32 +909,37 @@ const DaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps) => {
                                                             )
                                                         }
                                                     >
-                                                        פתיחת התיק והמשך טיפול
+                                                        פתיחת התיק
                                                     </button>
                                                 </div>
                                             ) : canCreate ? (
                                                 <button
                                                     className={styles.primaryButton}
                                                     type="button"
-                                                    onClick={() => openCreateDialog(row)}
+                                                    onClick={() =>
+                                                        openCreateDialog(row)
+                                                    }
                                                 >
                                                     פתיחת תיק הצטרפות
                                                 </button>
                                             ) : (
-                                                <span className={styles.onboardingUnavailable}>
-                                                    זמין לאחר החלטה להתקדם
+                                                <span
+                                                    className={
+                                                        styles.onboardingUnavailable
+                                                    }
+                                                >
+                                                    תיק הצטרפות יהיה זמין לאחר
+                                                    החלטה להתקדם
                                                 </span>
                                             )}
-                                        </td>
-                                        <td className={styles.tableCell} data-label="תאריך פנייה">
-                                            {formatDate(row.createdAt)}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                        </div>
+                                    </div>
+                                ) : null}
+                            </article>
+                        );
+                    })}
                 </div>
+                </>
             )}
 
             {draft ? (
