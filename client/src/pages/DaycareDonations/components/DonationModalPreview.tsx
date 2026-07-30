@@ -304,24 +304,28 @@ const DonationModalPreview = ({
                             <fieldset className={styles.amountFieldset}>
                                 <legend>בחרו סכום</legend>
                                 <div className={styles.amountGrid}>
-                                    {amountOptions.map((option) => (
-                                        <button
-                                            type="button"
-                                            key={String(option.value)}
-                                            className={
-                                                amountChoice === option.value
-                                                    ? styles.amountActive
-                                                    : ""
-                                            }
-                                            onClick={() => setAmountChoice(option.value)}
-                                            disabled={
-                                                option.value === "complete" &&
-                                                remaining === null
-                                            }
-                                        >
-                                            {option.label}
-                                        </button>
-                                    ))}
+                                    {amountOptions
+                                        .filter(
+                                            (option) =>
+                                                option.value !== "complete" ||
+                                                remaining !== null
+                                        )
+                                        .map((option) => (
+                                            <button
+                                                type="button"
+                                                key={String(option.value)}
+                                                className={
+                                                    amountChoice === option.value
+                                                        ? styles.amountActive
+                                                        : ""
+                                                }
+                                                onClick={() =>
+                                                    setAmountChoice(option.value)
+                                                }
+                                            >
+                                                {option.label}
+                                            </button>
+                                        ))}
                                 </div>
                             </fieldset>
                             {amountChoice === "custom" && (

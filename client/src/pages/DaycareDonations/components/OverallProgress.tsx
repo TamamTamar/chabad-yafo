@@ -16,7 +16,14 @@ const OverallProgress = ({
     raised,
     completedItemsCount,
 }: OverallProgressProps) => {
-    const progress = goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
+    const progress = goal > 0 ? Math.min(100, (raised / goal) * 100) : 0;
+    const roundedProgress = Math.round(progress);
+    const progressLabel =
+        raised > 0 && progress < 1 ? "פחות מ־1%" : `${roundedProgress}%`;
+    const accessibleProgressLabel =
+        raised > 0 && progress < 1
+            ? "גויסו פחות מאחוז אחד מתוך היעד הכללי"
+            : `גויסו ${roundedProgress}% מתוך היעד הכללי`;
 
     return (
         <section className={styles.overallProgress} aria-label="התקדמות הקמפיין">
@@ -29,12 +36,14 @@ const OverallProgress = ({
                         מתוך ₪{formatCurrency(goal)}
                     </span>
                 </div>
-                <span className={styles.overallPercent}>{progress}%</span>
+                {raised > 0 && (
+                    <span className={styles.overallPercent}>{progressLabel}</span>
+                )}
             </div>
 
             <ProgressBar
                 value={progress}
-                label={`גויסו ${progress}% מתוך היעד הכללי`}
+                label={accessibleProgressLabel}
                 size="large"
             />
 
@@ -43,10 +52,14 @@ const OverallProgress = ({
                     <HeartHandshake aria-hidden="true" />
                     כל תרומה מקרבת אותנו לפתיחה
                 </span>
-                <span>
-                    <CheckCircle2 aria-hidden="true" />
-                    {completedItemsCount} חלקים כבר הושלמו
-                </span>
+                {completedItemsCount > 0 && (
+                    <span>
+                        <CheckCircle2 aria-hidden="true" />
+                        {completedItemsCount === 1
+                            ? "חלק אחד כבר הושלם"
+                            : `${completedItemsCount} חלקים כבר הושלמו`}
+                    </span>
+                )}
             </div>
         </section>
     );

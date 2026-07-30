@@ -19,6 +19,7 @@ type HeroSlide = {
     eyebrow?: string;
     title: string;
     description?: string;
+    contentPosition?: "left" | "right";
     desktopImage: string;
     mobileImage: string;
     imagePosition?: string;
@@ -33,6 +34,7 @@ const slides: HeroSlide[] = [
     {
         id: "main",
         title: "בית חב״ד יפו\nהכתובת שלך לכל עניין יהודי",
+        contentPosition: "right",
         desktopImage: mainDesktop,
         mobileImage: mainMobile,
         actions: [
@@ -50,6 +52,7 @@ const slides: HeroSlide[] = [
         title: "מעון חדש בצפון יפו",
         description:
             "מעון חם ומקצועי לילדים בגילאי שנה עד שלוש. מספר המקומות מוגבל.",
+        contentPosition: "right",
         desktopImage: daycareDesktop,
         mobileImage: daycareMobile,
         imagePosition: "center",
@@ -106,7 +109,13 @@ const Hero = () => {
                         <div className={styles.overlay} aria-hidden="true" />
 
                         <Container className={styles.inner}>
-                            <div className={styles.card}>
+                            <div
+                                className={`${styles.card} ${
+                                    slide.contentPosition === "right"
+                                        ? styles.cardRight
+                                        : ""
+                                }`}
+                            >
                                 {slide.eyebrow && (
                                     <span className={styles.eyebrow}>{slide.eyebrow}</span>
                                 )}

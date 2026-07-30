@@ -157,6 +157,20 @@
     margin-top: 18px;
 }
 
+.heroTrust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin: 14px 0 0;
+    color: rgba($color-white, 0.72);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.heroTrust span {
+    color: var(--campaign-gold-light);
+}
+
 .primaryButton,
 .secondaryButton,
 .generalButton,
@@ -1826,6 +1840,14 @@
         display: grid;
         grid-template-columns: 1fr;
         margin-top: 18px;
+    }
+
+    .heroTrust {
+        justify-content: center;
+        margin-top: 13px;
+        padding-inline: 8px;
+        font-size: 0.74rem;
+        line-height: 1.6;
     }
 
     .primaryButton,

@@ -67,6 +67,13 @@
     color: $color-white;
 }
 
+.cardRight {
+    right: clamp(32px, 4vw, 72px);
+    left: auto;
+    margin-right: 0;
+    margin-left: auto;
+}
+
 .eyebrow {
     display: inline-flex;
     margin-bottom: 12px;
@@ -262,6 +269,10 @@
         padding: 24px 16px;
     }
 
+    .cardRight {
+        right: 0;
+    }
+
     .eyebrow {
         margin-bottom: 10px;
         font-size: 0.82rem;
@@ -297,6 +308,11 @@
 @media (min-width: 641px) and (max-width: 900px) {
     .card {
         left: 48px;
+    }
+
+    .cardRight {
+        right: 24px;
+        left: auto;
     }
 }
 

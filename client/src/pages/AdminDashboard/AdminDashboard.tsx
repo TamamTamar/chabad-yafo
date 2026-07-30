@@ -12,17 +12,24 @@ import styles from "./AdminDashboard.module.scss";
 type AdminTab = "projects" | "families" | "daycareRegistrations" | "rebbeLetters" | "payments";
 
 const AdminDashboard = () => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const initialTab: AdminTab =
         searchParams.get("tab") === "families"
             ? "families"
             : searchParams.get("tab") === "daycareRegistrations"
             ? "daycareRegistrations"
+            : searchParams.get("tab") === "rebbeLetters"
+            ? "rebbeLetters"
             : searchParams.get("tab") === "payments"
-              ? "payments"
+            ? "payments"
             : "projects";
     const [activeTab, setActiveTab] = useState<AdminTab>(initialTab);
     const navigate = useNavigate();
+
+    const selectTab = (tab: AdminTab) => {
+        setActiveTab(tab);
+        setSearchParams(tab === "projects" ? {} : { tab });
+    };
 
     const handleLogout = async () => {
         await logoutAdmin();
@@ -56,16 +63,17 @@ const AdminDashboard = () => {
                     <button
                         type="button"
                         className={activeTab === "projects" ? styles.tabActive : styles.tab}
-                        onClick={() => setActiveTab("projects")}
+                        onClick={() => selectTab("projects")}
                     >
                         פרויקטים
                     </button>
+
                     <button
                         type="button"
                         className={styles.tab}
                         onClick={() => navigate("/admin/daycare")}
                     >
-                        ניהול מעון
+                        ניהול המעון
                     </button>
 
                     <button
@@ -75,9 +83,9 @@ const AdminDashboard = () => {
                                 ? styles.tabActive
                                 : styles.tab
                         }
-                        onClick={() => setActiveTab("daycareRegistrations")}
+                        onClick={() => selectTab("daycareRegistrations")}
                     >
-                        מעון צפון יפו
+                        פניות למעון
                     </button>
 
                     <button
@@ -87,7 +95,7 @@ const AdminDashboard = () => {
                                 ? styles.tabActive
                                 : styles.tab
                         }
-                        onClick={() => setActiveTab("rebbeLetters")}
+                        onClick={() => selectTab("rebbeLetters")}
                     >
                         מכתבים לרבי
                     </button>
@@ -99,7 +107,7 @@ const AdminDashboard = () => {
                                 ? styles.tabActive
                                 : styles.tab
                         }
-                        onClick={() => setActiveTab("payments")}
+                        onClick={() => selectTab("payments")}
                     >
                         כספים
                     </button>

@@ -81,6 +81,13 @@ const DaycareDonationsHero = ({
                     תרומה כללית למעון
                 </button>
             </div>
+            <p className={styles.heroTrust}>
+                תשלום מאובטח באמצעות נדרים פלוס
+                <span aria-hidden="true">•</span>
+                קבלה אוטומטית
+                <span aria-hidden="true">•</span>
+                פרטי האשראי אינם נשמרים באתר
+            </p>
         </div>
     </section>
 );

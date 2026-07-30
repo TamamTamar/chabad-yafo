@@ -5,6 +5,7 @@ import styles from "./FloatingSocials.module.scss";
 
 const FloatingSocials = () => {
     const { pathname } = useLocation();
+    const hideWhatsApp = pathname.replace(/\/+$/, "") === "/daycare-donations";
 
     if (pathname === "/daycare-parent-info") {
         return null;
@@ -12,16 +13,20 @@ const FloatingSocials = () => {
 
     return (
         <div className={styles.wrapper} aria-label="קישורים מהירים">
-            <a
-                href="https://wa.me/972537700339"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${styles.fab} ${styles.whatsapp}`}
-                aria-label="שליחת הודעה בוואטסאפ"
-                onClick={() => trackWhatsAppClick({ location: "floating_socials" })}
-            >
-                <MessageCircle size={20} strokeWidth={1.8} />
-            </a>
+            {!hideWhatsApp && (
+                <a
+                    href="https://wa.me/972537700339"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${styles.fab} ${styles.whatsapp}`}
+                    aria-label="שליחת הודעה בוואטסאפ"
+                    onClick={() =>
+                        trackWhatsAppClick({ location: "floating_socials" })
+                    }
+                >
+                    <MessageCircle size={20} strokeWidth={1.8} />
+                </a>
+            )}
 
             <a
                 href="https://www.instagram.com/chabad_yaffo"
