@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
+import ReasonDialog from "../../../../components/ReasonDialog/ReasonDialog";
 import {
     clearAdminDaycareDonationDiagnostics,
     createAdminDiagnosticDonationIntent,
@@ -55,6 +56,16 @@ const auditLabels: Record<string, string> = {
 
 type AdminView = "overview" | "records" | "manual" | "items" | "history";
 
+type PendingRecordUpdate = {
+    recordId: string;
+    updates: {
+        itemId?: string;
+        status?: DaycareDonationRecord["status"];
+    };
+    title: string;
+    message: string;
+};
+
 const adminViews: Array<{
     id: AdminView;
     label: string;
@@ -85,6 +96,8 @@ const DaycareDonationsAdmin = () => {
     const [recordStatus, setRecordStatus] = useState<
         "all" | DaycareDonationRecord["status"]
     >("all");
+    const [pendingRecordUpdate, setPendingRecordUpdate] =
+        useState<PendingRecordUpdate | null>(null);
 
     const loadData = useCallback(async () => {
         const [campaignData, recordData, auditData, diagnosticData] =
@@ -251,9 +264,11 @@ const DaycareDonationsAdmin = () => {
             });
             await loadData();
             setMessage("רשומת התרומה עודכנה.");
+            return true;
         } catch (saveError) {
             console.error("Failed to update donation record:", saveError);
             setError("עדכון התרומה נכשל.");
+            return false;
         } finally {
             setSaving(false);
         }
@@ -927,20 +942,21 @@ const DaycareDonationsAdmin = () => {
                                                 value={record.itemId ?? ""}
                                                 disabled={saving}
                                                 onChange={(event) => {
-                                                    const reason =
-                                                        window.prompt(
-                                                            "יש להזין סיבה לשינוי השיוך"
-                                                        );
-                                                    if (!reason?.trim()) return;
-                                                    void handleRecordUpdate(
-                                                        record._id,
-                                                        {
-                                                            itemId:
-                                                                event.target
-                                                                    .value,
-                                                        },
-                                                        reason.trim()
-                                                    );
+                                                    const itemId =
+                                                        event.target.value;
+                                                    const itemTitle =
+                                                        campaign.items.find(
+                                                            (item) =>
+                                                                item.id ===
+                                                                itemId
+                                                        )?.title ??
+                                                        "תרומה כללית";
+                                                    setPendingRecordUpdate({
+                                                        recordId: record._id,
+                                                        updates: { itemId },
+                                                        title: "שינוי שיוך תרומה",
+                                                        message: `התרומה של ${record.donorName || "תורם ללא שם"} תשויך אל "${itemTitle}".`,
+                                                    });
                                                 }}
                                             >
                                                 <option value="">
@@ -962,19 +978,15 @@ const DaycareDonationsAdmin = () => {
                                                 value={record.status}
                                                 disabled={saving}
                                                 onChange={(event) => {
-                                                    const reason =
-                                                        window.prompt(
-                                                            "יש להזין סיבה לביטול, החזר או שינוי מצב"
-                                                        );
-                                                    if (!reason?.trim()) return;
-                                                    void handleRecordUpdate(
-                                                        record._id,
-                                                        {
-                                                            status: event.target
-                                                                .value as DaycareDonationRecord["status"],
-                                                        },
-                                                        reason.trim()
-                                                    );
+                                                    const status =
+                                                        event.target
+                                                            .value as DaycareDonationRecord["status"];
+                                                    setPendingRecordUpdate({
+                                                        recordId: record._id,
+                                                        updates: { status },
+                                                        title: "שינוי מצב תרומה",
+                                                        message: `מצב התרומה של ${record.donorName || "תורם ללא שם"} ישתנה ל"${statusLabels[status]}".`,
+                                                    });
                                                 }}
                                             >
                                                 {Object.entries(
@@ -1048,6 +1060,23 @@ const DaycareDonationsAdmin = () => {
                 onConfirm={() => void handleClearDiagnostics()}
                 onClose={() => setClearDiagnosticsOpen(false)}
             />
+            {pendingRecordUpdate && (
+                <ReasonDialog
+                    title={pendingRecordUpdate.title}
+                    message={pendingRecordUpdate.message}
+                    busy={saving}
+                    onConfirm={(reason) => {
+                        void handleRecordUpdate(
+                            pendingRecordUpdate.recordId,
+                            pendingRecordUpdate.updates,
+                            reason
+                        ).then((updated) => {
+                            if (updated) setPendingRecordUpdate(null);
+                        });
+                    }}
+                    onClose={() => setPendingRecordUpdate(null)}
+                />
+            )}
             {diagnosticPaymentOpen && (
                 <DonationModalPreview
                     open
