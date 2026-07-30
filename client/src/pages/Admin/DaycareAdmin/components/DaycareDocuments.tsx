@@ -30,10 +30,22 @@ const DaycareDocuments = () => {
     };
 
     useEffect(() => {
-        loadDocuments().catch((error) => {
-            console.error("Failed to load daycare documents:", error);
-            setLoading(false);
-        });
+        let active = true;
+
+        void getDaycareDocuments()
+            .then((data) => {
+                if (active) setDocuments(data);
+            })
+            .catch((error) => {
+                console.error("Failed to load daycare documents:", error);
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
     }, []);
 
     const resetDraft = () => {

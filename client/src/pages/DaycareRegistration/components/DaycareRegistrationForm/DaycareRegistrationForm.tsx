@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import DaycareLogo from "../../../../components/DaycareLogo/DaycareLogo";
 import { createDaycareRegistration } from "../../../../services/daycareRegistrationService";
 import {
@@ -22,11 +22,11 @@ type Props = {
 const DaycareRegistrationForm = ({ onSuccess }: Props) => {
     const hasTrackedFormStart = useRef(false);
     const {
+        control,
         register,
         handleSubmit,
         reset,
         setError,
-        watch,
         formState: { errors, isSubmitting },
     } = useForm<DaycareRegistrationFormValues>({
         mode: "onChange",
@@ -35,7 +35,10 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
             requiredHours: "עד 15:30",
         },
     });
-    const selectedRequiredHours = watch("requiredHours");
+    const selectedRequiredHours = useWatch({
+        control,
+        name: "requiredHours",
+    });
 
     const handleFormStart = () => {
         if (hasTrackedFormStart.current) {

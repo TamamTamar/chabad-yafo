@@ -1460,6 +1460,28 @@
     gap: 12px;
 }
 
+.financeSaveActions {
+    display: grid;
+    justify-items: end;
+    gap: 6px;
+}
+
+.financeSaveStatus,
+.financeSaveError {
+    max-width: 280px;
+    font-size: $type-caption;
+    font-weight: 800;
+    text-align: right;
+}
+
+.financeSaveStatus {
+    color: $ui-success;
+}
+
+.financeSaveError {
+    color: $ui-danger;
+}
+
 .financeMonthList {
     grid-column: 1 / -1;
     display: grid;

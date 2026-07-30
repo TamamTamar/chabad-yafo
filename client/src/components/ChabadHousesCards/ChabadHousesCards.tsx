@@ -25,11 +25,11 @@ const ChabadHousesCards = ({ cards }: Props) => {
         }
 
         // Mobile: try Waze first
-        window.location.href = getWazeDeepLink(query);
+        window.location.assign(getWazeDeepLink(query));
 
         // Fallback to Google Maps if Waze isn't installed / blocked
         window.setTimeout(() => {
-            window.location.href = gmaps;
+            window.location.assign(gmaps);
         }, 700);
     };
 

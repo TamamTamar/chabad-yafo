@@ -1,5 +1,10 @@
 import { useEffect, useMemo } from "react";
-import { useFieldArray, useForm, type SubmitHandler } from "react-hook-form";
+import {
+    useFieldArray,
+    useForm,
+    useWatch,
+    type SubmitHandler,
+} from "react-hook-form";
 import type {
     DaycareGuardianSummary,
     DaycareIdentityProfile,
@@ -91,7 +96,6 @@ const IdentityProfileForm = ({
         register,
         handleSubmit,
         reset,
-        watch,
         formState: { errors },
     } = useForm<SubmitDaycareIdentityProfilePayload>({
         defaultValues: initialValue,
@@ -101,7 +105,7 @@ const IdentityProfileForm = ({
         control,
         name: "guardians",
     });
-    const guardians = watch("guardians");
+    const guardians = useWatch({ control, name: "guardians" });
     const showSecondGuardian = guardianFields.length > 1;
     const isEditingSavedProfile = Boolean(initialProfile);
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import styles from "./SurveyForm.module.scss";
 import type { FormValues } from "../../../../types/family";
@@ -53,8 +54,8 @@ const SurveyForm = () => {
                 top: 0,
                 behavior: "smooth",
             });
-        } catch (error: any) {
-            if (error?.response?.status === 409) {
+        } catch (error: unknown) {
+            if (isAxiosError(error) && error.response?.status === 409) {
                 setError("phone", {
                     type: "server",
                     message: "הטלפון הזה כבר רשום במערכת",

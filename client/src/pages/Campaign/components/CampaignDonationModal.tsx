@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import {
   trackDonationComplete,
@@ -64,10 +64,10 @@ const CampaignDonationModal: React.FC<Props> = ({
   const [showSuccessPreview, setShowSuccessPreview] = useState(false);
 
   const {
+    control,
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm<DonorForm>({
     mode: "onSubmit",
@@ -75,7 +75,7 @@ const CampaignDonationModal: React.FC<Props> = ({
     defaultValues: prefilledDonor || EMPTY_DONOR,
   });
 
-  const watchedDonor = watch();
+  const watchedDonor = useWatch({ control });
   const currency: Currency = nedarim.Currency;
 
   const { isPaying, errorText, setErrorText, startPayment, resetPaymentUi, ok } =
@@ -97,21 +97,18 @@ const CampaignDonationModal: React.FC<Props> = ({
   useEffect(() => {
     if (!open) return;
 
-    setStep(initialStep ?? 1);
-    setShowSuccessPreview(false);
-    setErrorText("");
-    resetPaymentUi();
+    const resetTimer = window.setTimeout(() => {
+      setStep(initialStep ?? 1);
+      setShowSuccessPreview(false);
+      setErrorText("");
+      resetPaymentUi();
+      setSelectedAmount(presetAmount);
+      setCustomRaw("");
+      setAmountMode(startWithCustom ? "custom" : "preset");
+      reset(prefilledDonor || EMPTY_DONOR);
+    }, 0);
 
-    setSelectedAmount(presetAmount);
-    setCustomRaw("");
-    reset(prefilledDonor || EMPTY_DONOR);
-
-    if (startWithCustom) {
-      setAmountMode("custom");
-      window.setTimeout(() => customInputRef.current?.focus(), 0);
-    } else {
-      setAmountMode("preset");
-    }
+    return () => window.clearTimeout(resetTimer);
   }, [
     open,
     presetAmount,
@@ -122,6 +119,17 @@ const CampaignDonationModal: React.FC<Props> = ({
     initialStep,
     reset,
   ]);
+
+  useEffect(() => {
+    if (!open || !startWithCustom) return;
+
+    const focusTimer = window.setTimeout(
+      () => customInputRef.current?.focus(),
+      0,
+    );
+
+    return () => window.clearTimeout(focusTimer);
+  }, [open, startWithCustom]);
 
   const amountToShow = useMemo(() => {
     if (amountMode === "custom") {

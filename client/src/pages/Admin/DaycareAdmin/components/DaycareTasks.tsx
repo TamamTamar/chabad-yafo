@@ -186,10 +186,22 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
     };
 
     useEffect(() => {
-        loadTasks().catch((error) => {
-            console.error("Failed to load daycare tasks:", error);
-            setLoading(false);
-        });
+        let active = true;
+
+        void getDaycareTasks()
+            .then((data) => {
+                if (active) setTasks(data);
+            })
+            .catch((error) => {
+                console.error("Failed to load daycare tasks:", error);
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
     }, []);
 
     const resetDraft = () => {

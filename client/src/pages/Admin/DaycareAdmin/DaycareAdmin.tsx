@@ -87,6 +87,10 @@ const DaycareAdmin = () => {
         setFinanceRefreshKey((currentKey) => currentKey + 1);
     };
 
+    const handleFinanceSaved = () => {
+        void loadOverview();
+    };
+
     useEffect(() => {
         void getDaycareOverview()
             .then(setOverview)
@@ -150,7 +154,7 @@ const DaycareAdmin = () => {
                 {activeTab === "finance" && (
                     <div className={styles.tabPanel}>
                         <DaycareFinance
-                            onChanged={handleDataChanged}
+                            onChanged={handleFinanceSaved}
                             refreshKey={financeRefreshKey}
                         />
                     </div>

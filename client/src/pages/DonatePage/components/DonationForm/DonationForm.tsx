@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import Container from "../../../../components/Container/Container";
 import {
     trackDonationComplete,
@@ -36,12 +36,10 @@ const DonationForm = () => {
     const [step, setStep] = useState<DonationStep>(1);
     const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
 
-
-
     const {
+        control,
         register,
         handleSubmit,
-        watch,
         setValue,
         trigger,
         getValues,
@@ -69,9 +67,10 @@ const DonationForm = () => {
                     ? "תשלום מאובטח"
                     : "התרומה התקבלה";
 
-    const amount = watch("amount");
-    const donationType = watch("donationType");
-    const payments = watch("payments");
+    const [amount, donationType, payments] = useWatch({
+        control,
+        name: ["amount", "donationType", "payments"],
+    });
 
     const amountNumber = useMemo(() => Number(amount) || 0, [amount]);
     const isMonthly = donationType === "monthly";
@@ -137,15 +136,20 @@ const DonationForm = () => {
             payments: Number(data.payments) || 1,
         });
         setStep(3);
+    };
 
-        setTimeout(() => {
+    useEffect(() => {
+        if (step !== 3) return;
+
+        const scrollTimer = window.setTimeout(() => {
             iframeRef.current?.scrollIntoView({
                 behavior: "smooth",
                 block: "center",
             });
         }, 150);
-    };
 
+        return () => window.clearTimeout(scrollTimer);
+    }, [step]);
 
     const onSubmit = () => {
         if (step === 1) {

@@ -199,71 +199,76 @@ const formatMonth = (month: string) => {
     }).format(new Date(`${month}-01T00:00:00`));
 };
 
+const ensureCurrentYearCashflows = (settings: DaycareFinanceSettings) => {
+    const existingCashflows = settings.monthlyCashflows || [];
+    const existingMonths = new Set(
+        existingCashflows.map((cashflow) => cashflow.month)
+    );
+    const missingMonths = getCurrentYearMonths().filter(
+        (month) => !existingMonths.has(month)
+    );
+
+    if (missingMonths.length === 0) {
+        return { settings, changed: false };
+    }
+
+    return {
+        settings: {
+            ...settings,
+            monthlyCashflows: [
+                ...existingCashflows,
+                ...missingMonths.map((month) =>
+                    getDefaultMonthlyCashflow(settings, month)
+                ),
+            ].sort((a, b) => a.month.localeCompare(b.month)),
+        },
+        changed: true,
+    };
+};
+
 const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
     const [settings, setSettings] = useState<DaycareFinanceSettings | null>(
         null
     );
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
     const [financeDirty, setFinanceDirty] = useState(false);
+    const [loadError, setLoadError] = useState("");
+    const [saveError, setSaveError] = useState("");
+    const [saveMessage, setSaveMessage] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthValue);
 
     useEffect(() => {
-        if (!settings) {
-            setLoading(true);
-        }
+        let active = true;
 
-        getDaycareFinance()
+        void getDaycareFinance()
             .then((financeSettings) => {
-                setSettings(financeSettings);
-                setFinanceDirty(false);
+                if (!active) return;
+
+                const normalized = ensureCurrentYearCashflows(financeSettings);
+                setSettings(normalized.settings);
+                setFinanceDirty(normalized.changed);
+                setLoadError("");
+                setSaveMessage(
+                    normalized.changed
+                        ? "נוספו חודשי השנה. יש לשמור את הנתונים."
+                        : ""
+                );
             })
-            .catch((error) => console.error("Failed to load finance:", error))
-            .finally(() => setLoading(false));
+            .catch((error) => {
+                console.error("Failed to load finance:", error);
+                if (active) {
+                    setLoadError("לא הצלחנו לטעון את הנתונים הכספיים.");
+                }
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
     }, [refreshKey]);
-
-    useEffect(() => {
-        if (!settings || !financeDirty) {
-            return;
-        }
-
-        const saveTimer = window.setTimeout(() => {
-            handleSave(settings);
-        }, 700);
-
-        return () => window.clearTimeout(saveTimer);
-    }, [financeDirty, settings]);
-
-    useEffect(() => {
-        if (!settings || loading) {
-            return;
-        }
-
-        const existingCashflows = settings.monthlyCashflows || [];
-        const cashflowsByMonth = new Map(
-            existingCashflows.map((cashflow) => [cashflow.month, cashflow])
-        );
-        const yearMonths = getCurrentYearMonths();
-        const hasAllYearMonths = yearMonths.every((month) =>
-            cashflowsByMonth.has(month)
-        );
-
-        if (hasAllYearMonths) {
-            return;
-        }
-
-        const nextCashflows = [
-            ...existingCashflows,
-            ...yearMonths
-                .filter((month) => !cashflowsByMonth.has(month))
-                .map((month) => getDefaultMonthlyCashflow(settings, month)),
-        ].sort((a, b) => a.month.localeCompare(b.month));
-
-        setSettings({
-            ...settings,
-            monthlyCashflows: nextCashflows,
-        });
-        setFinanceDirty(true);
-    }, [loading, settings]);
 
     const summary = useMemo(() => {
         if (!settings) {
@@ -303,15 +308,27 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
             renovationInvestment - totalRepayment,
             0
         );
-        let runningRepayment = 0;
-        const coveredCashflow = cashflows.find((cashflow) => {
-            runningRepayment += cashflow.renovationRepayment || 0;
+        const coverage = cashflows.reduce<{
+            total: number;
+            month?: string;
+        }>(
+            (result, cashflow) => {
+                if (result.month) return result;
 
-            return (
-                renovationInvestment > 0 &&
-                runningRepayment >= renovationInvestment
-            );
-        });
+                const total =
+                    result.total + (cashflow.renovationRepayment || 0);
+
+                return {
+                    total,
+                    month:
+                        renovationInvestment > 0 &&
+                        total >= renovationInvestment
+                            ? cashflow.month
+                            : undefined,
+                };
+            },
+            { total: 0 }
+        );
 
         return {
             latestIncome,
@@ -324,7 +341,7 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
             cashflows,
             totalRepayment,
             remainingInvestment,
-            coveredMonth: coveredCashflow?.month,
+            coveredMonth: coverage.month,
         };
     }, [settings]);
 
@@ -371,6 +388,8 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
             monthlyCashflows: nextCashflows,
         });
         setFinanceDirty(true);
+        setSaveError("");
+        setSaveMessage("");
     };
 
     const updateMonthlyRenovationCashflow = (
@@ -402,24 +421,33 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
             monthlyCashflows: nextCashflows,
         });
         setFinanceDirty(true);
+        setSaveError("");
+        setSaveMessage("");
     };
 
-    const handleSave = async (
-        settingsToSave: DaycareFinanceSettings | null = settings
-    ) => {
-        if (!settingsToSave) {
-            return;
-        }
+    const handleSave = async () => {
+        if (!settings || !financeDirty || saving) return;
 
+        setSaving(true);
+        setSaveError("");
+        setSaveMessage("");
         try {
-            const updatedSettings = await updateDaycareFinance(settingsToSave);
+            const updatedSettings = await updateDaycareFinance(settings);
             setSettings(updatedSettings);
             setFinanceDirty(false);
+            setSaveMessage("הנתונים הכספיים נשמרו בהצלחה.");
             onChanged();
         } catch (error) {
             console.error("Failed to save finance settings:", error);
+            setSaveError("שמירת הנתונים נכשלה. נסו שוב.");
+        } finally {
+            setSaving(false);
         }
     };
+
+    if (loadError) {
+        return <div className={styles.loading}>{loadError}</div>;
+    }
 
     if (loading || !settings || !summary) {
         return <div className={styles.loading}>טוען תחזית כלכלית...</div>;
@@ -475,6 +503,31 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
                                     לכל חודש בנפרד.
                                 </p>
                             </div>
+                            <div className={styles.financeSaveActions}>
+                                <button
+                                    className={styles.primaryButton}
+                                    type="button"
+                                    disabled={!financeDirty || saving}
+                                    onClick={() => void handleSave()}
+                                >
+                                    {saving
+                                        ? "שומר..."
+                                        : financeDirty
+                                          ? "שמירת הנתונים הכספיים"
+                                          : "הנתונים שמורים"}
+                                </button>
+                                {(saveError || saveMessage) && (
+                                    <span
+                                        className={
+                                            saveError
+                                                ? styles.financeSaveError
+                                                : styles.financeSaveStatus
+                                        }
+                                    >
+                                        {saveError || saveMessage}
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
                         <div className={styles.financeMonthPicker}>
@@ -484,6 +537,7 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
                                 </span>
                                 <select
                                     className={styles.financeMonthSelect}
+                                    disabled={saving}
                                     value={selectedCashflow?.month || ""}
                                     onChange={(event) =>
                                         setSelectedMonth(event.target.value)
@@ -567,6 +621,7 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
                                                         </span>
                                                         <input
                                                             className={`${styles.input} ${styles.numberInput}`}
+                                                            disabled={saving}
                                                             inputMode="numeric"
                                                             type="text"
                                                             value={
@@ -612,6 +667,7 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
                                                             </span>
                                                             <input
                                                                 className={`${styles.input} ${styles.numberInput}`}
+                                                                disabled={saving}
                                                                 inputMode="numeric"
                                                                 type="text"
                                                                 value={
@@ -662,6 +718,7 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
                                                             </span>
                                                             <input
                                                                 className={`${styles.input} ${styles.numberInput}`}
+                                                                disabled={saving}
                                                                 inputMode="numeric"
                                                                 type="text"
                                                                 value={
@@ -717,6 +774,7 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
                                                                 </span>
                                                                 <input
                                                                     className={`${styles.input} ${styles.numberInput}`}
+                                                                    disabled={saving}
                                                                     inputMode="numeric"
                                                                     type="text"
                                                                     value={
@@ -762,6 +820,7 @@ const DaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
                                                     </span>
                                                     <input
                                                         className={`${styles.input} ${styles.numberInput}`}
+                                                        disabled={saving}
                                                         inputMode="numeric"
                                                         type="text"
                                                         value={

@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import {
     createFinanceEntry,
     getFinanceOverview,
@@ -90,18 +90,18 @@ const AdminPaymentsTab = () => {
     const [error, setError] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth);
     const {
+        control,
         register,
         handleSubmit,
         reset,
         setValue,
-        watch,
         formState: { errors, isSubmitting },
     } = useForm<FinanceFormValues>({ defaultValues: initialForm, mode: "onBlur" });
-    const type = watch("type");
+    const type = useWatch({ control, name: "type" });
 
     const entries = useMemo(() => finance?.entries ?? [], [finance]);
 
-    const fetchFinance = async () => {
+    const fetchFinance = useCallback(async () => {
         try {
             setError("");
             const data = await getFinanceOverview(selectedMonth);
@@ -111,10 +111,29 @@ const AdminPaymentsTab = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedMonth]);
 
     useEffect(() => {
-        fetchFinance();
+        let active = true;
+
+        void getFinanceOverview(selectedMonth)
+            .then((data) => {
+                if (!active) return;
+                setFinance(data);
+                setError("");
+            })
+            .catch(() => {
+                if (active) {
+                    setError("לא הצלחנו לטעון את נתוני הכספים");
+                }
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
     }, [selectedMonth]);
 
     const submitFinanceEntry: SubmitHandler<FinanceFormValues> = async (form) => {
