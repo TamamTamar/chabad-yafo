@@ -61,13 +61,58 @@
         border-radius: $radius-md;
     }
 
-    .table {
-        min-width: 820px;
+    .tableWrapper {
+        overflow: visible;
     }
 
-    .tableHeader,
+    .table,
+    .table tbody,
+    .tableRow,
     .tableCell {
-        padding: 13px 14px;
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .table {
+        border-collapse: separate;
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .tableRow {
+        margin-bottom: 12px;
+        overflow: hidden;
+        border: 1px solid $ui-border-soft;
+        border-radius: $radius-md;
+        background: $brand-bg;
+    }
+
+    .tableCell {
+        display: grid;
+        grid-template-columns: minmax(90px, 32%) minmax(0, 1fr);
+        gap: 10px;
+        padding: 11px 13px;
         font-size: $type-body-sm;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .tableCell::before {
+        content: attr(data-label);
+        color: $brand-primary;
+        font-size: $type-caption;
+        font-weight: 900;
+    }
+
+    .phone {
+        direction: rtl;
+    }
+
+    .phone span {
+        direction: ltr;
+        justify-self: start;
     }
 }

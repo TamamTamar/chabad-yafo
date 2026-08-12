@@ -63,13 +63,13 @@ const AdminRebbeLettersTab = () => {
                         <tbody>
                             {letters.map((letter) => (
                                 <tr key={letter._id}>
-                                    <td>{letter.fullName}</td>
-                                    <td>{letter.motherName}</td>
-                                    <td className={styles.phone}>{letter.phone || "-"}</td>
-                                    <td>{letter.email || "-"}</td>
-                                    <td className={styles.letterText}>{letter.letter || "-"}</td>
-                                    <td>{letter.wantsUpdates ? "כן" : "לא"}</td>
-                                    <td>
+                                    <td data-label="שם מלא">{letter.fullName}</td>
+                                    <td data-label="שם האם">{letter.motherName}</td>
+                                    <td className={styles.phone} data-label="טלפון"><span dir="ltr">{letter.phone || "-"}</span></td>
+                                    <td data-label="אימייל" className={styles.email}>{letter.email || "-"}</td>
+                                    <td className={styles.letterText} data-label="תוכן המכתב">{letter.letter || "-"}</td>
+                                    <td data-label="עדכונים">{letter.wantsUpdates ? "כן" : "לא"}</td>
+                                    <td data-label="סטטוס">
                                         <select
                                             className={styles.statusSelect}
                                             value={letter.status}
@@ -86,7 +86,7 @@ const AdminRebbeLettersTab = () => {
                                             <option value="handled">טופל</option>
                                         </select>
                                     </td>
-                                    <td>
+                                    <td data-label="תאריך">
                                         {letter.createdAt
                                             ? new Date(letter.createdAt).toLocaleDateString("he-IL")
                                             : "-"}

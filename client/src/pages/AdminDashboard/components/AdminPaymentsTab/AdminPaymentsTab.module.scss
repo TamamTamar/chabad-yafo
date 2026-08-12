@@ -337,13 +337,102 @@
         border-radius: $radius-md;
     }
 
-    .table {
-        min-width: 920px;
+    .toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
     }
 
-    .table th,
-    .table td {
-        padding: 13px 14px;
+    .toolbar label {
+        min-width: 0;
+    }
+
+    .form {
+        padding: 16px;
+    }
+
+    .segmented,
+    .saveButton {
+        width: 100%;
+        justify-self: stretch;
+    }
+
+    .card,
+    .tableWrapper {
+        overflow: visible;
+    }
+
+    .table,
+    .categoryTable,
+    .table tbody,
+    .categoryTable tbody,
+    .table tr,
+    .categoryTable tr,
+    .table td,
+    .categoryTable td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .table,
+    .categoryTable {
+        border-collapse: separate;
+    }
+
+    .table thead,
+    .categoryTable thead {
+        display: none;
+    }
+
+    .table tr,
+    .categoryTable tr {
+        margin-bottom: 12px;
+        overflow: hidden;
+        border: 1px solid $ui-border-soft;
+        border-radius: $radius-md;
+        background: $brand-bg;
+        box-shadow: 0 10px 24px $ui-shadow-card;
+    }
+
+    .table td,
+    .categoryTable td {
+        display: grid;
+        grid-template-columns: minmax(86px, 30%) minmax(0, 1fr);
+        gap: 10px;
+        padding: 11px 13px;
         font-size: $type-body-sm;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .table td::before,
+    .categoryTable td::before {
+        content: attr(data-label);
+        color: $brand-primary;
+        font-size: $type-caption;
+        font-weight: 900;
+    }
+
+    .incomeAmount,
+    .expenseAmount,
+    .amount {
+        direction: rtl;
+        text-align: right;
+    }
+}
+
+@media (max-width: 420px) {
+    .toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .filterButton {
+        width: 100%;
+    }
+
+    .summaryItem,
+    .summaryItemStrong {
+        padding: 16px;
     }
 }

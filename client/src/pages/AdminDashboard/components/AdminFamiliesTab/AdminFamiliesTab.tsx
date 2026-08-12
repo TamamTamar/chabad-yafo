@@ -52,15 +52,15 @@ const AdminFamiliesTab = () => {
                         <tbody>
                             {families.map((family) => (
                                 <tr key={family._id}>
-                                    <td>{family.parentName}</td>
+                                    <td data-label="שם הורה">{family.parentName}</td>
 
-                                    <td className={styles.phone}>
-                                        {family.phone}
+                                    <td className={styles.phone} data-label="טלפון">
+                                        <span dir="ltr">{family.phone}</span>
                                     </td>
 
-                                    <td>{family.area}</td>
+                                    <td data-label="אזור">{family.area}</td>
 
-                                    <td>
+                                    <td data-label="גילאי ילדים">
                                         <div className={styles.tagList}>
                                             {family.ages.map((age) => (
                                                 <span
@@ -73,7 +73,7 @@ const AdminFamiliesTab = () => {
                                         </div>
                                     </td>
 
-                                    <td>
+                                    <td data-label="תחומי עניין">
                                         <div className={styles.tagList}>
                                             {family.interests.map((interest) => (
                                                 <span
@@ -86,9 +86,9 @@ const AdminFamiliesTab = () => {
                                         </div>
                                     </td>
 
-                                    <td>{family.missing || "-"}</td>
+                                    <td data-label="מה חסר באזור">{family.missing || "-"}</td>
 
-                                    <td>
+                                    <td data-label="עדכונים">
                                         <span
                                             className={
                                                 family.updates
@@ -100,7 +100,7 @@ const AdminFamiliesTab = () => {
                                         </span>
                                     </td>
 
-                                    <td>
+                                    <td data-label="תאריך">
                                         {family.createdAt
                                             ? new Date(
                                                 family.createdAt

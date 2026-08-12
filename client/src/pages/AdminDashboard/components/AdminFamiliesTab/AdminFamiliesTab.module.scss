@@ -133,17 +133,60 @@
         font-size: $type-form-title;
     }
 
-    .card {
-        border-radius: $radius-md;
+    .card,
+    .tableWrapper {
+        overflow: visible;
+    }
+
+    .table,
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+        min-width: 0;
     }
 
     .table {
-        min-width: 860px;
+        border-collapse: separate;
     }
 
-    .table th,
+    .table thead {
+        display: none;
+    }
+
+    .table tr {
+        margin-bottom: 12px;
+        overflow: hidden;
+        border: 1px solid $ui-border-soft;
+        border-radius: $radius-md;
+        background: $brand-bg;
+        box-shadow: 0 10px 24px $ui-shadow-card;
+    }
+
     .table td {
-        padding: 13px 14px;
+        display: grid;
+        grid-template-columns: minmax(90px, 31%) minmax(0, 1fr);
+        gap: 10px;
+        padding: 11px 13px;
         font-size: $type-body-sm;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .table td::before {
+        content: attr(data-label);
+        color: $brand-primary;
+        font-size: $type-caption;
+        font-weight: 900;
+    }
+
+    .phone {
+        direction: rtl;
+    }
+
+    .phone span {
+        direction: ltr;
+        justify-self: start;
     }
 }

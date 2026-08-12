@@ -140,13 +140,57 @@
 
 @media (max-width: 560px) {
     .tabBar {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        border-radius: $radius;
+        position: static;
+        display: grid;
+        grid-auto-columns: max-content;
+        grid-auto-flow: column;
+        grid-template-columns: none;
+        justify-content: start;
+        width: calc(100% + 16px);
+        margin-inline: 0 -16px;
+        padding: 6px 0 10px 16px;
+        overflow-x: auto;
+        border-inline: 0;
+        border-radius: 0;
+        box-shadow: none;
+        scroll-padding-inline: 16px;
+        scroll-snap-type: inline proximity;
+        scrollbar-width: none;
+    }
+
+    .tabBar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tabButton,
+    .tabButtonActive {
+        min-width: 104px;
+        padding-inline: 16px;
+        scroll-snap-align: start;
     }
 
     .innerTabBar {
-        width: 100%;
-        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+        grid-auto-columns: max-content;
+        grid-auto-flow: column;
+        grid-template-columns: none;
+        justify-self: stretch;
+        width: auto;
+        margin-inline: -2px;
+        padding: 5px;
+        overflow-x: auto;
+        border-radius: $radius;
+        scrollbar-width: none;
+    }
+
+    .innerTabBar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .innerTabButton,
+    .innerTabButtonActive {
+        min-width: 126px;
+        padding-inline: 14px;
     }
 }
 
@@ -2677,7 +2721,7 @@
 
     .hero,
     .section {
-        padding: 18px;
+        padding: 16px;
         border-radius: $radius-md;
     }
 
@@ -2696,9 +2740,7 @@
 
     .tabBar {
         gap: 6px;
-        margin: 0 -2px 16px;
-        padding: 6px;
-        border-radius: $radius;
+        margin-bottom: 16px;
     }
 
     .tabButton,

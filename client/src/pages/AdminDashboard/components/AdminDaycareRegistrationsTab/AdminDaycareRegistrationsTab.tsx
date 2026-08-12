@@ -71,26 +71,27 @@ const AdminDaycareRegistrationsTab = () => {
                                     className={styles.tableRow}
                                     key={registration._id}
                                 >
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="שם הורה">
                                         {registration.parentName}
                                     </td>
                                     <td
                                         className={`${styles.tableCell} ${styles.phone}`}
+                                        data-label="טלפון"
                                     >
-                                        {registration.phone}
+                                        <span dir="ltr">{registration.phone}</span>
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="גיל הילד/ה">
                                         {registration.childAge ||
                                             registration.childName ||
                                             formatDate(registration.birthDate)}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="שעות מועדפות">
                                         {formatRequiredHours(registration)}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="הערות">
                                         {registration.notes || "-"}
                                     </td>
-                                    <td className={styles.tableCell}>
+                                    <td className={styles.tableCell} data-label="תאריך פנייה">
                                         {formatDate(registration.createdAt)}
                                     </td>
                                 </tr>

@@ -332,14 +332,14 @@ const AdminPaymentsTab = () => {
                             <tbody>
                                 {finance.categorySummary.map((category) => (
                                     <tr key={category.category}>
-                                        <td>{category.category}</td>
-                                        <td className={styles.incomeAmount}>
+                                        <td data-label="קטגוריה">{category.category}</td>
+                                        <td className={styles.incomeAmount} data-label="הכנסות">
                                             {currencyFormatter.format(category.income)}
                                         </td>
-                                        <td className={styles.expenseAmount}>
+                                        <td className={styles.expenseAmount} data-label="הוצאות">
                                             {currencyFormatter.format(category.expenses)}
                                         </td>
-                                        <td className={styles.amount}>
+                                        <td className={styles.amount} data-label="יתרה">
                                             {currencyFormatter.format(category.balance)}
                                         </td>
                                     </tr>
@@ -404,19 +404,20 @@ type FinanceRowProps = {
 
 const FinanceRow = ({ entry }: FinanceRowProps) => (
     <tr>
-        <td>{entry.type === "income" ? "הכנסה" : "הוצאה"}</td>
-        <td>{sourceLabels[entry.source] ?? "אחר"}</td>
-        <td>{entry.category || "כללי"}</td>
-        <td>{entry.title}</td>
-        <td>{entry.donorName || "-"}</td>
+        <td data-label="סוג">{entry.type === "income" ? "הכנסה" : "הוצאה"}</td>
+        <td data-label="אמצעי">{sourceLabels[entry.source] ?? "אחר"}</td>
+        <td data-label="קטגוריה">{entry.category || "כללי"}</td>
+        <td data-label="תיאור">{entry.title}</td>
+        <td data-label="שם">{entry.donorName || "-"}</td>
         <td
+            data-label="סכום"
             className={
                 entry.type === "income" ? styles.incomeAmount : styles.expenseAmount
             }
         >
             {currencyFormatter.format(entry.amount)}
         </td>
-        <td>{entry.notes || "-"}</td>
+        <td data-label="הערה">{entry.notes || "-"}</td>
     </tr>
 );
 
