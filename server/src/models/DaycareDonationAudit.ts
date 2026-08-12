@@ -13,7 +13,14 @@ const daycareDonationAuditSchema =
             action: { type: String, required: true, trim: true },
             entityType: {
                 type: String,
-                enum: ["campaign", "category", "item", "record", "intent"],
+                enum: [
+                    "campaign",
+                    "category",
+                    "item",
+                    "record",
+                    "intent",
+                    "ambassador",
+                ],
                 required: true,
             },
             entityId: { type: String, required: true, trim: true },

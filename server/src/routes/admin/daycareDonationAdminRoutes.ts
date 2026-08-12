@@ -1,10 +1,12 @@
-import { randomUUID } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import { Router } from "express";
+import mongoose from "mongoose";
 import { DAYCARE_DONATION_CAMPAIGN_SLUG } from "../../config/daycareDonationDefaults";
 import { requireAdmin } from "../../middleware/adminAuth";
 import type { AdminActor } from "../../middleware/adminAuth";
 import { requireSecureAdminMutation } from "../../middleware/adminMutationSecurity";
 import { DaycareDonationCampaign } from "../../models/DaycareDonationCampaign";
+import { DaycareDonationAmbassador } from "../../models/DaycareDonationAmbassador";
 import { DaycareDonationAudit } from "../../models/DaycareDonationAudit";
 import { DaycareDonationDiagnostic } from "../../models/DaycareDonationDiagnostic";
 import { DaycareDonationIntent } from "../../models/DaycareDonationIntent";
@@ -33,6 +35,15 @@ router.use(requireSecureAdminMutation);
 
 const cleanText = (value: unknown, maxLength = 500) =>
     String(value ?? "").trim().slice(0, maxLength);
+
+const createUniqueAmbassadorRef = async () => {
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+        const refCode = randomBytes(4).toString("hex");
+        const exists = await DaycareDonationAmbassador.exists({ refCode });
+        if (!exists) return refCode;
+    }
+    throw new Error("Could not create a unique ambassador reference");
+};
 
 const isStatusOverride = (
     value: unknown
@@ -101,6 +112,10 @@ router.get("/records", async (_req, res) => {
         const records = await DaycareDonationRecord.find({
             campaignSlug: DAYCARE_DONATION_CAMPAIGN_SLUG,
         })
+            .populate({
+                path: "ambassadorId",
+                select: { name: 1, refCode: 1, active: 1 },
+            })
             .sort({ receivedAt: -1, createdAt: -1 })
             .limit(250)
             .lean();
@@ -110,6 +125,167 @@ router.get("/records", async (_req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to get donation records",
+        });
+    }
+});
+
+router.get("/ambassadors", async (_req, res) => {
+    try {
+        const [ambassadors, totals] = await Promise.all([
+            DaycareDonationAmbassador.find()
+                .sort({ active: -1, createdAt: -1 })
+                .lean(),
+            DaycareDonationRecord.aggregate([
+                {
+                    $match: {
+                        campaignSlug: DAYCARE_DONATION_CAMPAIGN_SLUG,
+                        status: "confirmed",
+                        ambassadorId: { $type: "objectId" },
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$ambassadorId",
+                        raised: { $sum: "$amount" },
+                        donationCount: { $sum: 1 },
+                    },
+                },
+            ]),
+        ]);
+        const totalsById = new Map<
+            string,
+            { raised: number; donationCount: number }
+        >(
+            totals.map((entry) => [
+                String(entry._id),
+                {
+                    raised: Number(entry.raised) || 0,
+                    donationCount: Number(entry.donationCount) || 0,
+                },
+            ])
+        );
+
+        return res.json({
+            success: true,
+            data: ambassadors.map((ambassador) => ({
+                ...ambassador,
+                raised:
+                    totalsById.get(String(ambassador._id))?.raised ?? 0,
+                donationCount:
+                    totalsById.get(String(ambassador._id))?.donationCount ?? 0,
+            })),
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get donation ambassadors",
+        });
+    }
+});
+
+router.post("/ambassadors", async (req, res) => {
+    try {
+        const name = cleanText(req.body.name, 160);
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: "Ambassador name is required",
+            });
+        }
+
+        const ambassador = await DaycareDonationAmbassador.create({
+            name,
+            refCode: await createUniqueAmbassadorRef(),
+            active: true,
+        });
+        await writeDaycareDonationAudit({
+            action: "ambassador.created",
+            entityType: "ambassador",
+            entityId: String(ambassador._id),
+            ...getAdminAuditActor(res.locals.adminActor),
+            after: {
+                name: ambassador.name,
+                refCode: ambassador.refCode,
+                active: ambassador.active,
+            },
+        });
+
+        return res.status(201).json({
+            success: true,
+            data: { ...ambassador.toObject(), raised: 0, donationCount: 0 },
+        });
+    } catch (error) {
+        console.error("Failed to create donation ambassador:", error);
+        return res.status(400).json({
+            success: false,
+            message: "Failed to create donation ambassador",
+        });
+    }
+});
+
+router.patch("/ambassadors/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(404).json({
+                success: false,
+                message: "Ambassador was not found",
+            });
+        }
+        const ambassador = await DaycareDonationAmbassador.findById(
+            req.params.id
+        );
+        if (!ambassador) {
+            return res.status(404).json({
+                success: false,
+                message: "Ambassador was not found",
+            });
+        }
+
+        const before = {
+            name: ambassador.name,
+            active: ambassador.active,
+        };
+        if (req.body.name !== undefined) {
+            const name = cleanText(req.body.name, 160);
+            if (!name) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Ambassador name is required",
+                });
+            }
+            ambassador.name = name;
+        }
+        if (req.body.active !== undefined) {
+            ambassador.active = Boolean(req.body.active);
+        }
+        if (
+            ambassador.name === before.name &&
+            ambassador.active === before.active
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "No ambassador change was requested",
+            });
+        }
+
+        await ambassador.save();
+        await writeDaycareDonationAudit({
+            action: "ambassador.updated",
+            entityType: "ambassador",
+            entityId: String(ambassador._id),
+            ...getAdminAuditActor(res.locals.adminActor),
+            before,
+            after: {
+                name: ambassador.name,
+                active: ambassador.active,
+            },
+        });
+
+        return res.json({ success: true, data: ambassador });
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Failed to update donation ambassador",
         });
     }
 });

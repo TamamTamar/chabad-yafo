@@ -29,6 +29,7 @@ type DonationModalProps = {
     donationItems: DonationItem[];
     paymentsEnabled: boolean;
     diagnosticMode?: boolean;
+    refCode?: string;
     createIntent?: (
         input: DaycareDonationIntentInput
     ) => Promise<DaycareDonationIntentResponse>;
@@ -48,6 +49,7 @@ const DonationModalPreview = ({
     donationItems,
     paymentsEnabled,
     diagnosticMode = false,
+    refCode,
     createIntent = createDaycareDonationIntent,
     onClose,
     onPaymentComplete,
@@ -153,6 +155,7 @@ const DonationModalPreview = ({
                 phone: phone.trim(),
                 email: email.trim(),
                 dedication: dedication.trim() || undefined,
+                refCode: diagnosticMode ? undefined : refCode,
             });
             const [firstName = "", ...lastNameParts] = fullName.trim().split(/\s+/);
             const lastName = lastNameParts.join(" ") || firstName;

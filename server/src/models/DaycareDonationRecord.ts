@@ -38,6 +38,11 @@ const daycareDonationRecordSchema =
             enteredByLabel: { type: String, trim: true },
             providerIntentId: { type: String, trim: true, index: true },
             externalTransactionId: { type: String, trim: true },
+            ambassadorId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "DaycareDonationAmbassador",
+                index: true,
+            },
             receivedAt: { type: Date, required: true, default: Date.now },
         },
         { timestamps: true }

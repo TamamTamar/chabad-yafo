@@ -44,7 +44,34 @@ const fallbackCampaign: DaycareDonationCampaignData = {
     })),
 };
 
+const ambassadorStorageKey = "daycare-donations-ref";
+const validAmbassadorRef = /^[a-z0-9]{4,32}$/;
+
+const getPersistedAmbassadorRef = () => {
+    const queryValue = new URLSearchParams(window.location.search)
+        .get("ref")
+        ?.trim()
+        .toLowerCase();
+    try {
+        if (queryValue !== undefined) {
+            if (queryValue && validAmbassadorRef.test(queryValue)) {
+                window.sessionStorage.setItem(ambassadorStorageKey, queryValue);
+                return queryValue;
+            }
+            window.sessionStorage.removeItem(ambassadorStorageKey);
+            return undefined;
+        }
+        window.sessionStorage.removeItem(ambassadorStorageKey);
+        return undefined;
+    } catch {
+        return queryValue && validAmbassadorRef.test(queryValue)
+            ? queryValue
+            : undefined;
+    }
+};
+
 const DaycareDonations = () => {
+    const [ambassadorRef] = useState(getPersistedAmbassadorRef);
     const [selectedDonation, setSelectedDonation] =
         useState<DonationSelection>(defaultSelection);
     const [donationModalOpen, setDonationModalOpen] = useState(false);
@@ -141,6 +168,7 @@ const DaycareDonations = () => {
                     initialSelection={selectedDonation}
                     donationItems={campaign.items}
                     paymentsEnabled={campaign.paymentsEnabled}
+                    refCode={ambassadorRef}
                     onClose={() => setDonationModalOpen(false)}
                     onPaymentComplete={() => {
                         window.setTimeout(() => void refreshCampaign(), 1200);

@@ -3,6 +3,7 @@ import type { ApiResponse } from "../types/api";
 import type {
     DaycareDonationCampaignData,
     DaycareDonationAudit,
+    DaycareDonationAmbassador,
     DaycareDonationDiagnostics,
     DaycareDonationRecord,
 } from "../pages/DaycareDonations/types";
@@ -27,6 +28,7 @@ export type DaycareDonationIntentInput = {
     phone: string;
     email: string;
     dedication?: string;
+    refCode?: string;
 };
 
 export type DaycareDonationIntentResponse = {
@@ -73,6 +75,32 @@ export const getAdminDaycareDonationCampaign = async () => {
 export const getAdminDaycareDonationRecords = async () => {
     const response = await http.get<ApiResponse<DaycareDonationRecord[]>>(
         "/admin/daycare/donations/records"
+    );
+    return response.data.data;
+};
+
+export const getAdminDaycareDonationAmbassadors = async () => {
+    const response = await http.get<ApiResponse<DaycareDonationAmbassador[]>>(
+        "/admin/daycare/donations/ambassadors"
+    );
+    return response.data.data;
+};
+
+export const createDaycareDonationAmbassador = async (name: string) => {
+    const response = await http.post<ApiResponse<DaycareDonationAmbassador>>(
+        "/admin/daycare/donations/ambassadors",
+        { name }
+    );
+    return response.data.data;
+};
+
+export const updateDaycareDonationAmbassador = async (
+    id: string,
+    updates: { name?: string; active?: boolean }
+) => {
+    const response = await http.patch<ApiResponse<DaycareDonationAmbassador>>(
+        `/admin/daycare/donations/ambassadors/${id}`,
+        updates
     );
     return response.data.data;
 };

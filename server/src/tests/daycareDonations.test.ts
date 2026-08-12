@@ -6,6 +6,7 @@ import {
     DAYCARE_NEDARIM_OFFICIAL_VERIFICATION_IMPLEMENTED,
 } from "../config/daycareDonationSecurity";
 import { DaycareDonationDiagnostic } from "../models/DaycareDonationDiagnostic";
+import { DaycareDonationAmbassador } from "../models/DaycareDonationAmbassador";
 import { DaycareDonationIntent } from "../models/DaycareDonationIntent";
 import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
 import {
@@ -76,6 +77,27 @@ test("provider transaction ID has a unique database index", () => {
     assert.deepEqual(index[1].partialFilterExpression, {
         externalTransactionId: { $type: "string" },
     });
+});
+
+test("ambassador references are URL-safe, unique and deactivatable", async () => {
+    const ambassador = new DaycareDonationAmbassador({
+        name: "מושקי",
+        refCode: "a1b2c3d4",
+    });
+    await ambassador.validate();
+    assert.equal(ambassador.active, true);
+
+    const invalidAmbassador = new DaycareDonationAmbassador({
+        name: "רבקה",
+        refCode: "not safe!",
+    });
+    await assert.rejects(() => invalidAmbassador.validate());
+
+    const index = DaycareDonationAmbassador.schema
+        .indexes()
+        .find(([fields]) => fields.refCode === 1);
+    assert.ok(index);
+    assert.equal(index[1].unique, true);
 });
 
 test("diagnostics have an automatic expiry index", () => {

@@ -17,6 +17,14 @@ export type DaycareDonationIntentStatus =
     | "expired";
 export type DaycareDonationIntentMode = "live" | "diagnostic";
 
+export type DaycareDonationAmbassadorDocument = {
+    name: string;
+    refCode: string;
+    active: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+};
+
 export type DaycareDonationVisual = {
     src?: string;
     alt: string;
@@ -73,6 +81,7 @@ export type DaycareDonationRecordDocument = {
     enteredByLabel?: string;
     providerIntentId?: string;
     externalTransactionId?: string;
+    ambassadorId?: unknown;
     receivedAt: Date;
     createdAt?: Date;
     updatedAt?: Date;
@@ -89,6 +98,7 @@ export type DaycareDonationIntentDocument = {
     phone: string;
     email: string;
     dedication?: string;
+    ambassadorId?: unknown;
     externalTransactionId?: string;
     providerMessage?: string;
     expiresAt: Date;
@@ -100,7 +110,13 @@ export type DaycareDonationIntentDocument = {
 export type DaycareDonationAuditDocument = {
     campaignSlug: string;
     action: string;
-    entityType: "campaign" | "category" | "item" | "record" | "intent";
+    entityType:
+        | "campaign"
+        | "category"
+        | "item"
+        | "record"
+        | "intent"
+        | "ambassador";
     entityId: string;
     actor: "admin" | "nedarim" | "system";
     actorId?: string;

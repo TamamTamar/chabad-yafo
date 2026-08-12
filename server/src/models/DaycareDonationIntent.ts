@@ -42,6 +42,11 @@ const daycareDonationIntentSchema =
                 lowercase: true,
             },
             dedication: { type: String, trim: true },
+            ambassadorId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "DaycareDonationAmbassador",
+                index: true,
+            },
             externalTransactionId: { type: String, trim: true },
             providerMessage: { type: String, trim: true },
             expiresAt: { type: Date, required: true },

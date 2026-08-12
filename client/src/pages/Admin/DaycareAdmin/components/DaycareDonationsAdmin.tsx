@@ -6,6 +6,7 @@ import {
     createAdminDiagnosticDonationIntent,
     createManualDaycareDonation,
     getAdminDaycareDonationAudit,
+    getAdminDaycareDonationAmbassadors,
     getAdminDaycareDonationCampaign,
     getAdminDaycareDonationDiagnostics,
     getAdminDaycareDonationRecords,
@@ -15,11 +16,13 @@ import {
 } from "../../../../services/daycareDonationService";
 import type {
     DaycareDonationCampaignData,
+    DaycareDonationAmbassador,
     DaycareDonationAudit,
     DaycareDonationDiagnostics,
     DaycareDonationRecord,
 } from "../../../DaycareDonations/types";
 import DonationModalPreview from "../../../DaycareDonations/components/DonationModalPreview";
+import DaycareAmbassadorsAdmin from "./DaycareAmbassadorsAdmin";
 import styles from "./DaycareDonationsAdmin.module.scss";
 
 const formatCurrency = (value: number) =>
@@ -52,9 +55,17 @@ const auditLabels: Record<string, string> = {
     "diagnostic.intentCreated": "הוכנה עסקת בדיקה",
     "diagnostic.paymentObserved": "עסקת הבדיקה התקבלה",
     "diagnostics.cleared": "נתוני האבחון נמחקו",
+    "ambassador.created": "שגריר נוסף",
+    "ambassador.updated": "פרטי שגריר עודכנו",
 };
 
-type AdminView = "overview" | "records" | "manual" | "items" | "history";
+type AdminView =
+    | "overview"
+    | "records"
+    | "ambassadors"
+    | "manual"
+    | "items"
+    | "history";
 
 type PendingRecordUpdate = {
     recordId: string;
@@ -73,6 +84,7 @@ const adminViews: Array<{
 }> = [
     { id: "overview", label: "סקירה", description: "מצב הקמפיין" },
     { id: "records", label: "תרומות", description: "רשומות ושיוכים" },
+    { id: "ambassadors", label: "שגרירים", description: "לינקים ומעקב" },
     { id: "manual", label: "הזנה ידנית", description: "תרומה מחוץ לאתר" },
     { id: "items", label: "סעיפים ויעדים", description: "יעדים ומצבים" },
     { id: "history", label: "היסטוריה", description: "שינויים וכלים" },
@@ -82,6 +94,7 @@ const DaycareDonationsAdmin = () => {
     const [campaign, setCampaign] =
         useState<DaycareDonationCampaignData | null>(null);
     const [records, setRecords] = useState<DaycareDonationRecord[]>([]);
+    const [ambassadors, setAmbassadors] = useState<DaycareDonationAmbassador[]>([]);
     const [audit, setAudit] = useState<DaycareDonationAudit[]>([]);
     const [diagnostics, setDiagnostics] =
         useState<DaycareDonationDiagnostics | null>(null);
@@ -100,15 +113,23 @@ const DaycareDonationsAdmin = () => {
         useState<PendingRecordUpdate | null>(null);
 
     const loadData = useCallback(async () => {
-        const [campaignData, recordData, auditData, diagnosticData] =
+        const [
+            campaignData,
+            recordData,
+            ambassadorData,
+            auditData,
+            diagnosticData,
+        ] =
             await Promise.all([
             getAdminDaycareDonationCampaign(),
             getAdminDaycareDonationRecords(),
+            getAdminDaycareDonationAmbassadors(),
             getAdminDaycareDonationAudit(),
             getAdminDaycareDonationDiagnostics(),
         ]);
         setCampaign(campaignData);
         setRecords(recordData);
+        setAmbassadors(ambassadorData);
         setAudit(auditData);
         setDiagnostics(diagnosticData);
     }, []);
@@ -143,6 +164,7 @@ const DaycareDonationsAdmin = () => {
                     record.phone,
                     record.externalTransactionId,
                     record.reference,
+                    record.ambassadorId?.name,
                 ].some((value) =>
                     String(value ?? "")
                         .toLocaleLowerCase("he")
@@ -394,6 +416,9 @@ const DaycareDonationsAdmin = () => {
                         <small>{view.description}</small>
                         {view.id === "records" && records.length > 0 && (
                             <span>{records.length}</span>
+                        )}
+                        {view.id === "ambassadors" && ambassadors.length > 0 && (
+                            <span>{ambassadors.length}</span>
                         )}
                     </button>
                 ))}
@@ -907,6 +932,7 @@ const DaycareDonationsAdmin = () => {
                                     <th>תורם</th>
                                     <th>מקור</th>
                                     <th>סכום</th>
+                                    <th>שגריר</th>
                                     <th>שיוך</th>
                                     <th>מצב</th>
                                 </tr>
@@ -935,6 +961,9 @@ const DaycareDonationsAdmin = () => {
                                         </td>
                                         <td>
                                             ₪{formatCurrency(record.amount)}
+                                        </td>
+                                        <td>
+                                            {record.ambassadorId?.name ?? "ישיר"}
                                         </td>
                                         <td>
                                             <select
@@ -1008,6 +1037,14 @@ const DaycareDonationsAdmin = () => {
                     </div>
                 )}
             </section>
+            )}
+
+            {activeView === "ambassadors" && (
+                <DaycareAmbassadorsAdmin
+                    ambassadors={ambassadors}
+                    records={records}
+                    onChanged={loadData}
+                />
             )}
 
             {activeView === "history" && (

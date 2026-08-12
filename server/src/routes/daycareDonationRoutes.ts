@@ -3,6 +3,7 @@ import express, { Router } from "express";
 import { DAYCARE_DONATION_CAMPAIGN_SLUG } from "../config/daycareDonationDefaults";
 import { areDaycareDonationPaymentsEnabled } from "../config/daycareDonationSecurity";
 import { DaycareDonationIntent } from "../models/DaycareDonationIntent";
+import { DaycareDonationAmbassador } from "../models/DaycareDonationAmbassador";
 import { DaycareDonationDiagnostic } from "../models/DaycareDonationDiagnostic";
 import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
 import {
@@ -18,6 +19,7 @@ import {
 import type { DaycareDonationItemConfig } from "../types/daycareDonations";
 
 const router = Router();
+const validAmbassadorRef = /^[a-z0-9]{4,32}$/;
 
 const cleanText = (value: unknown, maxLength: number) =>
     String(value ?? "").trim().slice(0, maxLength);
@@ -115,6 +117,7 @@ router.post("/intents", async (req, res) => {
         const phone = cleanText(req.body.phone, 40);
         const email = cleanText(req.body.email, 180).toLowerCase();
         const dedication = cleanText(req.body.dedication, 600) || undefined;
+        const refCode = String(req.body.refCode ?? "").trim().toLowerCase();
 
         if (!campaign.active) {
             return res.status(409).json({
@@ -150,6 +153,13 @@ router.post("/intents", async (req, res) => {
             }
         }
 
+        const ambassador = validAmbassadorRef.test(refCode)
+            ? await DaycareDonationAmbassador.findOne({
+                  refCode,
+                  active: true,
+              }).select({ _id: 1 })
+            : null;
+
         const publicId = randomUUID();
         const intent = await DaycareDonationIntent.create({
             publicId,
@@ -162,6 +172,7 @@ router.post("/intents", async (req, res) => {
             phone,
             email,
             dedication,
+            ambassadorId: ambassador?._id,
             expiresAt: new Date(Date.now() + 30 * 60 * 1000),
         });
 
@@ -349,6 +360,7 @@ router.post(
                         phone: intent.phone,
                         email: intent.email,
                         dedication: intent.dedication,
+                        ambassadorId: intent.ambassadorId,
                         providerIntentId: publicId,
                         externalTransactionId,
                         receivedAt: new Date(),
