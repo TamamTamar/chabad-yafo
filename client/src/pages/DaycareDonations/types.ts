@@ -86,6 +86,7 @@ export type DaycareDonationAmbassador = {
     _id: string;
     name: string;
     refCode: string;
+    goal: number;
     active: boolean;
     raised: number;
     donationCount: number;

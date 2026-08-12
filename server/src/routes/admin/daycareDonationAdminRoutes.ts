@@ -186,15 +186,23 @@ router.get("/ambassadors", async (_req, res) => {
 router.post("/ambassadors", async (req, res) => {
     try {
         const name = cleanText(req.body.name, 160);
+        const goal = Number(req.body.goal);
         if (!name) {
             return res.status(400).json({
                 success: false,
                 message: "Ambassador name is required",
             });
         }
+        if (!Number.isFinite(goal) || goal <= 0 || goal > 100_000_000) {
+            return res.status(400).json({
+                success: false,
+                message: "Ambassador goal must be greater than zero",
+            });
+        }
 
         const ambassador = await DaycareDonationAmbassador.create({
             name,
+            goal,
             refCode: await createUniqueAmbassadorRef(),
             active: true,
         });
@@ -205,6 +213,7 @@ router.post("/ambassadors", async (req, res) => {
             ...getAdminAuditActor(res.locals.adminActor),
             after: {
                 name: ambassador.name,
+                goal: ambassador.goal,
                 refCode: ambassador.refCode,
                 active: ambassador.active,
             },
@@ -243,6 +252,7 @@ router.patch("/ambassadors/:id", async (req, res) => {
 
         const before = {
             name: ambassador.name,
+            goal: ambassador.goal,
             active: ambassador.active,
         };
         if (req.body.name !== undefined) {
@@ -255,11 +265,22 @@ router.patch("/ambassadors/:id", async (req, res) => {
             }
             ambassador.name = name;
         }
+        if (req.body.goal !== undefined) {
+            const goal = Number(req.body.goal);
+            if (!Number.isFinite(goal) || goal <= 0 || goal > 100_000_000) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Ambassador goal must be greater than zero",
+                });
+            }
+            ambassador.goal = goal;
+        }
         if (req.body.active !== undefined) {
             ambassador.active = Boolean(req.body.active);
         }
         if (
             ambassador.name === before.name &&
+            ambassador.goal === before.goal &&
             ambassador.active === before.active
         ) {
             return res.status(400).json({
@@ -277,6 +298,7 @@ router.patch("/ambassadors/:id", async (req, res) => {
             before,
             after: {
                 name: ambassador.name,
+                goal: ambassador.goal,
                 active: ambassador.active,
             },
         });

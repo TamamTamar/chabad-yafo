@@ -64,10 +64,12 @@ const DaycareAmbassadorsAdmin = ({
     const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.currentTarget;
-        const name = String(new FormData(form).get("name") ?? "").trim();
-        if (!name) return;
+        const data = new FormData(form);
+        const name = String(data.get("name") ?? "").trim();
+        const goal = Number(data.get("goal"));
+        if (!name || !Number.isFinite(goal) || goal <= 0) return;
         const created = await runMutation(
-            () => createDaycareDonationAmbassador(name),
+            () => createDaycareDonationAmbassador(name, goal),
             "השגריר נוסף והלינק האישי מוכן."
         );
         if (created) {
@@ -76,21 +78,28 @@ const DaycareAmbassadorsAdmin = ({
         }
     };
 
-    const handleRename = async (
+    const handleEdit = async (
         event: React.FormEvent<HTMLFormElement>,
         ambassador: DaycareDonationAmbassador
     ) => {
         event.preventDefault();
+        const data = new FormData(event.currentTarget);
         const name = String(
-            new FormData(event.currentTarget).get("name") ?? ""
+            data.get("name") ?? ""
         ).trim();
-        if (!name || name === ambassador.name) {
+        const goal = Number(data.get("goal"));
+        if (!name || !Number.isFinite(goal) || goal <= 0) return;
+        if (name === ambassador.name && goal === ambassador.goal) {
             setEditingId(null);
             return;
         }
         const updated = await runMutation(
-            () => updateDaycareDonationAmbassador(ambassador._id, { name }),
-            "שם השגריר עודכן."
+            () =>
+                updateDaycareDonationAmbassador(ambassador._id, {
+                    name,
+                    goal,
+                }),
+            "פרטי השגריר והיעד עודכנו."
         );
         if (updated) setEditingId(null);
     };
@@ -132,6 +141,17 @@ const DaycareAmbassadorsAdmin = ({
                         שם השגריר
                         <input name="name" type="text" maxLength={160} required autoFocus />
                     </label>
+                    <label>
+                        יעד כספי
+                        <input
+                            name="goal"
+                            type="number"
+                            min="1"
+                            max="100000000"
+                            step="1"
+                            required
+                        />
+                    </label>
                     <button type="submit" disabled={saving}>יצירת לינק אישי</button>
                 </form>
             )}
@@ -145,7 +165,7 @@ const DaycareAmbassadorsAdmin = ({
                             <tr>
                                 <th>שם</th>
                                 <th>סטטוס</th>
-                                <th>סכום שגויס</th>
+                                <th>התקדמות מול היעד</th>
                                 <th>תרומות</th>
                                 <th>לינק אישי</th>
                                 <th>פעולות</th>
@@ -157,6 +177,18 @@ const DaycareAmbassadorsAdmin = ({
                                     (record) =>
                                         record.ambassadorId?._id === ambassador._id
                                 );
+                                const progressPercent =
+                                    ambassador.goal > 0
+                                        ? Math.round(
+                                              (ambassador.raised /
+                                                  ambassador.goal) *
+                                                  100
+                                          )
+                                        : 0;
+                                const remaining = Math.max(
+                                    0,
+                                    ambassador.goal - ambassador.raised
+                                );
                                 return (
                                     <Fragment key={ambassador._id}>
                                         <tr>
@@ -165,7 +197,7 @@ const DaycareAmbassadorsAdmin = ({
                                                     <form
                                                         className={styles.renameForm}
                                                         onSubmit={(event) =>
-                                                            void handleRename(event, ambassador)
+                                                            void handleEdit(event, ambassador)
                                                         }
                                                     >
                                                         <input
@@ -174,6 +206,17 @@ const DaycareAmbassadorsAdmin = ({
                                                             maxLength={160}
                                                             required
                                                             autoFocus
+                                                        />
+                                                        <input
+                                                            aria-label={`היעד של ${ambassador.name}`}
+                                                            name="goal"
+                                                            type="number"
+                                                            min="1"
+                                                            max="100000000"
+                                                            step="1"
+                                                            defaultValue={ambassador.goal || ""}
+                                                            placeholder="יעד"
+                                                            required
                                                         />
                                                         <button disabled={saving}>שמירה</button>
                                                     </form>
@@ -204,7 +247,57 @@ const DaycareAmbassadorsAdmin = ({
                                                     {ambassador.active ? "פעיל" : "לא פעיל"}
                                                 </span>
                                             </td>
-                                            <td>₪{formatCurrency(ambassador.raised)}</td>
+                                            <td>
+                                                {ambassador.goal > 0 ? (
+                                                    <div className={styles.progressCell}>
+                                                        <div className={styles.progressSummary}>
+                                                            <strong>
+                                                                ₪{formatCurrency(ambassador.raised)}
+                                                                {" מתוך "}
+                                                                ₪{formatCurrency(ambassador.goal)}
+                                                            </strong>
+                                                            <span>{progressPercent}%</span>
+                                                        </div>
+                                                        <div
+                                                            className={styles.progressTrack}
+                                                            role="progressbar"
+                                                            aria-label={`התקדמות השגריר ${ambassador.name}`}
+                                                            aria-valuemin={0}
+                                                            aria-valuemax={100}
+                                                            aria-valuenow={Math.min(
+                                                                100,
+                                                                progressPercent
+                                                            )}
+                                                        >
+                                                            <span
+                                                                style={{
+                                                                    width: `${Math.min(
+                                                                        100,
+                                                                        progressPercent
+                                                                    )}%`,
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <small
+                                                            className={
+                                                                remaining === 0
+                                                                    ? styles.goalReached
+                                                                    : styles.goalRemaining
+                                                            }
+                                                        >
+                                                            {remaining === 0
+                                                                ? progressPercent > 100
+                                                                    ? `היעד הושג ועבר ב־₪${formatCurrency(ambassador.raised - ambassador.goal)}`
+                                                                    : "היעד הושג"
+                                                                : `נותרו ₪${formatCurrency(remaining)} ליעד`}
+                                                        </small>
+                                                    </div>
+                                                ) : (
+                                                    <span className={styles.noGoal}>
+                                                        טרם הוגדר
+                                                    </span>
+                                                )}
+                                            </td>
                                             <td>{ambassador.donationCount}</td>
                                             <td>
                                                 <input
@@ -227,7 +320,7 @@ const DaycareAmbassadorsAdmin = ({
                                                         type="button"
                                                         onClick={() => setEditingId(ambassador._id)}
                                                     >
-                                                        עריכת שם
+                                                        עריכה
                                                     </button>
                                                     <button
                                                         type="button"

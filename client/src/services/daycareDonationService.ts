@@ -86,17 +86,20 @@ export const getAdminDaycareDonationAmbassadors = async () => {
     return response.data.data;
 };
 
-export const createDaycareDonationAmbassador = async (name: string) => {
+export const createDaycareDonationAmbassador = async (
+    name: string,
+    goal: number
+) => {
     const response = await http.post<ApiResponse<DaycareDonationAmbassador>>(
         "/admin/daycare/donations/ambassadors",
-        { name }
+        { name, goal }
     );
     return response.data.data;
 };
 
 export const updateDaycareDonationAmbassador = async (
     id: string,
-    updates: { name?: string; active?: boolean }
+    updates: { name?: string; goal?: number; active?: boolean }
 ) => {
     const response = await http.patch<ApiResponse<DaycareDonationAmbassador>>(
         `/admin/daycare/donations/ambassadors/${id}`,

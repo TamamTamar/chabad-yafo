@@ -83,9 +83,11 @@ test("ambassador references are URL-safe, unique and deactivatable", async () =>
     const ambassador = new DaycareDonationAmbassador({
         name: "מושקי",
         refCode: "a1b2c3d4",
+        goal: 10_000,
     });
     await ambassador.validate();
     assert.equal(ambassador.active, true);
+    assert.equal(ambassador.goal, 10_000);
 
     const invalidAmbassador = new DaycareDonationAmbassador({
         name: "רבקה",

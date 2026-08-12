@@ -44,7 +44,7 @@
 
 .addForm {
     display: grid;
-    grid-template-columns: minmax(220px, 1fr) auto;
+    grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px) auto;
     align-items: end;
     gap: 12px;
     margin-top: 20px;
@@ -68,6 +68,61 @@
 .active { background: $ui-success-soft; color: $ui-success; }
 .inactive { background: $ui-surface-muted; color: $ui-text-muted; }
 
+.progressCell {
+    display: grid;
+    gap: 6px;
+    min-width: 230px;
+}
+
+.progressSummary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.progressSummary span {
+    padding: 3px 7px;
+    border-radius: $radius-pill;
+    background: rgba($brand-primary, 0.08);
+    color: $brand-primary;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.progressTrack {
+    height: 8px;
+    overflow: hidden;
+    border-radius: $radius-pill;
+    background: $ui-surface-muted;
+}
+
+.progressTrack > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: $brand-primary;
+}
+
+.goalRemaining,
+.goalReached {
+    font-size: $type-caption;
+    font-weight: 800;
+}
+
+.goalRemaining {
+    color: $ui-text-muted;
+}
+
+.goalReached {
+    color: $ui-success;
+}
+
+.noGoal {
+    color: $ui-text-muted;
+    font-size: $type-caption;
+}
+
 .nameButton { border: 0; background: transparent; color: $brand-primary; font: inherit; font-weight: 900; cursor: pointer; }
 .linkInput { width: min(310px, 30vw); min-width: 220px; padding: 8px 10px; border: 1px solid $ui-border-soft; border-radius: 9px; background: $brand-surface-cool; font: inherit; }
 .actions { display: flex; gap: 6px; }
@@ -76,7 +131,8 @@
 .actions button:disabled { opacity: 0.55; }
 
 .renameForm { display: flex; gap: 6px; }
-.renameForm input { min-width: 150px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; }
+.renameForm input { width: 110px; min-width: 110px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; }
+.renameForm input:first-child { width: 150px; min-width: 150px; }
 
 .details { padding: 16px !important; background: $brand-surface-cool; white-space: normal !important; }
 .details > strong,

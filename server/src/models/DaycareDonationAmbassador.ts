@@ -19,6 +19,13 @@ const daycareDonationAmbassadorSchema =
                 match: /^[a-z0-9]{4,32}$/,
                 index: true,
             },
+            goal: {
+                type: Number,
+                required: true,
+                min: 0,
+                max: 100_000_000,
+                default: 0,
+            },
             active: {
                 type: Boolean,
                 required: true,
