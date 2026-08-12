@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import {
     daycarePriorities,
     daycareTaskCategories,
@@ -34,9 +34,9 @@ type CategoryFilter =
     | "הושלמו";
 
 const quickTaskFilters: CategoryFilter[] = [
-    "הכל",
     "פתוחות",
     "דחופות",
+    "הכל",
     "הושלמו",
 ];
 
@@ -104,16 +104,11 @@ const getStatusFromSubtasks = (
     return "לא התחיל";
 };
 
-const getSubtaskProgressText = (task: DaycareTask) => {
+const getSubtaskProgressLabel = (task: DaycareTask) => {
     const subtasks = task.subtasks || [];
-
-    if (subtasks.length === 0) {
-        return "";
-    }
-
     const completedCount = subtasks.filter((subtask) => subtask.completed).length;
 
-    return `${completedCount}/${subtasks.length}`;
+    return `בוצעו ${completedCount} מתוך ${subtasks.length}`;
 };
 
 const hasSubtasks = (task: DaycareTask) => {
@@ -142,15 +137,31 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
     const [draft, setDraft] = useState<EditableDaycareTask>(emptyTask);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] =
-        useState<CategoryFilter>("הכל");
+        useState<CategoryFilter>("פתוחות");
+    const [searchQuery, setSearchQuery] = useState("");
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
     const [expandedTaskIds, setExpandedTaskIds] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
-    const taskFormRef = useRef<HTMLDivElement | null>(null);
     const taskTitleInputRef = useRef<HTMLInputElement | null>(null);
     const visibleTasks = sortTasksByStatus(
         tasks.filter((task) => {
+            const normalizedQuery = searchQuery.trim().toLocaleLowerCase("he");
+            const matchesSearch =
+                !normalizedQuery ||
+                task.title.toLocaleLowerCase("he").includes(normalizedQuery) ||
+                Boolean(
+                    task.subtasks?.some((subtask) =>
+                        subtask.title
+                            .toLocaleLowerCase("he")
+                            .includes(normalizedQuery)
+                    )
+                );
+
+            if (!matchesSearch) {
+                return false;
+            }
+
             if (selectedCategory === "הכל") {
                 return true;
             }
@@ -204,6 +215,23 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
         };
     }, []);
 
+    useEffect(() => {
+        if (!showTaskForm) {
+            return;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setDraft(emptyTask);
+                setEditingId(null);
+                setShowTaskForm(false);
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [showTaskForm]);
+
     const resetDraft = () => {
         setDraft(emptyTask);
         setEditingId(null);
@@ -212,11 +240,7 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
 
     const focusTaskForm = () => {
         window.setTimeout(() => {
-            taskFormRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
-            taskTitleInputRef.current?.focus({ preventScroll: true });
+            taskTitleInputRef.current?.focus();
         }, 0);
     };
 
@@ -394,6 +418,13 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
         onChanged();
     };
 
+    const getFilterCount = (filter: CategoryFilter) => {
+        if (filter === "פתוחות") return openTasksCount;
+        if (filter === "דחופות") return urgentOpenTasksCount;
+        if (filter === "הושלמו") return completedTasksCount;
+        return tasks.length;
+    };
+
     return (
         <section className={styles.section} aria-labelledby="daycare-tasks">
             <div className={styles.sectionHeader}>
@@ -411,12 +442,41 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                     type="button"
                     onClick={handleAddClick}
                 >
-                    הוספת משימה
+                    <Plus aria-hidden="true" size={18} />
+                    משימה חדשה
                 </button>
             </div>
 
             {showTaskForm && (
-            <div className={styles.inlineForm} ref={taskFormRef}>
+            <div
+                className={styles.taskModalBackdrop}
+                role="presentation"
+                onMouseDown={(event) => {
+                    if (event.currentTarget === event.target) resetDraft();
+                }}
+            >
+            <div
+                aria-labelledby="task-editor-title"
+                aria-modal="true"
+                className={`${styles.inlineForm} ${styles.taskEditor}`}
+                role="dialog"
+            >
+                <div className={styles.taskEditorHeader}>
+                    <div>
+                        <h3 id="task-editor-title">
+                            {editingId ? "עריכת משימה" : "משימה חדשה"}
+                        </h3>
+                        <p>שם, סיווג ורשימת ביצוע — הכול נשמר יחד.</p>
+                    </div>
+                    <button
+                        aria-label="סגירת הטופס"
+                        className={styles.taskEditorClose}
+                        type="button"
+                        onClick={resetDraft}
+                    >
+                        <X aria-hidden="true" size={20} />
+                    </button>
+                </div>
                 <label className={styles.field}>
                     <span className={styles.fieldLabel}>כותרת משימה</span>
                     <input
@@ -513,54 +573,25 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                 <div className={styles.formActions}>
                     <button
                         className={styles.primaryButton}
+                        disabled={!draft.title.trim()}
                         type="button"
                         onClick={handleSave}
                     >
                         {editingId ? "שמירה" : "הוספת משימה"}
                     </button>
-                    {editingId && (
-                        <button
-                            className={styles.secondaryButton}
-                            type="button"
-                            onClick={resetDraft}
-                        >
-                            ביטול
-                        </button>
-                    )}
+                    <button
+                        className={styles.secondaryButton}
+                        type="button"
+                        onClick={resetDraft}
+                    >
+                        ביטול
+                    </button>
                 </div>
+            </div>
             </div>
             )}
 
-            <div className={styles.taskFocusSummary}>
-                <div className={styles.taskFocusItem}>
-                    <span>פתוחות</span>
-                    <strong>{openTasksCount}</strong>
-                </div>
-                <div className={styles.taskFocusItem}>
-                    <span>דחופות</span>
-                    <strong>{urgentOpenTasksCount}</strong>
-                </div>
-                <div className={styles.taskFocusItem}>
-                    <span>הושלמו</span>
-                    <strong>{completedTasksCount}</strong>
-                </div>
-                <button
-                    className={styles.taskFocusButton}
-                    type="button"
-                    onClick={() => setSelectedCategory("דחופות")}
-                >
-                    הצג דחופות
-                </button>
-            </div>
-
             <div className={styles.categoryFilterBar} aria-label="סינון משימות">
-                <div className={styles.filterSummaryRow}>
-                    <span className={styles.categoryFilterLabel}>סינון משימות</span>
-                    <span className={styles.categoryFilterCount}>
-                        {visibleTasks.length} משימות
-                    </span>
-                </div>
-
                 <div className={styles.quickFilterGroup}>
                     {quickTaskFilters.map((filter) => (
                         <button
@@ -573,13 +604,25 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                             type="button"
                             onClick={() => setSelectedCategory(filter)}
                         >
-                            {filter}
+                            <span>{filter}</span>
+                            <strong>{getFilterCount(filter)}</strong>
                         </button>
                     ))}
                 </div>
 
+                <label className={styles.taskSearchField}>
+                    <Search aria-hidden="true" size={18} />
+                    <input
+                        aria-label="חיפוש משימה"
+                        placeholder="חיפוש משימה או פריט..."
+                        type="search"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                    />
+                </label>
+
                 <label className={styles.categorySelectField}>
-                    <span className={styles.categoryFilterLabel}>קטגוריה</span>
+                    <span className={styles.visuallyHidden}>קטגוריה</span>
                     <select
                         className={styles.categorySelect}
                         value={
@@ -606,6 +649,10 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                         ))}
                     </select>
                 </label>
+
+                <span className={styles.categoryFilterCount} aria-live="polite">
+                    מוצגות {visibleTasks.length} משימות
+                </span>
             </div>
 
             {loading ? (
@@ -620,43 +667,61 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                         return (
                             <article
                                 className={
-                                    task.status === "הושלם"
-                                        ? `${styles.taskCard} ${styles.taskCardCompleted}`
-                                        : styles.taskCard
+                                    [
+                                        styles.taskCard,
+                                        task.status === "הושלם"
+                                            ? styles.taskCardCompleted
+                                            : "",
+                                        isExpanded ? styles.taskCardExpanded : "",
+                                    ].filter(Boolean).join(" ")
                                 }
                                 key={task._id}
                             >
-                                <button
-                                    className={styles.taskCardHeader}
-                                    disabled={!hasSubtasks(task)}
-                                    type="button"
-                                    onClick={() => toggleTaskDetails(task._id)}
-                                >
-                                    <span className={styles.taskCheckLabel}>
-                                        <span
-                                            aria-hidden="true"
-                                            className={
-                                                task.status === "הושלם"
-                                                    ? `${styles.taskCheckboxVisual} ${styles.taskCheckboxVisualChecked}`
-                                                    : styles.taskCheckboxVisual
-                                            }
-                                        />
-                                        <span className={styles.taskTitleText}>
-                                            {task.title}
+                                <div className={styles.taskCardTop}>
+                                    <button
+                                        aria-expanded={
+                                            hasSubtasks(task)
+                                                ? isExpanded
+                                                : undefined
+                                        }
+                                        className={styles.taskCardHeader}
+                                        disabled={!hasSubtasks(task)}
+                                        type="button"
+                                        onClick={() => toggleTaskDetails(task._id)}
+                                    >
+                                        <span className={styles.taskCheckLabel}>
+                                            <span
+                                                aria-hidden="true"
+                                                className={
+                                                    task.status === "הושלם"
+                                                        ? `${styles.taskCheckboxVisual} ${styles.taskCheckboxVisualChecked}`
+                                                        : styles.taskCheckboxVisual
+                                                }
+                                            />
+                                            <span className={styles.taskTitleText}>
+                                                {task.title}
+                                            </span>
+                                            {hasSubtasks(task) && (
+                                                <span className={styles.taskProgressText}>
+                                                    {getSubtaskProgressLabel(task)}
+                                                </span>
+                                            )}
                                         </span>
-                                    </span>
 
-                                    {hasSubtasks(task) && (
-                                        <span className={styles.taskHeaderProgress}>
-                                            {isExpanded ? "סגור" : "פתח"}
-                                            <strong>
-                                                {getSubtaskProgressText(task)}
-                                            </strong>
-                                        </span>
-                                    )}
-                                </button>
+                                        {hasSubtasks(task) && (
+                                            <ChevronDown
+                                                aria-hidden="true"
+                                                className={
+                                                    isExpanded
+                                                        ? styles.taskChevronOpen
+                                                        : styles.taskChevron
+                                                }
+                                                size={20}
+                                            />
+                                        )}
+                                    </button>
 
-                                <div className={styles.rowActions}>
+                                    <div className={styles.rowActions}>
                                     <button
                                         aria-label={`עריכת ${task.title}`}
                                         className={`${styles.linkButton} ${styles.iconActionButton}`}
@@ -675,6 +740,7 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                                     >
                                         <Trash2 aria-hidden="true" size={17} />
                                     </button>
+                                    </div>
                                 </div>
 
                                 <div className={styles.taskCardMeta}>
@@ -689,25 +755,11 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                                         className={`${styles.statusSelect} ${styles.lockedStatus}`}
                                         title="הסטטוס נקבע אוטומטית לפי תתי־המשימות"
                                     >
-                                        {task.status}
+                                        סטטוס: {task.status}
                                     </span>
                                     <span className={styles.priorityPill}>
                                         {task.priority}
                                     </span>
-                                    {hasSubtasks(task) && (
-                                        <button
-                                            className={styles.subtaskToggle}
-                                            type="button"
-                                            onClick={() =>
-                                                toggleTaskDetails(task._id)
-                                            }
-                                        >
-                                            {isExpanded ? "סגירת פירוט" : "פירוט"}
-                                            <span>
-                                                {getSubtaskProgressText(task)}
-                                            </span>
-                                        </button>
-                                    )}
                                 </div>
 
                                 {task.subtasks &&
@@ -929,6 +981,12 @@ const DaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksProps) => {
                             </article>
                         );
                     })}
+                    {visibleTasks.length === 0 && (
+                        <div className={styles.emptyState}>
+                            לא נמצאו משימות שמתאימות לסינון. אפשר לנקות את
+                            החיפוש או לבחור “הכל”.
+                        </div>
+                    )}
                 </div>
             )}
         </section>

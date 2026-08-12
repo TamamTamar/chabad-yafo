@@ -7,8 +7,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
 
-import daycareDesktop from "../../assets/families-hero.webp";
-import daycareMobile from "../../assets/families-hero-mobile.webp";
 import mainDesktop from "../../assets/hero-desktop.webp";
 import mainMobile from "../../assets/hero-mobile.webp";
 import Container from "../Container/Container";
@@ -47,19 +45,18 @@ const slides: HeroSlide[] = [
         ],
     },
     {
-        id: "daycare",
-        eyebrow: "הרישום המקדים נפתח",
-        title: "מעון חדש בצפון יפו",
-        description:
-            "מעון חם ומקצועי לילדים בגילאי שנה עד שלוש. מספר המקומות מוגבל.",
+        id: "daycare-donations",
+        eyebrow: "מקימים יחד בית קטן עם לב גדול",
+        title: "בונים לילדי יפו מקום לגדול בו",
+        description: "מעון בטוח, חם ושמח — שנבנה יחד, חלק אחר חלק.",
         contentPosition: "right",
-        desktopImage: daycareDesktop,
-        mobileImage: daycareMobile,
+        desktopImage: "/daycare-donations/hero.webp",
+        mobileImage: "/daycare-donations/hero.webp",
         imagePosition: "center",
         actions: [
             {
-                label: "לרישום מקדים למעון",
-                to: "/daycare-registration",
+                label: "לקחת חלק בהקמת המעון",
+                to: "/daycare-donations",
                 variant: "primary",
             },
         ],
