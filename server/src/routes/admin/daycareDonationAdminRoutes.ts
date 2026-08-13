@@ -10,6 +10,7 @@ import { DaycareDonationAmbassador } from "../../models/DaycareDonationAmbassado
 import { DaycareDonationAudit } from "../../models/DaycareDonationAudit";
 import { DaycareDonationDiagnostic } from "../../models/DaycareDonationDiagnostic";
 import { DaycareDonationIntent } from "../../models/DaycareDonationIntent";
+import { DaycareDonationLead } from "../../models/DaycareDonationLead";
 import { DaycareDonationRecord } from "../../models/DaycareDonationRecord";
 import {
     ensureDefaultDaycareDonationCampaign,
@@ -23,6 +24,8 @@ import {
 } from "../../services/daycareDonationCallbackSecurity";
 import type {
     DaycareDonationItemConfig,
+    DaycareDonationContactMethod,
+    DaycareDonationLeadStatus,
     DaycareDonationRecordStatus,
     DaycareDonationManualSource,
     DaycareDonationStatusOverride,
@@ -35,6 +38,12 @@ router.use(requireSecureAdminMutation);
 
 const cleanText = (value: unknown, maxLength = 500) =>
     String(value ?? "").trim().slice(0, maxLength);
+
+const cleanAmbassadorLinkSlug = (value: unknown) =>
+    cleanText(value, 60)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
 
 const createUniqueAmbassadorRef = async () => {
     for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -64,6 +73,36 @@ const isManualSource = (
     value === "cash" ||
     value === "check" ||
     value === "other";
+
+const isLeadStatus = (value: unknown): value is DaycareDonationLeadStatus =>
+    value === "new" ||
+    value === "contacted" ||
+    value === "waiting" ||
+    value === "pledged" ||
+    value === "completed" ||
+    value === "closed";
+
+const isContactMethod = (
+    value: unknown
+): value is DaycareDonationContactMethod =>
+    value === "phone" ||
+    value === "whatsapp" ||
+    value === "meeting" ||
+    value === "other";
+
+const parseOptionalAmount = (value: unknown) => {
+    if (value === undefined || value === null || value === "") return undefined;
+    const amount = Number(value);
+    return Number.isFinite(amount) && amount >= 0 && amount <= 100_000_000
+        ? amount
+        : null;
+};
+
+const parseOptionalDate = (value: unknown) => {
+    if (value === undefined || value === null || value === "") return undefined;
+    const date = new Date(String(value));
+    return Number.isNaN(date.getTime()) ? null : date;
+};
 
 const getAdminAuditActor = (adminActor?: AdminActor) => ({
     actor: "admin" as const,
@@ -186,11 +225,18 @@ router.get("/ambassadors", async (_req, res) => {
 router.post("/ambassadors", async (req, res) => {
     try {
         const name = cleanText(req.body.name, 160);
+        const linkSlug = cleanAmbassadorLinkSlug(req.body.linkSlug);
         const goal = Number(req.body.goal);
         if (!name) {
             return res.status(400).json({
                 success: false,
                 message: "Ambassador name is required",
+            });
+        }
+        if (!linkSlug) {
+            return res.status(400).json({
+                success: false,
+                message: "Ambassador link name in English is required",
             });
         }
         if (!Number.isFinite(goal) || goal <= 0 || goal > 100_000_000) {
@@ -202,9 +248,12 @@ router.post("/ambassadors", async (req, res) => {
 
         const ambassador = await DaycareDonationAmbassador.create({
             name,
+            linkSlug,
             goal,
             refCode: await createUniqueAmbassadorRef(),
             active: true,
+            ownerLabel: cleanText(req.body.ownerLabel, 160) || undefined,
+            notes: cleanText(req.body.notes, 800) || undefined,
         });
         await writeDaycareDonationAudit({
             action: "ambassador.created",
@@ -213,9 +262,12 @@ router.post("/ambassadors", async (req, res) => {
             ...getAdminAuditActor(res.locals.adminActor),
             after: {
                 name: ambassador.name,
+                linkSlug: ambassador.linkSlug,
                 goal: ambassador.goal,
                 refCode: ambassador.refCode,
                 active: ambassador.active,
+                ownerLabel: ambassador.ownerLabel ?? null,
+                notes: ambassador.notes ?? null,
             },
         });
 
@@ -252,8 +304,11 @@ router.patch("/ambassadors/:id", async (req, res) => {
 
         const before = {
             name: ambassador.name,
+            linkSlug: ambassador.linkSlug ?? null,
             goal: ambassador.goal,
             active: ambassador.active,
+            ownerLabel: ambassador.ownerLabel ?? null,
+            notes: ambassador.notes ?? null,
         };
         if (req.body.name !== undefined) {
             const name = cleanText(req.body.name, 160);
@@ -264,6 +319,16 @@ router.patch("/ambassadors/:id", async (req, res) => {
                 });
             }
             ambassador.name = name;
+        }
+        if (req.body.linkSlug !== undefined) {
+            const linkSlug = cleanAmbassadorLinkSlug(req.body.linkSlug);
+            if (!linkSlug) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Ambassador link name in English is required",
+                });
+            }
+            ambassador.linkSlug = linkSlug;
         }
         if (req.body.goal !== undefined) {
             const goal = Number(req.body.goal);
@@ -278,10 +343,20 @@ router.patch("/ambassadors/:id", async (req, res) => {
         if (req.body.active !== undefined) {
             ambassador.active = Boolean(req.body.active);
         }
+        if (req.body.ownerLabel !== undefined) {
+            ambassador.ownerLabel =
+                cleanText(req.body.ownerLabel, 160) || undefined;
+        }
+        if (req.body.notes !== undefined) {
+            ambassador.notes = cleanText(req.body.notes, 800) || undefined;
+        }
         if (
             ambassador.name === before.name &&
+            (ambassador.linkSlug ?? null) === before.linkSlug &&
             ambassador.goal === before.goal &&
-            ambassador.active === before.active
+            ambassador.active === before.active &&
+            (ambassador.ownerLabel ?? null) === before.ownerLabel &&
+            (ambassador.notes ?? null) === before.notes
         ) {
             return res.status(400).json({
                 success: false,
@@ -298,8 +373,11 @@ router.patch("/ambassadors/:id", async (req, res) => {
             before,
             after: {
                 name: ambassador.name,
+                linkSlug: ambassador.linkSlug ?? null,
                 goal: ambassador.goal,
                 active: ambassador.active,
+                ownerLabel: ambassador.ownerLabel ?? null,
+                notes: ambassador.notes ?? null,
             },
         });
 
@@ -308,6 +386,376 @@ router.patch("/ambassadors/:id", async (req, res) => {
         return res.status(400).json({
             success: false,
             message: "Failed to update donation ambassador",
+        });
+    }
+});
+
+router.delete("/ambassadors/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(404).json({
+                success: false,
+                message: "Ambassador was not found",
+            });
+        }
+
+        const ambassador = await DaycareDonationAmbassador.findById(
+            req.params.id
+        );
+        if (!ambassador) {
+            return res.status(404).json({
+                success: false,
+                message: "Ambassador was not found",
+            });
+        }
+
+        const [hasRecords, hasLeads, hasActiveIntents] = await Promise.all([
+            DaycareDonationRecord.exists({ ambassadorId: ambassador._id }),
+            DaycareDonationLead.exists({ ambassadorId: ambassador._id }),
+            DaycareDonationIntent.exists({
+                ambassadorId: ambassador._id,
+                status: { $in: ["created", "submitted", "confirmed"] },
+            }),
+        ]);
+        if (hasRecords || hasLeads || hasActiveIntents) {
+            return res.status(409).json({
+                success: false,
+                message: "Ambassadors with donation activity cannot be deleted",
+            });
+        }
+
+        await DaycareDonationAmbassador.deleteOne({ _id: ambassador._id });
+        await DaycareDonationIntent.updateMany(
+            { ambassadorId: ambassador._id },
+            { $unset: { ambassadorId: 1 } }
+        );
+        await writeDaycareDonationAudit({
+            action: "ambassador.deleted",
+            entityType: "ambassador",
+            entityId: String(ambassador._id),
+            ...getAdminAuditActor(res.locals.adminActor),
+            before: {
+                name: ambassador.name,
+                linkSlug: ambassador.linkSlug ?? null,
+                goal: ambassador.goal,
+                refCode: ambassador.refCode,
+                active: ambassador.active,
+                ownerLabel: ambassador.ownerLabel ?? null,
+                notes: ambassador.notes ?? null,
+            },
+            after: null,
+        });
+
+        return res.json({ success: true });
+    } catch (error) {
+        console.error("Failed to delete donation ambassador:", error);
+        return res.status(400).json({
+            success: false,
+            message: "Failed to delete donation ambassador",
+        });
+    }
+});
+
+router.get("/leads", async (_req, res) => {
+    try {
+        const leads = await DaycareDonationLead.find({
+            campaignSlug: DAYCARE_DONATION_CAMPAIGN_SLUG,
+        })
+            .populate({
+                path: "ambassadorId",
+                select: { name: 1, refCode: 1, active: 1 },
+            })
+            .sort({ nextFollowUpAt: 1, updatedAt: -1 })
+            .limit(500)
+            .lean();
+
+        return res.json({ success: true, data: leads });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get donation leads",
+        });
+    }
+});
+
+router.post("/leads", async (req, res) => {
+    try {
+        const donorName = cleanText(req.body.donorName, 160);
+        const targetAmount = parseOptionalAmount(req.body.targetAmount);
+        const pledgedAmount = parseOptionalAmount(req.body.pledgedAmount);
+        const nextFollowUpAt = parseOptionalDate(req.body.nextFollowUpAt);
+        const status = req.body.status ?? "new";
+        const contactMethod = req.body.contactMethod || undefined;
+        const ambassadorId = cleanText(req.body.ambassadorId, 80) || undefined;
+
+        if (!donorName) {
+            return res.status(400).json({
+                success: false,
+                message: "Lead donor name is required",
+            });
+        }
+        if (targetAmount === null || pledgedAmount === null) {
+            return res.status(400).json({
+                success: false,
+                message: "Lead amounts must be valid positive values",
+            });
+        }
+        if (nextFollowUpAt === null) {
+            return res.status(400).json({
+                success: false,
+                message: "Lead follow-up date is invalid",
+            });
+        }
+        if (!isLeadStatus(status)) {
+            return res.status(400).json({
+                success: false,
+                message: "Lead status is invalid",
+            });
+        }
+        if (contactMethod && !isContactMethod(contactMethod)) {
+            return res.status(400).json({
+                success: false,
+                message: "Lead contact method is invalid",
+            });
+        }
+        if (status === "pledged" && !pledgedAmount) {
+            return res.status(400).json({
+                success: false,
+                message: "A pledged lead requires a pledged amount",
+            });
+        }
+        if (ambassadorId) {
+            if (
+                !mongoose.isValidObjectId(ambassadorId) ||
+                !(await DaycareDonationAmbassador.exists({ _id: ambassadorId }))
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead ambassador was not found",
+                });
+            }
+        }
+
+        const lead = await DaycareDonationLead.create({
+            campaignSlug: DAYCARE_DONATION_CAMPAIGN_SLUG,
+            donorName,
+            phone: cleanText(req.body.phone, 40) || undefined,
+            ambassadorId,
+            targetAmount,
+            pledgedAmount,
+            contactMethod,
+            status,
+            nextFollowUpAt,
+            notes: cleanText(req.body.notes, 1200) || undefined,
+            createdById: res.locals.adminActor.id,
+            createdByLabel: res.locals.adminActor.label,
+        });
+
+        await writeDaycareDonationAudit({
+            action: "lead.created",
+            entityType: "lead",
+            entityId: String(lead._id),
+            ...getAdminAuditActor(res.locals.adminActor),
+            after: {
+                donorName: lead.donorName,
+                status: lead.status,
+                targetAmount: lead.targetAmount ?? null,
+                pledgedAmount: lead.pledgedAmount ?? null,
+                ambassadorId: lead.ambassadorId ?? null,
+                nextFollowUpAt: lead.nextFollowUpAt ?? null,
+            },
+        });
+
+        await lead.populate({
+            path: "ambassadorId",
+            select: { name: 1, refCode: 1, active: 1 },
+        });
+        return res.status(201).json({ success: true, data: lead });
+    } catch (error) {
+        console.error("Failed to create donation lead:", error);
+        return res.status(400).json({
+            success: false,
+            message: "Failed to create donation lead",
+        });
+    }
+});
+
+router.patch("/leads/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(404).json({
+                success: false,
+                message: "Donation lead was not found",
+            });
+        }
+        const lead = await DaycareDonationLead.findOne({
+            _id: req.params.id,
+            campaignSlug: DAYCARE_DONATION_CAMPAIGN_SLUG,
+        });
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: "Donation lead was not found",
+            });
+        }
+
+        const before = {
+            donorName: lead.donorName,
+            phone: lead.phone ?? null,
+            ambassadorId: lead.ambassadorId
+                ? String(lead.ambassadorId)
+                : null,
+            targetAmount: lead.targetAmount ?? null,
+            pledgedAmount: lead.pledgedAmount ?? null,
+            contactMethod: lead.contactMethod ?? null,
+            status: lead.status,
+            lastContactAt: lead.lastContactAt?.toISOString() ?? null,
+            nextFollowUpAt: lead.nextFollowUpAt?.toISOString() ?? null,
+            notes: lead.notes ?? null,
+        };
+
+        if (req.body.donorName !== undefined) {
+            const donorName = cleanText(req.body.donorName, 160);
+            if (!donorName) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead donor name is required",
+                });
+            }
+            lead.donorName = donorName;
+        }
+        if (req.body.phone !== undefined) {
+            lead.phone = cleanText(req.body.phone, 40) || undefined;
+        }
+        if (req.body.targetAmount !== undefined) {
+            const amount = parseOptionalAmount(req.body.targetAmount);
+            if (amount === null) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead target amount is invalid",
+                });
+            }
+            lead.targetAmount = amount;
+        }
+        if (req.body.pledgedAmount !== undefined) {
+            const amount = parseOptionalAmount(req.body.pledgedAmount);
+            if (amount === null) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead pledged amount is invalid",
+                });
+            }
+            lead.pledgedAmount = amount;
+        }
+        if (req.body.contactMethod !== undefined) {
+            const method = req.body.contactMethod || undefined;
+            if (method && !isContactMethod(method)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead contact method is invalid",
+                });
+            }
+            lead.contactMethod = method;
+        }
+        if (req.body.status !== undefined) {
+            if (!isLeadStatus(req.body.status)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead status is invalid",
+                });
+            }
+            lead.status = req.body.status;
+        }
+        if (req.body.lastContactAt !== undefined) {
+            const date = parseOptionalDate(req.body.lastContactAt);
+            if (date === null) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead contact date is invalid",
+                });
+            }
+            lead.lastContactAt = date;
+        }
+        if (req.body.nextFollowUpAt !== undefined) {
+            const date = parseOptionalDate(req.body.nextFollowUpAt);
+            if (date === null) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Lead follow-up date is invalid",
+                });
+            }
+            lead.nextFollowUpAt = date;
+        }
+        if (req.body.notes !== undefined) {
+            lead.notes = cleanText(req.body.notes, 1200) || undefined;
+        }
+        if (req.body.ambassadorId !== undefined) {
+            const ambassadorId = cleanText(req.body.ambassadorId, 80);
+            if (ambassadorId) {
+                if (
+                    !mongoose.isValidObjectId(ambassadorId) ||
+                    !(await DaycareDonationAmbassador.exists({
+                        _id: ambassadorId,
+                    }))
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Lead ambassador was not found",
+                    });
+                }
+                lead.ambassadorId = new mongoose.Types.ObjectId(ambassadorId);
+            } else {
+                lead.ambassadorId = undefined;
+            }
+        }
+
+        if (lead.status === "pledged" && !lead.pledgedAmount) {
+            return res.status(400).json({
+                success: false,
+                message: "A pledged lead requires a pledged amount",
+            });
+        }
+
+        const after = {
+            donorName: lead.donorName,
+            phone: lead.phone ?? null,
+            ambassadorId: lead.ambassadorId
+                ? String(lead.ambassadorId)
+                : null,
+            targetAmount: lead.targetAmount ?? null,
+            pledgedAmount: lead.pledgedAmount ?? null,
+            contactMethod: lead.contactMethod ?? null,
+            status: lead.status,
+            lastContactAt: lead.lastContactAt?.toISOString() ?? null,
+            nextFollowUpAt: lead.nextFollowUpAt?.toISOString() ?? null,
+            notes: lead.notes ?? null,
+        };
+        if (JSON.stringify(before) === JSON.stringify(after)) {
+            return res.status(400).json({
+                success: false,
+                message: "No donation lead change was requested",
+            });
+        }
+
+        await lead.save();
+        await writeDaycareDonationAudit({
+            action: "lead.updated",
+            entityType: "lead",
+            entityId: String(lead._id),
+            ...getAdminAuditActor(res.locals.adminActor),
+            before,
+            after,
+        });
+        await lead.populate({
+            path: "ambassadorId",
+            select: { name: 1, refCode: 1, active: 1 },
+        });
+        return res.json({ success: true, data: lead });
+    } catch (error) {
+        console.error("Failed to update donation lead:", error);
+        return res.status(400).json({
+            success: false,
+            message: "Failed to update donation lead",
         });
     }
 });

@@ -8,6 +8,7 @@ import {
 import { DaycareDonationDiagnostic } from "../models/DaycareDonationDiagnostic";
 import { DaycareDonationAmbassador } from "../models/DaycareDonationAmbassador";
 import { DaycareDonationIntent } from "../models/DaycareDonationIntent";
+import { DaycareDonationLead } from "../models/DaycareDonationLead";
 import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
 import {
     isValidDaycareDonationIntentSignature,
@@ -82,12 +83,17 @@ test("provider transaction ID has a unique database index", () => {
 test("ambassador references are URL-safe, unique and deactivatable", async () => {
     const ambassador = new DaycareDonationAmbassador({
         name: "מושקי",
+        linkSlug: "mushky-cohen",
         refCode: "a1b2c3d4",
         goal: 10_000,
+        ownerLabel: "תמר",
+        notes: "מעקב שבועי",
     });
     await ambassador.validate();
     assert.equal(ambassador.active, true);
     assert.equal(ambassador.goal, 10_000);
+    assert.equal(ambassador.ownerLabel, "תמר");
+    assert.equal(ambassador.linkSlug, "mushky-cohen");
 
     const invalidAmbassador = new DaycareDonationAmbassador({
         name: "רבקה",
@@ -95,11 +101,51 @@ test("ambassador references are URL-safe, unique and deactivatable", async () =>
     });
     await assert.rejects(() => invalidAmbassador.validate());
 
+    const invalidLinkSlug = new DaycareDonationAmbassador({
+        name: "רבקה",
+        linkSlug: "רבקה-כהן",
+        refCode: "b1c2d3e4",
+        goal: 5_000,
+    });
+    await assert.rejects(() => invalidLinkSlug.validate());
+
     const index = DaycareDonationAmbassador.schema
         .indexes()
         .find(([fields]) => fields.refCode === 1);
     assert.ok(index);
     assert.equal(index[1].unique, true);
+
+    const linkSlugIndex = DaycareDonationAmbassador.schema
+        .indexes()
+        .find(([fields]) => fields.linkSlug === 1);
+    assert.ok(linkSlugIndex);
+    assert.equal(linkSlugIndex[1].unique, true);
+    assert.equal(linkSlugIndex[1].sparse, true);
+});
+
+test("donation leads track pledges separately from confirmed donations", async () => {
+    const lead = new DaycareDonationLead({
+        campaignSlug: "daycare-2026",
+        donorName: "תורם פוטנציאלי",
+        targetAmount: 5_000,
+        pledgedAmount: 2_000,
+        contactMethod: "phone",
+        status: "pledged",
+        nextFollowUpAt: new Date("2026-08-20"),
+    });
+
+    await lead.validate();
+    assert.equal(lead.pledgedAmount, 2_000);
+    assert.equal(lead.status, "pledged");
+
+    const invalidDonation = new DaycareDonationRecord({
+        campaignSlug: "daycare-2026",
+        source: "nedarim",
+        status: "pledged",
+        amount: 2_000,
+        receivedAt: new Date(),
+    });
+    await assert.rejects(() => invalidDonation.validate());
 });
 
 test("diagnostics have an automatic expiry index", () => {

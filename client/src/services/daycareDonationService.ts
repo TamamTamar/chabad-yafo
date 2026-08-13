@@ -5,6 +5,9 @@ import type {
     DaycareDonationAudit,
     DaycareDonationAmbassador,
     DaycareDonationDiagnostics,
+    DaycareDonationLead,
+    DaycareDonationContactMethod,
+    DaycareDonationLeadStatus,
     DaycareDonationRecord,
 } from "../pages/DaycareDonations/types";
 
@@ -87,22 +90,79 @@ export const getAdminDaycareDonationAmbassadors = async () => {
 };
 
 export const createDaycareDonationAmbassador = async (
-    name: string,
-    goal: number
+    input: {
+        name: string;
+        linkSlug: string;
+        goal: number;
+        ownerLabel?: string;
+        notes?: string;
+    }
 ) => {
     const response = await http.post<ApiResponse<DaycareDonationAmbassador>>(
         "/admin/daycare/donations/ambassadors",
-        { name, goal }
+        input
     );
     return response.data.data;
 };
 
 export const updateDaycareDonationAmbassador = async (
     id: string,
-    updates: { name?: string; goal?: number; active?: boolean }
+    updates: {
+        name?: string;
+        linkSlug?: string;
+        goal?: number;
+        active?: boolean;
+        ownerLabel?: string;
+        notes?: string;
+    }
 ) => {
     const response = await http.patch<ApiResponse<DaycareDonationAmbassador>>(
         `/admin/daycare/donations/ambassadors/${id}`,
+        updates
+    );
+    return response.data.data;
+};
+
+export const deleteDaycareDonationAmbassador = async (id: string) => {
+    await http.delete(`/admin/daycare/donations/ambassadors/${id}`);
+};
+
+export type DaycareDonationLeadInput = {
+    donorName: string;
+    phone?: string;
+    ambassadorId?: string;
+    targetAmount?: number;
+    pledgedAmount?: number;
+    contactMethod?: DaycareDonationContactMethod;
+    status?: DaycareDonationLeadStatus;
+    lastContactAt?: string;
+    nextFollowUpAt?: string;
+    notes?: string;
+};
+
+export const getAdminDaycareDonationLeads = async () => {
+    const response = await http.get<ApiResponse<DaycareDonationLead[]>>(
+        "/admin/daycare/donations/leads"
+    );
+    return response.data.data;
+};
+
+export const createDaycareDonationLead = async (
+    input: DaycareDonationLeadInput
+) => {
+    const response = await http.post<ApiResponse<DaycareDonationLead>>(
+        "/admin/daycare/donations/leads",
+        input
+    );
+    return response.data.data;
+};
+
+export const updateDaycareDonationLead = async (
+    id: string,
+    updates: Partial<DaycareDonationLeadInput>
+) => {
+    const response = await http.patch<ApiResponse<DaycareDonationLead>>(
+        `/admin/daycare/donations/leads/${id}`,
         updates
     );
     return response.data.data;

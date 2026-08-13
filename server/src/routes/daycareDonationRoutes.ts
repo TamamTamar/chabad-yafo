@@ -20,6 +20,7 @@ import type { DaycareDonationItemConfig } from "../types/daycareDonations";
 
 const router = Router();
 const validAmbassadorRef = /^[a-z0-9]{4,32}$/;
+const validAmbassadorIdentifier = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const cleanText = (value: unknown, maxLength: number) =>
     String(value ?? "").trim().slice(0, maxLength);
@@ -153,12 +154,22 @@ router.post("/intents", async (req, res) => {
             }
         }
 
-        const ambassador = validAmbassadorRef.test(refCode)
-            ? await DaycareDonationAmbassador.findOne({
-                  refCode,
-                  active: true,
-              }).select({ _id: 1 })
-            : null;
+        const legacyRefCode = refCode.match(/-([a-z0-9]{4,32})$/)?.[1];
+        const ambassador =
+            refCode.length <= 100 && validAmbassadorIdentifier.test(refCode)
+                ? await DaycareDonationAmbassador.findOne({
+                      active: true,
+                      $or: [
+                          ...(validAmbassadorRef.test(refCode)
+                              ? [{ refCode }]
+                              : []),
+                          { linkSlug: refCode },
+                          ...(legacyRefCode && validAmbassadorRef.test(legacyRefCode)
+                              ? [{ refCode: legacyRefCode }]
+                              : []),
+                      ],
+                  }).select({ _id: 1 })
+                : null;
 
         const publicId = randomUUID();
         const intent = await DaycareDonationIntent.create({

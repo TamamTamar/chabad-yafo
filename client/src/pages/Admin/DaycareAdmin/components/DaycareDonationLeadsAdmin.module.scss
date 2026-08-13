@@ -1,0 +1,58 @@
+@use "../../../../styles/variables" as *;
+
+.panel { padding: 24px; border: 1px solid $ui-border-soft; border-radius: $radius-lg; background: $brand-bg; box-shadow: 0 16px 38px $ui-shadow-blue-soft; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.header h2 { margin: 0 0 6px; color: $brand-blue-ink; }
+.header p { margin: 0; color: $ui-text-muted; }
+.header > button, .formActions button:first-child { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 9px 16px; border: 0; border-radius: $radius-pill; background: $brand-primary; color: $color-white; font: inherit; font-weight: 900; }
+.summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+.summary article { display: grid; gap: 5px; padding: 14px; border-radius: 13px; background: $brand-surface-cool; }
+.summary span { color: $ui-text-muted; font-size: $type-caption; font-weight: 800; }
+.summary strong { color: $brand-primary; font-size: $type-card-title; }
+.summary .alertCard { background: rgba($ui-danger, .08); }
+.summary .alertCard strong { color: $ui-danger; }
+.success, .error, .empty { margin: 16px 0 0; padding: 12px 14px; border-radius: 12px; font-weight: 800; }
+.success { background: $ui-success-soft; color: $ui-success; }
+.error { background: rgba($ui-danger, .09); color: $ui-danger; }
+.empty { background: $brand-surface-cool; color: $ui-text-muted; }
+.leadForm { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; padding: 16px; border-radius: 14px; background: $brand-surface-cool; }
+.leadForm label { display: grid; gap: 6px; color: $brand-blue-ink; font-size: $type-caption; font-weight: 900; }
+.leadForm input, .leadForm select, .leadForm textarea { width: 100%; min-width: 0; min-height: 42px; padding: 8px 10px; border: 1px solid $ui-border-soft; border-radius: 10px; background: $brand-bg; color: $brand-blue-ink; font: inherit; }
+.leadForm textarea { resize: vertical; }
+.wideField { grid-column: 1 / -1; }
+.formActions { grid-column: 1 / -1; display: flex; gap: 8px; }
+.formActions button:last-child { min-height: 42px; padding: 9px 16px; border: 1px solid $ui-border-soft; border-radius: $radius-pill; background: $brand-bg; color: $brand-primary; font: inherit; font-weight: 900; }
+.filters { display: flex; gap: 7px; margin-top: 18px; }
+.filters button { min-height: 38px; padding: 7px 14px; border: 1px solid $ui-border-soft; border-radius: $radius-pill; background: $brand-bg; color: $ui-text-muted; font: inherit; font-weight: 900; }
+.filters .activeFilter { border-color: $brand-primary; background: $brand-primary; color: $color-white; }
+.leadList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.leadCard { min-width: 0; padding: 15px; border: 1px solid $ui-border-soft; border-radius: 14px; background: $brand-bg; }
+.leadCard.overdue { border-color: rgba($ui-danger, .32); }
+.leadCard .leadForm { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; background: transparent; }
+.leadHeader, .amounts, .followUp, .actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.leadHeader > div { display: grid; gap: 2px; min-width: 0; }
+.leadHeader strong { color: $brand-blue-ink; font-size: $type-body-lg; }
+.leadHeader span, .followUp { color: $ui-text-muted; font-size: $type-caption; }
+.status { flex: 0 0 auto; padding: 5px 9px; border-radius: $radius-pill; background: rgba($brand-primary, .08); color: $brand-primary !important; font-weight: 900; }
+.amounts { margin-top: 12px; padding: 11px; border-radius: 11px; background: $brand-surface-cool; color: $ui-text-muted; font-size: $type-caption; }
+.amounts span { display: grid; gap: 2px; }
+.amounts strong { color: $brand-primary-deep; font-size: $type-body; }
+.followUp { margin-top: 10px; }
+.overdueText { color: $ui-danger; font-weight: 900; }
+.notes { margin: 10px 0 0; color: $ui-text-muted; font-size: $type-caption; line-height: 1.5; }
+.actions { justify-content: flex-start; flex-wrap: wrap; margin-top: 12px; }
+.actions button, .actions a { display: inline-flex; min-width: 40px; min-height: 38px; align-items: center; justify-content: center; gap: 5px; padding: 7px 10px; border: 1px solid rgba($brand-primary, .2); border-radius: 9px; background: $brand-bg; color: $brand-primary; font: inherit; font-size: $type-caption; font-weight: 900; }
+
+@media (max-width: 760px) {
+    .panel { padding: 18px; }
+    .header { flex-direction: column; gap: 14px; }
+    .header > button { width: 100%; }
+    .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .summary article { min-width: 0; padding: 10px 7px; text-align: center; }
+    .summary strong { font-size: $type-body-lg; }
+    .leadForm, .leadCard .leadForm, .leadList { grid-template-columns: 1fr; }
+    .wideField, .formActions { grid-column: auto; }
+    .filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .filters button { min-width: 0; padding-inline: 5px; }
+    .leadHeader { align-items: flex-start; }
+}

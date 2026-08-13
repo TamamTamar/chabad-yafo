@@ -9,6 +9,7 @@ import {
     getAdminDaycareDonationAmbassadors,
     getAdminDaycareDonationCampaign,
     getAdminDaycareDonationDiagnostics,
+    getAdminDaycareDonationLeads,
     getAdminDaycareDonationRecords,
     updateDaycareDonationCampaign,
     updateDaycareDonationItem,
@@ -19,10 +20,12 @@ import type {
     DaycareDonationAmbassador,
     DaycareDonationAudit,
     DaycareDonationDiagnostics,
+    DaycareDonationLead,
     DaycareDonationRecord,
 } from "../../../DaycareDonations/types";
 import DonationModalPreview from "../../../DaycareDonations/components/DonationModalPreview";
 import DaycareAmbassadorsAdmin from "./DaycareAmbassadorsAdmin";
+import DaycareDonationLeadsAdmin from "./DaycareDonationLeadsAdmin";
 import styles from "./DaycareDonationsAdmin.module.scss";
 
 const formatCurrency = (value: number) =>
@@ -57,12 +60,16 @@ const auditLabels: Record<string, string> = {
     "diagnostics.cleared": "נתוני האבחון נמחקו",
     "ambassador.created": "שגריר נוסף",
     "ambassador.updated": "פרטי שגריר עודכנו",
+    "ambassador.deleted": "שגריר נמחק",
+    "lead.created": "פנייה לתורם נוספה",
+    "lead.updated": "פנייה לתורם עודכנה",
 };
 
 type AdminView =
     | "overview"
     | "records"
     | "ambassadors"
+    | "leads"
     | "manual"
     | "items"
     | "history";
@@ -85,6 +92,7 @@ const adminViews: Array<{
     { id: "overview", label: "סקירה", description: "מצב הקמפיין" },
     { id: "records", label: "תרומות", description: "רשומות ושיוכים" },
     { id: "ambassadors", label: "שגרירים", description: "לינקים ומעקב" },
+    { id: "leads", label: "פניות", description: "מעקב והבטחות" },
     { id: "manual", label: "הזנה ידנית", description: "תרומה מחוץ לאתר" },
     { id: "items", label: "סעיפים ויעדים", description: "יעדים ומצבים" },
     { id: "history", label: "היסטוריה", description: "שינויים וכלים" },
@@ -99,6 +107,7 @@ const DaycareDonationsAdmin = () => {
         useState<DaycareDonationCampaignData | null>(null);
     const [records, setRecords] = useState<DaycareDonationRecord[]>([]);
     const [ambassadors, setAmbassadors] = useState<DaycareDonationAmbassador[]>([]);
+    const [leads, setLeads] = useState<DaycareDonationLead[]>([]);
     const [audit, setAudit] = useState<DaycareDonationAudit[]>([]);
     const [diagnostics, setDiagnostics] =
         useState<DaycareDonationDiagnostics | null>(null);
@@ -121,6 +130,7 @@ const DaycareDonationsAdmin = () => {
             campaignData,
             recordData,
             ambassadorData,
+            leadData,
             auditData,
             diagnosticData,
         ] =
@@ -128,12 +138,14 @@ const DaycareDonationsAdmin = () => {
             getAdminDaycareDonationCampaign(),
             getAdminDaycareDonationRecords(),
             getAdminDaycareDonationAmbassadors(),
+            getAdminDaycareDonationLeads(),
             getAdminDaycareDonationAudit(),
             getAdminDaycareDonationDiagnostics(),
         ]);
         setCampaign(campaignData);
         setRecords(recordData);
         setAmbassadors(ambassadorData);
+        setLeads(leadData);
         setAudit(auditData);
         setDiagnostics(diagnosticData);
     }, []);
@@ -423,6 +435,9 @@ const DaycareDonationsAdmin = () => {
                         )}
                         {view.id === "ambassadors" && ambassadors.length > 0 && (
                             <span>{ambassadors.length}</span>
+                        )}
+                        {view.id === "leads" && leads.length > 0 && (
+                            <span>{leads.length}</span>
                         )}
                     </button>
                 ))}
@@ -1084,6 +1099,14 @@ const DaycareDonationsAdmin = () => {
                 <DaycareAmbassadorsAdmin
                     ambassadors={ambassadors}
                     records={records}
+                    onChanged={loadData}
+                />
+            )}
+
+            {activeView === "leads" && (
+                <DaycareDonationLeadsAdmin
+                    leads={leads}
+                    ambassadors={ambassadors}
                     onChanged={loadData}
                 />
             )}

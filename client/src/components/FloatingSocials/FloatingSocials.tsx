@@ -5,7 +5,8 @@ import styles from "./FloatingSocials.module.scss";
 
 const FloatingSocials = () => {
     const { pathname } = useLocation();
-    const hideWhatsApp = pathname.replace(/\/+$/, "") === "/daycare-donations";
+    const normalizedPathname = pathname.replace(/\/+$/, "");
+    const hideWhatsApp = normalizedPathname.startsWith("/daycare-donations");
 
     if (pathname === "/daycare-parent-info") {
         return null;

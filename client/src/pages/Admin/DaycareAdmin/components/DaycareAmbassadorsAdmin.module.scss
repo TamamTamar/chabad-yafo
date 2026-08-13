@@ -55,7 +55,10 @@
     label { display: grid; gap: 7px; color: $brand-blue-ink; font-weight: 900; }
     input { min-height: 43px; padding: 8px 11px; border: 1px solid $ui-border-soft; border-radius: 11px; font: inherit; }
     button { min-height: 43px; padding: 8px 16px; border: 0; border-radius: 11px; background: $brand-primary; color: $color-white; font: inherit; font-weight: 900; }
+    textarea { min-height: 70px; padding: 8px 11px; border: 1px solid $ui-border-soft; border-radius: 11px; font: inherit; resize: vertical; }
 }
+
+.wideField { grid-column: 1 / -1; }
 
 .tableWrap { margin-top: 20px; overflow-x: auto; }
 .table { width: 100%; border-collapse: collapse; }
@@ -119,11 +122,13 @@
 }
 
 .nameButton { border: 0; background: transparent; color: $brand-primary; font: inherit; font-weight: 900; cursor: pointer; }
+.ownerLabel { display: block; margin-top: 3px; color: $ui-text-muted; font-size: $type-caption; }
 .linkInput { width: min(310px, 30vw); min-width: 220px; padding: 8px 10px; border: 1px solid $ui-border-soft; border-radius: 9px; background: $brand-surface-cool; font: inherit; }
 .actions { display: flex; gap: 6px; }
 .actions button,
 .renameForm button { padding: 7px 10px; border: 1px solid rgba($brand-primary, 0.2); border-radius: 9px; background: $color-white; color: $brand-primary; font: inherit; font-size: $type-caption; font-weight: 900; cursor: pointer; }
 .actions button:disabled { opacity: 0.55; }
+.actions .deleteAction { border-color: rgba($ui-danger, 0.25); color: $ui-danger; }
 
 .actions button {
     display: inline-flex;
@@ -139,6 +144,7 @@
 .renameForm { display: flex; gap: 6px; }
 .renameForm input { width: 110px; min-width: 110px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; }
 .renameForm input:first-child { width: 150px; min-width: 150px; }
+.renameForm textarea { min-width: 180px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; resize: vertical; }
 
 .details { padding: 16px !important; background: $brand-surface-cool; white-space: normal !important; }
 .details > strong,
@@ -147,6 +153,7 @@
 .details ul { display: grid; gap: 7px; margin: 12px 0 0; padding: 0; list-style: none; }
 .details li { display: grid; grid-template-columns: minmax(0, 1fr) auto 90px; gap: 12px; padding: 9px 11px; border-radius: 9px; background: $color-white; }
 .details small { color: $ui-text-muted; }
+.internalMeta { display: grid; gap: 4px; margin-top: 8px; color: $ui-text-muted; font-size: $type-caption; }
 
 @media (max-width: 600px) {
     .panel {
@@ -166,6 +173,7 @@
         padding-block: 8px;
     }
     .addForm { grid-template-columns: 1fr; }
+    .wideField { grid-column: auto; }
 
     .tableWrap {
         width: 100%;
@@ -264,7 +272,7 @@
 
     .actions {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 7px;
     }
 
@@ -289,7 +297,8 @@
     }
 
     .renameForm input,
-    .renameForm input:first-child {
+    .renameForm input:first-child,
+    .renameForm textarea {
         width: 100%;
         min-width: 0;
     }

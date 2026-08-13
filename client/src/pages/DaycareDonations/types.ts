@@ -85,11 +85,52 @@ export type DaycareDonationRecord = {
 export type DaycareDonationAmbassador = {
     _id: string;
     name: string;
+    linkSlug?: string;
     refCode: string;
     goal: number;
     active: boolean;
     raised: number;
     donationCount: number;
+    ownerLabel?: string;
+    notes?: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type DaycareDonationLeadStatus =
+    | "new"
+    | "contacted"
+    | "waiting"
+    | "pledged"
+    | "completed"
+    | "closed";
+
+export type DaycareDonationContactMethod =
+    | "phone"
+    | "whatsapp"
+    | "meeting"
+    | "other";
+
+export type DaycareDonationLead = {
+    _id: string;
+    campaignSlug: string;
+    donorName: string;
+    phone?: string;
+    ambassadorId?: {
+        _id: string;
+        name: string;
+        refCode: string;
+        active: boolean;
+    };
+    targetAmount?: number;
+    pledgedAmount?: number;
+    contactMethod?: DaycareDonationContactMethod;
+    status: DaycareDonationLeadStatus;
+    lastContactAt?: string;
+    nextFollowUpAt?: string;
+    notes?: string;
+    createdById?: string;
+    createdByLabel?: string;
     createdAt: string;
     updatedAt: string;
 };
@@ -103,7 +144,8 @@ export type DaycareDonationAudit = {
         | "item"
         | "record"
         | "intent"
-        | "ambassador";
+        | "ambassador"
+        | "lead";
     entityId: string;
     actor: "admin" | "nedarim" | "system";
     actorId?: string;

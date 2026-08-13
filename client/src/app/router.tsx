@@ -60,6 +60,10 @@ export const router = createBrowserRouter([
                 path: "daycare-donations", element: <DaycareDonations />
             },
             {
+                path: "daycare-donations/:ambassadorLink",
+                element: <DaycareDonations />
+            },
+            {
                 path: "daycare-parent-info", element: <DaycareParentInfo />
             },
             {

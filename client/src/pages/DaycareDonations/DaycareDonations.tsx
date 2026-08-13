@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import styles from "./DaycareDonations.module.scss";
 import {
     CAMPAIGN_GOAL,
@@ -19,6 +20,10 @@ import DaycareDonationsHero from "./components/DaycareDonationsHero";
 import DonationCategorySection from "./components/DonationCategorySection";
 import DonationModalPreview from "./components/DonationModalPreview";
 import MobileDonationBar from "./components/MobileDonationBar";
+import {
+    extractAmbassadorRef,
+    normalizeAmbassadorRef,
+} from "./ambassadorLinks";
 
 const defaultSelection: DonationSelection = {
     kind: "general",
@@ -45,18 +50,18 @@ const fallbackCampaign: DaycareDonationCampaignData = {
 };
 
 const ambassadorStorageKey = "daycare-donations-ref";
-const validAmbassadorRef = /^[a-z0-9]{4,32}$/;
 
-const getPersistedAmbassadorRef = () => {
-    const queryValue = new URLSearchParams(window.location.search)
-        .get("ref")
-        ?.trim()
-        .toLowerCase();
+const getPersistedAmbassadorRef = (ambassadorLink?: string) => {
+    const pathValue = extractAmbassadorRef(ambassadorLink);
+    const queryParameter = new URLSearchParams(window.location.search).get("ref");
+    const queryValue = normalizeAmbassadorRef(queryParameter);
+    const hasQueryParameter = queryParameter !== null;
+    const refCode = pathValue ?? queryValue;
     try {
-        if (queryValue !== undefined) {
-            if (queryValue && validAmbassadorRef.test(queryValue)) {
-                window.sessionStorage.setItem(ambassadorStorageKey, queryValue);
-                return queryValue;
+        if (ambassadorLink !== undefined || hasQueryParameter) {
+            if (refCode) {
+                window.sessionStorage.setItem(ambassadorStorageKey, refCode);
+                return refCode;
             }
             window.sessionStorage.removeItem(ambassadorStorageKey);
             return undefined;
@@ -64,14 +69,15 @@ const getPersistedAmbassadorRef = () => {
         window.sessionStorage.removeItem(ambassadorStorageKey);
         return undefined;
     } catch {
-        return queryValue && validAmbassadorRef.test(queryValue)
-            ? queryValue
-            : undefined;
+        return refCode;
     }
 };
 
 const DaycareDonations = () => {
-    const [ambassadorRef] = useState(getPersistedAmbassadorRef);
+    const { ambassadorLink } = useParams<{ ambassadorLink?: string }>();
+    const [ambassadorRef] = useState(() =>
+        getPersistedAmbassadorRef(ambassadorLink)
+    );
     const [selectedDonation, setSelectedDonation] =
         useState<DonationSelection>(defaultSelection);
     const [donationModalOpen, setDonationModalOpen] = useState(false);

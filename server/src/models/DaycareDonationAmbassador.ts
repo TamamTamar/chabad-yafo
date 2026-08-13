@@ -10,6 +10,16 @@ const daycareDonationAmbassadorSchema =
                 trim: true,
                 maxlength: 160,
             },
+            linkSlug: {
+                type: String,
+                lowercase: true,
+                trim: true,
+                maxlength: 60,
+                match: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                unique: true,
+                sparse: true,
+                index: true,
+            },
             refCode: {
                 type: String,
                 required: true,
@@ -31,6 +41,16 @@ const daycareDonationAmbassadorSchema =
                 required: true,
                 default: true,
                 index: true,
+            },
+            ownerLabel: {
+                type: String,
+                trim: true,
+                maxlength: 160,
+            },
+            notes: {
+                type: String,
+                trim: true,
+                maxlength: 800,
             },
         },
         { timestamps: true }
