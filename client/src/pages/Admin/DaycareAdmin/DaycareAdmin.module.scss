@@ -90,6 +90,10 @@
     box-shadow: 0 10px 20px $ui-shadow-blue-soft;
 }
 
+.tabSelect {
+    display: none;
+}
+
 .tabPanel {
     display: grid;
     gap: 22px;
@@ -140,57 +144,51 @@
 
 @media (max-width: 560px) {
     .tabBar {
-        position: static;
-        display: grid;
-        grid-auto-columns: max-content;
-        grid-auto-flow: column;
-        grid-template-columns: none;
-        justify-content: start;
-        width: calc(100% + 16px);
-        margin-inline: 0 -16px;
-        padding: 6px 0 10px 16px;
-        overflow-x: auto;
-        border-inline: 0;
-        border-radius: 0;
-        box-shadow: none;
-        scroll-padding-inline: 16px;
-        scroll-snap-type: inline proximity;
-        scrollbar-width: none;
-    }
-
-    .tabBar::-webkit-scrollbar {
         display: none;
     }
 
-    .tabButton,
-    .tabButtonActive {
-        min-width: 104px;
-        padding-inline: 16px;
-        scroll-snap-align: start;
+    .tabSelect {
+        display: grid;
+        gap: 7px;
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 16px;
+        color: $brand-blue-ink;
+        font-size: $type-caption;
+        font-weight: 900;
+    }
+
+    .tabSelect select {
+        width: 100%;
+        min-width: 0;
+        min-height: 48px;
+        padding: 9px 12px;
+        border: 1px solid $ui-border-soft;
+        border-radius: 12px;
+        background: $brand-bg;
+        color: $brand-blue-ink;
+        font: inherit;
     }
 
     .innerTabBar {
         display: grid;
-        grid-auto-columns: max-content;
-        grid-auto-flow: column;
-        grid-template-columns: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         justify-self: stretch;
-        width: auto;
-        margin-inline: -2px;
+        width: 100%;
+        min-width: 0;
+        margin-inline: 0;
         padding: 5px;
-        overflow-x: auto;
+        overflow: visible;
         border-radius: $radius;
-        scrollbar-width: none;
-    }
-
-    .innerTabBar::-webkit-scrollbar {
-        display: none;
     }
 
     .innerTabButton,
     .innerTabButtonActive {
-        min-width: 126px;
-        padding-inline: 14px;
+        width: 100%;
+        min-width: 0;
+        padding-inline: 8px;
+        line-height: 1.2;
+        white-space: normal;
     }
 }
 

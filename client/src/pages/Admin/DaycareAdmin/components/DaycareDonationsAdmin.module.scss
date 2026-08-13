@@ -3,10 +3,18 @@
 .layout {
     display: grid;
     gap: 22px;
+    min-width: 0;
+}
+
+.layout > * {
+    min-width: 0;
 }
 
 .summarySection,
 .panel {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     padding: 24px;
     border: 1px solid $ui-border-soft;
     border-radius: $radius-lg;
@@ -19,6 +27,10 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 18px;
+}
+
+.sectionHeader > * {
+    min-width: 0;
 }
 
 .sectionHeader a {
@@ -129,6 +141,14 @@
 .adminViewNav .activeView > span {
     background: rgba($color-white, 0.18);
     color: $color-white;
+}
+
+.adminViewSelect {
+    display: none;
+}
+
+.mobileExtraNav {
+    display: none;
 }
 
 .quickActions {
@@ -745,19 +765,62 @@
 
     .sectionHeader a {
         width: 100%;
+        max-width: 100%;
         text-align: center;
     }
 
     .adminViewNav {
-        grid-auto-columns: 148px;
-        grid-auto-flow: column;
-        grid-template-columns: none;
-        overflow-x: auto;
-        scroll-snap-type: inline mandatory;
+        display: none;
     }
 
-    .adminViewNav button {
-        scroll-snap-align: start;
+    .adminViewSelect {
+        display: grid;
+        gap: 7px;
+        width: 100%;
+        min-width: 0;
+        color: $brand-blue-ink;
+        font-size: $type-caption;
+        font-weight: 900;
+    }
+
+    .adminViewSelect select {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        padding: 9px 12px;
+        border: 1px solid $ui-border-soft;
+        border-radius: 12px;
+        background: $brand-bg;
+        color: $brand-blue-ink;
+        font: inherit;
+    }
+
+    .mobileExtraNav {
+        display: block;
+        margin-top: -10px;
+        padding: 0 2px;
+        color: $ui-text-muted;
+        font-size: $type-caption;
+    }
+
+    .mobileExtraNav summary {
+        width: max-content;
+        margin-inline-start: auto;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .mobileExtraNav button {
+        width: 100%;
+        min-height: 42px;
+        margin-top: 8px;
+        padding: 8px 12px;
+        border: 1px solid $ui-border-soft;
+        border-radius: 11px;
+        background: $brand-surface-cool;
+        color: $brand-primary;
+        font: inherit;
+        font-weight: 900;
     }
 
     .metrics,
@@ -789,6 +852,72 @@
     .manualForm > button,
     .recordFilters > span {
         grid-column: auto;
+    }
+
+    .recordsTableWrap {
+        width: 100%;
+        min-width: 0;
+        overflow: visible;
+    }
+
+    .recordsTable,
+    .recordsTable tbody {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .recordsTable thead {
+        display: none;
+    }
+
+    .recordRow {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 14px;
+        padding: 13px;
+        border: 1px solid $ui-border-soft;
+        border-radius: 13px;
+        background: $brand-bg;
+        box-shadow: 0 9px 22px rgba($brand-primary, 0.06);
+    }
+
+    .recordRow td {
+        display: grid;
+        width: 100%;
+        min-width: 0;
+        gap: 4px;
+        padding: 9px;
+        border: 0;
+        border-radius: 10px;
+        background: $brand-surface-cool;
+        white-space: normal;
+    }
+
+    .recordRow td::before {
+        content: attr(data-label);
+        color: $ui-text-muted;
+        font-size: 0.72rem;
+        font-weight: 900;
+        line-height: 1.2;
+    }
+
+    .recordRow td[data-label="תאריך"] { order: 1; }
+    .recordRow td[data-label="סכום"] { order: 2; font-weight: 900; }
+    .recordRow td[data-label="תורם"] { order: 3; grid-column: 1 / -1; }
+    .recordRow td[data-label="מקור"] { order: 4; }
+    .recordRow td[data-label="שגריר"] { order: 5; }
+    .recordRow td[data-label="שיוך"] { order: 6; grid-column: 1 / -1; }
+    .recordRow td[data-label="מצב"] { order: 7; grid-column: 1 / -1; }
+
+    .recordRow select {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        min-height: 43px;
     }
 
     .diagnosticList dl {

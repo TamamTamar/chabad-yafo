@@ -1,4 +1,5 @@
 import { Fragment, useState } from "react";
+import { Copy, Pencil, Power, PowerOff } from "lucide-react";
 import {
     createDaycareDonationAmbassador,
     updateDaycareDonationAmbassador,
@@ -191,8 +192,14 @@ const DaycareAmbassadorsAdmin = ({
                                 );
                                 return (
                                     <Fragment key={ambassador._id}>
-                                        <tr>
-                                            <td>
+                                        <tr
+                                            className={`${styles.ambassadorRow} ${
+                                                editingId === ambassador._id
+                                                    ? styles.ambassadorRowEditing
+                                                    : ""
+                                            }`}
+                                        >
+                                            <td data-label="שם">
                                                 {editingId === ambassador._id ? (
                                                     <form
                                                         className={styles.renameForm}
@@ -236,7 +243,7 @@ const DaycareAmbassadorsAdmin = ({
                                                     </button>
                                                 )}
                                             </td>
-                                            <td>
+                                            <td data-label="סטטוס">
                                                 <span
                                                     className={
                                                         ambassador.active
@@ -247,7 +254,7 @@ const DaycareAmbassadorsAdmin = ({
                                                     {ambassador.active ? "פעיל" : "לא פעיל"}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td data-label="התקדמות מול היעד">
                                                 {ambassador.goal > 0 ? (
                                                     <div className={styles.progressCell}>
                                                         <div className={styles.progressSummary}>
@@ -278,19 +285,11 @@ const DaycareAmbassadorsAdmin = ({
                                                                 }}
                                                             />
                                                         </div>
-                                                        <small
-                                                            className={
-                                                                remaining === 0
-                                                                    ? styles.goalReached
-                                                                    : styles.goalRemaining
-                                                            }
-                                                        >
-                                                            {remaining === 0
-                                                                ? progressPercent > 100
-                                                                    ? `היעד הושג ועבר ב־₪${formatCurrency(ambassador.raised - ambassador.goal)}`
-                                                                    : "היעד הושג"
-                                                                : `נותרו ₪${formatCurrency(remaining)} ליעד`}
-                                                        </small>
+                                                        {remaining === 0 && (
+                                                            <small className={styles.goalReached}>
+                                                                היעד הושג
+                                                            </small>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <span className={styles.noGoal}>
@@ -298,8 +297,8 @@ const DaycareAmbassadorsAdmin = ({
                                                     </span>
                                                 )}
                                             </td>
-                                            <td>{ambassador.donationCount}</td>
-                                            <td>
+                                            <td data-label="תרומות">{ambassador.donationCount}</td>
+                                            <td data-label="לינק אישי">
                                                 <input
                                                     className={styles.linkInput}
                                                     aria-label={`הלינק האישי של ${ambassador.name}`}
@@ -308,22 +307,38 @@ const DaycareAmbassadorsAdmin = ({
                                                     dir="ltr"
                                                 />
                                             </td>
-                                            <td>
+                                            <td data-label="פעולות">
                                                 <div className={styles.actions}>
                                                     <button
                                                         type="button"
+                                                        aria-label={`העתקת הלינק של ${ambassador.name}`}
+                                                        title="העתקת לינק"
                                                         onClick={() => void copyLink(ambassador.refCode)}
                                                     >
-                                                        העתקה
+                                                        <Copy
+                                                            aria-hidden="true"
+                                                            className={styles.actionIcon}
+                                                            size={19}
+                                                        />
+                                                        <span className={styles.actionText}>העתקה</span>
                                                     </button>
                                                     <button
                                                         type="button"
+                                                        aria-label={`עריכת השגריר ${ambassador.name}`}
+                                                        title="עריכה"
                                                         onClick={() => setEditingId(ambassador._id)}
                                                     >
-                                                        עריכה
+                                                        <Pencil
+                                                            aria-hidden="true"
+                                                            className={styles.actionIcon}
+                                                            size={19}
+                                                        />
+                                                        <span className={styles.actionText}>עריכה</span>
                                                     </button>
                                                     <button
                                                         type="button"
+                                                        aria-label={`${ambassador.active ? "השבתת" : "הפעלת"} השגריר ${ambassador.name}`}
+                                                        title={ambassador.active ? "השבתה" : "הפעלה"}
                                                         disabled={saving}
                                                         onClick={() =>
                                                             void runMutation(
@@ -338,13 +353,28 @@ const DaycareAmbassadorsAdmin = ({
                                                             )
                                                         }
                                                     >
-                                                        {ambassador.active ? "השבתה" : "הפעלה"}
+                                                        {ambassador.active ? (
+                                                            <PowerOff
+                                                                aria-hidden="true"
+                                                                className={styles.actionIcon}
+                                                                size={19}
+                                                            />
+                                                        ) : (
+                                                            <Power
+                                                                aria-hidden="true"
+                                                                className={styles.actionIcon}
+                                                                size={19}
+                                                            />
+                                                        )}
+                                                        <span className={styles.actionText}>
+                                                            {ambassador.active ? "השבתה" : "הפעלה"}
+                                                        </span>
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
                                         {expandedId === ambassador._id && (
-                                            <tr key={`${ambassador._id}-details`}>
+                                            <tr className={styles.detailsRow} key={`${ambassador._id}-details`}>
                                                 <td colSpan={6} className={styles.details}>
                                                     <strong>תרומות דרך {ambassador.name}</strong>
                                                     {ambassadorRecords.length === 0 ? (

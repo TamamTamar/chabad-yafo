@@ -10,6 +10,8 @@ html {
     direction: rtl;
     scroll-behavior: smooth;
     scroll-padding-top: calc($header-height + 28px);
+    max-width: 100%;
+    overflow-x: clip;
 }
 
 body {
@@ -20,6 +22,16 @@ body {
     color: $brand-text;
     -webkit-font-smoothing: antialiased; /* עוזר לפונט להיראות חד יותר */
     -moz-osx-font-smoothing: grayscale;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+#root,
+.app-root,
+#main-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 a {
@@ -73,6 +85,22 @@ section[id],
 #form,
 #donation-form-section {
     scroll-margin-top: calc($header-height + 28px);
+}
+
+@media (max-width: 640px) {
+    #main-content :where(h1, h2, h3, h4, p, li, label, a, button, span, strong) {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    #main-content :where(img, picture, video, iframe, canvas, svg) {
+        max-width: 100%;
+    }
+
+    #main-content :where(input, select, textarea) {
+        max-width: 100%;
+        min-width: 0;
+    }
 }
 
 @keyframes softRise {

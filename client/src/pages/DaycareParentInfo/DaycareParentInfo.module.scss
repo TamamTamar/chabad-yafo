@@ -862,6 +862,26 @@
         width: min(100% - 30px, 1080px);
     }
 
+    .tabsList {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        grid-template-rows: repeat(2, minmax(42px, auto));
+        justify-content: stretch;
+        overflow-x: visible;
+        scroll-snap-type: none;
+    }
+
+    .tabButton {
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        padding: 6px 8px;
+        line-height: 1.15;
+        white-space: normal;
+        scroll-snap-align: none;
+    }
+
     .hero {
         padding: 28px 0 66px;
     }

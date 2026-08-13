@@ -104,14 +104,9 @@
     background: $brand-primary;
 }
 
-.goalRemaining,
 .goalReached {
     font-size: $type-caption;
     font-weight: 800;
-}
-
-.goalRemaining {
-    color: $ui-text-muted;
 }
 
 .goalReached {
@@ -130,6 +125,17 @@
 .renameForm button { padding: 7px 10px; border: 1px solid rgba($brand-primary, 0.2); border-radius: 9px; background: $color-white; color: $brand-primary; font: inherit; font-size: $type-caption; font-weight: 900; cursor: pointer; }
 .actions button:disabled { opacity: 0.55; }
 
+.actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.actionIcon {
+    display: none;
+}
+
 .renameForm { display: flex; gap: 6px; }
 .renameForm input { width: 110px; min-width: 110px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; }
 .renameForm input:first-child { width: 150px; min-width: 150px; }
@@ -143,8 +149,167 @@
 .details small { color: $ui-text-muted; }
 
 @media (max-width: 600px) {
-    .panel { padding: 18px; }
-    .header { flex-direction: column; }
-    .header > button { width: 100%; }
+    .panel {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        padding: 18px;
+    }
+    .header {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .header > button {
+        width: 100%;
+        min-height: 44px;
+        padding-block: 8px;
+    }
     .addForm { grid-template-columns: 1fr; }
+
+    .tableWrap {
+        width: 100%;
+        min-width: 0;
+        overflow: visible;
+    }
+
+    .table,
+    .table tbody {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .ambassadorRow {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 14px;
+        padding: 14px;
+        border: 1px solid $ui-border-soft;
+        border-radius: 13px;
+        background: $brand-bg;
+        box-shadow: 0 9px 22px rgba($brand-primary, 0.06);
+    }
+
+    .ambassadorRow td {
+        display: grid;
+        width: 100%;
+        min-width: 0;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 5px;
+        align-items: start;
+        padding: 10px;
+        border: 0;
+        border-radius: 10px;
+        background: $brand-surface-cool;
+        white-space: normal;
+    }
+
+    .ambassadorRow td::before {
+        content: attr(data-label);
+        color: $ui-text-muted;
+        font-size: 0.72rem;
+        font-weight: 900;
+        line-height: 1.2;
+    }
+
+    .ambassadorRow td[data-label="התקדמות מול היעד"],
+    .ambassadorRow td[data-label="לינק אישי"],
+    .ambassadorRow td[data-label="פעולות"] {
+        grid-column: 1 / -1;
+    }
+
+    .ambassadorRow td[data-label="פעולות"] {
+        padding: 0;
+        background: transparent;
+    }
+
+    .ambassadorRowEditing td:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .nameButton {
+        padding: 0;
+        text-align: right;
+    }
+
+    .active,
+    .inactive {
+        justify-self: start;
+    }
+
+    .progressCell,
+    .linkInput {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .progressSummary {
+        align-items: center;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .progressSummary strong {
+        font-size: $type-body-sm;
+    }
+
+    .actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .actions button {
+        min-width: 0;
+        min-height: 40px;
+        padding-inline: 5px;
+    }
+
+    .actionIcon {
+        display: block;
+    }
+
+    .actionText {
+        display: none;
+    }
+
+    .renameForm {
+        display: grid;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .renameForm input,
+    .renameForm input:first-child {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .detailsRow {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        margin: -6px 0 14px;
+    }
+
+    .detailsRow .details {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        border-radius: 12px;
+    }
+
+    .details li {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
 }

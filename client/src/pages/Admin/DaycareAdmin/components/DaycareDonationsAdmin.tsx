@@ -90,6 +90,10 @@ const adminViews: Array<{
     { id: "history", label: "היסטוריה", description: "שינויים וכלים" },
 ];
 
+const primaryAdminViews = adminViews.filter(
+    (view) => view.id !== "history"
+);
+
 const DaycareDonationsAdmin = () => {
     const [campaign, setCampaign] =
         useState<DaycareDonationCampaignData | null>(null);
@@ -423,6 +427,41 @@ const DaycareDonationsAdmin = () => {
                     </button>
                 ))}
             </nav>
+
+            <label className={styles.adminViewSelect}>
+                אזור ניהול
+                <select
+                    value={activeView}
+                    onChange={(event) => {
+                        setActiveView(event.target.value as AdminView);
+                        setError("");
+                        setMessage("");
+                    }}
+                >
+                    {primaryAdminViews.map((view) => (
+                        <option key={view.id} value={view.id}>
+                            {view.label} — {view.description}
+                        </option>
+                    ))}
+                    {activeView === "history" && (
+                        <option value="history">היסטוריה — שינויים וכלים</option>
+                    )}
+                </select>
+            </label>
+
+            <details className={styles.mobileExtraNav}>
+                <summary>אפשרויות נוספות</summary>
+                <button
+                    type="button"
+                    onClick={() => {
+                        setActiveView("history");
+                        setError("");
+                        setMessage("");
+                    }}
+                >
+                    היסטוריה וכלים טכניים
+                </button>
+            </details>
 
             {activeView === "history" && (
             <details className={styles.technicalTools}>
@@ -939,9 +978,11 @@ const DaycareDonationsAdmin = () => {
                             </thead>
                             <tbody>
                                 {filteredRecords.map((record) => (
-                                    <tr key={record._id}>
-                                        <td>{formatDate(record.receivedAt)}</td>
-                                        <td>
+                                    <tr className={styles.recordRow} key={record._id}>
+                                        <td data-label="תאריך">
+                                            {formatDate(record.receivedAt)}
+                                        </td>
+                                        <td data-label="תורם">
                                             <div className={styles.recordDonor}>
                                                 <strong>
                                                     {record.donorName ||
@@ -954,18 +995,18 @@ const DaycareDonationsAdmin = () => {
                                                 </small>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td data-label="מקור">
                                             {record.source === "nedarim"
                                                 ? "נדרים פלוס"
                                                 : "ידנית"}
                                         </td>
-                                        <td>
+                                        <td data-label="סכום">
                                             ₪{formatCurrency(record.amount)}
                                         </td>
-                                        <td>
+                                        <td data-label="שגריר">
                                             {record.ambassadorId?.name ?? "ישיר"}
                                         </td>
-                                        <td>
+                                        <td data-label="שיוך">
                                             <select
                                                 aria-label={`שיוך התרומה של ${record.donorName || "תורם"}`}
                                                 value={record.itemId ?? ""}
@@ -1001,7 +1042,7 @@ const DaycareDonationsAdmin = () => {
                                                 ))}
                                             </select>
                                         </td>
-                                        <td>
+                                        <td data-label="מצב">
                                             <select
                                                 aria-label={`מצב התרומה של ${record.donorName || "תורם"}`}
                                                 value={record.status}

@@ -134,6 +134,22 @@ const DaycareAdmin = () => {
                     ))}
                 </nav>
 
+                <label className={styles.tabSelect}>
+                    אזור ניהול במעון
+                    <select
+                        value={activeTab}
+                        onChange={(event) =>
+                            selectTab(event.target.value as DaycareAdminTab)
+                        }
+                    >
+                        {daycareAdminTabs.map((tab) => (
+                            <option key={tab.id} value={tab.id}>
+                                {tab.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
                 {activeTab === "tasks" && (
                     <div className={styles.tabPanel}>
                         <DaycareTasks
