@@ -19,6 +19,10 @@ import {
 } from "../../services/daycareDonationService";
 import { writeDaycareDonationAudit } from "../../services/daycareDonationAuditService";
 import {
+    createAvailableDaycareAmbassadorSlug,
+    normalizeDaycareAmbassadorSlug,
+} from "../../services/daycareDonationAmbassadorService";
+import {
     buildDaycareDonationCallbackUrl,
     isDaycareDonationCallbackConfigured,
 } from "../../services/daycareDonationCallbackSecurity";
@@ -38,12 +42,6 @@ router.use(requireSecureAdminMutation);
 
 const cleanText = (value: unknown, maxLength = 500) =>
     String(value ?? "").trim().slice(0, maxLength);
-
-const cleanAmbassadorLinkSlug = (value: unknown) =>
-    cleanText(value, 60)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
 
 const createUniqueAmbassadorRef = async () => {
     for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -225,7 +223,9 @@ router.get("/ambassadors", async (_req, res) => {
 router.post("/ambassadors", async (req, res) => {
     try {
         const name = cleanText(req.body.name, 160);
-        const linkSlug = cleanAmbassadorLinkSlug(req.body.linkSlug);
+        const requestedLinkSlug = normalizeDaycareAmbassadorSlug(
+            req.body.linkSlug
+        );
         const goal = Number(req.body.goal);
         if (!name) {
             return res.status(400).json({
@@ -233,12 +233,15 @@ router.post("/ambassadors", async (req, res) => {
                 message: "Ambassador name is required",
             });
         }
-        if (!linkSlug) {
+        if (!requestedLinkSlug) {
             return res.status(400).json({
                 success: false,
                 message: "Ambassador link name in English is required",
             });
         }
+        const linkSlug = await createAvailableDaycareAmbassadorSlug(
+            requestedLinkSlug
+        );
         if (!Number.isFinite(goal) || goal <= 0 || goal > 100_000_000) {
             return res.status(400).json({
                 success: false,
@@ -305,6 +308,7 @@ router.patch("/ambassadors/:id", async (req, res) => {
         const before = {
             name: ambassador.name,
             linkSlug: ambassador.linkSlug ?? null,
+            linkAliases: ambassador.linkAliases ?? [],
             goal: ambassador.goal,
             active: ambassador.active,
             ownerLabel: ambassador.ownerLabel ?? null,
@@ -321,12 +325,26 @@ router.patch("/ambassadors/:id", async (req, res) => {
             ambassador.name = name;
         }
         if (req.body.linkSlug !== undefined) {
-            const linkSlug = cleanAmbassadorLinkSlug(req.body.linkSlug);
-            if (!linkSlug) {
+            const requestedLinkSlug = normalizeDaycareAmbassadorSlug(
+                req.body.linkSlug
+            );
+            if (!requestedLinkSlug) {
                 return res.status(400).json({
                     success: false,
                     message: "Ambassador link name in English is required",
                 });
+            }
+            const linkSlug = await createAvailableDaycareAmbassadorSlug(
+                requestedLinkSlug,
+                ambassador._id
+            );
+            if (ambassador.linkSlug && ambassador.linkSlug !== linkSlug) {
+                ambassador.linkAliases = Array.from(
+                    new Set([
+                        ...(ambassador.linkAliases ?? []),
+                        ambassador.linkSlug,
+                    ])
+                ).filter((alias) => alias !== linkSlug);
             }
             ambassador.linkSlug = linkSlug;
         }
@@ -374,6 +392,7 @@ router.patch("/ambassadors/:id", async (req, res) => {
             after: {
                 name: ambassador.name,
                 linkSlug: ambassador.linkSlug ?? null,
+                linkAliases: ambassador.linkAliases ?? [],
                 goal: ambassador.goal,
                 active: ambassador.active,
                 ownerLabel: ambassador.ownerLabel ?? null,
@@ -437,6 +456,7 @@ router.delete("/ambassadors/:id", async (req, res) => {
             before: {
                 name: ambassador.name,
                 linkSlug: ambassador.linkSlug ?? null,
+                linkAliases: ambassador.linkAliases ?? [],
                 goal: ambassador.goal,
                 refCode: ambassador.refCode,
                 active: ambassador.active,

@@ -58,7 +58,22 @@
     textarea { min-height: 70px; padding: 8px 11px; border: 1px solid $ui-border-soft; border-radius: 11px; font: inherit; resize: vertical; }
 }
 
+.fieldError {
+    min-height: 1.1rem;
+    color: $ui-danger;
+    font-size: $type-caption;
+    font-weight: 700;
+    line-height: 1.1rem;
+}
+
+.addForm [aria-invalid="true"],
+.renameForm [aria-invalid="true"] {
+    border-color: $ui-danger;
+}
+
 .wideField { grid-column: 1 / -1; }
+.linkPreview { direction: ltr; color: $ui-text-muted; font-weight: 600; overflow-wrap: anywhere; }
+.slugSuggestion { color: $brand-primary; font-weight: 800; }
 
 .tableWrap { margin-top: 20px; overflow-x: auto; }
 .table { width: 100%; border-collapse: collapse; }
@@ -129,6 +144,7 @@
 .renameForm button { padding: 7px 10px; border: 1px solid rgba($brand-primary, 0.2); border-radius: 9px; background: $color-white; color: $brand-primary; font: inherit; font-size: $type-caption; font-weight: 900; cursor: pointer; }
 .actions button:disabled { opacity: 0.55; }
 .actions .deleteAction { border-color: rgba($ui-danger, 0.25); color: $ui-danger; }
+.actions .whatsAppAction { border-color: rgba($ui-success, 0.25); color: $ui-success; }
 
 .actions button {
     display: inline-flex;
@@ -141,10 +157,12 @@
     display: none;
 }
 
-.renameForm { display: flex; gap: 6px; }
+.renameForm { display: flex; align-items: flex-start; gap: 6px; }
+.editField { display: grid; gap: 3px; }
 .renameForm input { width: 110px; min-width: 110px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; }
-.renameForm input:first-child { width: 150px; min-width: 150px; }
+.renameForm > .editField:first-child input { width: 150px; min-width: 150px; }
 .renameForm textarea { min-width: 180px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; resize: vertical; }
+.renameForm > button { margin-top: 0; }
 
 .details { padding: 16px !important; background: $brand-surface-cool; white-space: normal !important; }
 .details > strong,
@@ -272,7 +290,7 @@
 
     .actions {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 7px;
     }
 
@@ -297,7 +315,7 @@
     }
 
     .renameForm input,
-    .renameForm input:first-child,
+    .renameForm > .editField:first-child input,
     .renameForm textarea {
         width: 100%;
         min-width: 0;

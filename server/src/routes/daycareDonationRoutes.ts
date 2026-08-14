@@ -3,7 +3,6 @@ import express, { Router } from "express";
 import { DAYCARE_DONATION_CAMPAIGN_SLUG } from "../config/daycareDonationDefaults";
 import { areDaycareDonationPaymentsEnabled } from "../config/daycareDonationSecurity";
 import { DaycareDonationIntent } from "../models/DaycareDonationIntent";
-import { DaycareDonationAmbassador } from "../models/DaycareDonationAmbassador";
 import { DaycareDonationDiagnostic } from "../models/DaycareDonationDiagnostic";
 import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
 import {
@@ -17,10 +16,9 @@ import {
     isValidDaycareDonationIntentSignature,
 } from "../services/daycareDonationCallbackSecurity";
 import type { DaycareDonationItemConfig } from "../types/daycareDonations";
+import { findActiveDaycareDonationAmbassador } from "../services/daycareDonationAmbassadorService";
 
 const router = Router();
-const validAmbassadorRef = /^[a-z0-9]{4,32}$/;
-const validAmbassadorIdentifier = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const cleanText = (value: unknown, maxLength: number) =>
     String(value ?? "").trim().slice(0, maxLength);
@@ -94,6 +92,35 @@ router.get("/campaign", async (_req, res) => {
     }
 });
 
+router.get("/ambassadors/:identifier", async (req, res) => {
+    try {
+        const ambassador = await findActiveDaycareDonationAmbassador(
+            req.params.identifier
+        )?.select({ name: 1, refCode: 1, linkSlug: 1 });
+        if (!ambassador) {
+            return res.status(404).json({
+                success: false,
+                message: "Ambassador link was not found",
+            });
+        }
+
+        res.set("Cache-Control", "no-store");
+        return res.json({
+            success: true,
+            data: {
+                name: ambassador.name,
+                refCode: ambassador.refCode,
+                linkSlug: ambassador.linkSlug,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to validate ambassador link",
+        });
+    }
+});
+
 router.post("/intents", async (req, res) => {
     try {
         if (!areDaycareDonationPaymentsEnabled()) {
@@ -154,22 +181,9 @@ router.post("/intents", async (req, res) => {
             }
         }
 
-        const legacyRefCode = refCode.match(/-([a-z0-9]{4,32})$/)?.[1];
-        const ambassador =
-            refCode.length <= 100 && validAmbassadorIdentifier.test(refCode)
-                ? await DaycareDonationAmbassador.findOne({
-                      active: true,
-                      $or: [
-                          ...(validAmbassadorRef.test(refCode)
-                              ? [{ refCode }]
-                              : []),
-                          { linkSlug: refCode },
-                          ...(legacyRefCode && validAmbassadorRef.test(legacyRefCode)
-                              ? [{ refCode: legacyRefCode }]
-                              : []),
-                      ],
-                  }).select({ _id: 1 })
-                : null;
+        const ambassador = await findActiveDaycareDonationAmbassador(
+            refCode
+        )?.select({ _id: 1 });
 
         const publicId = randomUUID();
         const intent = await DaycareDonationIntent.create({

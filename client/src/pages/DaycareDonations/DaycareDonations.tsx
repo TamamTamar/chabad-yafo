@@ -11,7 +11,10 @@ import type {
     DaycareDonationCampaignData,
     DonationSelection,
 } from "./types";
-import { getDaycareDonationCampaign } from "../../services/daycareDonationService";
+import {
+    getDaycareDonationAmbassadorReference,
+    getDaycareDonationCampaign,
+} from "../../services/daycareDonationService";
 import CampaignStory from "./components/CampaignStory";
 import ClosingDonationSection from "./components/ClosingDonationSection";
 import CompletedProjects from "./components/CompletedProjects";
@@ -51,32 +54,19 @@ const fallbackCampaign: DaycareDonationCampaignData = {
 
 const ambassadorStorageKey = "daycare-donations-ref";
 
-const getPersistedAmbassadorRef = (ambassadorLink?: string) => {
+const getAmbassadorCandidate = (ambassadorLink?: string) => {
     const pathValue = extractAmbassadorRef(ambassadorLink);
     const queryParameter = new URLSearchParams(window.location.search).get("ref");
     const queryValue = normalizeAmbassadorRef(queryParameter);
-    const hasQueryParameter = queryParameter !== null;
-    const refCode = pathValue ?? queryValue;
-    try {
-        if (ambassadorLink !== undefined || hasQueryParameter) {
-            if (refCode) {
-                window.sessionStorage.setItem(ambassadorStorageKey, refCode);
-                return refCode;
-            }
-            window.sessionStorage.removeItem(ambassadorStorageKey);
-            return undefined;
-        }
-        window.sessionStorage.removeItem(ambassadorStorageKey);
-        return undefined;
-    } catch {
-        return refCode;
-    }
+    return pathValue ?? queryValue;
 };
 
 const DaycareDonations = () => {
     const { ambassadorLink } = useParams<{ ambassadorLink?: string }>();
-    const [ambassadorRef] = useState(() =>
-        getPersistedAmbassadorRef(ambassadorLink)
+    const [ambassadorRef, setAmbassadorRef] = useState<string>();
+    const [ambassadorLinkInvalid, setAmbassadorLinkInvalid] = useState(false);
+    const [ambassadorLinkChecking, setAmbassadorLinkChecking] = useState(() =>
+        Boolean(getAmbassadorCandidate(ambassadorLink))
     );
     const [selectedDonation, setSelectedDonation] =
         useState<DonationSelection>(defaultSelection);
@@ -100,6 +90,70 @@ const DaycareDonations = () => {
         void refreshCampaign();
     }, [refreshCampaign]);
 
+    useEffect(() => {
+        const candidate = getAmbassadorCandidate(ambassadorLink);
+        if (!candidate) {
+            let active = true;
+            queueMicrotask(() => {
+                if (!active) return;
+                setAmbassadorRef(undefined);
+                setAmbassadorLinkInvalid(ambassadorLink !== undefined);
+                setAmbassadorLinkChecking(false);
+            });
+            try {
+                window.sessionStorage.removeItem(ambassadorStorageKey);
+            } catch {
+                // Attribution still works without session storage.
+            }
+            return () => {
+                active = false;
+            };
+        }
+
+        let active = true;
+        void getDaycareDonationAmbassadorReference(candidate)
+            .then((reference) => {
+                if (!active) return;
+                setAmbassadorRef(reference.refCode);
+                setAmbassadorLinkInvalid(false);
+                setAmbassadorLinkChecking(false);
+                try {
+                    window.sessionStorage.setItem(
+                        ambassadorStorageKey,
+                        reference.refCode
+                    );
+                } catch {
+                    // Attribution still works without session storage.
+                }
+                if (
+                    ambassadorLink &&
+                    reference.linkSlug &&
+                    ambassadorLink !== reference.linkSlug
+                ) {
+                    window.history.replaceState(
+                        null,
+                        "",
+                        `/daycare-donations/${reference.linkSlug}`
+                    );
+                }
+            })
+            .catch(() => {
+                if (!active) return;
+                setAmbassadorRef(undefined);
+                setAmbassadorLinkInvalid(true);
+                setAmbassadorLinkChecking(false);
+                try {
+                    window.sessionStorage.removeItem(ambassadorStorageKey);
+                } catch {
+                    // Nothing to clear.
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [ambassadorLink]);
+
     const completedItemsCount = useMemo(
         () =>
             campaign.items.filter(
@@ -109,6 +163,7 @@ const DaycareDonations = () => {
     );
 
     const openDonation = (selection: DonationSelection) => {
+        if (ambassadorLinkChecking) return;
         setSelectedDonation(selection);
         setDonationModalOpen(true);
     };
@@ -140,6 +195,16 @@ const DaycareDonations = () => {
                     <p className={styles.campaignDataNotice} role="status">
                         נתוני הקמפיין אינם זמינים כרגע. מוצגים היעדים ללא
                         סכומי תרומות.
+                    </p>
+                )}
+                {ambassadorLinkInvalid && (
+                    <p className={styles.campaignDataNotice} role="status">
+                        הקישור האישי אינו פעיל. אפשר עדיין לתרום ישירות לקמפיין.
+                    </p>
+                )}
+                {ambassadorLinkChecking && (
+                    <p className={styles.campaignDataNotice} role="status">
+                        בודקים את הקישור האישי…
                     </p>
                 )}
                 <CampaignStory

@@ -32,6 +32,7 @@ export type DaycareDonationIntentMode = "live" | "diagnostic";
 export type DaycareDonationAmbassadorDocument = {
     name: string;
     linkSlug?: string;
+    linkAliases?: string[];
     refCode: string;
     goal: number;
     active: boolean;

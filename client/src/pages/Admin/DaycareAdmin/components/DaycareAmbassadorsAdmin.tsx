@@ -1,5 +1,13 @@
 import { Fragment, useState } from "react";
-import { Copy, Pencil, Power, PowerOff, Trash2 } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
+import {
+    Copy,
+    MessageCircle,
+    Pencil,
+    Power,
+    PowerOff,
+    Trash2,
+} from "lucide-react";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
 import {
     createDaycareDonationAmbassador,
@@ -10,13 +18,155 @@ import type {
     DaycareDonationAmbassador,
     DaycareDonationRecord,
 } from "../../../DaycareDonations/types";
-import { buildAmbassadorLink } from "../../../DaycareDonations/ambassadorLinks";
+import {
+    buildAmbassadorLink,
+    normalizeAmbassadorSlug,
+    transliterateAmbassadorName,
+} from "../../../DaycareDonations/ambassadorLinks";
 import styles from "./DaycareAmbassadorsAdmin.module.scss";
 
 type Props = {
     ambassadors: DaycareDonationAmbassador[];
     records: DaycareDonationRecord[];
     onChanged: () => Promise<void>;
+};
+
+type AmbassadorFormValues = {
+    name: string;
+    linkSlug: string;
+    goal: number;
+    ownerLabel: string;
+    notes: string;
+};
+
+const slugPattern = /^[A-Za-z0-9]+(?:[- ][A-Za-z0-9]+)*$/;
+
+type AmbassadorEditFormProps = {
+    ambassador: DaycareDonationAmbassador;
+    saving: boolean;
+    onSave: (values: AmbassadorFormValues) => Promise<boolean>;
+};
+
+const AmbassadorEditForm = ({
+    ambassador,
+    saving,
+    onSave,
+}: AmbassadorEditFormProps) => {
+    const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors, isSubmitting },
+    } = useForm<AmbassadorFormValues>({
+        mode: "onBlur",
+        defaultValues: {
+            name: ambassador.name,
+            linkSlug: ambassador.linkSlug ?? "",
+            goal: ambassador.goal,
+            ownerLabel: ambassador.ownerLabel ?? "",
+            notes: ambassador.notes ?? "",
+        },
+    });
+    const nameField = register("name", {
+        required: "יש להזין שם שגריר",
+        maxLength: { value: 160, message: "השם ארוך מדי" },
+        onChange: (event) => {
+            if (!slugManuallyEdited) {
+                setValue(
+                    "linkSlug",
+                    transliterateAmbassadorName(event.target.value),
+                    { shouldValidate: true }
+                );
+            }
+        },
+    });
+    const linkSlugField = register("linkSlug", {
+        required: "יש להזין שם באנגלית ללינק",
+        maxLength: { value: 60, message: "השם בלינק ארוך מדי" },
+        pattern: {
+            value: slugPattern,
+            message: "אפשר להשתמש רק באנגלית, מספרים ומקפים",
+        },
+        onChange: () => {
+            setSlugManuallyEdited(true);
+        },
+    });
+
+    return (
+        <form
+            className={styles.renameForm}
+            onSubmit={handleSubmit(async (values) => {
+                await onSave(values);
+            })}
+            noValidate
+        >
+            <label className={styles.editField}>
+                <input {...nameField} autoFocus aria-invalid={Boolean(errors.name)} />
+                <span className={styles.fieldError} role="alert">
+                    {errors.name?.message || ""}
+                </span>
+            </label>
+            <label className={styles.editField}>
+                <input
+                    {...linkSlugField}
+                    placeholder="שם בלינק באנגלית"
+                    aria-label={`השם באנגלית בלינק של ${ambassador.name}`}
+                    aria-invalid={Boolean(errors.linkSlug)}
+                    dir="ltr"
+                />
+                <span className={styles.fieldError} role="alert">
+                    {errors.linkSlug?.message || ""}
+                </span>
+            </label>
+            <label className={styles.editField}>
+                <input
+                    {...register("goal", {
+                        required: "יש להזין יעד",
+                        valueAsNumber: true,
+                        min: { value: 1, message: "היעד חייב להיות גדול מאפס" },
+                        max: { value: 100_000_000, message: "היעד גבוה מדי" },
+                    })}
+                    aria-label={`היעד של ${ambassador.name}`}
+                    aria-invalid={Boolean(errors.goal)}
+                    type="number"
+                    step="1"
+                    placeholder="יעד"
+                />
+                <span className={styles.fieldError} role="alert">
+                    {errors.goal?.message || ""}
+                </span>
+            </label>
+            <label className={styles.editField}>
+                <input
+                    {...register("ownerLabel", {
+                        maxLength: { value: 160, message: "שם האחראי ארוך מדי" },
+                    })}
+                    maxLength={160}
+                    placeholder="אחראי/ת"
+                    aria-invalid={Boolean(errors.ownerLabel)}
+                />
+                <span className={styles.fieldError} role="alert">
+                    {errors.ownerLabel?.message || ""}
+                </span>
+            </label>
+            <label className={styles.editField}>
+                <textarea
+                    {...register("notes", {
+                        maxLength: { value: 800, message: "ההערה ארוכה מדי" },
+                    })}
+                    maxLength={800}
+                    rows={2}
+                    placeholder="הערה פנימית"
+                    aria-invalid={Boolean(errors.notes)}
+                />
+                <span className={styles.fieldError} role="alert">
+                    {errors.notes?.message || ""}
+                </span>
+            </label>
+            <button disabled={saving || isSubmitting}>שמירה</button>
+        </form>
+    );
 };
 
 const formatCurrency = (value: number) =>
@@ -49,6 +199,76 @@ const DaycareAmbassadorsAdmin = ({
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [createSlugManuallyEdited, setCreateSlugManuallyEdited] =
+        useState(false);
+
+    const getAvailableSlug = (value: string) => {
+        const baseSlug = normalizeAmbassadorSlug(value);
+        if (!baseSlug) return "";
+        const usedSlugs = new Set(
+            ambassadors.flatMap((ambassador) => [
+                ambassador.linkSlug ?? "",
+                ...(ambassador.linkAliases ?? []),
+            ])
+        );
+        for (let suffix = 1; suffix <= 999; suffix += 1) {
+            const suffixText = suffix === 1 ? "" : `-${suffix}`;
+            const candidate = `${baseSlug.slice(
+                0,
+                60 - suffixText.length
+            )}${suffixText}`;
+            if (!usedSlugs.has(candidate)) return candidate;
+        }
+        return baseSlug;
+    };
+
+    const {
+        register: registerCreate,
+        handleSubmit: handleCreateSubmit,
+        setValue: setCreateValue,
+        reset: resetCreate,
+        control: createControl,
+        formState: {
+            errors: createErrors,
+            isSubmitting: createSubmitting,
+        },
+    } = useForm<AmbassadorFormValues>({
+        mode: "onBlur",
+        defaultValues: {
+            name: "",
+            linkSlug: "",
+            goal: undefined,
+            ownerLabel: "",
+            notes: "",
+        },
+    });
+    const createLinkSlug =
+        useWatch({ control: createControl, name: "linkSlug" }) ?? "";
+    const availableCreateSlug = getAvailableSlug(createLinkSlug);
+    const createNameField = registerCreate("name", {
+        required: "יש להזין שם שגריר",
+        maxLength: { value: 160, message: "השם ארוך מדי" },
+        onChange: (event) => {
+            if (!createSlugManuallyEdited) {
+                setCreateValue(
+                    "linkSlug",
+                    transliterateAmbassadorName(event.target.value),
+                    { shouldValidate: true }
+                );
+            }
+        },
+    });
+    const createLinkSlugField = registerCreate("linkSlug", {
+        required: "יש להזין שם באנגלית ללינק",
+        maxLength: { value: 60, message: "השם בלינק ארוך מדי" },
+        pattern: {
+            value: slugPattern,
+            message: "אפשר להשתמש רק באנגלית, מספרים ומקפים",
+        },
+        onChange: () => {
+            setCreateSlugManuallyEdited(true);
+        },
+    });
 
     const runMutation = async (
         mutation: () => Promise<unknown>,
@@ -71,69 +291,57 @@ const DaycareAmbassadorsAdmin = ({
         }
     };
 
-    const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        const data = new FormData(form);
-        const name = String(data.get("name") ?? "").trim();
-        const linkSlug = String(data.get("linkSlug") ?? "").trim();
-        const goal = Number(data.get("goal"));
-        const ownerLabel = String(data.get("ownerLabel") ?? "").trim();
-        const notes = String(data.get("notes") ?? "").trim();
-        if (!name || !linkSlug || !Number.isFinite(goal) || goal <= 0) return;
+    const handleCreate = async (values: AmbassadorFormValues) => {
+        const linkSlug = getAvailableSlug(values.linkSlug);
         const created = await runMutation(
             () =>
                 createDaycareDonationAmbassador({
-                    name,
+                    name: values.name.trim(),
                     linkSlug,
-                    goal,
-                    ownerLabel: ownerLabel || undefined,
-                    notes: notes || undefined,
+                    goal: values.goal,
+                    ownerLabel: values.ownerLabel.trim() || undefined,
+                    notes: values.notes.trim() || undefined,
                 }),
             "השגריר נוסף והלינק האישי מוכן."
         );
         if (created) {
-            form.reset();
+            resetCreate();
+            setCreateSlugManuallyEdited(false);
             setAdding(false);
         }
     };
 
     const handleEdit = async (
-        event: React.FormEvent<HTMLFormElement>,
+        values: AmbassadorFormValues,
         ambassador: DaycareDonationAmbassador
     ) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        const name = String(
-            data.get("name") ?? ""
-        ).trim();
-        const linkSlug = String(data.get("linkSlug") ?? "").trim();
-        const goal = Number(data.get("goal"));
-        const ownerLabel = String(data.get("ownerLabel") ?? "").trim();
-        const notes = String(data.get("notes") ?? "").trim();
-        if (!name || !linkSlug || !Number.isFinite(goal) || goal <= 0) return;
+        const name = values.name.trim();
+        const linkSlug = normalizeAmbassadorSlug(values.linkSlug);
+        const ownerLabel = values.ownerLabel.trim();
+        const notes = values.notes.trim();
         if (
             name === ambassador.name &&
             linkSlug === (ambassador.linkSlug ?? "") &&
-            goal === ambassador.goal &&
+            values.goal === ambassador.goal &&
             ownerLabel === (ambassador.ownerLabel ?? "") &&
             notes === (ambassador.notes ?? "")
         ) {
             setEditingId(null);
-            return;
+            return true;
         }
         const updated = await runMutation(
             () =>
                 updateDaycareDonationAmbassador(ambassador._id, {
                     name,
                     linkSlug,
-                    goal,
+                    goal: values.goal,
                     ownerLabel,
                     notes,
                 }),
             "פרטי השגריר והיעד עודכנו."
         );
         if (updated) setEditingId(null);
+        return updated;
     };
 
     const copyLink = async (ambassador: DaycareDonationAmbassador) => {
@@ -145,6 +353,15 @@ const DaycareAmbassadorsAdmin = ({
             console.error("Failed to copy ambassador link:", copyError);
             setError("לא הצלחנו להעתיק אוטומטית. אפשר לסמן ולהעתיק את הלינק.");
         }
+    };
+
+    const shareOnWhatsApp = (ambassador: DaycareDonationAmbassador) => {
+        const text = `נשמח שתצטרפו לקמפיין התרומות למעון חב״ד יפו דרך ${ambassador.name}: ${getAmbassadorLink(ambassador)}`;
+        window.open(
+            `https://wa.me/?text=${encodeURIComponent(text)}`,
+            "_blank",
+            "noopener,noreferrer"
+        );
     };
 
     const handleDelete = async () => {
@@ -185,43 +402,110 @@ const DaycareAmbassadorsAdmin = ({
             )}
 
             {adding && (
-                <form className={styles.addForm} onSubmit={handleCreate}>
+                <form
+                    className={styles.addForm}
+                    onSubmit={handleCreateSubmit(handleCreate)}
+                    noValidate
+                >
                     <label>
                         שם השגריר
-                        <input name="name" type="text" maxLength={160} required autoFocus />
+                        <input
+                            {...createNameField}
+                            type="text"
+                            maxLength={160}
+                            autoFocus
+                            aria-invalid={Boolean(createErrors.name)}
+                        />
+                        <span className={styles.fieldError} role="alert">
+                            {createErrors.name?.message || ""}
+                        </span>
                     </label>
                     <label>
                         שם בלינק באנגלית
                         <input
-                            name="linkSlug"
+                            {...createLinkSlugField}
                             type="text"
                             maxLength={60}
-                            pattern="[A-Za-z0-9]+(?:[- ][A-Za-z0-9]+)*"
                             placeholder="moshe-cohen"
                             dir="ltr"
-                            required
+                            aria-invalid={Boolean(createErrors.linkSlug)}
                         />
+                        {availableCreateSlug && (
+                            <small className={styles.linkPreview} dir="ltr">
+                                {`${window.location.origin}/daycare-donations/${availableCreateSlug}`}
+                            </small>
+                        )}
+                        {createLinkSlug &&
+                            normalizeAmbassadorSlug(createLinkSlug) !==
+                                availableCreateSlug && (
+                                <small className={styles.slugSuggestion}>
+                                    השם תפוס; המערכת תשתמש ב־{availableCreateSlug}
+                                </small>
+                            )}
+                        <span className={styles.fieldError} role="alert">
+                            {createErrors.linkSlug?.message || ""}
+                        </span>
                     </label>
                     <label>
                         יעד כספי
                         <input
-                            name="goal"
+                            {...registerCreate("goal", {
+                                required: "יש להזין יעד",
+                                valueAsNumber: true,
+                                min: {
+                                    value: 1,
+                                    message: "היעד חייב להיות גדול מאפס",
+                                },
+                                max: {
+                                    value: 100_000_000,
+                                    message: "היעד גבוה מדי",
+                                },
+                            })}
                             type="number"
-                            min="1"
-                            max="100000000"
                             step="1"
-                            required
+                            aria-invalid={Boolean(createErrors.goal)}
                         />
+                        <span className={styles.fieldError} role="alert">
+                            {createErrors.goal?.message || ""}
+                        </span>
                     </label>
                     <label>
                         אחראי/ת פנימי/ת
-                        <input name="ownerLabel" type="text" maxLength={160} />
+                        <input
+                            {...registerCreate("ownerLabel", {
+                                maxLength: {
+                                    value: 160,
+                                    message: "שם האחראי ארוך מדי",
+                                },
+                            })}
+                            type="text"
+                            maxLength={160}
+                            aria-invalid={Boolean(createErrors.ownerLabel)}
+                        />
+                        <span className={styles.fieldError} role="alert">
+                            {createErrors.ownerLabel?.message || ""}
+                        </span>
                     </label>
                     <label className={styles.wideField}>
                         הערה פנימית
-                        <textarea name="notes" rows={2} maxLength={800} />
+                        <textarea
+                            {...registerCreate("notes", {
+                                maxLength: {
+                                    value: 800,
+                                    message: "ההערה ארוכה מדי",
+                                },
+                            })}
+                            rows={2}
+                            maxLength={800}
+                            aria-invalid={Boolean(createErrors.notes)}
+                        />
+                        <span className={styles.fieldError} role="alert">
+                            {createErrors.notes?.message || ""}
+                        </span>
                     </label>
-                    <button type="submit" disabled={saving}>יצירת לינק אישי</button>
+                    <button type="submit" disabled={saving || createSubmitting}>
+                        יצירת לינק אישי
+                    </button>
                 </form>
             )}
 
@@ -269,55 +553,13 @@ const DaycareAmbassadorsAdmin = ({
                                         >
                                             <td data-label="שם">
                                                 {editingId === ambassador._id ? (
-                                                    <form
-                                                        className={styles.renameForm}
-                                                        onSubmit={(event) =>
-                                                            void handleEdit(event, ambassador)
+                                                    <AmbassadorEditForm
+                                                        ambassador={ambassador}
+                                                        saving={saving}
+                                                        onSave={(values) =>
+                                                            handleEdit(values, ambassador)
                                                         }
-                                                    >
-                                                        <input
-                                                            name="name"
-                                                            defaultValue={ambassador.name}
-                                                            maxLength={160}
-                                                            required
-                                                            autoFocus
-                                                        />
-                                                        <input
-                                                            name="linkSlug"
-                                                            defaultValue={ambassador.linkSlug ?? ""}
-                                                            maxLength={60}
-                                                            pattern="[A-Za-z0-9]+(?:[- ][A-Za-z0-9]+)*"
-                                                            placeholder="שם בלינק באנגלית"
-                                                            aria-label={`השם באנגלית בלינק של ${ambassador.name}`}
-                                                            dir="ltr"
-                                                            required
-                                                        />
-                                                        <input
-                                                            aria-label={`היעד של ${ambassador.name}`}
-                                                            name="goal"
-                                                            type="number"
-                                                            min="1"
-                                                            max="100000000"
-                                                            step="1"
-                                                            defaultValue={ambassador.goal || ""}
-                                                            placeholder="יעד"
-                                                            required
-                                                        />
-                                                        <input
-                                                            name="ownerLabel"
-                                                            defaultValue={ambassador.ownerLabel ?? ""}
-                                                            maxLength={160}
-                                                            placeholder="אחראי/ת"
-                                                        />
-                                                        <textarea
-                                                            name="notes"
-                                                            defaultValue={ambassador.notes ?? ""}
-                                                            maxLength={800}
-                                                            rows={2}
-                                                            placeholder="הערה פנימית"
-                                                        />
-                                                        <button disabled={saving}>שמירה</button>
-                                                    </form>
+                                                    />
                                                 ) : (
                                                     <button
                                                         type="button"
@@ -417,6 +659,20 @@ const DaycareAmbassadorsAdmin = ({
                                                             size={19}
                                                         />
                                                         <span className={styles.actionText}>העתקה</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className={styles.whatsAppAction}
+                                                        aria-label={`שיתוף הלינק של ${ambassador.name} בוואטסאפ`}
+                                                        title="שיתוף בוואטסאפ"
+                                                        onClick={() => shareOnWhatsApp(ambassador)}
+                                                    >
+                                                        <MessageCircle
+                                                            aria-hidden="true"
+                                                            className={styles.actionIcon}
+                                                            size={19}
+                                                        />
+                                                        <span className={styles.actionText}>וואטסאפ</span>
                                                     </button>
                                                     <button
                                                         type="button"

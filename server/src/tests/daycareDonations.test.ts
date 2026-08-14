@@ -18,6 +18,11 @@ import {
     calculateDaycareDonationTotals,
     deriveDaycareDonationGoals,
 } from "../services/daycareDonationService";
+import {
+    createAvailableDaycareAmbassadorSlug,
+    findActiveDaycareDonationAmbassador,
+    normalizeDaycareAmbassadorSlug,
+} from "../services/daycareDonationAmbassadorService";
 
 test("daycare donation defaults preserve the approved 100,000 ILS budget", () => {
     const categoryGoal = defaultDaycareDonationCampaign.categories.reduce(
@@ -109,6 +114,15 @@ test("ambassador references are URL-safe, unique and deactivatable", async () =>
     });
     await assert.rejects(() => invalidLinkSlug.validate());
 
+    const invalidAlias = new DaycareDonationAmbassador({
+        name: "רבקה",
+        linkSlug: "rivka-cohen",
+        linkAliases: ["רבקה-כהן"],
+        refCode: "c1d2e3f4",
+        goal: 5_000,
+    });
+    await assert.rejects(() => invalidAlias.validate());
+
     const index = DaycareDonationAmbassador.schema
         .indexes()
         .find(([fields]) => fields.refCode === 1);
@@ -121,6 +135,58 @@ test("ambassador references are URL-safe, unique and deactivatable", async () =>
     assert.ok(linkSlugIndex);
     assert.equal(linkSlugIndex[1].unique, true);
     assert.equal(linkSlugIndex[1].sparse, true);
+});
+
+test("ambassador lookup accepts current, previous and legacy links", (t) => {
+    const originalFindOne = DaycareDonationAmbassador.findOne;
+    let capturedQuery: Record<string, unknown> | undefined;
+    t.after(() => {
+        DaycareDonationAmbassador.findOne = originalFindOne;
+    });
+    DaycareDonationAmbassador.findOne = ((query: Record<string, unknown>) => {
+        capturedQuery = query;
+        return { select: () => null };
+    }) as unknown as typeof DaycareDonationAmbassador.findOne;
+
+    findActiveDaycareDonationAmbassador("old-moshe-link");
+    assert.equal(capturedQuery?.active, true);
+    assert.deepEqual(capturedQuery?.$or, [
+        { linkSlug: "old-moshe-link" },
+        { linkAliases: "old-moshe-link" },
+    ]);
+
+    findActiveDaycareDonationAmbassador("moshe-a1b2c3d4");
+    assert.deepEqual(capturedQuery?.$or, [
+        { linkSlug: "moshe-a1b2c3d4" },
+        { linkAliases: "moshe-a1b2c3d4" },
+        { refCode: "a1b2c3d4" },
+    ]);
+});
+
+test("ambassador link names normalize and receive an available suffix", async (t) => {
+    assert.equal(
+        normalizeDaycareAmbassadorSlug(" Moshe  Cohen! "),
+        "moshe-cohen"
+    );
+    assert.equal(normalizeDaycareAmbassadorSlug("משה כהן"), "");
+
+    const originalExists = DaycareDonationAmbassador.exists;
+    t.after(() => {
+        DaycareDonationAmbassador.exists = originalExists;
+    });
+    DaycareDonationAmbassador.exists = ((query: {
+        $or?: Array<{ linkSlug?: string }>;
+    }) => {
+        const candidate = query.$or?.[0]?.linkSlug;
+        return Promise.resolve(
+            candidate === "moshe-cohen" ? { _id: "used" } : null
+        );
+    }) as typeof DaycareDonationAmbassador.exists;
+
+    assert.equal(
+        await createAvailableDaycareAmbassadorSlug("moshe-cohen"),
+        "moshe-cohen-2"
+    );
 });
 
 test("donation leads track pledges separately from confirmed donations", async () => {

@@ -38,7 +38,7 @@ const slides: HeroSlide[] = [
         actions: [
             { label: "סעודות שבת", to: "/shabbat", variant: "primary" },
             {
-                label: "לקחת חלק בפעילות",
+                label: "תרומה לפעילות",
                 to: "/donate#donate-form",
                 variant: "secondary",
             },
@@ -82,10 +82,10 @@ const Hero = () => {
                     reduceMotion
                         ? false
                         : {
-                              delay: 1500,
-                              disableOnInteraction: false,
-                              pauseOnMouseEnter: true,
-                          }
+                            delay: 1500,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        }
                 }
                 onSwiper={(swiper) => {
                     swiperRef.current = swiper;
@@ -107,11 +107,10 @@ const Hero = () => {
 
                         <Container className={styles.inner}>
                             <div
-                                className={`${styles.card} ${
-                                    slide.contentPosition === "right"
+                                className={`${styles.card} ${slide.contentPosition === "right"
                                         ? styles.cardRight
                                         : ""
-                                }`}
+                                    }`}
                             >
                                 {slide.eyebrow && (
                                     <span className={styles.eyebrow}>{slide.eyebrow}</span>
@@ -163,9 +162,8 @@ const Hero = () => {
                         <button
                             key={slide.id}
                             type="button"
-                            className={`${styles.dot} ${
-                                activeSlide === index ? styles.dotActive : ""
-                            }`}
+                            className={`${styles.dot} ${activeSlide === index ? styles.dotActive : ""
+                                }`}
                             onClick={() => swiperRef.current?.slideToLoop(index)}
                             aria-label={`מעבר לתוכן ${index + 1} מתוך ${slides.length}`}
                             aria-current={activeSlide === index ? "true" : undefined}

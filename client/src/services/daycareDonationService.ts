@@ -42,10 +42,25 @@ export type DaycareDonationIntentResponse = {
     expiresAt: string;
 };
 
+export type DaycareDonationAmbassadorReference = {
+    name: string;
+    refCode: string;
+    linkSlug?: string;
+};
+
 export const getDaycareDonationCampaign = async () => {
     const response = await http.get<ApiResponse<DaycareDonationCampaignData>>(
         "/daycare-donations/campaign"
     );
+    return response.data.data;
+};
+
+export const getDaycareDonationAmbassadorReference = async (
+    identifier: string
+) => {
+    const response = await http.get<
+        ApiResponse<DaycareDonationAmbassadorReference>
+    >(`/daycare-donations/ambassadors/${encodeURIComponent(identifier)}`);
     return response.data.data;
 };
 

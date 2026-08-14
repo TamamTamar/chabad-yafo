@@ -81,8 +81,8 @@ const Shabbat = () => {
                         <button
                             className={styles.secondary}
                             onClick={() => {
-                reset(initialForm);
-                setSubmitted(false);
+                                reset(initialForm);
+                                setSubmitted(false);
                             }}
                         >
                             רישום נוסף
@@ -186,7 +186,7 @@ const Shabbat = () => {
                             {isSubmitting ? "שולחים..." : "שליחת רישום"}
                         </button>
                         <a href="https://www.matara.pro/nedarimplus/online/?S=aVIw" className={styles.secondary}>
-                            לקחת חלק בפעילות
+                            תרומה לפעילות
                         </a>
                     </div>
 

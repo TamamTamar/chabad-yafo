@@ -20,6 +20,20 @@ const daycareDonationAmbassadorSchema =
                 sparse: true,
                 index: true,
             },
+            linkAliases: {
+                type: [String],
+                default: undefined,
+                lowercase: true,
+                trim: true,
+                validate: {
+                    validator: (aliases: string[] | undefined) =>
+                        !aliases ||
+                        aliases.every((alias) =>
+                            /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(alias)
+                        ),
+                    message: "Ambassador link aliases must be URL-safe",
+                },
+            },
             refCode: {
                 type: String,
                 required: true,
