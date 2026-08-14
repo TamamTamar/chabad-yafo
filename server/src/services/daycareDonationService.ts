@@ -14,6 +14,24 @@ type ConfirmedDonationAmount = {
 type GoalCategory = { id: string; goal: number };
 type GoalItem = { categoryId: string; goal: number };
 
+type PublicDonationSource = {
+    _id: unknown;
+    amount: number;
+    donorName?: string | null;
+    displayDonorName?: boolean | null;
+    receivedAt: Date;
+};
+
+export const toPublicDaycareDonation = (record: PublicDonationSource) => ({
+    id: String(record._id),
+    donorName:
+        record.displayDonorName !== false && record.donorName
+            ? record.donorName
+            : "תרומה אנונימית",
+    amount: record.amount,
+    receivedAt: record.receivedAt,
+});
+
 export const deriveDaycareDonationGoals = (
     categories: GoalCategory[],
     items: GoalItem[]
@@ -97,7 +115,14 @@ export const getDaycareDonationCampaignSnapshot = async () => {
         campaignSlug: campaign.slug,
         status: "confirmed",
     })
-        .select({ amount: 1, itemId: 1 })
+        .select({
+            amount: 1,
+            itemId: 1,
+            donorName: 1,
+            displayDonorName: 1,
+            receivedAt: 1,
+        })
+        .sort({ receivedAt: -1 })
         .lean();
 
     const { raised, generalRaised, raisedByItem } =
@@ -180,6 +205,8 @@ export const getDaycareDonationCampaignSnapshot = async () => {
         remaining: Math.max(0, derivedGoals.campaignGoal - raised),
         overflow: Math.max(0, raised - derivedGoals.campaignGoal),
         generalRaised,
+        donationCount: records.length,
+        recentDonations: records.slice(0, 60).map(toPublicDaycareDonation),
         categories,
         items,
         updatedAt: campaign.updatedAt,

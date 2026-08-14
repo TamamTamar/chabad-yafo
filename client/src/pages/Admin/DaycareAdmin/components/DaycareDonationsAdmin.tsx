@@ -79,6 +79,7 @@ type PendingRecordUpdate = {
     updates: {
         itemId?: string;
         status?: DaycareDonationRecord["status"];
+        displayDonorName?: boolean;
     };
     title: string;
     message: string;
@@ -288,6 +289,7 @@ const DaycareDonationsAdmin = () => {
         updates: {
             itemId?: string;
             status?: DaycareDonationRecord["status"];
+            displayDonorName?: boolean;
         },
         reason: string
     ) => {
@@ -965,9 +967,11 @@ const DaycareDonationsAdmin = () => {
                             )}
                         </select>
                     </label>
-                    <span>
-                        מוצגות {filteredRecords.length} מתוך {records.length}
-                    </span>
+                    {filteredRecords.length !== records.length && (
+                        <span>
+                            מוצגות {filteredRecords.length} מתוך {records.length}
+                        </span>
+                    )}
                 </div>
                 {records.length === 0 ? (
                     <p className={styles.emptyState}>
@@ -987,6 +991,7 @@ const DaycareDonationsAdmin = () => {
                                     <th>מקור</th>
                                     <th>סכום</th>
                                     <th>שגריר</th>
+                                    <th>פרסום</th>
                                     <th>שיוך</th>
                                     <th>מצב</th>
                                 </tr>
@@ -1020,6 +1025,42 @@ const DaycareDonationsAdmin = () => {
                                         </td>
                                         <td data-label="שגריר">
                                             {record.ambassadorId?.name ?? "ישיר"}
+                                        </td>
+                                        <td data-label="פרסום">
+                                            <button
+                                                type="button"
+                                                className={`${styles.publicationToggle} ${
+                                                    record.displayDonorName !== false
+                                                        ? styles.publicationToggleActive
+                                                        : ""
+                                                }`}
+                                                disabled={saving || !record.donorName}
+                                                aria-pressed={record.displayDonorName !== false}
+                                                title={
+                                                    record.donorName
+                                                        ? "שינוי הרשאה להצגת שם התורם באתר"
+                                                        : "אי אפשר לפרסם תרומה ללא שם"
+                                                }
+                                                onClick={() => {
+                                                    const displayDonorName =
+                                                        record.displayDonorName === false;
+                                                    setPendingRecordUpdate({
+                                                        recordId: record._id,
+                                                        updates: { displayDonorName },
+                                                        title: displayDonorName
+                                                            ? "אישור הצגת שם באתר"
+                                                            : "הסרת שם מהאתר",
+                                                        message: displayDonorName
+                                                            ? `יש לוודא שהתקבל אישור מ${record.donorName} להצגת השם והסכום בעמוד הקמפיין. כתבו בשדה הסיבה כיצד התקבל האישור.`
+                                                            : `השם של ${record.donorName} יוסר מעמוד הקמפיין והתרומה תוצג כאנונימית.`,
+                                                    });
+                                                }}
+                                            >
+                                                <span aria-hidden="true" />
+                                                {record.displayDonorName !== false
+                                                    ? "מוצג באתר"
+                                                    : "פרטי"}
+                                            </button>
                                         </td>
                                         <td data-label="שיוך">
                                             <select

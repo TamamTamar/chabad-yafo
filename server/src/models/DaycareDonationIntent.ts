@@ -34,6 +34,7 @@ const daycareDonationIntentSchema =
             amount: { type: Number, required: true, min: 1 },
             itemId: { type: String, trim: true, index: true },
             donorName: { type: String, required: true, trim: true },
+            displayDonorName: { type: Boolean, default: true },
             phone: { type: String, required: true, trim: true },
             email: {
                 type: String,

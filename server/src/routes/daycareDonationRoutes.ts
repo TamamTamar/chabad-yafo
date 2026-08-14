@@ -142,6 +142,7 @@ router.post("/intents", async (req, res) => {
         const amount = Number(req.body.amount);
         const itemId = cleanText(req.body.itemId, 80) || undefined;
         const donorName = cleanText(req.body.donorName, 160);
+        const displayDonorName = req.body.displayDonorName !== false;
         const phone = cleanText(req.body.phone, 40);
         const email = cleanText(req.body.email, 180).toLowerCase();
         const dedication = cleanText(req.body.dedication, 600) || undefined;
@@ -194,6 +195,7 @@ router.post("/intents", async (req, res) => {
             amount,
             itemId,
             donorName,
+            displayDonorName,
             phone,
             email,
             dedication,
@@ -382,6 +384,7 @@ router.post(
                         amount: callbackAmount,
                         itemId: intent.itemId,
                         donorName: intent.donorName,
+                        displayDonorName: intent.displayDonorName,
                         phone: intent.phone,
                         email: intent.email,
                         dedication: intent.dedication,
