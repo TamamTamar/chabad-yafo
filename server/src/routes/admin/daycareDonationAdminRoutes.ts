@@ -1096,6 +1096,29 @@ router.patch("/records/:id", async (req, res) => {
             updates.itemId = itemId || null;
         }
 
+        if (req.body.ambassadorId !== undefined) {
+            const ambassadorId = cleanText(req.body.ambassadorId, 80);
+            if (ambassadorId) {
+                if (
+                    !mongoose.isValidObjectId(ambassadorId) ||
+                    !(await DaycareDonationAmbassador.exists({
+                        _id: ambassadorId,
+                        active: true,
+                    }))
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Donation ambassador was not found or is inactive",
+                    });
+                }
+                updates.ambassadorId = new mongoose.Types.ObjectId(
+                    ambassadorId
+                );
+            } else {
+                updates.ambassadorId = null;
+            }
+        }
+
         if (req.body.status !== undefined) {
             if (!isRecordStatus(req.body.status)) {
                 return res.status(400).json({
@@ -1125,6 +1148,10 @@ router.patch("/records/:id", async (req, res) => {
         const itemChanged =
             Object.prototype.hasOwnProperty.call(updates, "itemId") &&
             (updates.itemId ?? null) !== (previous.itemId ?? null);
+        const ambassadorChanged =
+            Object.prototype.hasOwnProperty.call(updates, "ambassadorId") &&
+            String(updates.ambassadorId ?? "") !==
+                String(previous.ambassadorId ?? "");
         const statusChanged =
             Object.prototype.hasOwnProperty.call(updates, "status") &&
             updates.status !== previous.status;
@@ -1132,7 +1159,13 @@ router.patch("/records/:id", async (req, res) => {
             Object.prototype.hasOwnProperty.call(updates, "displayDonorName") &&
             updates.displayDonorName !== (previous.displayDonorName !== false);
 
-        if ((itemChanged || statusChanged || displayDonorNameChanged) && !reason) {
+        if (
+            (itemChanged ||
+                ambassadorChanged ||
+                statusChanged ||
+                displayDonorNameChanged) &&
+            !reason
+        ) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -1140,7 +1173,12 @@ router.patch("/records/:id", async (req, res) => {
             });
         }
 
-        if (!itemChanged && !statusChanged && !displayDonorNameChanged) {
+        if (
+            !itemChanged &&
+            !ambassadorChanged &&
+            !statusChanged &&
+            !displayDonorNameChanged
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "No donation record change was requested",
@@ -1171,11 +1209,13 @@ router.patch("/records/:id", async (req, res) => {
             reason,
             before: {
                 itemId: previous.itemId ?? null,
+                ambassadorId: previous.ambassadorId ?? null,
                 status: previous.status,
                 displayDonorName: previous.displayDonorName !== false,
             },
             after: {
                 itemId: record.itemId ?? null,
+                ambassadorId: record.ambassadorId ?? null,
                 status: record.status,
                 displayDonorName: Boolean(record.displayDonorName),
             },

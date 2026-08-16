@@ -221,6 +221,7 @@ export const updateDaycareDonationRecord = async (
     id: string,
     updates: {
         itemId?: string;
+        ambassadorId?: string;
         status?: DaycareDonationRecord["status"];
         displayDonorName?: boolean;
         reason: string;

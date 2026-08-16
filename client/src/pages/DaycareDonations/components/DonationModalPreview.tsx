@@ -2,6 +2,8 @@ import {
     ArrowLeft,
     ArrowRight,
     Check,
+    Eye,
+    EyeOff,
     Heart,
     LockKeyhole,
     X,
@@ -464,6 +466,48 @@ const DonationModalPreview = ({
                                         autoComplete="tel"
                                     />
                                 </label>
+                                {!diagnosticMode && (
+                                    <label
+                                        className={`${styles.publicNameChoice} ${
+                                            displayDonorName
+                                                ? styles.publicNameChoiceActive
+                                                : ""
+                                        }`}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={displayDonorName}
+                                            onChange={(event) =>
+                                                setDisplayDonorName(event.target.checked)
+                                            }
+                                        />
+                                        <span className={styles.publicNameChoiceIcon}>
+                                            {displayDonorName ? (
+                                                <Eye aria-hidden="true" />
+                                            ) : (
+                                                <EyeOff aria-hidden="true" />
+                                            )}
+                                        </span>
+                                        <span className={styles.publicNameChoiceCopy}>
+                                            <small className={styles.publicNameChoiceEyebrow}>
+                                                פרסום בעמוד הקמפיין
+                                            </small>
+                                            <strong>
+                                                {displayDonorName
+                                                    ? "השם, הסכום וההקדשה יוצגו"
+                                                    : "התרומה תוצג בעילום שם"}
+                                            </strong>
+                                            <small>
+                                                {displayDonorName
+                                                    ? "כבו את המתג לתרומה אנונימית. טלפון ודוא״ל לא יוצגו."
+                                                    : "הדליקו את המתג כדי להופיע ברשימת השותפים."}
+                                            </small>
+                                        </span>
+                                        <span className={styles.publicNameSwitch} aria-hidden="true">
+                                            <i />
+                                        </span>
+                                    </label>
+                                )}
                                 <label className={styles.fullField}>
                                     דוא״ל לקבלה
                                     <input
@@ -484,21 +528,6 @@ const DonationModalPreview = ({
                                         placeholder="אפשר להקדיש את התרומה..."
                                     />
                                 </label>
-                                {!diagnosticMode && (
-                                    <label className={styles.publicNameChoice}>
-                                        <input
-                                            type="checkbox"
-                                            checked={displayDonorName}
-                                            onChange={(event) =>
-                                                setDisplayDonorName(event.target.checked)
-                                            }
-                                        />
-                                        <span>
-                                            <strong>אפשר להציג את שמי בעמוד הקמפיין</strong>
-                                            <small>השם, הסכום וההקדשה יוצגו בעמוד. טלפון ודוא״ל לעולם לא יוצגו.</small>
-                                        </span>
-                                    </label>
-                                )}
                             </div>
                             {formError && (
                                 <p className={styles.paymentError} role="alert">

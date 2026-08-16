@@ -1887,29 +1887,112 @@
 }
 
 .donorFields .publicNameChoice {
+    position: relative;
     grid-column: 1 / -1;
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    align-items: center;
     gap: 10px;
-    padding: 12px 14px;
-    border: 1px solid rgba($brand-gold-rich, 0.22);
-    border-radius: 13px;
-    background: rgba($brand-gold-light, 0.11);
+    padding: 9px 12px;
+    border: 1px solid rgba($brand-primary-deep, 0.1);
+    border-radius: 14px;
+    background: rgba($color-white, 0.72);
     cursor: pointer;
+    transition:
+        border-color 160ms ease,
+        background 160ms ease,
+        box-shadow 160ms ease;
 }
 
 .donorFields .publicNameChoice input {
-    width: 18px;
-    min-width: 18px;
-    height: 18px;
-    min-height: 0;
-    margin-top: 2px;
-    accent-color: var(--campaign-navy);
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
-.publicNameChoice span { display: grid; gap: 3px; }
-.publicNameChoice strong { font-size: 0.86rem; }
-.publicNameChoice small { color: rgba(20, 40, 59, 0.6); font-size: 0.73rem; font-weight: 600; line-height: 1.45; }
+.publicNameChoiceActive {
+    border-color: rgba($brand-gold-rich, 0.24);
+    background: rgba($brand-gold-light, 0.055);
+}
+
+.publicNameChoice:focus-within {
+    outline: 3px solid rgba($brand-gold-rich, 0.2);
+    outline-offset: 2px;
+}
+
+.publicNameChoiceIcon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: rgba($brand-primary-deep, 0.065);
+    color: var(--campaign-navy-soft);
+}
+
+.publicNameChoiceIcon svg { width: 18px; height: 18px; }
+
+.publicNameChoiceCopy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.publicNameChoiceCopy strong {
+    color: var(--campaign-navy);
+    font-size: 0.83rem;
+    font-weight: 800;
+}
+
+.publicNameChoiceCopy > small:last-child {
+    overflow: hidden;
+    color: rgba(20, 40, 59, 0.62);
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.publicNameChoiceEyebrow {
+    color: rgba(157, 111, 35, 0.78);
+    font-size: 0.62rem;
+    font-weight: 900;
+}
+
+.publicNameSwitch {
+    position: relative;
+    display: block;
+    width: 43px;
+    height: 24px;
+    border-radius: 999px;
+    background: rgba($brand-primary-deep, 0.2);
+    box-shadow: inset 0 1px 3px rgba($brand-primary-deep, 0.16);
+    transition: background 160ms ease;
+}
+
+.publicNameSwitch i {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: $color-white;
+    box-shadow: 0 2px 6px rgba($brand-primary-deep, 0.24);
+    transition: transform 160ms ease;
+}
+
+.publicNameChoiceActive .publicNameSwitch {
+    background: var(--campaign-gold);
+}
+
+.publicNameChoiceActive .publicNameSwitch i {
+    transform: translateX(-19px);
+}
 
 .stepSummary {
     display: grid;

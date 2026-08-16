@@ -22,6 +22,7 @@ import type {
     DaycareDonationDiagnostics,
     DaycareDonationLead,
     DaycareDonationRecord,
+    DonationItem,
 } from "../../../DaycareDonations/types";
 import DonationModalPreview from "../../../DaycareDonations/components/DonationModalPreview";
 import DaycareAmbassadorsAdmin from "./DaycareAmbassadorsAdmin";
@@ -39,6 +40,19 @@ const formatDate = (value: string) =>
         hour: "2-digit",
         minute: "2-digit",
     }).format(new Date(value));
+
+const getItemRemaining = (item: DonationItem) =>
+    Math.max(0, item.remaining ?? item.goal - item.raised);
+
+const sortItemsByNeed = (items: DonationItem[]) =>
+    [...items].sort((first, second) => {
+        const needDifference =
+            getItemRemaining(second) - getItemRemaining(first);
+
+        if (needDifference !== 0) return needDifference;
+
+        return (first.openingPriority ?? 0) - (second.openingPriority ?? 0);
+    });
 
 const statusLabels: Record<DaycareDonationRecord["status"], string> = {
     confirmed: "מאושרת",
@@ -78,6 +92,7 @@ type PendingRecordUpdate = {
     recordId: string;
     updates: {
         itemId?: string;
+        ambassadorId?: string;
         status?: DaycareDonationRecord["status"];
         displayDonorName?: boolean;
     };
@@ -288,6 +303,7 @@ const DaycareDonationsAdmin = () => {
         recordId: string,
         updates: {
             itemId?: string;
+            ambassadorId?: string;
             status?: DaycareDonationRecord["status"];
             displayDonorName?: boolean;
         },
@@ -739,9 +755,11 @@ const DaycareDonationsAdmin = () => {
                             <option value="">
                                 למקום שבו התרומה נדרשת ביותר
                             </option>
-                            {campaign.items.map((item) => (
+                            {sortItemsByNeed(campaign.items).map((item) => (
                                 <option key={item.id} value={item.id}>
-                                    {item.title}
+                                    {item.title} — {getItemRemaining(item) > 0
+                                        ? `חסרים ₪${formatCurrency(getItemRemaining(item))}`
+                                        : "היעד הושלם"}
                                 </option>
                             ))}
                         </select>
@@ -929,8 +947,8 @@ const DaycareDonationsAdmin = () => {
                 <header>
                     <h2>רשומות תרומה</h2>
                     <p>
-                        אפשר לשייך תרומה כללית לסעיף או לסמן ביטול/החזר
-                        מבלי למחוק את הרשומה.
+                        אפשר לשייך תרומה כללית לסעיף או לשגריר, ולסמן
+                        ביטול/החזר מבלי למחוק את הרשומה.
                     </p>
                 </header>
                 <div className={styles.recordFilters}>
@@ -1040,7 +1058,52 @@ const DaycareDonationsAdmin = () => {
                                             </div>
                                         </td>
                                         <td data-label="שגריר">
-                                            {record.ambassadorId?.name ?? "ישיר"}
+                                            <select
+                                                aria-label={`שגריר לתרומה של ${record.donorName || "תורם"}`}
+                                                value={record.ambassadorId?._id ?? ""}
+                                                disabled={saving}
+                                                onChange={(event) => {
+                                                    const ambassadorId =
+                                                        event.target.value;
+                                                    const ambassadorName =
+                                                        ambassadors.find(
+                                                            (ambassador) =>
+                                                                ambassador._id ===
+                                                                ambassadorId
+                                                        )?.name ??
+                                                        "ללא שגריר";
+                                                    setPendingRecordUpdate({
+                                                        recordId: record._id,
+                                                        updates: {
+                                                            ambassadorId,
+                                                        },
+                                                        title: "שינוי שגריר לתרומה",
+                                                        message: ambassadorId
+                                                            ? `התרומה של ${record.donorName || "תורם ללא שם"} תשויך לשגריר/ה ${ambassadorName}.`
+                                                            : `השיוך של התרומה של ${record.donorName || "תורם ללא שם"} לשגריר יוסר והיא תיחשב כתרומה כללית.`,
+                                                    });
+                                                }}
+                                            >
+                                                <option value="">
+                                                    ללא שגריר — תרומה כללית
+                                                </option>
+                                                {ambassadors.map((ambassador) => (
+                                                    <option
+                                                        key={ambassador._id}
+                                                        value={ambassador._id}
+                                                        disabled={
+                                                            !ambassador.active &&
+                                                            record.ambassadorId?._id !==
+                                                                ambassador._id
+                                                        }
+                                                    >
+                                                        {ambassador.name}
+                                                        {!ambassador.active
+                                                            ? " — לא פעיל"
+                                                            : ""}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </td>
                                         <td data-label="פרסום">
                                             <button
@@ -1095,12 +1158,14 @@ const DaycareDonationsAdmin = () => {
                                                 <option value="">
                                                     תרומה כללית
                                                 </option>
-                                                {campaign.items.map((item) => (
+                                                {sortItemsByNeed(campaign.items).map((item) => (
                                                     <option
                                                         key={item.id}
                                                         value={item.id}
                                                     >
-                                                        {item.title}
+                                                        {item.title} — {getItemRemaining(item) > 0
+                                                            ? `חסרים ₪${formatCurrency(getItemRemaining(item))}`
+                                                            : "היעד הושלם"}
                                                     </option>
                                                 ))}
                                             </select>
