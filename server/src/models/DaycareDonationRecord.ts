@@ -23,6 +23,11 @@ const daycareDonationRecordSchema =
                 index: true,
             },
             amount: { type: Number, required: true, min: 0.01 },
+            paymentType: {
+                type: String,
+                enum: ["HK", "Ragil"],
+            },
+            installments: { type: Number, min: 1, max: 12 },
             itemId: { type: String, trim: true, index: true },
             donorName: { type: String, trim: true },
             displayDonorName: { type: Boolean, default: true },

@@ -200,11 +200,6 @@ const DaycareDonations = () => {
                         סכומי תרומות.
                     </p>
                 )}
-                {ambassadorLinkInvalid && (
-                    <p className={styles.campaignDataNotice} role="status">
-                        הקישור האישי אינו פעיל. אפשר עדיין לתרום ישירות לקמפיין.
-                    </p>
-                )}
                 {ambassadorLinkChecking && (
                     <p className={styles.campaignDataNotice} role="status">
                         בודקים את הקישור האישי…
@@ -214,6 +209,11 @@ const DaycareDonations = () => {
                     donationCount={campaign.donationCount ?? 0}
                     donations={campaign.recentDonations ?? []}
                 />
+                {ambassadorLinkInvalid && (
+                    <p className={styles.ambassadorStatus} role="status">
+                        הקישור האישי לא זוהה; אפשר להמשיך בתרומה רגילה.
+                    </p>
+                )}
                 <CampaignStory
                     onDonate={openDonation}
                     generalRaised={campaign.generalRaised}

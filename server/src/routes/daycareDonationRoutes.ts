@@ -140,6 +140,11 @@ router.post("/intents", async (req, res) => {
         const campaign = await ensureDefaultDaycareDonationCampaign();
         const campaignSnapshot = await getDaycareDonationCampaignSnapshot();
         const amount = Number(req.body.amount);
+        const paymentType =
+            String(req.body.paymentType ?? "Ragil") === "HK"
+                ? "HK"
+                : "Ragil";
+        const installments = Number(req.body.installments ?? 1);
         const itemId = cleanText(req.body.itemId, 80) || undefined;
         const donorName = cleanText(req.body.donorName, 160);
         const displayDonorName = req.body.displayDonorName !== false;
@@ -156,6 +161,27 @@ router.post("/intents", async (req, res) => {
         }
 
         if (!Number.isFinite(amount) || amount < 1 || amount > 1_000_000) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid donation amount",
+            });
+        }
+
+        if (
+            !Number.isInteger(installments) ||
+            installments < 1 ||
+            installments > 12 ||
+            (paymentType === "HK" && installments !== 12)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid donation payment plan",
+            });
+        }
+
+        const campaignAmount =
+            paymentType === "HK" ? amount * installments : amount;
+        if (campaignAmount > 1_000_000) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid donation amount",
@@ -193,6 +219,8 @@ router.post("/intents", async (req, res) => {
             mode: "live",
             status: "created",
             amount,
+            paymentType,
+            installments,
             itemId,
             donorName,
             displayDonorName,
@@ -213,6 +241,9 @@ router.post("/intents", async (req, res) => {
             actor: "system",
             after: {
                 amount,
+                campaignAmount,
+                paymentType,
+                installments,
                 itemId: itemId ?? null,
                 status: intent.status,
             },
@@ -349,6 +380,13 @@ router.post(
                 return res.status(409).send("TRANSACTION_ID_MISSING");
             }
 
+            const paymentType = intent.paymentType ?? "Ragil";
+            const installments = intent.installments ?? 1;
+            const campaignAmount =
+                paymentType === "HK"
+                    ? callbackAmount * installments
+                    : callbackAmount;
+
             if (intent.mode === "diagnostic") {
                 intent.status = "confirmed";
                 intent.externalTransactionId = externalTransactionId;
@@ -365,7 +403,10 @@ router.post(
                     before: { status: previousIntentStatus },
                     after: {
                         status: "confirmed",
-                        amount: callbackAmount,
+                        amount: campaignAmount,
+                        providerAmount: callbackAmount,
+                        paymentType,
+                        installments,
                         externalTransactionId,
                         itemId: intent.itemId ?? null,
                         countedInCampaign: false,
@@ -381,7 +422,9 @@ router.post(
                         campaignSlug: intent.campaignSlug,
                         source: "nedarim",
                         status: "confirmed",
-                        amount: callbackAmount,
+                        amount: campaignAmount,
+                        paymentType,
+                        installments,
                         itemId: intent.itemId,
                         donorName: intent.donorName,
                         displayDonorName: intent.displayDonorName,
@@ -435,7 +478,10 @@ router.post(
                     after: {
                         intentId: publicId,
                         externalTransactionId,
-                        amount: callbackAmount,
+                        amount: campaignAmount,
+                        providerAmount: callbackAmount,
+                        paymentType,
+                        installments,
                         itemId: intent.itemId ?? null,
                     },
                 });

@@ -59,6 +59,7 @@ export type PublicDaycareDonation = {
     id: string;
     donorName: string;
     amount: number;
+    dedication?: string;
     receivedAt: string;
 };
 
@@ -68,6 +69,8 @@ export type DaycareDonationRecord = {
     source: "manual" | "nedarim";
     status: "confirmed" | "refunded" | "cancelled";
     amount: number;
+    paymentType?: "HK" | "Ragil";
+    installments?: number;
     itemId?: string;
     donorName?: string;
     displayDonorName?: boolean;

@@ -1,4 +1,4 @@
-import { Heart, UsersRound, X } from "lucide-react";
+import { ArrowLeft, Heart, UsersRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { PublicDaycareDonation } from "../types";
 import styles from "../DaycareDonations.module.scss";
@@ -34,15 +34,24 @@ const RecentDonors = ({ donationCount, donations }: RecentDonorsProps) => {
                 </div>
             </div>
             <div className={styles.donorsPreview}>
-                {donations.slice(0, 4).map((donation) => (
-                    <span key={donation.id}>
-                        {donation.donorName}
+                {donations.slice(0, 12).map((donation) => (
+                    <article key={donation.id}>
+                        <span className={styles.donorAvatar} aria-hidden="true">
+                            {donation.donorName.slice(0, 1)}
+                        </span>
+                        <span className={styles.donorPreviewCopy}>
+                            <strong dir="auto">{donation.donorName}</strong>
+                            {donation.dedication && (
+                                <small dir="auto">{donation.dedication}</small>
+                            )}
+                        </span>
                         <b>₪{formatCurrency(donation.amount)}</b>
-                    </span>
+                    </article>
                 ))}
             </div>
             <button type="button" onClick={() => setOpen(true)}>
                 לכל השותפים
+                <ArrowLeft aria-hidden="true" />
             </button>
 
             <dialog
@@ -72,7 +81,12 @@ const RecentDonors = ({ donationCount, donations }: RecentDonorsProps) => {
                         {donations.map((donation) => (
                             <div key={donation.id}>
                                 <span>{donation.donorName.slice(0, 1)}</span>
-                                <strong>{donation.donorName}</strong>
+                                <div>
+                                    <strong dir="auto">{donation.donorName}</strong>
+                                    {donation.dedication && (
+                                        <small dir="auto">{donation.dedication}</small>
+                                    )}
+                                </div>
                                 <b>₪{formatCurrency(donation.amount)}</b>
                             </div>
                         ))}

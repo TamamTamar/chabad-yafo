@@ -28,6 +28,7 @@ export type DaycareDonationIntentStatus =
     | "failed"
     | "expired";
 export type DaycareDonationIntentMode = "live" | "diagnostic";
+export type DaycareDonationPaymentType = "HK" | "Ragil";
 
 export type DaycareDonationAmbassadorDocument = {
     name: string;
@@ -104,6 +105,8 @@ export type DaycareDonationRecordDocument = {
     source: DaycareDonationSource;
     status: DaycareDonationRecordStatus;
     amount: number;
+    paymentType?: DaycareDonationPaymentType;
+    installments?: number;
     itemId?: string;
     donorName?: string;
     displayDonorName?: boolean;
@@ -129,6 +132,8 @@ export type DaycareDonationIntentDocument = {
     mode: DaycareDonationIntentMode;
     status: DaycareDonationIntentStatus;
     amount: number;
+    paymentType: DaycareDonationPaymentType;
+    installments: number;
     itemId?: string;
     donorName: string;
     displayDonorName?: boolean;

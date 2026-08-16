@@ -26,6 +26,8 @@ export type ManualDonationInput = {
 
 export type DaycareDonationIntentInput = {
     amount: number;
+    paymentType: "HK" | "Ragil";
+    installments: number;
     itemId?: string;
     donorName: string;
     displayDonorName?: boolean;

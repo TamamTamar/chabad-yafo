@@ -1019,7 +1019,25 @@ const DaycareDonationsAdmin = () => {
                                                 : "ידנית"}
                                         </td>
                                         <td data-label="סכום">
-                                            ₪{formatCurrency(record.amount)}
+                                            <div className={styles.recordDonor}>
+                                                <strong>
+                                                    ₪{formatCurrency(record.amount)}
+                                                </strong>
+                                                {record.paymentType === "HK" && (
+                                                    <small>
+                                                        הו״ק: ₪{formatCurrency(
+                                                            record.amount /
+                                                                (record.installments || 12)
+                                                        )} × {record.installments || 12}
+                                                    </small>
+                                                )}
+                                                {record.paymentType === "Ragil" &&
+                                                    (record.installments || 1) > 1 && (
+                                                        <small>
+                                                            {record.installments} תשלומים
+                                                        </small>
+                                                    )}
+                                            </div>
                                         </td>
                                         <td data-label="שגריר">
                                             {record.ambassadorId?.name ?? "ישיר"}

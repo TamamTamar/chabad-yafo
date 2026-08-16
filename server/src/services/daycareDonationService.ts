@@ -18,6 +18,7 @@ type PublicDonationSource = {
     _id: unknown;
     amount: number;
     donorName?: string | null;
+    dedication?: string | null;
     displayDonorName?: boolean | null;
     receivedAt: Date;
 };
@@ -29,6 +30,7 @@ export const toPublicDaycareDonation = (record: PublicDonationSource) => ({
             ? record.donorName
             : "תרומה אנונימית",
     amount: record.amount,
+    dedication: record.dedication || undefined,
     receivedAt: record.receivedAt,
 });
 
@@ -119,6 +121,7 @@ export const getDaycareDonationCampaignSnapshot = async () => {
             amount: 1,
             itemId: 1,
             donorName: 1,
+            dedication: 1,
             displayDonorName: 1,
             receivedAt: 1,
         })

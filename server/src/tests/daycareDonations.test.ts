@@ -62,6 +62,7 @@ test("public donor feed shows names by default and respects an explicit opt-out"
         _id: "legacy",
         amount: 770,
         donorName: "תורם ותיק",
+        dedication: "לזכות משפחת ישראל",
         receivedAt,
     });
     const privateDonation = toPublicDaycareDonation({
@@ -73,6 +74,7 @@ test("public donor feed shows names by default and respects an explicit opt-out"
     });
 
     assert.equal(legacyDonation.donorName, "תורם ותיק");
+    assert.equal(legacyDonation.dedication, "לזכות משפחת ישראל");
     assert.equal(privateDonation.donorName, "תרומה אנונימית");
     assert.equal("phone" in privateDonation, false);
     assert.equal("email" in privateDonation, false);
@@ -271,7 +273,42 @@ test("diagnostic intents are explicit and legacy intents remain live", async () 
     await diagnosticIntent.validate();
 
     assert.equal(legacyIntent.mode, "live");
+    assert.equal(legacyIntent.paymentType, "Ragil");
+    assert.equal(legacyIntent.installments, 1);
     assert.equal(diagnosticIntent.mode, "diagnostic");
+});
+
+test("daycare donation intents support regular installments and 12-month HK", async () => {
+    const monthlyIntent = new DaycareDonationIntent({
+        publicId: "monthly-intent",
+        campaignSlug: "daycare-2026",
+        amount: 180,
+        paymentType: "HK",
+        installments: 12,
+        donorName: "Monthly Donor",
+        phone: "0500000000",
+        email: "monthly@example.com",
+        expiresAt: new Date(Date.now() + 60_000),
+    });
+    const installmentsIntent = new DaycareDonationIntent({
+        publicId: "installments-intent",
+        campaignSlug: "daycare-2026",
+        amount: 1_200,
+        paymentType: "Ragil",
+        installments: 6,
+        donorName: "Installments Donor",
+        phone: "0500000000",
+        email: "installments@example.com",
+        expiresAt: new Date(Date.now() + 60_000),
+    });
+
+    await monthlyIntent.validate();
+    await installmentsIntent.validate();
+
+    assert.equal(monthlyIntent.paymentType, "HK");
+    assert.equal(monthlyIntent.installments, 12);
+    assert.equal(installmentsIntent.paymentType, "Ragil");
+    assert.equal(installmentsIntent.installments, 6);
 });
 
 test("diagnostic callback URLs require the intent-specific server signature", () => {

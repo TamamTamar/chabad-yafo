@@ -39,6 +39,7 @@ type DonationModalProps = {
 
 type AmountChoice = 1 | 5 | 180 | 360 | 770 | "complete" | "custom";
 type DonationStep = 1 | 2 | 3 | 4;
+type PaymentMode = "once" | "monthly";
 
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat("he-IL").format(value);
@@ -62,6 +63,8 @@ const DonationModalPreview = ({
         diagnosticMode ? 1 : 360
     );
     const [customAmount, setCustomAmount] = useState("");
+    const [paymentMode, setPaymentMode] = useState<PaymentMode>("once");
+    const [installments, setInstallments] = useState(1);
     const [fullName, setFullName] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
@@ -110,6 +113,8 @@ const DonationModalPreview = ({
             : amountChoice === "complete"
               ? remaining ?? 0
               : amountChoice;
+    const isMonthly = paymentMode === "monthly";
+    const campaignAmount = isMonthly ? amount * 12 : amount;
 
     const amountOptions: { value: AmountChoice; label: string }[] =
         diagnosticMode
@@ -151,6 +156,8 @@ const DonationModalPreview = ({
         try {
             const intent = await createIntent({
                 amount,
+                paymentType: isMonthly ? "HK" : "Ragil",
+                installments: isMonthly ? 12 : installments,
                 itemId: selectedId === "general" ? undefined : selectedId,
                 donorName: fullName.trim(),
                 displayDonorName,
@@ -167,6 +174,11 @@ const DonationModalPreview = ({
             const providerComment = [
                 campaignLabel,
                 `יעד: ${selectedTitle}`,
+                isMonthly
+                    ? `הו״ק: ₪${formatCurrency(amount)} לחודש ל־12 חודשים`
+                    : installments > 1
+                      ? `${installments} תשלומים`
+                      : "תשלום אחד",
                 dedication.trim()
                     ? `הקדשה: ${dedication.trim()}`
                     : "",
@@ -179,7 +191,7 @@ const DonationModalPreview = ({
                     Mosad: import.meta.env.VITE_NEDARIM_MOSAD,
                     ApiValid: import.meta.env.VITE_NEDARIM_API_VALID,
                     Amount: amount,
-                    Tashlumim: 1,
+                    Tashlumim: isMonthly ? 12 : installments,
                     Currency: "1",
                     Description: diagnosticMode
                         ? `עסקת ניסיון למעון — ${selectedTitle}`
@@ -189,7 +201,7 @@ const DonationModalPreview = ({
                     lastName,
                     phone: phone.trim(),
                     email: email.trim(),
-                    PaymentType: "Ragil",
+                    PaymentType: isMonthly ? "HK" : "Ragil",
                     Comment: providerComment,
                     CallBack: intent.callbackUrl,
                     Param1: intent.param1,
@@ -312,8 +324,10 @@ const DonationModalPreview = ({
                                     {amountOptions
                                         .filter(
                                             (option) =>
-                                                option.value !== "complete" ||
-                                                remaining !== null
+                                                (option.value !== "complete" ||
+                                                    remaining !== null) &&
+                                                (option.value !== "complete" ||
+                                                    !isMonthly)
                                         )
                                         .map((option) => (
                                             <button
@@ -353,6 +367,65 @@ const DonationModalPreview = ({
                                     </span>
                                 </label>
                             )}
+                            {!diagnosticMode && (
+                                <fieldset className={styles.paymentTypeFieldset}>
+                                    <legend>איך תרצו לתרום?</legend>
+                                    <div className={styles.paymentTypeGrid}>
+                                        <button
+                                            type="button"
+                                            className={!isMonthly ? styles.amountActive : ""}
+                                            onClick={() => setPaymentMode("once")}
+                                        >
+                                            תרומה רגילה
+                                            <small>בתשלום אחד או בתשלומים</small>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={isMonthly ? styles.amountActive : ""}
+                                            onClick={() => {
+                                                setPaymentMode("monthly");
+                                                if (amountChoice === "complete") {
+                                                    setAmountChoice(360);
+                                                }
+                                            }}
+                                        >
+                                            הו״ק ל־12 חודשים
+                                            <small>חיוב חודשי קבוע</small>
+                                        </button>
+                                    </div>
+                                    {!isMonthly && (
+                                        <label className={styles.installmentsField}>
+                                            מספר תשלומים
+                                            <select
+                                                value={installments}
+                                                onChange={(event) =>
+                                                    setInstallments(Number(event.target.value))
+                                                }
+                                            >
+                                                {Array.from({ length: 12 }, (_, index) => index + 1).map(
+                                                    (count) => (
+                                                        <option key={count} value={count}>
+                                                            {count === 1
+                                                                ? "תשלום אחד"
+                                                                : `${count} תשלומים — כ־₪${formatCurrency(
+                                                                      Math.ceil(amount / count)
+                                                                  )} לתשלום`}
+                                                        </option>
+                                                    )
+                                                )}
+                                            </select>
+                                        </label>
+                                    )}
+                                    {isMonthly && (
+                                        <p className={styles.paymentPlanNote}>
+                                            ₪{formatCurrency(amount)} בחודש למשך 12 חודשים
+                                            {amount > 0 && (
+                                                <> · סה״כ התחייבות ₪{formatCurrency(campaignAmount)}</>
+                                            )}
+                                        </p>
+                                    )}
+                                </fieldset>
+                            )}
                         </>
                     )}
 
@@ -360,7 +433,14 @@ const DonationModalPreview = ({
                         <>
                             <div className={styles.stepSummary}>
                                 <span>התרומה שלכם</span>
-                                <strong>₪{formatCurrency(amount)}</strong>
+                                <strong>
+                                    ₪{formatCurrency(amount)}{isMonthly ? " לחודש" : ""}
+                                </strong>
+                                {isMonthly && (
+                                    <small>
+                                        12 חודשים · סה״כ ₪{formatCurrency(campaignAmount)}
+                                    </small>
+                                )}
                                 <small>{selectedTitle}</small>
                             </div>
                             <div className={styles.donorFields}>
@@ -415,7 +495,7 @@ const DonationModalPreview = ({
                                         />
                                         <span>
                                             <strong>אפשר להציג את שמי בעמוד הקמפיין</strong>
-                                            <small>הסכום יוצג לצד השם. טלפון ודוא״ל לעולם לא יוצגו.</small>
+                                            <small>השם, הסכום וההקדשה יוצגו בעמוד. טלפון ודוא״ל לעולם לא יוצגו.</small>
                                         </span>
                                     </label>
                                 )}
@@ -432,7 +512,14 @@ const DonationModalPreview = ({
                         <>
                             <div className={styles.stepSummary}>
                                 <span>חיוב מאובטח באמצעות נדרים פלוס</span>
-                                <strong>₪{formatCurrency(amount)}</strong>
+                                <strong>
+                                    ₪{formatCurrency(amount)}{isMonthly ? " לחודש" : ""}
+                                </strong>
+                                {isMonthly && (
+                                    <small>
+                                        הו״ק ל־12 חודשים · סה״כ ₪{formatCurrency(campaignAmount)}
+                                    </small>
+                                )}
                                 <small>{selectedTitle}</small>
                             </div>
                             <div className={styles.nedarimFrameWrap}>
@@ -481,7 +568,7 @@ const DonationModalPreview = ({
                 <footer className={styles.modalFooter}>
                     {step < 4 && (
                         <div>
-                            <span>סכום התרומה</span>
+                            <span>{isMonthly ? "חיוב חודשי" : "סכום התרומה"}</span>
                             <strong>₪{formatCurrency(amount)}</strong>
                         </div>
                     )}
