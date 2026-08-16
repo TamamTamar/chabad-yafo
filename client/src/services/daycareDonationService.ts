@@ -15,6 +15,7 @@ export type ManualDonationInput = {
     amount: number;
     itemId?: string;
     donorName?: string;
+    displayDonorName?: boolean;
     phone?: string;
     email?: string;
     dedication?: string;

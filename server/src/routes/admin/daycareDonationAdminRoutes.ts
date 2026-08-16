@@ -974,6 +974,7 @@ router.post("/records", async (req, res) => {
         const manualSource = req.body.manualSource;
         const reference = cleanText(req.body.reference, 200) || undefined;
         const note = cleanText(req.body.note, 600) || undefined;
+        const displayDonorName = req.body.displayDonorName !== false;
         const receivedAt = req.body.receivedAt
             ? new Date(req.body.receivedAt)
             : null;
@@ -1025,6 +1026,7 @@ router.post("/records", async (req, res) => {
             amount,
             itemId,
             donorName: cleanText(req.body.donorName, 160) || undefined,
+            displayDonorName,
             phone: cleanText(req.body.phone, 40) || undefined,
             email: cleanText(req.body.email, 180) || undefined,
             dedication: cleanText(req.body.dedication, 600) || undefined,
@@ -1046,6 +1048,7 @@ router.post("/records", async (req, res) => {
                 itemId: record.itemId ?? null,
                 status: record.status,
                 manualSource,
+                displayDonorName,
                 reference: reference ?? null,
                 receivedAt,
                 enteredById: res.locals.adminActor.id,

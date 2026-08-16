@@ -41,6 +41,13 @@ const formatDate = (value: string) =>
         minute: "2-digit",
     }).format(new Date(value));
 
+const toLocalDateTimeInputValue = (date = new Date()) => {
+    const localTime = new Date(
+        date.getTime() - date.getTimezoneOffset() * 60_000
+    );
+    return localTime.toISOString().slice(0, 16);
+};
+
 const getItemRemaining = (item: DonationItem) =>
     Math.max(0, item.remaining ?? item.goal - item.raised);
 
@@ -212,6 +219,8 @@ const DaycareDonationsAdmin = () => {
         event.preventDefault();
         const form = event.currentTarget;
         const data = new FormData(form);
+        const receivedAtValue = String(data.get("receivedAt") ?? "");
+        const receivedAt = new Date(receivedAtValue);
 
         setSaving(true);
         setError("");
@@ -222,6 +231,7 @@ const DaycareDonationsAdmin = () => {
                 amount: Number(data.get("amount")),
                 itemId: String(data.get("itemId") ?? "") || undefined,
                 donorName: String(data.get("donorName") ?? "") || undefined,
+                displayDonorName: data.get("displayDonorName") === "on",
                 phone: String(data.get("phone") ?? "") || undefined,
                 email: String(data.get("email") ?? "") || undefined,
                 dedication:
@@ -234,7 +244,9 @@ const DaycareDonationsAdmin = () => {
                     | "other",
                 reference:
                     String(data.get("reference") ?? "") || undefined,
-                receivedAt: String(data.get("receivedAt") ?? ""),
+                receivedAt: Number.isNaN(receivedAt.getTime())
+                    ? receivedAtValue
+                    : receivedAt.toISOString(),
             });
             form.reset();
             await loadData();
@@ -783,14 +795,26 @@ const DaycareDonationsAdmin = () => {
                         שם התורם
                         <input name="donorName" type="text" />
                     </label>
+                    <label className={`${styles.manualPrivacyChoice} ${styles.fullField}`}>
+                        <input
+                            name="displayDonorName"
+                            type="checkbox"
+                            defaultChecked
+                        />
+                        <span>
+                            <strong>להציג את שם התורם בעמוד הקמפיין</strong>
+                            <small>
+                                בטלו את הסימון כדי שהתרומה תוצג כאנונימית, בלי למחוק את השם מהאדמין.
+                            </small>
+                        </span>
+                    </label>
                     <label>
-                        תאריך קבלה
+                        תאריך ושעת קבלה
                         <input
                             name="receivedAt"
-                            type="date"
-                            defaultValue={new Date()
-                                .toISOString()
-                                .slice(0, 10)}
+                            type="datetime-local"
+                            defaultValue={toLocalDateTimeInputValue()}
+                            step="60"
                             required
                         />
                     </label>
