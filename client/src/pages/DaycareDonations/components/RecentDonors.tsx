@@ -1,0 +1,91 @@
+import { Heart, UsersRound, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { PublicDaycareDonation } from "../types";
+import styles from "../DaycareDonations.module.scss";
+
+type RecentDonorsProps = {
+    donationCount: number;
+    donations: PublicDaycareDonation[];
+};
+
+const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("he-IL").format(value);
+
+const RecentDonors = ({ donationCount, donations }: RecentDonorsProps) => {
+    const [open, setOpen] = useState(false);
+    const dialogRef = useRef<HTMLDialogElement | null>(null);
+
+    useEffect(() => {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+        if (open && !dialog.open) dialog.showModal();
+        if (!open && dialog.open) dialog.close();
+    }, [open]);
+
+    if (donationCount === 0) return null;
+
+    return (
+        <section className={styles.donorsStrip} aria-label="שותפים בקמפיין">
+            <div className={styles.donorsIntro}>
+                <span><UsersRound aria-hidden="true" /></span>
+                <div>
+                    <strong>{donationCount} שותפים כבר הצטרפו</strong>
+                    <small>יחד בונים מקום לגדול בו</small>
+                </div>
+            </div>
+            <div className={styles.donorsPreview}>
+                {donations.slice(0, 4).map((donation) => (
+                    <span key={donation.id}>
+                        {donation.donorName}
+                        <b>₪{formatCurrency(donation.amount)}</b>
+                    </span>
+                ))}
+            </div>
+            <button type="button" onClick={() => setOpen(true)}>
+                לכל השותפים
+            </button>
+
+            <dialog
+                ref={dialogRef}
+                className={styles.donorsDialog}
+                aria-labelledby="donors-dialog-title"
+                onCancel={(event) => {
+                    event.preventDefault();
+                    setOpen(false);
+                }}
+                onClose={() => setOpen(false)}
+                onClick={(event) => {
+                    if (event.target === event.currentTarget) setOpen(false);
+                }}
+            >
+                <div className={styles.donorsDialogCard}>
+                    <header>
+                        <div>
+                            <p><Heart aria-hidden="true" /> תודה לכל השותפים</p>
+                            <h2 id="donors-dialog-title">בונים את המעון יחד</h2>
+                        </div>
+                        <button type="button" onClick={() => setOpen(false)} aria-label="סגירת רשימת התורמים">
+                            <X aria-hidden="true" />
+                        </button>
+                    </header>
+                    <div className={styles.donorsList}>
+                        {donations.map((donation) => (
+                            <div key={donation.id}>
+                                <span>{donation.donorName.slice(0, 1)}</span>
+                                <strong>{donation.donorName}</strong>
+                                <b>₪{formatCurrency(donation.amount)}</b>
+                            </div>
+                        ))}
+                    </div>
+                    {donationCount > donations.length && (
+                        <p className={styles.donorsListNote}>
+                            מוצגות {donations.length} התרומות האחרונות מתוך {donationCount}.
+                        </p>
+                    )}
+                </div>
+            </dialog>
+        </section>
+    );
+};
+
+export default RecentDonors;

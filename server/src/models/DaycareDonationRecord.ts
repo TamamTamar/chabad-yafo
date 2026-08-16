@@ -25,6 +25,7 @@ const daycareDonationRecordSchema =
             amount: { type: Number, required: true, min: 0.01 },
             itemId: { type: String, trim: true, index: true },
             donorName: { type: String, trim: true },
+            displayDonorName: { type: Boolean, default: true },
             phone: { type: String, trim: true },
             email: { type: String, trim: true, lowercase: true },
             dedication: { type: String, trim: true },

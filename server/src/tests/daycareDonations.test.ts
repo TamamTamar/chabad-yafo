@@ -17,6 +17,7 @@ import {
 import {
     calculateDaycareDonationTotals,
     deriveDaycareDonationGoals,
+    toPublicDaycareDonation,
 } from "../services/daycareDonationService";
 import {
     createAvailableDaycareAmbassadorSlug,
@@ -53,6 +54,28 @@ test("confirmed donation totals separate general and allocated donations", () =>
     assert.equal(result.generalRaised, 180);
     assert.equal(result.raisedByItem.get("painting"), 1_130);
     assert.equal(result.raisedByItem.get("plumbing"), 500);
+});
+
+test("public donor feed shows names by default and respects an explicit opt-out", () => {
+    const receivedAt = new Date("2026-08-14T10:00:00.000Z");
+    const legacyDonation = toPublicDaycareDonation({
+        _id: "legacy",
+        amount: 770,
+        donorName: "תורם ותיק",
+        receivedAt,
+    });
+    const privateDonation = toPublicDaycareDonation({
+        _id: "private",
+        amount: 180,
+        donorName: "שם פרטי",
+        displayDonorName: false,
+        receivedAt,
+    });
+
+    assert.equal(legacyDonation.donorName, "תורם ותיק");
+    assert.equal(privateDonation.donorName, "תרומה אנונימית");
+    assert.equal("phone" in privateDonation, false);
+    assert.equal("email" in privateDonation, false);
 });
 
 test("campaign and category goals are derived from item goals", () => {

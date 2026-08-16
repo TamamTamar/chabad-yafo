@@ -23,6 +23,7 @@ import DaycareDonationsHero from "./components/DaycareDonationsHero";
 import DonationCategorySection from "./components/DonationCategorySection";
 import DonationModalPreview from "./components/DonationModalPreview";
 import MobileDonationBar from "./components/MobileDonationBar";
+import RecentDonors from "./components/RecentDonors";
 import {
     extractAmbassadorRef,
     normalizeAmbassadorRef,
@@ -43,6 +44,8 @@ const fallbackCampaign: DaycareDonationCampaignData = {
     paymentsEnabled: false,
     raised: 0,
     generalRaised: 0,
+    donationCount: 0,
+    recentDonations: [],
     categories: fallbackCategories,
     items: fallbackItems.map((item) => ({
         ...item,
@@ -207,6 +210,10 @@ const DaycareDonations = () => {
                         בודקים את הקישור האישי…
                     </p>
                 )}
+                <RecentDonors
+                    donationCount={campaign.donationCount ?? 0}
+                    donations={campaign.recentDonations ?? []}
+                />
                 <CampaignStory
                     onDonate={openDonation}
                     generalRaised={campaign.generalRaised}

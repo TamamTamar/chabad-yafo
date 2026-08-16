@@ -28,6 +28,7 @@ export type DaycareDonationIntentInput = {
     amount: number;
     itemId?: string;
     donorName: string;
+    displayDonorName?: boolean;
     phone: string;
     email: string;
     dedication?: string;
@@ -219,6 +220,7 @@ export const updateDaycareDonationRecord = async (
     updates: {
         itemId?: string;
         status?: DaycareDonationRecord["status"];
+        displayDonorName?: boolean;
         reason: string;
     }
 ) => {

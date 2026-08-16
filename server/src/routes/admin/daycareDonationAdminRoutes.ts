@@ -1106,14 +1106,33 @@ router.patch("/records/:id", async (req, res) => {
             updates.status = req.body.status;
         }
 
+        if (req.body.displayDonorName !== undefined) {
+            if (typeof req.body.displayDonorName !== "boolean") {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid public donor name setting",
+                });
+            }
+            if (req.body.displayDonorName && !previous.donorName) {
+                return res.status(400).json({
+                    success: false,
+                    message: "A donor name is required for public display",
+                });
+            }
+            updates.displayDonorName = req.body.displayDonorName;
+        }
+
         const itemChanged =
             Object.prototype.hasOwnProperty.call(updates, "itemId") &&
             (updates.itemId ?? null) !== (previous.itemId ?? null);
         const statusChanged =
             Object.prototype.hasOwnProperty.call(updates, "status") &&
             updates.status !== previous.status;
+        const displayDonorNameChanged =
+            Object.prototype.hasOwnProperty.call(updates, "displayDonorName") &&
+            updates.displayDonorName !== (previous.displayDonorName !== false);
 
-        if ((itemChanged || statusChanged) && !reason) {
+        if ((itemChanged || statusChanged || displayDonorNameChanged) && !reason) {
             return res.status(400).json({
                 success: false,
                 message:
@@ -1121,7 +1140,7 @@ router.patch("/records/:id", async (req, res) => {
             });
         }
 
-        if (!itemChanged && !statusChanged) {
+        if (!itemChanged && !statusChanged && !displayDonorNameChanged) {
             return res.status(400).json({
                 success: false,
                 message: "No donation record change was requested",
@@ -1153,10 +1172,12 @@ router.patch("/records/:id", async (req, res) => {
             before: {
                 itemId: previous.itemId ?? null,
                 status: previous.status,
+                displayDonorName: previous.displayDonorName !== false,
             },
             after: {
                 itemId: record.itemId ?? null,
                 status: record.status,
+                displayDonorName: Boolean(record.displayDonorName),
             },
         });
 

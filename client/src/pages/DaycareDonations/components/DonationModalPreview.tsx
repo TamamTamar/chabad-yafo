@@ -66,6 +66,7 @@ const DonationModalPreview = ({
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [dedication, setDedication] = useState("");
+    const [displayDonorName, setDisplayDonorName] = useState(true);
     const [preparing, setPreparing] = useState(false);
     const [formError, setFormError] = useState("");
     const [paymentPayload, setPaymentPayload] =
@@ -152,6 +153,7 @@ const DonationModalPreview = ({
                 amount,
                 itemId: selectedId === "general" ? undefined : selectedId,
                 donorName: fullName.trim(),
+                displayDonorName,
                 phone: phone.trim(),
                 email: email.trim(),
                 dedication: dedication.trim() || undefined,
@@ -402,6 +404,21 @@ const DonationModalPreview = ({
                                         placeholder="אפשר להקדיש את התרומה..."
                                     />
                                 </label>
+                                {!diagnosticMode && (
+                                    <label className={styles.publicNameChoice}>
+                                        <input
+                                            type="checkbox"
+                                            checked={displayDonorName}
+                                            onChange={(event) =>
+                                                setDisplayDonorName(event.target.checked)
+                                            }
+                                        />
+                                        <span>
+                                            <strong>אפשר להציג את שמי בעמוד הקמפיין</strong>
+                                            <small>הסכום יוצג לצד השם. טלפון ודוא״ל לעולם לא יוצגו.</small>
+                                        </span>
+                                    </label>
+                                )}
                             </div>
                             {formError && (
                                 <p className={styles.paymentError} role="alert">

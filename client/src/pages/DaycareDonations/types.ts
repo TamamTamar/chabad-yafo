@@ -48,9 +48,18 @@ export type DaycareDonationCampaignData = {
     remaining?: number;
     overflow?: number;
     generalRaised: number;
+    donationCount: number;
+    recentDonations: PublicDaycareDonation[];
     categories: DonationCategory[];
     items: DonationItem[];
     updatedAt?: string;
+};
+
+export type PublicDaycareDonation = {
+    id: string;
+    donorName: string;
+    amount: number;
+    receivedAt: string;
 };
 
 export type DaycareDonationRecord = {
@@ -61,6 +70,7 @@ export type DaycareDonationRecord = {
     amount: number;
     itemId?: string;
     donorName?: string;
+    displayDonorName?: boolean;
     phone?: string;
     email?: string;
     dedication?: string;

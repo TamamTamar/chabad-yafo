@@ -496,6 +496,52 @@
     min-width: 150px;
 }
 
+.publicationToggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid $ui-border-soft;
+    border-radius: 999px;
+    background: $brand-surface-cool;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.publicationToggle > span {
+    position: relative;
+    width: 27px;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba($brand-primary, 0.18);
+}
+
+.publicationToggle > span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $color-white;
+    box-shadow: 0 1px 3px rgba($brand-primary-deep, 0.25);
+    transition: transform 160ms ease;
+}
+
+.publicationToggleActive {
+    border-color: rgba($ui-success, 0.22);
+    background: $ui-success-soft;
+    color: $ui-success;
+}
+
+.publicationToggleActive > span { background: $ui-success; }
+.publicationToggleActive > span::after { transform: translateX(-11px); }
+.publicationToggle:disabled { cursor: not-allowed; opacity: 0.45; }
+
 .recordFilters {
     display: grid;
     grid-template-columns: minmax(220px, 1fr) 180px auto;
@@ -910,8 +956,9 @@
     .recordRow td[data-label="תורם"] { order: 3; grid-column: 1 / -1; }
     .recordRow td[data-label="מקור"] { order: 4; }
     .recordRow td[data-label="שגריר"] { order: 5; }
-    .recordRow td[data-label="שיוך"] { order: 6; grid-column: 1 / -1; }
-    .recordRow td[data-label="מצב"] { order: 7; grid-column: 1 / -1; }
+    .recordRow td[data-label="פרסום"] { order: 6; }
+    .recordRow td[data-label="שיוך"] { order: 7; grid-column: 1 / -1; }
+    .recordRow td[data-label="מצב"] { order: 8; grid-column: 1 / -1; }
 
     .recordRow select {
         width: 100%;
