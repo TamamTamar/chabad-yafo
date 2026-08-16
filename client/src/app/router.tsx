@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRouteAdmin";
 import Root from "./Root";
+import RouteErrorPage from "./RouteErrorPage";
 
 const AboutPage = lazy(() => import("../pages/AboutPage/AboutPage"));
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard/AdminDashboard"));
@@ -34,6 +35,7 @@ const WriteToRebbe = lazy(() => import("../pages/WriteToRebbe/WriteToRebbe"));
 export const router = createBrowserRouter([
     {
         path: "/daycare/onboarding/:token",
+        errorElement: <RouteErrorPage />,
         element: (
             <Suspense fallback={<div aria-live="polite">טוען את מסלול ההצטרפות...</div>}>
                 <DaycareOnboarding />
@@ -43,6 +45,7 @@ export const router = createBrowserRouter([
     {
         path: "/",
         element: <Root />,
+        errorElement: <RouteErrorPage />,
         children: [
             { index: true, element: <Home /> },
             { path: "purim", element: <PurimMatanotLaEvyonim /> },

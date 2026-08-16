@@ -1,2 +1,3 @@
 /api/* https://chabad-yafo-production.up.railway.app/api/:splat 200!
+/assets/* /404.html 404
 /* /index.html 200

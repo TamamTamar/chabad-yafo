@@ -14,6 +14,34 @@ import {
 } from "./services/metaPixelService";
 import "./styles/_base.scss";
 
+const preloadReloadKey = "chabad-yafo:preload-reload";
+const preloadReloadCooldownMs = 15_000;
+
+window.addEventListener("vite:preloadError", (event) => {
+  event.preventDefault();
+
+  let lastReloadAt = 0;
+  let canTrackReload = true;
+
+  try {
+    lastReloadAt = Number(sessionStorage.getItem(preloadReloadKey)) || 0;
+  } catch {
+    canTrackReload = false;
+  }
+
+  if (!canTrackReload || Date.now() - lastReloadAt < preloadReloadCooldownMs) {
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(preloadReloadKey, String(Date.now()));
+  } catch {
+    return;
+  }
+
+  window.location.reload();
+});
+
 const metaPixelId = import.meta.env.VITE_META_PIXEL_ID?.trim();
 const isPrivateOnboardingPath = window.location.pathname.startsWith(
   "/daycare/onboarding/"

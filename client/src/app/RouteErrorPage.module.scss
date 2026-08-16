@@ -1,0 +1,81 @@
+@use "../styles/variables" as *;
+
+.page {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    direction: rtl;
+    background: linear-gradient(135deg, $brand-blue-error-top, $brand-blue-error-bottom);
+}
+
+.card {
+    width: min(100%, 540px);
+    padding: 42px 32px;
+    text-align: center;
+    border-radius: $radius-card-xl;
+    background: $color-white;
+    box-shadow: 0 24px 60px rgba($color-black, 0.24);
+
+    h1 {
+        margin: 8px 0 16px;
+        color: $brand-text;
+        font-size: $type-section-title;
+        line-height: $line-title;
+    }
+
+    p {
+        margin: 0;
+        color: $ui-text-muted;
+        font-size: $type-body-lg;
+        line-height: 1.6;
+    }
+}
+
+.eyebrow {
+    color: $brand-primary !important;
+    font-size: $type-eyebrow !important;
+    font-weight: 800;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+
+    button,
+    a {
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font: inherit;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    button {
+        border: 0;
+        background: $ui-btn-primary-bg;
+        color: $ui-btn-primary-text;
+        cursor: pointer;
+    }
+
+    a {
+        border: 1px solid $brand-primary;
+        color: $brand-primary;
+    }
+}
+
+@media (max-width: 520px) {
+    .card {
+        padding: 34px 22px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+}
