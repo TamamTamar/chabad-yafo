@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID } from "crypto";
-import { Router } from "express";
+import { Router, type NextFunction, type Request, type Response } from "express";
 import mongoose from "mongoose";
+import multer from "multer";
 import { DAYCARE_DONATION_CAMPAIGN_SLUG } from "../../config/daycareDonationDefaults";
 import { requireAdmin } from "../../middleware/adminAuth";
 import type { AdminActor } from "../../middleware/adminAuth";
@@ -27,6 +28,7 @@ import {
     buildDaycareDonationCallbackUrl,
     isDaycareDonationCallbackConfigured,
 } from "../../services/daycareDonationCallbackSecurity";
+import { getDaycareStorageProvider } from "../../services/daycareStorageService";
 import type {
     DaycareDonationItemConfig,
     DaycareDonationContactMethod,
@@ -37,6 +39,36 @@ import type {
 } from "../../types/daycareDonations";
 
 const router = Router();
+
+const fieldUpdateUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 8 * 1024 * 1024, files: 1 },
+});
+const receiveFieldUpdateImage = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    fieldUpdateUpload.single("image")(req, res, (error) => {
+        if (error instanceof multer.MulterError) {
+            return res.status(error.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({
+                success: false,
+                message:
+                    error.code === "LIMIT_FILE_SIZE"
+                        ? "התמונה גדולה מ־8MB. יש לבחור קובץ קטן יותר."
+                        : "לא הצלחנו לקבל את התמונה.",
+            });
+        }
+        if (error) return next(error);
+        return next();
+    });
+};
+
+const allowedFieldUpdateMimeTypes = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+]);
 
 router.use(requireAdmin);
 router.use(requireSecureAdminMutation);
@@ -134,13 +166,245 @@ const synchronizeStoredCampaignGoals = (campaign: {
 
 router.get("/campaign", async (_req, res) => {
     try {
-        const campaign = await getDaycareDonationCampaignSnapshot();
+        const campaign = await getDaycareDonationCampaignSnapshot({
+            includeUnpublishedUpdates: true,
+        });
         return res.json({ success: true, data: campaign });
     } catch (error) {
         return res.status(500).json({
             success: false,
             message: "Failed to get donation campaign",
         });
+    }
+});
+
+router.post("/field-updates", receiveFieldUpdateImage, async (req, res) => {
+    let storedImage: Awaited<
+        ReturnType<ReturnType<typeof getDaycareStorageProvider>["upload"]>
+    > | null = null;
+    try {
+        const campaign = await ensureDefaultDaycareDonationCampaign();
+        const title = cleanText(req.body.title, 180);
+        const description = cleanText(req.body.description, 1200);
+        const imageAlt = cleanText(req.body.imageAlt, 220);
+        const itemId = cleanText(req.body.itemId, 80) || undefined;
+        const published = String(req.body.published) === "true";
+
+        if (!title || !description || !imageAlt || !req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "כותרת, תיאור, תיאור תמונה וקובץ תמונה הם שדות חובה.",
+            });
+        }
+        if (!allowedFieldUpdateMimeTypes.has(req.file.mimetype)) {
+            return res.status(400).json({
+                success: false,
+                message: "אפשר להעלות תמונת JPG, PNG או WebP בלבד.",
+            });
+        }
+        if (itemId && !campaign.items.some((item) => item.id === itemId)) {
+            return res.status(400).json({
+                success: false,
+                message: "הסעיף המקושר לא נמצא.",
+            });
+        }
+
+        storedImage = await getDaycareStorageProvider().upload({
+            bytes: req.file.buffer,
+            mimeType: req.file.mimetype,
+            originalName: req.file.originalname,
+            category: "campaign-updates",
+        });
+        const now = new Date();
+        const update = {
+            id: randomUUID(),
+            title,
+            description,
+            itemId,
+            published,
+            publishedAt: published ? now : undefined,
+            image: {
+                storageKey: storedImage.storageKey,
+                mimeType: storedImage.mimeType,
+                alt: imageAlt,
+            },
+            createdAt: now,
+            updatedAt: now,
+        };
+        campaign.fieldUpdates.push(update);
+        campaign.markModified("fieldUpdates");
+        await campaign.save();
+
+        await writeDaycareDonationAudit({
+            action: "fieldUpdate.created",
+            entityType: "fieldUpdate",
+            entityId: update.id,
+            ...getAdminAuditActor(res.locals.adminActor),
+            after: { title, itemId: itemId ?? null, published },
+        });
+
+        return res.status(201).json({
+            success: true,
+            data: await getDaycareDonationCampaignSnapshot({
+                includeUnpublishedUpdates: true,
+            }),
+        });
+    } catch (error) {
+        if (storedImage) {
+            await getDaycareStorageProvider()
+                .delete(storedImage.storageKey)
+                .catch(() => undefined);
+        }
+        console.error("Failed to create field update:", error);
+        return res.status(400).json({
+            success: false,
+            message: "לא הצלחנו לשמור את העדכון מהשטח.",
+        });
+    }
+});
+
+router.patch("/field-updates/:id", receiveFieldUpdateImage, async (req, res) => {
+    let replacementImage: Awaited<
+        ReturnType<ReturnType<typeof getDaycareStorageProvider>["upload"]>
+    > | null = null;
+    try {
+        const campaign = await ensureDefaultDaycareDonationCampaign();
+        const update = campaign.fieldUpdates.find(
+            (entry) => entry.id === req.params.id
+        );
+        if (!update) {
+            return res.status(404).json({
+                success: false,
+                message: "העדכון לא נמצא.",
+            });
+        }
+        const before = {
+            title: update.title,
+            itemId: update.itemId ?? null,
+            published: update.published,
+        };
+
+        if (req.body.title !== undefined) {
+            const title = cleanText(req.body.title, 180);
+            if (!title) {
+                return res.status(400).json({ success: false, message: "נדרשת כותרת." });
+            }
+            update.title = title;
+        }
+        if (req.body.description !== undefined) {
+            const description = cleanText(req.body.description, 1200);
+            if (!description) {
+                return res.status(400).json({ success: false, message: "נדרש תיאור." });
+            }
+            update.description = description;
+        }
+        if (req.body.imageAlt !== undefined) {
+            const imageAlt = cleanText(req.body.imageAlt, 220);
+            if (!imageAlt) {
+                return res.status(400).json({ success: false, message: "נדרש תיאור לתמונה." });
+            }
+            update.image.alt = imageAlt;
+        }
+        if (req.body.itemId !== undefined) {
+            const itemId = cleanText(req.body.itemId, 80) || undefined;
+            if (itemId && !campaign.items.some((item) => item.id === itemId)) {
+                return res.status(400).json({ success: false, message: "הסעיף המקושר לא נמצא." });
+            }
+            update.itemId = itemId;
+        }
+        if (req.body.published !== undefined) {
+            const published = String(req.body.published) === "true";
+            if (published && !update.published) update.publishedAt = new Date();
+            update.published = published;
+        }
+        const previousStorageKey = update.image.storageKey;
+        if (req.file) {
+            if (!allowedFieldUpdateMimeTypes.has(req.file.mimetype)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "אפשר להעלות תמונת JPG, PNG או WebP בלבד.",
+                });
+            }
+            replacementImage = await getDaycareStorageProvider().upload({
+                bytes: req.file.buffer,
+                mimeType: req.file.mimetype,
+                originalName: req.file.originalname,
+                category: "campaign-updates",
+            });
+            update.image.src = undefined;
+            update.image.storageKey = replacementImage.storageKey;
+            update.image.mimeType = replacementImage.mimeType;
+        }
+        update.updatedAt = new Date();
+        campaign.markModified("fieldUpdates");
+        await campaign.save();
+
+        if (replacementImage && previousStorageKey) {
+            await getDaycareStorageProvider().delete(previousStorageKey).catch(() => undefined);
+        }
+        await writeDaycareDonationAudit({
+            action: "fieldUpdate.updated",
+            entityType: "fieldUpdate",
+            entityId: update.id,
+            ...getAdminAuditActor(res.locals.adminActor),
+            before,
+            after: {
+                title: update.title,
+                itemId: update.itemId ?? null,
+                published: update.published,
+            },
+        });
+        return res.json({
+            success: true,
+            data: await getDaycareDonationCampaignSnapshot({
+                includeUnpublishedUpdates: true,
+            }),
+        });
+    } catch (error) {
+        if (replacementImage) {
+            await getDaycareStorageProvider()
+                .delete(replacementImage.storageKey)
+                .catch(() => undefined);
+        }
+        console.error("Failed to update field update:", error);
+        return res.status(400).json({ success: false, message: "לא הצלחנו לעדכן את הפרסום." });
+    }
+});
+
+router.delete("/field-updates/:id", async (req, res) => {
+    try {
+        const campaign = await ensureDefaultDaycareDonationCampaign();
+        const index = campaign.fieldUpdates.findIndex(
+            (entry) => entry.id === req.params.id
+        );
+        if (index < 0) {
+            return res.status(404).json({ success: false, message: "העדכון לא נמצא." });
+        }
+        const [removed] = campaign.fieldUpdates.splice(index, 1);
+        campaign.markModified("fieldUpdates");
+        await campaign.save();
+        if (removed.image.storageKey) {
+            await getDaycareStorageProvider().delete(removed.image.storageKey).catch(() => undefined);
+        }
+        await writeDaycareDonationAudit({
+            action: "fieldUpdate.deleted",
+            entityType: "fieldUpdate",
+            entityId: removed.id,
+            ...getAdminAuditActor(res.locals.adminActor),
+            before: {
+                title: removed.title,
+                itemId: removed.itemId ?? null,
+                published: removed.published,
+            },
+        });
+        return res.json({
+            success: true,
+            data: await getDaycareDonationCampaignSnapshot({
+                includeUnpublishedUpdates: true,
+            }),
+        });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: "לא הצלחנו למחוק את העדכון." });
     }
 });
 
@@ -1376,6 +1640,7 @@ router.patch("/campaign", async (req, res) => {
         const before = {
             goal: campaign.goal,
             active: campaign.active,
+            recommendedChoiceIds: campaign.recommendedChoiceIds ?? [],
         };
 
         if (req.body.goal !== undefined) {
@@ -1388,6 +1653,37 @@ router.patch("/campaign", async (req, res) => {
 
         if (req.body.active !== undefined) {
             campaign.active = Boolean(req.body.active);
+        }
+
+        if (req.body.recommendedChoiceIds !== undefined) {
+            if (!Array.isArray(req.body.recommendedChoiceIds)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Recommended choices must be an array",
+                });
+            }
+            const recommendedChoiceIds = req.body.recommendedChoiceIds.map(
+                (value: unknown) => cleanText(value, 80)
+            );
+            const allowedChoiceIds = new Set([
+                "general",
+                ...campaign.items.map((item) => item.id),
+            ]);
+            if (
+                recommendedChoiceIds.length !== 0 &&
+                (recommendedChoiceIds.length !== 3 ||
+                    new Set(recommendedChoiceIds).size !== 3 ||
+                    recommendedChoiceIds.some(
+                        (choiceId: string) => !allowedChoiceIds.has(choiceId)
+                    ))
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Choose three distinct valid donation paths",
+                });
+            }
+            campaign.recommendedChoiceIds = recommendedChoiceIds;
+            campaign.markModified("recommendedChoiceIds");
         }
 
         synchronizeStoredCampaignGoals(
@@ -1407,6 +1703,7 @@ router.patch("/campaign", async (req, res) => {
             after: {
                 goal: campaign.goal,
                 active: campaign.active,
+                recommendedChoiceIds: campaign.recommendedChoiceIds ?? [],
             },
         });
 

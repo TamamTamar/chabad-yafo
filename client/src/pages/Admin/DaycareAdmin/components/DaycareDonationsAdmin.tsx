@@ -9,7 +9,6 @@ import {
     getAdminDaycareDonationAmbassadors,
     getAdminDaycareDonationCampaign,
     getAdminDaycareDonationDiagnostics,
-    getAdminDaycareDonationLeads,
     getAdminDaycareDonationRecords,
     updateDaycareDonationCampaign,
     updateDaycareDonationItem,
@@ -20,14 +19,17 @@ import type {
     DaycareDonationAmbassador,
     DaycareDonationAudit,
     DaycareDonationDiagnostics,
-    DaycareDonationLead,
     DaycareDonationRecord,
     DonationItem,
 } from "../../../DaycareDonations/types";
+import {
+    getDonationItemStatus,
+    getProgressPercent,
+} from "../../../DaycareDonations/daycareDonationsData";
 import DonationModalPreview from "../../../DaycareDonations/components/DonationModalPreview";
 import DaycareAmbassadorsAdmin from "./DaycareAmbassadorsAdmin";
 import DonationAllocationDialog from "./DonationAllocationDialog";
-import DaycareDonationLeadsAdmin from "./DaycareDonationLeadsAdmin";
+import DaycareFieldUpdatesAdmin from "./DaycareFieldUpdatesAdmin";
 import styles from "./DaycareDonationsAdmin.module.scss";
 
 const formatCurrency = (value: number) =>
@@ -52,6 +54,14 @@ const toLocalDateTimeInputValue = (date = new Date()) => {
 const getItemRemaining = (item: DonationItem) =>
     Math.max(0, item.remaining ?? item.goal - item.raised);
 
+const getInactiveRecommendationLabel = (item: DonationItem) => {
+    const status = getDonationItemStatus(item);
+
+    if (status === "complete" || getItemRemaining(item) <= 0) return "הושלם";
+    if (!item.acceptingDonations || status === "closed") return "סגור";
+    return null;
+};
+
 const sortItemsByNeed = (items: DonationItem[]) =>
     [...items].sort((first, second) => {
         const needDifference =
@@ -61,6 +71,56 @@ const sortItemsByNeed = (items: DonationItem[]) =>
 
         return (first.openingPriority ?? 0) - (second.openingPriority ?? 0);
     });
+
+const getAutomaticRecommendationIds = (items: DonationItem[]) => {
+    const openItems = items.filter(
+        (item) => !getInactiveRecommendationLabel(item)
+    );
+    const urgent = [...openItems].sort(
+        (first, second) =>
+            (first.openingPriority ?? 999) -
+                (second.openingPriority ?? 999) ||
+            getItemRemaining(first) - getItemRemaining(second)
+    )[0];
+    const quick = [...openItems]
+        .filter((item) => item.id !== urgent?.id)
+        .sort(
+            (first, second) =>
+                getItemRemaining(first) - getItemRemaining(second) ||
+                getProgressPercent(second) - getProgressPercent(first)
+        )[0];
+
+    return [urgent?.id, quick?.id, "general"].filter(
+        (value): value is string => Boolean(value)
+    );
+};
+
+const getEffectiveRecommendationIds = (
+    items: DonationItem[],
+    configuredIds: string[]
+) => {
+    const openItems = items.filter(
+        (item) => !getInactiveRecommendationLabel(item)
+    );
+    const validItemIds = new Set(openItems.map((item) => item.id));
+
+    return [
+        ...(configuredIds.length === 3 ? configuredIds : []),
+        ...getAutomaticRecommendationIds(items),
+        ...validItemIds,
+    ]
+        .filter(
+            (choiceId, index, choices) =>
+                (choiceId === "general" || validItemIds.has(choiceId)) &&
+                choices.indexOf(choiceId) === index
+        )
+        .slice(0, 3);
+};
+
+const getRecommendationLabel = (items: DonationItem[], choiceId: string) =>
+    choiceId === "general"
+        ? "תרומה כללית למעון"
+        : (items.find((item) => item.id === choiceId)?.title ?? choiceId);
 
 const statusLabels: Record<DaycareDonationRecord["status"], string> = {
     confirmed: "מאושרת",
@@ -83,6 +143,9 @@ const auditLabels: Record<string, string> = {
     "ambassador.created": "שגריר נוסף",
     "ambassador.updated": "פרטי שגריר עודכנו",
     "ambassador.deleted": "שגריר נמחק",
+    "fieldUpdate.created": "עדכון מהשטח נוסף",
+    "fieldUpdate.updated": "עדכון מהשטח נערך",
+    "fieldUpdate.deleted": "עדכון מהשטח נמחק",
     "lead.created": "פנייה לתורם נוספה",
     "lead.updated": "פנייה לתורם עודכנה",
 };
@@ -91,7 +154,7 @@ type AdminView =
     | "overview"
     | "records"
     | "ambassadors"
-    | "leads"
+    | "updates"
     | "manual"
     | "items"
     | "history";
@@ -117,7 +180,7 @@ const adminViews: Array<{
     { id: "overview", label: "סקירה", description: "מצב הקמפיין" },
     { id: "records", label: "תרומות", description: "רשומות ושיוכים" },
     { id: "ambassadors", label: "שגרירים", description: "לינקים ומעקב" },
-    { id: "leads", label: "פניות", description: "מעקב והבטחות" },
+    { id: "updates", label: "עדכונים", description: "חדשות מהשטח" },
     { id: "manual", label: "הזנה ידנית", description: "תרומה מחוץ לאתר" },
     { id: "items", label: "סעיפים ויעדים", description: "יעדים ומצבים" },
     { id: "history", label: "היסטוריה", description: "שינויים וכלים" },
@@ -132,7 +195,6 @@ const DaycareDonationsAdmin = () => {
         useState<DaycareDonationCampaignData | null>(null);
     const [records, setRecords] = useState<DaycareDonationRecord[]>([]);
     const [ambassadors, setAmbassadors] = useState<DaycareDonationAmbassador[]>([]);
-    const [leads, setLeads] = useState<DaycareDonationLead[]>([]);
     const [audit, setAudit] = useState<DaycareDonationAudit[]>([]);
     const [diagnostics, setDiagnostics] =
         useState<DaycareDonationDiagnostics | null>(null);
@@ -157,7 +219,6 @@ const DaycareDonationsAdmin = () => {
             campaignData,
             recordData,
             ambassadorData,
-            leadData,
             auditData,
             diagnosticData,
         ] =
@@ -165,14 +226,12 @@ const DaycareDonationsAdmin = () => {
             getAdminDaycareDonationCampaign(),
             getAdminDaycareDonationRecords(),
             getAdminDaycareDonationAmbassadors(),
-            getAdminDaycareDonationLeads(),
             getAdminDaycareDonationAudit(),
             getAdminDaycareDonationDiagnostics(),
         ]);
         setCampaign(campaignData);
         setRecords(recordData);
         setAmbassadors(ambassadorData);
-        setLeads(leadData);
         setAudit(auditData);
         setDiagnostics(diagnosticData);
     }, []);
@@ -315,6 +374,57 @@ const DaycareDonationsAdmin = () => {
         }
     };
 
+    const handleRecommendationsUpdate = async (
+        event: React.FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const recommendedChoiceIds = [1, 2, 3].map((position) =>
+            String(data.get(`choice${position}`) ?? "")
+        );
+        if (
+            recommendedChoiceIds.some((choiceId) => !choiceId) ||
+            new Set(recommendedChoiceIds).size !== 3
+        ) {
+            setError("יש לבחור שלושה מסלולים שונים.");
+            return;
+        }
+
+        setSaving(true);
+        setError("");
+        setMessage("");
+        try {
+            const updatedCampaign = await updateDaycareDonationCampaign({
+                recommendedChoiceIds,
+            });
+            setCampaign(updatedCampaign);
+            setMessage("שלושת המסלולים המומלצים עודכנו.");
+        } catch (saveError) {
+            console.error("Failed to update recommended choices:", saveError);
+            setError("עדכון המסלולים המומלצים נכשל.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const resetRecommendations = async () => {
+        setSaving(true);
+        setError("");
+        setMessage("");
+        try {
+            const updatedCampaign = await updateDaycareDonationCampaign({
+                recommendedChoiceIds: [],
+            });
+            setCampaign(updatedCampaign);
+            setMessage("הבחירה האוטומטית הוחזרה.");
+        } catch (saveError) {
+            console.error("Failed to reset recommended choices:", saveError);
+            setError("לא הצלחנו להחזיר את הבחירה האוטומטית.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleRecordUpdate = async (
         recordId: string,
         updates: {
@@ -377,6 +487,20 @@ const DaycareDonationsAdmin = () => {
             </p>
         );
     }
+
+    const inactiveRecommendedItems = campaign.recommendedChoiceIds
+        .map((choiceId) =>
+            campaign.items.find((item) => item.id === choiceId)
+        )
+        .filter(
+            (item): item is DonationItem =>
+                item !== undefined &&
+                Boolean(getInactiveRecommendationLabel(item))
+        );
+    const effectiveRecommendationIds = getEffectiveRecommendationIds(
+        campaign.items,
+        campaign.recommendedChoiceIds
+    );
 
     return (
         <div className={styles.layout}>
@@ -471,8 +595,8 @@ const DaycareDonationsAdmin = () => {
                         {view.id === "ambassadors" && ambassadors.length > 0 && (
                             <span>{ambassadors.length}</span>
                         )}
-                        {view.id === "leads" && leads.length > 0 && (
-                            <span>{leads.length}</span>
+                        {view.id === "updates" && campaign.fieldUpdates.length > 0 && (
+                            <span>{campaign.fieldUpdates.length}</span>
                         )}
                     </button>
                 ))}
@@ -863,6 +987,92 @@ const DaycareDonationsAdmin = () => {
                         שתרצו לערוך.
                     </p>
                 </header>
+                <form
+                    className={styles.recommendationsEditor}
+                    key={campaign.recommendedChoiceIds.join("|") || "automatic"}
+                    onSubmit={(event) => void handleRecommendationsUpdate(event)}
+                >
+                    <div className={styles.recommendationsIntro}>
+                        <strong>מה הכי יעזור עכשיו?</strong>
+                        <span>
+                            בחרו שלושה מסלולים. הסדר כאן הוא הסדר שיופיע באתר.
+                        </span>
+                    </div>
+                    {(campaign.recommendedChoiceIds.length === 3
+                        ? campaign.recommendedChoiceIds
+                        : getAutomaticRecommendationIds(campaign.items)
+                    ).map((choiceId, index) => (
+                        <label key={`choice-${index + 1}`}>
+                            מקום {index + 1}
+                            <select
+                                name={`choice${index + 1}`}
+                                defaultValue={choiceId}
+                            >
+                                <option value="general">תרומה כללית למעון</option>
+                                {campaign.items.map((item) => {
+                                    const inactiveLabel =
+                                        getInactiveRecommendationLabel(item);
+
+                                    return (
+                                        <option
+                                            key={item.id}
+                                            value={item.id}
+                                            disabled={
+                                                Boolean(inactiveLabel) &&
+                                                item.id !== choiceId
+                                            }
+                                        >
+                                            {item.title}
+                                            {inactiveLabel
+                                                ? ` — ${inactiveLabel}`
+                                                : ""}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </label>
+                    ))}
+                    <div className={styles.recommendationActions}>
+                        <button type="submit" disabled={saving}>
+                            {saving ? "שומר..." : "שמירת הבחירה"}
+                        </button>
+                        {campaign.recommendedChoiceIds.length === 3 && (
+                            <button
+                                type="button"
+                                className={styles.recommendationsReset}
+                                disabled={saving}
+                                onClick={() => void resetRecommendations()}
+                            >
+                                חזרה לאוטומטי
+                            </button>
+                        )}
+                    </div>
+                    {inactiveRecommendedItems.length > 0 && (
+                        <div
+                            className={styles.recommendationsWarning}
+                            role="status"
+                        >
+                            <strong>
+                                {inactiveRecommendedItems
+                                    .map((item) => item.title)
+                                    .join(" · ")} {inactiveRecommendedItems.length === 1
+                                    ? "לא מוצג כרגע באתר"
+                                    : "לא מוצגים כרגע באתר"}
+                            </strong>
+                            <span>
+                                הסעיף הושלם או נסגר ולכן הוחלף אוטומטית. באתר
+                                מופיעים עכשיו: {effectiveRecommendationIds
+                                    .map((choiceId) =>
+                                        getRecommendationLabel(
+                                            campaign.items,
+                                            choiceId
+                                        )
+                                    )
+                                    .join(" · ")}
+                            </span>
+                        </div>
+                    )}
+                </form>
                 <div className={styles.categoryEditors}>
                     {campaign.categories.map((category, categoryIndex) => (
                         <details
@@ -1217,10 +1427,10 @@ const DaycareDonationsAdmin = () => {
                 />
             )}
 
-            {activeView === "leads" && (
-                <DaycareDonationLeadsAdmin
-                    leads={leads}
-                    ambassadors={ambassadors}
+            {activeView === "updates" && (
+                <DaycareFieldUpdatesAdmin
+                    updates={campaign.fieldUpdates}
+                    items={campaign.items}
                     onChanged={loadData}
                 />
             )}

@@ -170,6 +170,24 @@ export const ensureDefaultDaycareDonationCampaign = async () => {
         { upsert: true, runValidators: true }
     );
 
+    await DaycareDonationCampaign.updateOne(
+        {
+            slug: DAYCARE_DONATION_CAMPAIGN_SLUG,
+            fieldUpdates: { $exists: false },
+        },
+        { $set: { fieldUpdates: defaultDaycareDonationCampaign.fieldUpdates } },
+        { runValidators: true }
+    );
+
+    await DaycareDonationCampaign.updateOne(
+        {
+            slug: DAYCARE_DONATION_CAMPAIGN_SLUG,
+            recommendedChoiceIds: { $exists: false },
+        },
+        { $set: { recommendedChoiceIds: [] } },
+        { runValidators: true }
+    );
+
     const campaign = await DaycareDonationCampaign.findOne({
         slug: DAYCARE_DONATION_CAMPAIGN_SLUG,
     });
@@ -181,7 +199,9 @@ export const ensureDefaultDaycareDonationCampaign = async () => {
     return campaign;
 };
 
-export const getDaycareDonationCampaignSnapshot = async () => {
+export const getDaycareDonationCampaignSnapshot = async (options?: {
+    includeUnpublishedUpdates?: boolean;
+}) => {
     const campaign = await ensureDefaultDaycareDonationCampaign();
     const records = await DaycareDonationRecord.find({
         campaignSlug: campaign.slug,
@@ -264,6 +284,31 @@ export const getDaycareDonationCampaignSnapshot = async () => {
             };
         });
 
+    const fieldUpdates = [...(campaign.fieldUpdates ?? [])]
+        .filter(
+            (update) =>
+                options?.includeUnpublishedUpdates || update.published
+        )
+        .sort(
+            (first, second) =>
+                (second.publishedAt ?? second.updatedAt).getTime() -
+                (first.publishedAt ?? first.updatedAt).getTime()
+        )
+        .map((update) => ({
+            id: update.id,
+            title: update.title,
+            description: update.description,
+            itemId: update.itemId,
+            published: update.published,
+            publishedAt: update.publishedAt,
+            imageUrl: update.image.storageKey
+                ? `/api/daycare-donations/field-updates/${encodeURIComponent(update.id)}/image`
+                : update.image.src,
+            imageAlt: update.image.alt,
+            createdAt: update.createdAt,
+            updatedAt: update.updatedAt,
+        }));
+
     return {
         slug: campaign.slug,
         title: campaign.title,
@@ -283,6 +328,8 @@ export const getDaycareDonationCampaignSnapshot = async () => {
         recentDonations: records.slice(0, 60).map(toPublicDaycareDonation),
         categories,
         items,
+        recommendedChoiceIds: campaign.recommendedChoiceIds ?? [],
+        fieldUpdates,
         updatedAt: campaign.updatedAt,
     };
 };

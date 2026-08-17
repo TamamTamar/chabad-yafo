@@ -425,6 +425,80 @@
     margin-top: 20px;
 }
 
+.recommendationsEditor {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.2fr) repeat(3, minmax(150px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid rgba($brand-gold-rich, 0.28);
+    border-radius: 15px;
+    background: rgba($brand-gold-light, 0.08);
+}
+
+.recommendationsIntro {
+    display: grid;
+    align-self: center;
+    gap: 4px;
+}
+
+.recommendationsIntro strong { color: $brand-blue-ink; }
+.recommendationsIntro span { color: $ui-text-muted; font-size: $type-caption; }
+.recommendationsEditor label {
+    display: grid;
+    gap: 7px;
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+.recommendationsEditor select {
+    width: 100%;
+    min-height: 43px;
+    padding: 8px 11px;
+    border: 1px solid $ui-border-soft;
+    border-radius: 11px;
+    background: $color-white;
+    color: $brand-blue-ink;
+    font: inherit;
+}
+.recommendationActions {
+    display: grid;
+    gap: 6px;
+}
+.recommendationActions button {
+    min-height: 43px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: $radius-pill;
+    background: $brand-primary;
+    color: $color-white;
+    font-weight: 900;
+}
+.recommendationActions .recommendationsReset {
+    min-height: 34px;
+    border: 1px solid $ui-border-soft;
+    background: $color-white;
+    color: $brand-blue-ink;
+    font-size: $type-caption;
+}
+
+.recommendationsWarning {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 4px;
+    padding: 11px 13px;
+    border: 1px solid rgba($brand-gold-rich, 0.35);
+    border-radius: 11px;
+    background: rgba($brand-gold-light, 0.16);
+    color: $brand-blue-ink;
+}
+
+.recommendationsWarning span {
+    color: $ui-text-muted;
+    font-size: $type-caption;
+}
+
 .categoryEditor {
     overflow: hidden;
     border: 1px solid $ui-border-soft;
@@ -844,6 +918,14 @@
         grid-template-columns: 1fr 1fr;
     }
 
+    .recommendationsEditor {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .recommendationsIntro {
+        grid-column: 1 / -1;
+    }
+
     .campaignForm,
     .categoryRow,
     .recordFilters {
@@ -856,6 +938,14 @@
     .summarySection,
     .panel {
         padding: 18px;
+    }
+
+    .recommendationsEditor {
+        grid-template-columns: 1fr;
+    }
+
+    .recommendationsIntro {
+        grid-column: auto;
     }
 
     .sectionHeader {

@@ -43,6 +43,20 @@ test("daycare donation defaults preserve the approved 100,000 ILS budget", () =>
     });
 });
 
+test("default campaign includes a published field update linked to a valid item", () => {
+    const update = defaultDaycareDonationCampaign.fieldUpdates[0];
+
+    assert.ok(update);
+    assert.equal(update.published, true);
+    assert.ok(update.image.src || update.image.storageKey);
+    assert.ok(
+        !update.itemId ||
+            defaultDaycareDonationCampaign.items.some(
+                (item) => item.id === update.itemId
+            )
+    );
+});
+
 test("confirmed donation totals separate general and allocated donations", () => {
     const result = calculateDaycareDonationTotals([
         { amount: 180 },

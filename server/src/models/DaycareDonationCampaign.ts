@@ -43,6 +43,32 @@ const itemSchema = new mongoose.Schema(
     { _id: false }
 );
 
+const fieldUpdateSchema = new mongoose.Schema(
+    {
+        id: { type: String, required: true, trim: true },
+        title: { type: String, required: true, trim: true },
+        description: { type: String, required: true, trim: true },
+        itemId: { type: String, trim: true },
+        published: { type: Boolean, required: true, default: false },
+        publishedAt: { type: Date },
+        image: {
+            type: new mongoose.Schema(
+                {
+                    src: { type: String, trim: true },
+                    storageKey: { type: String, trim: true },
+                    mimeType: { type: String, trim: true },
+                    alt: { type: String, required: true, trim: true },
+                },
+                { _id: false }
+            ),
+            required: true,
+        },
+        createdAt: { type: Date, required: true },
+        updatedAt: { type: Date, required: true },
+    },
+    { _id: false }
+);
+
 const daycareDonationCampaignSchema =
     new mongoose.Schema<DaycareDonationCampaignDocument>(
         {
@@ -50,8 +76,18 @@ const daycareDonationCampaignSchema =
             title: { type: String, required: true, trim: true },
             goal: { type: Number, required: true, min: 0 },
             active: { type: Boolean, required: true, default: true },
+            recommendedChoiceIds: {
+                type: [String],
+                required: true,
+                default: [],
+            },
             categories: { type: [categorySchema], required: true },
             items: { type: [itemSchema], required: true },
+            fieldUpdates: {
+                type: [fieldUpdateSchema],
+                required: true,
+                default: [],
+            },
         },
         { timestamps: true }
     );

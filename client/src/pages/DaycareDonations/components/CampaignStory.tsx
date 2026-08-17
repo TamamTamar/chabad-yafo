@@ -1,39 +1,87 @@
-import { HeartHandshake } from "lucide-react";
-import type { DonationSelection } from "../types";
+import { ArrowLeft, HardHat } from "lucide-react";
+import type {
+    DaycareDonationFieldUpdate,
+    DonationItem,
+    DonationSelection,
+    DonationVisual,
+} from "../types";
 import styles from "../DaycareDonations.module.scss";
-import GeneralDonationCard from "./GeneralDonationCard";
+import VisualPlaceholder from "./VisualPlaceholder";
 
 type CampaignStoryProps = {
     onDonate: (selection: DonationSelection) => void;
-    generalRaised: number;
+    donationItems: DonationItem[];
+    fieldUpdates: DaycareDonationFieldUpdate[];
 };
+
+const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("he-IL").format(value);
 
 const CampaignStory = ({
     onDonate,
-    generalRaised,
-}: CampaignStoryProps) => (
-    <section className={styles.storySection}>
-        <div className={styles.storyContent}>
-            <p className={styles.sectionEyebrow}>החזון מתחיל לקבל צורה</p>
-            <h2>כל פינה כאן תהפוך לחלק מהיום־יום של הילדים</h2>
-            <p>
-                כל קיר שנצבע, כל פינה בטוחה וכל משחק שנכניס למעון
-                יהפכו למקום שבו ילדי יפו ירגישו בבית.
-            </p>
-            <p>
-                אפשר לבחור חלק מסוים בפרויקט, או לתת לנו להפנות את
-                התרומה למקום שבו היא נחוצה ביותר.
-            </p>
-            <span className={styles.storySignature}>
-                <HeartHandshake aria-hidden="true" />
-                יחד פותחים את הדלת
-            </span>
-            <GeneralDonationCard
-                onDonate={onDonate}
-                generalRaised={generalRaised}
-            />
-        </div>
-    </section>
-);
+    donationItems,
+    fieldUpdates,
+}: CampaignStoryProps) => {
+    const update = fieldUpdates.find((entry) => entry.published);
+    if (!update) return null;
+
+    const updateVisual: DonationVisual = {
+        src: update.imageUrl,
+        alt: update.imageAlt,
+        placeholderLabel: "עדכון מהעבודות במעון",
+        tone: "sand",
+    };
+    const linkedItem = update.itemId
+        ? donationItems.find(
+              (item) => item.id === update.itemId && item.acceptingDonations
+          )
+        : undefined;
+    const nextItem = linkedItem ?? donationItems.find((item) => item.acceptingDonations);
+    const remaining = nextItem
+        ? Math.max(0, nextItem.remaining ?? nextItem.goal - nextItem.raised)
+        : 0;
+
+    return (
+        <section className={styles.fieldUpdate} aria-labelledby="field-update-title">
+            <div className={styles.fieldUpdateVisualWrap}>
+                <VisualPlaceholder
+                    visual={updateVisual}
+                    className={styles.fieldUpdateVisual}
+                />
+                <span className={styles.fieldUpdateBadge}>
+                    <HardHat aria-hidden="true" />
+                    עדכון אחרון מהשטח
+                </span>
+            </div>
+            <div className={styles.fieldUpdateContent}>
+                <p className={styles.sectionEyebrow}>העבודה ממשיכה להתקדם</p>
+                <h2 id="field-update-title">{update.title}</h2>
+                <p>{update.description}</p>
+                {nextItem && (
+                    <div className={styles.fieldUpdateAction}>
+                        <div>
+                            <span>השלב הבא</span>
+                            <strong>{nextItem.title}</strong>
+                            <small>נותרו ₪{formatCurrency(remaining)}</small>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() =>
+                                onDonate({
+                                    kind: "item",
+                                    id: nextItem.id,
+                                    title: nextItem.title,
+                                })
+                            }
+                        >
+                            שותפים בשלב הבא
+                            <ArrowLeft aria-hidden="true" />
+                        </button>
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+};
 
 export default CampaignStory;

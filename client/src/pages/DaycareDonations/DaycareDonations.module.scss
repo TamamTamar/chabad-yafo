@@ -570,6 +570,357 @@
     color: var(--campaign-gold-light);
 }
 
+.recommendedSection {
+    padding: 44px 0 38px;
+}
+
+.recommendedHeading {
+    max-width: 760px;
+    margin: 0 auto 24px;
+    text-align: center;
+}
+
+.recommendedHeading > p:first-child {
+    margin: 0 0 7px;
+    font-size: 0.86rem;
+    font-weight: 800;
+}
+
+.recommendedHeading h2 {
+    margin: 0;
+    color: var(--campaign-navy);
+    font-size: clamp(2rem, 4vw, 3.15rem);
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+}
+
+.recommendedHeading > p:last-child {
+    margin: 12px auto 0;
+    color: rgba(20, 40, 59, 0.68);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.recommendedGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.recommendedCard {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 360px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
+    overflow: hidden;
+    border: 1px solid rgba($brand-primary-deep, 0.1);
+    border-radius: 26px;
+    background: rgba($color-white, 0.94);
+    box-shadow: 0 16px 42px rgba($brand-primary-deep, 0.08);
+}
+
+.recommendedCard::after {
+    content: "";
+    position: absolute;
+    left: -74px;
+    bottom: -96px;
+    width: 210px;
+    height: 210px;
+    border: 1px solid rgba($brand-gold-rich, 0.13);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.recommendedUrgent {
+    border-color: rgba($brand-gold-rich, 0.42);
+    background: linear-gradient(
+        145deg,
+        rgba(255, 251, 240, 0.98),
+        rgba($color-white, 0.95)
+    );
+}
+
+.recommendedGeneral {
+    background: var(--campaign-navy);
+    color: $color-white;
+}
+
+.recommendedIcon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 18px;
+    place-items: center;
+    border-radius: 15px;
+    background: rgba($brand-gold-light, 0.22);
+    color: var(--campaign-gold);
+}
+
+.recommendedIcon svg {
+    width: 23px;
+    height: 23px;
+}
+
+.recommendedUrgent .recommendedIcon {
+    background: var(--campaign-gold);
+    color: $color-white;
+}
+
+.recommendedGeneral .recommendedIcon {
+    background: rgba($color-white, 0.1);
+    color: var(--campaign-gold-light);
+}
+
+.recommendedLabel {
+    margin-bottom: 7px;
+    color: var(--campaign-gold);
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.recommendedGeneral .recommendedLabel {
+    color: var(--campaign-gold-light);
+}
+
+.recommendedCard h3 {
+    margin: 0;
+    color: var(--campaign-navy);
+    font-size: 1.38rem;
+    line-height: 1.18;
+}
+
+.recommendedGeneral h3 {
+    color: $color-white;
+}
+
+.recommendedCard > p {
+    margin: 10px 0 16px;
+    color: rgba(20, 40, 59, 0.66);
+    font-size: 0.92rem;
+    line-height: 1.58;
+}
+
+.recommendedGeneral > p {
+    color: rgba($color-white, 0.72);
+}
+
+.recommendedCard > strong {
+    margin-top: auto;
+    color: var(--campaign-navy-soft);
+    font-size: 0.88rem;
+}
+
+.recommendedGeneral > strong {
+    color: var(--campaign-gold-light);
+}
+
+.recommendedCard > button {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+    border: 0;
+    border-radius: $radius-pill;
+    background: var(--campaign-navy);
+    color: $color-white;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.recommendedCard > button svg {
+    width: 17px;
+    height: 17px;
+}
+
+.recommendedGeneral > button {
+    background: var(--campaign-gold);
+    color: var(--campaign-navy);
+}
+
+.fieldUpdate {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 0;
+    margin: 20px 0 42px;
+    overflow: hidden;
+    border: 1px solid rgba($brand-primary-deep, 0.1);
+    border-radius: 28px;
+    background: rgba($color-white, 0.94);
+    box-shadow: 0 20px 58px rgba($brand-primary-deep, 0.1);
+}
+
+.fieldUpdateVisualWrap {
+    position: relative;
+    min-height: 260px;
+}
+
+.fieldUpdateVisual {
+    height: 100%;
+    min-height: 260px;
+    border-radius: 0;
+    object-position: center 68%;
+}
+
+.fieldUpdateBadge {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 13px;
+    border: 1px solid rgba($color-white, 0.45);
+    border-radius: $radius-pill;
+    background: rgba(9, 38, 65, 0.9);
+    color: $color-white;
+    font-size: 0.78rem;
+    font-weight: 800;
+    backdrop-filter: blur(10px);
+}
+
+.fieldUpdateBadge svg {
+    width: 16px;
+    height: 16px;
+    color: var(--campaign-gold-light);
+}
+
+.fieldUpdateContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 34px 38px;
+}
+
+.fieldUpdateContent > p:first-child {
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.fieldUpdateContent h2 {
+    margin: 0;
+    color: var(--campaign-navy);
+    font-size: clamp(1.75rem, 3vw, 2.6rem);
+    letter-spacing: -0.026em;
+    line-height: 1.1;
+}
+
+.fieldUpdateContent > p:not(.sectionEyebrow) {
+    margin: 14px 0 22px;
+    color: rgba(20, 40, 59, 0.7);
+    line-height: 1.68;
+}
+
+.fieldUpdateAction {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    padding-top: 18px;
+    border-top: 1px solid rgba($brand-primary-deep, 0.1);
+}
+
+.fieldUpdateAction > div {
+    display: grid;
+    gap: 2px;
+}
+
+.fieldUpdateAction span,
+.fieldUpdateAction small {
+    color: rgba(20, 40, 59, 0.56);
+    font-size: 0.76rem;
+}
+
+.fieldUpdateAction strong {
+    color: var(--campaign-navy);
+}
+
+.fieldUpdateAction > button {
+    display: inline-flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: $radius-pill;
+    background: var(--campaign-navy);
+    color: $color-white;
+    font-weight: 800;
+}
+
+.fieldUpdateAction > button svg {
+    width: 17px;
+    height: 17px;
+}
+
+.fullCatalog {
+    margin: 0 0 44px;
+    border: 1px solid rgba($brand-primary-deep, 0.11);
+    border-radius: 24px;
+    background: rgba($color-white, 0.7);
+    box-shadow: 0 14px 38px rgba($brand-primary-deep, 0.06);
+}
+
+.fullCatalog > summary {
+    display: flex;
+    min-height: 86px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 24px;
+    cursor: pointer;
+    list-style: none;
+    color: var(--campaign-navy);
+}
+
+.fullCatalog > summary::-webkit-details-marker {
+    display: none;
+}
+
+.fullCatalog > summary > span {
+    display: grid;
+    gap: 4px;
+}
+
+.fullCatalog > summary strong {
+    font-size: 1.18rem;
+}
+
+.fullCatalog > summary small {
+    color: rgba(20, 40, 59, 0.58);
+}
+
+.fullCatalog > summary > svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 180ms ease;
+}
+
+.fullCatalog[open] > summary > svg {
+    transform: rotate(180deg);
+}
+
+.fullCatalog[open] > summary {
+    border-bottom: 1px solid rgba($brand-primary-deep, 0.09);
+}
+
+.fullCatalogContent {
+    padding: 24px;
+}
+
+.fullCatalogContent .categoryQuickNav {
+    margin-bottom: 34px;
+}
+
 .storySection {
     padding: 38px 0 34px;
     border-bottom: 1px solid rgba($brand-primary-deep, 0.08);
@@ -2210,6 +2561,15 @@
     .galleryGrid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .recommendedGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .recommendedGeneral {
+        grid-column: 1 / -1;
+        min-height: 300px;
+    }
 }
 
 @media (max-width: 760px) {
@@ -2241,6 +2601,132 @@
 
     .contentShell {
         width: min(100% - 28px, 620px);
+    }
+
+    .recommendedSection {
+        padding: 34px 0 28px;
+    }
+
+    .recommendedHeading {
+        margin-bottom: 18px;
+    }
+
+    .recommendedHeading h2 {
+        font-size: 2.25rem;
+    }
+
+    .recommendedGrid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .recommendedCard,
+    .recommendedGeneral {
+        grid-column: auto;
+        min-height: 0;
+        padding: 20px;
+        border-radius: 22px;
+    }
+
+    .recommendedIcon {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 13px;
+    }
+
+    .recommendedCard h3 {
+        font-size: 1.28rem;
+    }
+
+    .recommendedCard > p {
+        margin: 8px 0 14px;
+    }
+
+    .recommendedCard > strong {
+        margin-top: 0;
+    }
+
+    .fieldUpdate {
+        grid-template-columns: 1fr;
+        margin: 14px 0 28px;
+        border-radius: 22px;
+    }
+
+    .fieldUpdateVisualWrap,
+    .fieldUpdateVisual {
+        min-height: 210px;
+    }
+
+    .fieldUpdateVisualWrap {
+        height: 210px;
+        background: #d9d5cc;
+    }
+
+    .fieldUpdateVisual {
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .fieldUpdateBadge {
+        top: 12px;
+        right: 12px;
+        gap: 6px;
+        padding: 7px 10px;
+        font-size: 0.72rem;
+    }
+
+    .fieldUpdateBadge svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .fieldUpdateContent {
+        padding: 20px 18px 22px;
+    }
+
+    .fieldUpdateContent > p:first-child {
+        margin-bottom: 6px;
+        font-size: 0.76rem;
+    }
+
+    .fieldUpdateContent h2 {
+        font-size: 1.55rem;
+        line-height: 1.14;
+    }
+
+    .fieldUpdateContent > p:not(.sectionEyebrow) {
+        margin: 10px 0 16px;
+        font-size: 0.9rem;
+        line-height: 1.52;
+    }
+
+    .fieldUpdateAction {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding-top: 14px;
+    }
+
+    .fieldUpdateAction > button {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .fullCatalog {
+        margin-bottom: 30px;
+        border-radius: 20px;
+    }
+
+    .fullCatalog > summary {
+        min-height: 76px;
+        padding: 15px 18px;
+    }
+
+    .fullCatalog > summary strong {
+        font-size: 1.02rem;
+    }
+
+    .fullCatalogContent {
+        padding: 14px;
     }
 
     .hero {

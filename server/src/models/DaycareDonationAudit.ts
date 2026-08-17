@@ -20,6 +20,7 @@ const daycareDonationAuditSchema =
                     "record",
                     "intent",
                     "ambassador",
+                    "fieldUpdate",
                     "lead",
                 ],
                 required: true,

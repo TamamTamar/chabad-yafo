@@ -266,10 +266,63 @@ export const updateDaycareDonationCategory = async (
 export const updateDaycareDonationCampaign = async (updates: {
     goal?: number;
     active?: boolean;
+    recommendedChoiceIds?: string[];
 }) => {
     const response = await http.patch<ApiResponse<DaycareDonationCampaignData>>(
         "/admin/daycare/donations/campaign",
         updates
+    );
+    return response.data.data;
+};
+
+export type DaycareDonationFieldUpdateInput = {
+    title: string;
+    description: string;
+    imageAlt: string;
+    itemId?: string;
+    published: boolean;
+    image?: File;
+};
+
+const toFieldUpdateFormData = (
+    input: Partial<DaycareDonationFieldUpdateInput>
+) => {
+    const formData = new FormData();
+    Object.entries(input).forEach(([key, value]) => {
+        if (value === undefined) return;
+        if (value instanceof File) formData.append(key, value);
+        else formData.append(key, String(value));
+    });
+    return formData;
+};
+
+export const createDaycareDonationFieldUpdate = async (
+    input: DaycareDonationFieldUpdateInput & { image: File }
+) => {
+    const response = await http.post<ApiResponse<DaycareDonationCampaignData>>(
+        "/admin/daycare/donations/field-updates",
+        toFieldUpdateFormData(input),
+        { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    return response.data.data;
+};
+
+export const updateDaycareDonationFieldUpdate = async (
+    id: string,
+    input: Partial<DaycareDonationFieldUpdateInput>
+) => {
+    const response = await http.patch<ApiResponse<DaycareDonationCampaignData>>(
+        `/admin/daycare/donations/field-updates/${id}`,
+        toFieldUpdateFormData(input),
+        { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    return response.data.data;
+};
+
+export const deleteDaycareDonationFieldUpdate = async (id: string) => {
+    const response = await http.delete<ApiResponse<DaycareDonationCampaignData>>(
+        `/admin/daycare/donations/field-updates/${id}`,
+        { data: {} }
     );
     return response.data.data;
 };

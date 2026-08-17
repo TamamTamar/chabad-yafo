@@ -7,6 +7,24 @@ export const defaultDaycareDonationCampaign: DaycareDonationCampaignDocument = {
     title: "מקימים יחד את מעון חב״ד יפו",
     goal: 100_000,
     active: true,
+    recommendedChoiceIds: [],
+    fieldUpdates: [
+        {
+            id: "kitchen-installed",
+            title: "המטבח כבר במקום — עכשיו משלימים את התשתיות",
+            description:
+                "ארונות המטבח והמשטח כבר הותקנו. השלב הבא הוא להשלים את האינסטלציה והשירותים המותאמים לילדים, כדי שהחלל יהיה מוכן לשימוש יום־יומי.",
+            itemId: "plumbing",
+            published: true,
+            publishedAt: new Date("2026-08-17T00:00:00.000Z"),
+            image: {
+                src: "/daycare-donations/field-update-kitchen.jpg",
+                alt: "ארונות המטבח החדשים שהותקנו במעון",
+            },
+            createdAt: new Date("2026-08-17T00:00:00.000Z"),
+            updatedAt: new Date("2026-08-17T00:00:00.000Z"),
+        },
+    ],
     categories: [
         {
             id: "renovation",

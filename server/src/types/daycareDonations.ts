@@ -66,6 +66,23 @@ export type DaycareDonationVisual = {
     alt: string;
 };
 
+export type DaycareDonationFieldUpdateConfig = {
+    id: string;
+    title: string;
+    description: string;
+    itemId?: string;
+    published: boolean;
+    publishedAt?: Date;
+    image: {
+        src?: string;
+        storageKey?: string;
+        mimeType?: string;
+        alt: string;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+};
+
 export type DaycareDonationCategoryConfig = {
     id: string;
     title: string;
@@ -94,8 +111,10 @@ export type DaycareDonationCampaignDocument = {
     title: string;
     goal: number;
     active: boolean;
+    recommendedChoiceIds: string[];
     categories: DaycareDonationCategoryConfig[];
     items: DaycareDonationItemConfig[];
+    fieldUpdates: DaycareDonationFieldUpdateConfig[];
     createdAt?: Date;
     updatedAt?: Date;
 };
@@ -163,6 +182,7 @@ export type DaycareDonationAuditDocument = {
         | "record"
         | "intent"
         | "ambassador"
+        | "fieldUpdate"
         | "lead";
     entityId: string;
     actor: "admin" | "nedarim" | "system";

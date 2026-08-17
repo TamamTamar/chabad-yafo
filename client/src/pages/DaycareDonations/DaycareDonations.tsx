@@ -24,6 +24,8 @@ import DonationCategorySection from "./components/DonationCategorySection";
 import DonationModalPreview from "./components/DonationModalPreview";
 import MobileDonationBar from "./components/MobileDonationBar";
 import RecentDonors from "./components/RecentDonors";
+import RecommendedDonationChoices from "./components/RecommendedDonationChoices";
+import { ChevronDown } from "lucide-react";
 import {
     extractAmbassadorRef,
     normalizeAmbassadorRef,
@@ -40,7 +42,10 @@ const fallbackCampaign: DaycareDonationCampaignData = {
     title: "מקימים יחד את מעון חב״ד יפו",
     goal: CAMPAIGN_GOAL,
     active: true,
-    publicVisible: false,
+    recommendedChoiceIds: [],
+    // Keep the local preview usable when the API is temporarily unavailable.
+    // Production still fails closed until the campaign is explicitly public.
+    publicVisible: import.meta.env.DEV,
     paymentsEnabled: false,
     raised: 0,
     generalRaised: 0,
@@ -53,6 +58,21 @@ const fallbackCampaign: DaycareDonationCampaignData = {
         acceptingDonations: true,
         statusOverride: "auto",
     })),
+    fieldUpdates: [
+        {
+            id: "kitchen-installed",
+            title: "המטבח כבר במקום — עכשיו משלימים את התשתיות",
+            description:
+                "ארונות המטבח והמשטח כבר הותקנו. השלב הבא הוא להשלים את האינסטלציה והשירותים המותאמים לילדים, כדי שהחלל יהיה מוכן לשימוש יום־יומי.",
+            itemId: "plumbing",
+            published: true,
+            publishedAt: "2026-08-17T00:00:00.000Z",
+            imageUrl: "/daycare-donations/field-update-kitchen.jpg",
+            imageAlt: "ארונות המטבח החדשים שהותקנו במעון",
+            createdAt: "2026-08-17T00:00:00.000Z",
+            updatedAt: "2026-08-17T00:00:00.000Z",
+        },
+    ],
 };
 
 const ambassadorStorageKey = "daycare-donations-ref";
@@ -214,23 +234,44 @@ const DaycareDonations = () => {
                         הקישור האישי לא זוהה; אפשר להמשיך בתרומה רגילה.
                     </p>
                 )}
+                <RecommendedDonationChoices
+                    donationItems={campaign.items}
+                    generalRaised={campaign.generalRaised}
+                    recommendedChoiceIds={campaign.recommendedChoiceIds}
+                    onDonate={openDonation}
+                />
                 <CampaignStory
                     onDonate={openDonation}
-                    generalRaised={campaign.generalRaised}
+                    donationItems={campaign.items}
+                    fieldUpdates={campaign.fieldUpdates}
                 />
-                <CategoryQuickNav categories={campaign.categories} />
 
-                <div id="campaign-parts" className={styles.categories}>
-                    {campaign.categories.map((category, index) => (
-                        <DonationCategorySection
-                            key={category.id}
-                            category={category}
-                            donationItems={campaign.items}
-                            index={index}
-                            onDonate={openDonation}
-                        />
-                    ))}
-                </div>
+                <details className={styles.fullCatalog}>
+                    <summary>
+                        <span>
+                            <strong>רוצים לבחור חלק מסוים במעון?</strong>
+                            <small>
+                                הצגת כל {campaign.items.length} הפרויקטים לפי
+                                תחום
+                            </small>
+                        </span>
+                        <ChevronDown aria-hidden="true" />
+                    </summary>
+                    <div className={styles.fullCatalogContent}>
+                        <CategoryQuickNav categories={campaign.categories} />
+                        <div className={styles.categories}>
+                            {campaign.categories.map((category, index) => (
+                                <DonationCategorySection
+                                    key={category.id}
+                                    category={category}
+                                    donationItems={campaign.items}
+                                    index={index}
+                                    onDonate={openDonation}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </details>
 
                 <CompletedProjects
                     categories={campaign.categories}

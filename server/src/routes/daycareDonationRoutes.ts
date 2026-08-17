@@ -17,6 +17,7 @@ import {
 } from "../services/daycareDonationCallbackSecurity";
 import type { DaycareDonationItemConfig } from "../types/daycareDonations";
 import { findActiveDaycareDonationAmbassador } from "../services/daycareDonationAmbassadorService";
+import { getDaycareStorageProvider } from "../services/daycareStorageService";
 
 const router = Router();
 
@@ -88,6 +89,35 @@ router.get("/campaign", async (_req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to get daycare donation campaign",
+        });
+    }
+});
+
+router.get("/field-updates/:id/image", async (req, res) => {
+    try {
+        const campaign = await ensureDefaultDaycareDonationCampaign();
+        const update = campaign.fieldUpdates.find(
+            (entry) => entry.id === req.params.id
+        );
+        if (!update?.image.storageKey || !update.image.mimeType) {
+            return res.status(404).json({
+                success: false,
+                message: "Field update image was not found",
+            });
+        }
+        const bytes = await getDaycareStorageProvider().download(
+            update.image.storageKey
+        );
+        res.set({
+            "Content-Type": update.image.mimeType,
+            "Cache-Control": "public, max-age=300",
+            "X-Content-Type-Options": "nosniff",
+        });
+        return res.send(bytes);
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            message: "Field update image was not found",
         });
     }
 });

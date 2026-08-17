@@ -62,10 +62,15 @@ export const requireSecureAdminMutation = (
         return;
     }
 
-    if (!req.is("application/json")) {
+    const isFieldUpdateImageMutation =
+        req.baseUrl === "/api/admin/daycare/donations" &&
+        req.path.startsWith("/field-updates") &&
+        Boolean(req.is("multipart/form-data"));
+
+    if (!req.is("application/json") && !isFieldUpdateImageMutation) {
         res.status(415).json({
             success: false,
-            message: "Admin mutations require application/json",
+            message: "Admin mutations require an approved content type",
         });
         return;
     }

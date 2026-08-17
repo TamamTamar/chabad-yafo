@@ -19,6 +19,14 @@ type Props = {
 
 const toAmountInput = (amount: number) => String(Math.round(amount * 100) / 100);
 
+const getRemaining = (item: DonationItem) =>
+    Math.max(0, item.remaining ?? item.goal - item.raised);
+
+const getTargetLabel = (item: DonationItem) => {
+    const remaining = getRemaining(item);
+    return `${item.title} — ${remaining > 0 ? `חסרים ₪${remaining.toLocaleString("he-IL")}` : "היעד הושלם"}`;
+};
+
 const DonationAllocationDialog = ({
     record,
     items,
@@ -48,6 +56,8 @@ const DonationAllocationDialog = ({
     const splitActive = Boolean(secondItemId);
     const firstValue = Number(firstAmount);
     const secondValue = Number(secondAmount);
+    const firstItem = items.find((item) => item.id === firstItemId);
+    const secondItem = items.find((item) => item.id === secondItemId);
     const remainingCents =
         Math.round(record.amount * 100) -
         Math.round((Number.isFinite(firstValue) ? firstValue : 0) * 100) -
@@ -61,6 +71,22 @@ const DonationAllocationDialog = ({
         if (remainingCents !== 0) return "סכומי החלוקה חייבים להיות שווים לסכום התרומה.";
         return "";
     }, [firstItemId, firstValue, remainingCents, secondItemId, secondValue, splitActive]);
+
+    const targetCapacityWarning = useMemo(() => {
+        const warnings: string[] = [];
+        const effectiveFirstAmount = splitActive ? firstValue : record.amount;
+        if (firstItem && effectiveFirstAmount > getRemaining(firstItem)) {
+            warnings.push(
+                `ב${firstItem.title} חסרים רק ₪${getRemaining(firstItem).toLocaleString("he-IL")}`
+            );
+        }
+        if (secondItem && secondValue > getRemaining(secondItem)) {
+            warnings.push(
+                `ב${secondItem.title} חסרים רק ₪${getRemaining(secondItem).toLocaleString("he-IL")}`
+            );
+        }
+        return warnings.join(" · ");
+    }, [firstItem, firstValue, record.amount, secondItem, secondValue, splitActive]);
 
     const handleSecondTarget = (itemId: string) => {
         setSecondItemId(itemId);
@@ -110,7 +136,7 @@ const DonationAllocationDialog = ({
                         >
                             <option value="">תרומה כללית</option>
                             {items.map((item) => (
-                                <option key={item.id} value={item.id}>{item.title}</option>
+                                <option key={item.id} value={item.id}>{getTargetLabel(item)}</option>
                             ))}
                         </select>
                     </label>
@@ -134,7 +160,7 @@ const DonationAllocationDialog = ({
                         >
                             <option value="">ללא יעד נוסף</option>
                             {items.map((item) => (
-                                <option key={item.id} value={item.id}>{item.title}</option>
+                                <option key={item.id} value={item.id}>{getTargetLabel(item)}</option>
                             ))}
                         </select>
                     </label>
@@ -154,6 +180,12 @@ const DonationAllocationDialog = ({
                 {splitActive && (
                     <p className={validationMessage ? styles.validationError : styles.validationOk}>
                         {validationMessage || "הסכום חולק במלואו בין שני היעדים."}
+                    </p>
+                )}
+
+                {targetCapacityWarning && (
+                    <p className={styles.capacityWarning}>
+                        שימו לב: {targetCapacityWarning}. אפשר לשמור, אבל היעד יקבל יותר מהסכום החסר.
                     </p>
                 )}
 

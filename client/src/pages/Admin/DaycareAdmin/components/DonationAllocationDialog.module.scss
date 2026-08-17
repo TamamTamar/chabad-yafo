@@ -60,7 +60,8 @@
 }
 
 .validationError,
-.validationOk {
+.validationOk,
+.capacityWarning {
     margin: 0;
     padding: 9px 11px;
     border-radius: $radius-sm;
@@ -75,6 +76,11 @@
 
 .validationOk {
     background: rgba($ui-success, 0.2);
+    color: $ui-surface-soft;
+}
+
+.capacityWarning {
+    background: rgba($brand-gold-rich, 0.2);
     color: $ui-surface-soft;
 }
 

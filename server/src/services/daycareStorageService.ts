@@ -8,7 +8,7 @@ type StoredFileInput = {
     bytes: Buffer;
     mimeType: string;
     originalName?: string;
-    category: "signatures" | "signed-agreements" | "health-signatures" | "health-declarations" | "pickup-signatures" | "pickup-authorizations";
+    category: "signatures" | "signed-agreements" | "health-signatures" | "health-declarations" | "pickup-signatures" | "pickup-authorizations" | "campaign-updates";
 };
 
 type StorageProvider = {
@@ -20,7 +20,15 @@ type StorageProvider = {
 
 const sha256 = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 const extensionForMime = (mimeType: string) =>
-    mimeType === "image/png" ? ".png" : mimeType === "application/pdf" ? ".pdf" : "";
+    mimeType === "image/png"
+        ? ".png"
+        : mimeType === "image/jpeg"
+          ? ".jpg"
+          : mimeType === "image/webp"
+            ? ".webp"
+            : mimeType === "application/pdf"
+              ? ".pdf"
+              : "";
 const createStorageKey = (input: StoredFileInput) =>
     `daycare/${input.category}/${randomUUID()}${extensionForMime(input.mimeType)}`;
 
@@ -111,13 +119,13 @@ const createLocalProvider = (): StorageProvider => ({
         };
     },
     async download(storageKey) {
-        if (!/^daycare\/(signatures|signed-agreements|health-signatures|health-declarations|pickup-signatures|pickup-authorizations)\/[a-f0-9-]+\.(png|pdf)$/.test(storageKey)) {
+        if (!/^daycare\/(signatures|signed-agreements|health-signatures|health-declarations|pickup-signatures|pickup-authorizations|campaign-updates)\/[a-f0-9-]+\.(png|jpg|webp|pdf)$/.test(storageKey)) {
             throw new Error("Invalid storage key");
         }
         return readFile(path.join(localRoot, storageKey));
     },
     async delete(storageKey) {
-        if (!/^daycare\/(signatures|signed-agreements|health-signatures|health-declarations|pickup-signatures|pickup-authorizations)\/[a-f0-9-]+\.(png|pdf)$/.test(storageKey)) {
+        if (!/^daycare\/(signatures|signed-agreements|health-signatures|health-declarations|pickup-signatures|pickup-authorizations|campaign-updates)\/[a-f0-9-]+\.(png|jpg|webp|pdf)$/.test(storageKey)) {
             throw new Error("Invalid storage key");
         }
         await unlink(path.join(localRoot, storageKey)).catch((error: NodeJS.ErrnoException) => {

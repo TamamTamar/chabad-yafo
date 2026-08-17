@@ -42,6 +42,7 @@ export type DaycareDonationCampaignData = {
     title: string;
     goal: number;
     active: boolean;
+    recommendedChoiceIds: string[];
     publicVisible: boolean;
     paymentsEnabled: boolean;
     raised: number;
@@ -52,7 +53,21 @@ export type DaycareDonationCampaignData = {
     recentDonations: PublicDaycareDonation[];
     categories: DonationCategory[];
     items: DonationItem[];
+    fieldUpdates: DaycareDonationFieldUpdate[];
     updatedAt?: string;
+};
+
+export type DaycareDonationFieldUpdate = {
+    id: string;
+    title: string;
+    description: string;
+    itemId?: string;
+    published: boolean;
+    publishedAt?: string;
+    imageUrl?: string;
+    imageAlt: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type PublicDaycareDonation = {
@@ -163,6 +178,7 @@ export type DaycareDonationAudit = {
         | "record"
         | "intent"
         | "ambassador"
+        | "fieldUpdate"
         | "lead";
     entityId: string;
     actor: "admin" | "nedarim" | "system";
