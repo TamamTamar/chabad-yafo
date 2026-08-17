@@ -144,8 +144,6 @@
 .renameForm button { padding: 7px 10px; border: 1px solid rgba($brand-primary, 0.2); border-radius: 9px; background: $color-white; color: $brand-primary; font: inherit; font-size: $type-caption; font-weight: 900; cursor: pointer; }
 .actions button:disabled { opacity: 0.55; }
 .actions .deleteAction { border-color: rgba($ui-danger, 0.25); color: $ui-danger; }
-.actions .whatsAppAction { border-color: rgba($ui-success, 0.25); color: $ui-success; }
-
 .actions button {
     display: inline-flex;
     align-items: center;

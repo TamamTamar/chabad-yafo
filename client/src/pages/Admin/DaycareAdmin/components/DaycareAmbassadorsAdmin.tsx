@@ -2,7 +2,6 @@ import { Fragment, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
     Copy,
-    MessageCircle,
     Pencil,
     Power,
     PowerOff,
@@ -355,15 +354,6 @@ const DaycareAmbassadorsAdmin = ({
         }
     };
 
-    const shareOnWhatsApp = (ambassador: DaycareDonationAmbassador) => {
-        const text = `נשמח שתצטרפו לקמפיין התרומות למעון חב״ד יפו דרך ${ambassador.name}: ${getAmbassadorLink(ambassador)}`;
-        window.open(
-            `https://wa.me/?text=${encodeURIComponent(text)}`,
-            "_blank",
-            "noopener,noreferrer"
-        );
-    };
-
     const handleDelete = async () => {
         if (!pendingDelete) return;
         const deleted = await runMutation(
@@ -659,20 +649,6 @@ const DaycareAmbassadorsAdmin = ({
                                                             size={19}
                                                         />
                                                         <span className={styles.actionText}>העתקה</span>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className={styles.whatsAppAction}
-                                                        aria-label={`שיתוף הלינק של ${ambassador.name} בוואטסאפ`}
-                                                        title="שיתוף בוואטסאפ"
-                                                        onClick={() => shareOnWhatsApp(ambassador)}
-                                                    >
-                                                        <MessageCircle
-                                                            aria-hidden="true"
-                                                            className={styles.actionIcon}
-                                                            size={19}
-                                                        />
-                                                        <span className={styles.actionText}>וואטסאפ</span>
                                                     </button>
                                                     <button
                                                         type="button"
