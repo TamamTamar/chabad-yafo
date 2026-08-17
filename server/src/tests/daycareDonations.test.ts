@@ -17,6 +17,7 @@ import {
 import {
     calculateDaycareDonationTotals,
     deriveDaycareDonationGoals,
+    normalizeDaycareDonationAllocations,
     toPublicDaycareDonation,
 } from "../services/daycareDonationService";
 import {
@@ -54,6 +55,65 @@ test("confirmed donation totals separate general and allocated donations", () =>
     assert.equal(result.generalRaised, 180);
     assert.equal(result.raisedByItem.get("painting"), 1_130);
     assert.equal(result.raisedByItem.get("plumbing"), 500);
+});
+
+test("confirmed donation totals split one donation between two items", () => {
+    const result = calculateDaycareDonationTotals([
+        {
+            amount: 500,
+            allocations: [
+                { itemId: "painting", amount: 300 },
+                { itemId: "plumbing", amount: 200 },
+            ],
+        },
+    ]);
+
+    assert.equal(result.raised, 500);
+    assert.equal(result.generalRaised, 0);
+    assert.equal(result.raisedByItem.get("painting"), 300);
+    assert.equal(result.raisedByItem.get("plumbing"), 200);
+});
+
+test("donation allocations require distinct valid items and the full amount", () => {
+    const validItems = new Set(["painting", "plumbing"]);
+    assert.deepEqual(
+        normalizeDaycareDonationAllocations(
+            [
+                { itemId: "painting", amount: 300 },
+                { itemId: "plumbing", amount: 200 },
+            ],
+            500,
+            validItems
+        ),
+        [
+            { itemId: "painting", amount: 300 },
+            { itemId: "plumbing", amount: 200 },
+        ]
+    );
+    assert.deepEqual(
+        normalizeDaycareDonationAllocations([], 500, validItems),
+        []
+    );
+    assert.throws(() =>
+        normalizeDaycareDonationAllocations(
+            [
+                { itemId: "painting", amount: 250 },
+                { itemId: "painting", amount: 250 },
+            ],
+            500,
+            validItems
+        )
+    );
+    assert.throws(() =>
+        normalizeDaycareDonationAllocations(
+            [
+                { itemId: "painting", amount: 300 },
+                { itemId: "plumbing", amount: 150 },
+            ],
+            500,
+            validItems
+        )
+    );
 });
 
 test("public donor feed shows names by default and respects an explicit opt-out", () => {

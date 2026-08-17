@@ -29,6 +29,13 @@ const daycareDonationRecordSchema =
             },
             installments: { type: Number, min: 1, max: 12 },
             itemId: { type: String, trim: true, index: true },
+            allocations: [
+                {
+                    _id: false,
+                    itemId: { type: String, required: true, trim: true },
+                    amount: { type: Number, required: true, min: 0.01 },
+                },
+            ],
             donorName: { type: String, trim: true },
             displayDonorName: { type: Boolean, default: true },
             phone: { type: String, trim: true },

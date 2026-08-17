@@ -15,6 +15,7 @@ import { DaycareDonationRecord } from "../../models/DaycareDonationRecord";
 import {
     ensureDefaultDaycareDonationCampaign,
     getDaycareDonationCampaignSnapshot,
+    normalizeDaycareDonationAllocations,
     synchronizeDaycareDonationGoals,
 } from "../../services/daycareDonationService";
 import { writeDaycareDonationAudit } from "../../services/daycareDonationAuditService";
@@ -1083,6 +1084,16 @@ router.patch("/records/:id", async (req, res) => {
             });
         }
 
+        if (
+            req.body.itemId !== undefined &&
+            req.body.allocations !== undefined
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Use either an item or allocations, not both",
+            });
+        }
+
         if (req.body.itemId !== undefined) {
             const itemId = cleanText(req.body.itemId, 80);
             if (
@@ -1097,6 +1108,18 @@ router.patch("/records/:id", async (req, res) => {
                 });
             }
             updates.itemId = itemId || null;
+            updates.allocations = [];
+        }
+
+        if (req.body.allocations !== undefined) {
+            const allocations = normalizeDaycareDonationAllocations(
+                req.body.allocations,
+                previous.amount,
+                new Set(campaign.items.map((item) => item.id))
+            );
+            updates.allocations = allocations;
+            updates.itemId =
+                allocations.length === 1 ? allocations[0].itemId : null;
         }
 
         if (req.body.ambassadorId !== undefined) {
@@ -1148,9 +1171,26 @@ router.patch("/records/:id", async (req, res) => {
             updates.displayDonorName = req.body.displayDonorName;
         }
 
+        const previousAllocations = previous.allocations?.length
+            ? previous.allocations.map((allocation) => ({
+                  itemId: allocation.itemId,
+                  amount: allocation.amount,
+              }))
+            : previous.itemId
+              ? [{ itemId: previous.itemId, amount: previous.amount }]
+              : [];
+        const nextAllocations = Object.prototype.hasOwnProperty.call(
+            updates,
+            "allocations"
+        )
+            ? (updates.allocations as Array<{
+                  itemId: string;
+                  amount: number;
+              }>)
+            : previousAllocations;
         const itemChanged =
-            Object.prototype.hasOwnProperty.call(updates, "itemId") &&
-            (updates.itemId ?? null) !== (previous.itemId ?? null);
+            JSON.stringify(nextAllocations) !==
+            JSON.stringify(previousAllocations);
         const ambassadorChanged =
             Object.prototype.hasOwnProperty.call(updates, "ambassadorId") &&
             String(updates.ambassadorId ?? "") !==
@@ -1212,12 +1252,14 @@ router.patch("/records/:id", async (req, res) => {
             reason,
             before: {
                 itemId: previous.itemId ?? null,
+                allocations: previousAllocations,
                 ambassadorId: previous.ambassadorId ?? null,
                 status: previous.status,
                 displayDonorName: previous.displayDonorName !== false,
             },
             after: {
                 itemId: record.itemId ?? null,
+                allocations: record.allocations ?? [],
                 ambassadorId: record.ambassadorId ?? null,
                 status: record.status,
                 displayDonorName: Boolean(record.displayDonorName),

@@ -533,6 +533,34 @@
     min-width: 150px;
 }
 
+.allocationButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 190px;
+    min-height: 43px;
+    padding: 8px 11px;
+    border: 1px solid $ui-border-soft;
+    border-radius: 11px;
+    background: $color-white;
+    color: $brand-blue-ink;
+    font: inherit;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.allocationButton::after {
+    content: "⌄";
+    color: $brand-primary;
+    font-weight: 900;
+}
+
+.allocationButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 .publicationToggle {
     display: inline-flex;
     align-items: center;
@@ -581,7 +609,7 @@
 
 .recordFilters {
     display: grid;
-    grid-template-columns: minmax(220px, 1fr) 180px auto;
+    grid-template-columns: minmax(220px, 1fr) 180px;
     align-items: end;
     gap: 12px;
     margin-top: 20px;
@@ -605,14 +633,6 @@
     background: $color-white;
     color: $brand-blue-ink;
     font: inherit;
-}
-
-.recordFilters > span {
-    padding-block: 11px;
-    color: $ui-text-muted;
-    font-size: $type-caption;
-    font-weight: 800;
-    white-space: nowrap;
 }
 
 .recordDonor {
@@ -830,10 +850,6 @@
         grid-template-columns: 1fr 1fr;
     }
 
-    .recordFilters > span {
-        grid-column: 1 / -1;
-        padding-block: 0;
-    }
 }
 
 @media (max-width: 600px) {
@@ -932,8 +948,7 @@
     }
 
     .fullField,
-    .manualForm > button,
-    .recordFilters > span {
+    .manualForm > button {
         grid-column: auto;
     }
 
@@ -1002,6 +1017,11 @@
         min-width: 0;
         max-width: 100%;
         min-height: 43px;
+    }
+
+    .allocationButton {
+        width: 100%;
+        min-width: 0;
     }
 
     .diagnosticList dl {

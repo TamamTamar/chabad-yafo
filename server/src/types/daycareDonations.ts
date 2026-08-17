@@ -108,6 +108,10 @@ export type DaycareDonationRecordDocument = {
     paymentType?: DaycareDonationPaymentType;
     installments?: number;
     itemId?: string;
+    allocations?: Array<{
+        itemId: string;
+        amount: number;
+    }>;
     donorName?: string;
     displayDonorName?: boolean;
     phone?: string;

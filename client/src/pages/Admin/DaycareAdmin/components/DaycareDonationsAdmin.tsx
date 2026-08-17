@@ -26,6 +26,7 @@ import type {
 } from "../../../DaycareDonations/types";
 import DonationModalPreview from "../../../DaycareDonations/components/DonationModalPreview";
 import DaycareAmbassadorsAdmin from "./DaycareAmbassadorsAdmin";
+import DonationAllocationDialog from "./DonationAllocationDialog";
 import DaycareDonationLeadsAdmin from "./DaycareDonationLeadsAdmin";
 import styles from "./DaycareDonationsAdmin.module.scss";
 
@@ -99,6 +100,7 @@ type PendingRecordUpdate = {
     recordId: string;
     updates: {
         itemId?: string;
+        allocations?: Array<{ itemId: string; amount: number }>;
         ambassadorId?: string;
         status?: DaycareDonationRecord["status"];
         displayDonorName?: boolean;
@@ -147,6 +149,8 @@ const DaycareDonationsAdmin = () => {
     >("all");
     const [pendingRecordUpdate, setPendingRecordUpdate] =
         useState<PendingRecordUpdate | null>(null);
+    const [allocationRecord, setAllocationRecord] =
+        useState<DaycareDonationRecord | null>(null);
 
     const loadData = useCallback(async () => {
         const [
@@ -315,6 +319,7 @@ const DaycareDonationsAdmin = () => {
         recordId: string,
         updates: {
             itemId?: string;
+            allocations?: Array<{ itemId: string; amount: number }>;
             ambassadorId?: string;
             status?: DaycareDonationRecord["status"];
             displayDonorName?: boolean;
@@ -1009,9 +1014,6 @@ const DaycareDonationsAdmin = () => {
                             )}
                         </select>
                     </label>
-                    <span>
-                        מוצגות {filteredRecords.length} מתוך {records.length}
-                    </span>
                 </div>
                 {records.length === 0 ? (
                     <p className={styles.emptyState}>
@@ -1157,42 +1159,17 @@ const DaycareDonationsAdmin = () => {
                                             </button>
                                         </td>
                                         <td data-label="שיוך">
-                                            <select
+                                            <button
+                                                type="button"
+                                                className={styles.allocationButton}
                                                 aria-label={`שיוך התרומה של ${record.donorName || "תורם"}`}
-                                                value={record.itemId ?? ""}
                                                 disabled={saving}
-                                                onChange={(event) => {
-                                                    const itemId =
-                                                        event.target.value;
-                                                    const itemTitle =
-                                                        campaign.items.find(
-                                                            (item) =>
-                                                                item.id ===
-                                                                itemId
-                                                        )?.title ??
-                                                        "תרומה כללית";
-                                                    setPendingRecordUpdate({
-                                                        recordId: record._id,
-                                                        updates: { itemId },
-                                                        title: "שינוי שיוך תרומה",
-                                                        message: `התרומה של ${record.donorName || "תורם ללא שם"} תשויך אל "${itemTitle}".`,
-                                                    });
-                                                }}
+                                                onClick={() => setAllocationRecord(record)}
                                             >
-                                                <option value="">
-                                                    תרומה כללית
-                                                </option>
-                                                {sortItemsByNeed(campaign.items).map((item) => (
-                                                    <option
-                                                        key={item.id}
-                                                        value={item.id}
-                                                    >
-                                                        {item.title} — {getItemRemaining(item) > 0
-                                                            ? `חסרים ₪${formatCurrency(getItemRemaining(item))}`
-                                                            : "היעד הושלם"}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                {record.allocations && record.allocations.length > 1
+                                                    ? `${record.allocations.length} יעדים · עריכה`
+                                                    : campaign.items.find((item) => item.id === (record.allocations?.[0]?.itemId ?? record.itemId))?.title ?? "תרומה כללית"}
+                                            </button>
                                         </td>
                                         <td data-label="מצב">
                                             <select
@@ -1313,6 +1290,23 @@ const DaycareDonationsAdmin = () => {
                         });
                     }}
                     onClose={() => setPendingRecordUpdate(null)}
+                />
+            )}
+            {allocationRecord && (
+                <DonationAllocationDialog
+                    record={allocationRecord}
+                    items={sortItemsByNeed(campaign.items)}
+                    busy={saving}
+                    onConfirm={(allocations, reason) => {
+                        void handleRecordUpdate(
+                            allocationRecord._id,
+                            { allocations },
+                            reason
+                        ).then((updated) => {
+                            if (updated) setAllocationRecord(null);
+                        });
+                    }}
+                    onClose={() => setAllocationRecord(null)}
                 />
             )}
             {diagnosticPaymentOpen && (

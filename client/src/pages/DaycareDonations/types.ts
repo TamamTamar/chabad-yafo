@@ -72,6 +72,10 @@ export type DaycareDonationRecord = {
     paymentType?: "HK" | "Ragil";
     installments?: number;
     itemId?: string;
+    allocations?: Array<{
+        itemId: string;
+        amount: number;
+    }>;
     donorName?: string;
     displayDonorName?: boolean;
     phone?: string;

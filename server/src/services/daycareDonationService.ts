@@ -9,6 +9,15 @@ import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
 type ConfirmedDonationAmount = {
     amount: number;
     itemId?: string | null;
+    allocations?: Array<{
+        itemId: string;
+        amount: number;
+    }> | null;
+};
+
+export type DaycareDonationAllocation = {
+    itemId: string;
+    amount: number;
 };
 
 type GoalCategory = { id: string; goal: number };
@@ -80,7 +89,15 @@ export const calculateDaycareDonationTotals = (
 
     records.forEach((record) => {
         raised += record.amount;
-        if (record.itemId) {
+        if (record.allocations?.length) {
+            record.allocations.forEach((allocation) => {
+                raisedByItem.set(
+                    allocation.itemId,
+                    (raisedByItem.get(allocation.itemId) ?? 0) +
+                        allocation.amount
+                );
+            });
+        } else if (record.itemId) {
             raisedByItem.set(
                 record.itemId,
                 (raisedByItem.get(record.itemId) ?? 0) + record.amount
@@ -91,6 +108,59 @@ export const calculateDaycareDonationTotals = (
     });
 
     return { raised, generalRaised, raisedByItem };
+};
+
+export const normalizeDaycareDonationAllocations = (
+    value: unknown,
+    donationAmount: number,
+    validItemIds: ReadonlySet<string>
+): DaycareDonationAllocation[] => {
+    if (!Array.isArray(value)) {
+        throw new Error("Donation allocations must be an array");
+    }
+    if (value.length > Math.min(2, validItemIds.size)) {
+        throw new Error("Donation allocations count is invalid");
+    }
+    if (value.length === 0) return [];
+
+    const seenItemIds = new Set<string>();
+    const allocations = value.map((entry) => {
+        if (!entry || typeof entry !== "object") {
+            throw new Error("Donation allocation is invalid");
+        }
+        const candidate = entry as Record<string, unknown>;
+        const itemId =
+            typeof candidate.itemId === "string"
+                ? candidate.itemId.trim()
+                : "";
+        const amount = Number(candidate.amount);
+
+        if (!validItemIds.has(itemId)) {
+            throw new Error("Donation allocation item was not found");
+        }
+        if (seenItemIds.has(itemId)) {
+            throw new Error("Donation allocation items must be unique");
+        }
+        if (!Number.isFinite(amount) || amount <= 0) {
+            throw new Error("Donation allocation amount is invalid");
+        }
+
+        seenItemIds.add(itemId);
+        return {
+            itemId,
+            amount: Math.round(amount * 100) / 100,
+        };
+    });
+
+    const allocatedCents = allocations.reduce(
+        (total, allocation) => total + Math.round(allocation.amount * 100),
+        0
+    );
+    if (allocatedCents !== Math.round(donationAmount * 100)) {
+        throw new Error("Donation allocations must equal the donation amount");
+    }
+
+    return allocations;
 };
 
 export const ensureDefaultDaycareDonationCampaign = async () => {
@@ -120,6 +190,7 @@ export const getDaycareDonationCampaignSnapshot = async () => {
         .select({
             amount: 1,
             itemId: 1,
+            allocations: 1,
             donorName: 1,
             dedication: 1,
             displayDonorName: 1,
