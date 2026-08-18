@@ -202,6 +202,7 @@ const DaycareDonationsAdmin = () => {
     const [saving, setSaving] = useState(false);
     const [clearDiagnosticsOpen, setClearDiagnosticsOpen] = useState(false);
     const [diagnosticPaymentOpen, setDiagnosticPaymentOpen] = useState(false);
+    const [successPreviewOpen, setSuccessPreviewOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [activeView, setActiveView] = useState<AdminView>("overview");
@@ -512,9 +513,21 @@ const DaycareDonationsAdmin = () => {
                             הסכומים בדף הציבורי מחושבים מרשומות מאושרות בלבד.
                         </p>
                     </div>
-                    <a href="/daycare-donations" target="_blank" rel="noreferrer">
-                        צפייה בדף הציבורי
-                    </a>
+                    <div className={styles.summaryActions}>
+                        <button
+                            type="button"
+                            onClick={() => setSuccessPreviewOpen(true)}
+                        >
+                            תצוגת מסך תודה
+                        </button>
+                        <a
+                            href="/daycare-donations"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            צפייה בדף הציבורי
+                        </a>
+                    </div>
                 </header>
 
                 <div className={styles.metrics}>
@@ -1535,6 +1548,20 @@ const DaycareDonationsAdmin = () => {
                     onPaymentComplete={() => {
                         window.setTimeout(() => void loadData(), 1200);
                     }}
+                />
+            )}
+            {successPreviewOpen && (
+                <DonationModalPreview
+                    open
+                    initialSelection={{
+                        kind: "general",
+                        id: "general",
+                        title: "למקום שבו התרומה נדרשת ביותר",
+                    }}
+                    donationItems={campaign.items}
+                    paymentsEnabled={campaign.paymentsEnabled}
+                    successPreview
+                    onClose={() => setSuccessPreviewOpen(false)}
                 />
             )}
         </div>

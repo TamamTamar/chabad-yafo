@@ -6,6 +6,7 @@ import {
     EyeOff,
     Heart,
     LockKeyhole,
+    MessageCircle,
     X,
 } from "lucide-react";
 import {
@@ -31,6 +32,7 @@ type DonationModalProps = {
     donationItems: DonationItem[];
     paymentsEnabled: boolean;
     diagnosticMode?: boolean;
+    successPreview?: boolean;
     refCode?: string;
     createIntent?: (
         input: DaycareDonationIntentInput
@@ -52,6 +54,7 @@ const DonationModalPreview = ({
     donationItems,
     paymentsEnabled,
     diagnosticMode = false,
+    successPreview = false,
     refCode,
     createIntent = createDaycareDonationIntent,
     onClose,
@@ -59,7 +62,7 @@ const DonationModalPreview = ({
 }: DonationModalProps) => {
     const dialogRef = useRef<HTMLDialogElement | null>(null);
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
-    const [step, setStep] = useState<DonationStep>(1);
+    const [step, setStep] = useState<DonationStep>(successPreview ? 4 : 1);
     const [selectedId, setSelectedId] = useState(initialSelection.id);
     const [amountChoice, setAmountChoice] = useState<AmountChoice>(
         diagnosticMode ? 1 : 360
@@ -117,6 +120,11 @@ const DonationModalPreview = ({
               : amountChoice;
     const isMonthly = paymentMode === "monthly";
     const campaignAmount = isMonthly ? amount * 12 : amount;
+    const donorFirstName = fullName.trim().split(/\s+/)[0];
+    const campaignShareUrl = `${window.location.origin}/daycare-donations`;
+    const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(
+        `גם אני שותף בהקמת המעון החדש של בית חב״ד יפו. בואו לקחת חלק: ${campaignShareUrl}`
+    )}`;
 
     const amountOptions: { value: AmountChoice; label: string }[] =
         diagnosticMode
@@ -228,7 +236,7 @@ const DonationModalPreview = ({
               ? "הפרטים שלכם"
               : step === 3
                 ? "תשלום מאובטח"
-                : "תודה שלקחתם חלק";
+                : "התרומה הושלמה";
 
     return (
         <dialog
@@ -244,7 +252,11 @@ const DonationModalPreview = ({
                 if (event.target === event.currentTarget) onClose();
             }}
         >
-            <div className={styles.donationModal}>
+            <div
+                className={`${styles.donationModal} ${
+                    step === 4 ? styles.donationModalSuccess : ""
+                }`}
+            >
                 <header className={styles.modalHeader}>
                     <div>
                         <p>
@@ -579,22 +591,69 @@ const DonationModalPreview = ({
 
                     {step === 4 && (
                         <div className={styles.paymentSuccess}>
-                            <Check aria-hidden="true" />
-                            <strong>
+                            <div className={styles.successMark}>
+                                <Check aria-hidden="true" />
+                            </div>
+                            <span className={styles.successEyebrow}>
+                                {diagnosticMode
+                                    ? "בדיקת החיבור הושלמה"
+                                    : "התרומה התקבלה בהצלחה"}
+                            </span>
+                            <strong className={styles.successTitle}>
                                 {diagnosticMode
                                     ? "עסקת הניסיון התקבלה"
-                                    : "התרומה בוצעה בהצלחה"}
+                                    : donorFirstName
+                                      ? `תודה רבה, ${donorFirstName}`
+                                      : "תודה שלקחתם חלק"}
                             </strong>
                             <p>
                                 {diagnosticMode
                                     ? "העסקה לא נוספה למדדי הקמפיין. עכשיו בודקים את ה־callback באדמין."
                                     : "תודה שאתם שותפים בהקמת מקום חם, בטוח ושמח לילדי המעון."}
                             </p>
+                            {!diagnosticMode && !successPreview && (
+                                <div className={styles.successReceipt}>
+                                    <span>
+                                        {isMonthly
+                                            ? "התרומה החודשית שלכם"
+                                            : "התרומה שלכם"}
+                                    </span>
+                                    <strong>
+                                        ₪{formatCurrency(amount)}
+                                        {isMonthly ? " לחודש" : ""}
+                                    </strong>
+                                    <small>{selectedTitle}</small>
+                                </div>
+                            )}
+                            {!diagnosticMode && (
+                                <div className={styles.successShareCard}>
+                                    <div>
+                                        <strong>עוזרים לנו להגיע לעוד שותפים</strong>
+                                        <span>
+                                            שיתוף קטן שלכם יכול לקרב אותנו עוד צעד
+                                            לפתיחת המעון.
+                                        </span>
+                                    </div>
+                                    <a
+                                        className={styles.paymentShare}
+                                        href={whatsappShareUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <MessageCircle aria-hidden="true" />
+                                        שיתוף בוואטסאפ
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
 
-                <footer className={styles.modalFooter}>
+                <footer
+                    className={`${styles.modalFooter} ${
+                        step === 4 ? styles.modalFooterSuccess : ""
+                    }`}
+                >
                     {step < 4 && (
                         <div>
                             <span>{isMonthly ? "חיוב חודשי" : "סכום התרומה"}</span>
@@ -667,13 +726,15 @@ const DonationModalPreview = ({
                     )}
                     {step === 4 && (
                         <button type="button" onClick={onClose}>
-                            סיום וחזרה לעמוד
+                            חזרה לקמפיין
                         </button>
                     )}
-                    <p>
-                        התשלום מתבצע בחלון המאובטח של נדרים פלוס. פרטי הכרטיס
-                        אינם נשמרים באתר.
-                    </p>
+                    {step < 4 && (
+                        <p>
+                            התשלום מתבצע בחלון המאובטח של נדרים פלוס. פרטי הכרטיס
+                            אינם נשמרים באתר.
+                        </p>
+                    )}
                 </footer>
             </div>
         </dialog>

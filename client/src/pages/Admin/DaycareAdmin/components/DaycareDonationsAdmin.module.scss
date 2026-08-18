@@ -42,6 +42,24 @@
     white-space: nowrap;
 }
 
+.summaryActions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.summaryActions button {
+    padding: 10px 16px;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-pill;
+    background: $color-white;
+    color: $brand-blue-ink;
+    font: inherit;
+    font-weight: 900;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
 .summarySection h2,
 .panel h2 {
     margin: 0 0 6px;
@@ -952,7 +970,13 @@
         flex-direction: column;
     }
 
-    .sectionHeader a {
+    .summaryActions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .sectionHeader a,
+    .summaryActions button {
         width: 100%;
         max-width: 100%;
         text-align: center;

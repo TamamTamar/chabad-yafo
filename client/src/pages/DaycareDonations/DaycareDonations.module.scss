@@ -1656,6 +1656,15 @@
     direction: rtl;
 }
 
+.donationDialog {
+    --campaign-navy: #0d2d4f;
+    --campaign-navy-soft: #173f68;
+    --campaign-gold: #c9973c;
+    --campaign-gold-light: #e6c98b;
+    --campaign-cream: #fbf7ed;
+    --campaign-ink: #14283b;
+}
+
 .lightbox::backdrop,
 .donationDialog::backdrop {
     background: rgba(5, 18, 31, 0.78);
@@ -2416,32 +2425,190 @@
 }
 
 .paymentSuccess {
+    position: relative;
     display: grid;
     justify-items: center;
-    gap: 12px;
-    padding: 30px 18px;
+    gap: 10px;
+    padding: 38px 34px 34px;
+    background:
+        radial-gradient(circle at 15% 8%, rgba($brand-gold-rich, 0.16), transparent 15rem),
+        radial-gradient(circle at 86% 90%, rgba($ui-success, 0.08), transparent 17rem),
+        #fffdf8;
     text-align: center;
 }
 
-.paymentSuccess > svg {
-    width: 58px;
-    height: 58px;
-    padding: 13px;
+.donationModalSuccess {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    width: min(620px, calc(100vw - 28px));
+    max-height: min(88vh, 760px);
+}
+
+.donationModalSuccess .modalHeader {
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    padding: 18px 22px;
+    text-align: center;
+}
+
+.donationModalSuccess .modalHeader > div {
+    margin-inline: auto;
+    text-align: center;
+}
+
+.donationModalSuccess .modalHeader p {
+    justify-content: center;
+}
+
+.donationModalSuccess .modalHeader h2 {
+    font-size: 1.35rem;
+}
+
+.donationModalSuccess .modalHeader > button {
+    position: absolute;
+    top: 50%;
+    left: 22px;
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.donationModalSuccess .modalBody {
+    padding: 0;
+}
+
+.successMark {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 82px;
+    height: 82px;
+    margin-bottom: 4px;
+    border: 1px solid rgba($ui-success, 0.2);
     border-radius: 50%;
     background: $ui-success-soft;
     color: $ui-success;
+    box-shadow:
+        0 0 0 9px rgba($ui-success, 0.055),
+        0 18px 38px rgba($ui-success, 0.14);
 }
 
-.paymentSuccess strong {
+.successMark svg {
+    width: 36px;
+    height: 36px;
+    stroke-width: 2.6;
+}
+
+.successEyebrow {
+    margin-top: 9px;
+    color: $ui-success-dark;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+}
+
+.paymentSuccess .successTitle {
     color: var(--campaign-navy);
-    font-size: 1.45rem;
+    font-size: clamp(1.8rem, 5vw, 2.25rem);
+    line-height: 1.12;
 }
 
-.paymentSuccess p {
+.paymentSuccess > p {
     max-width: 460px;
     margin: 0;
     color: rgba(20, 40, 59, 0.66);
+    font-size: 1rem;
     line-height: 1.65;
+}
+
+.successReceipt {
+    display: grid;
+    min-width: min(340px, 100%);
+    gap: 2px;
+    margin-top: 9px;
+    padding: 14px 18px;
+    border: 1px solid rgba($brand-gold-rich, 0.24);
+    border-radius: 16px;
+    background: rgba($brand-gold-light, 0.13);
+}
+
+.successReceipt span,
+.successReceipt small {
+    color: rgba(20, 40, 59, 0.58);
+    font-size: 0.76rem;
+}
+
+.successReceipt strong {
+    color: var(--campaign-navy);
+    font-size: 1.55rem;
+}
+
+.successShareCard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+    width: 100%;
+    margin-top: 12px;
+    padding: 18px;
+    border: 1px solid rgba($brand-primary-deep, 0.1);
+    border-radius: 18px;
+    background: $color-white;
+    box-shadow: 0 14px 34px rgba($brand-primary-deep, 0.08);
+    text-align: right;
+}
+
+.successShareCard > div {
+    display: grid;
+    gap: 3px;
+}
+
+.successShareCard strong {
+    color: var(--campaign-navy);
+    font-size: 0.95rem;
+}
+
+.successShareCard span {
+    color: rgba(20, 40, 59, 0.6);
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.paymentShare {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 20px;
+    border-radius: $radius-pill;
+    background: $ui-success-dark;
+    color: $color-white;
+    font-weight: 900;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        transform 160ms ease,
+        background 160ms ease;
+}
+
+.paymentShare:hover {
+    background: $ui-success;
+    transform: translateY(-1px);
+}
+
+.paymentShare:focus-visible {
+    outline: 3px solid rgba($ui-success, 0.28);
+    outline-offset: 3px;
+}
+
+.paymentShare svg {
+    width: 20px;
+    height: 20px;
 }
 
 .modalFooter {
@@ -2454,6 +2621,18 @@
     border-top: 1px solid rgba($brand-primary-deep, 0.1);
     background: rgba(255, 253, 248, 0.96);
     backdrop-filter: blur(12px);
+}
+
+.modalFooterSuccess {
+    grid-template-columns: minmax(220px, 320px);
+    justify-content: center;
+    padding-top: 14px;
+}
+
+.modalFooterSuccess > button {
+    background: transparent;
+    color: var(--campaign-navy);
+    border: 1px solid rgba($brand-primary-deep, 0.18);
 }
 
 .modalFooter > div {
@@ -3121,6 +3300,29 @@
         padding: 21px 18px;
     }
 
+    .donationModalSuccess .modalBody {
+        padding: 0;
+    }
+
+    .paymentSuccess {
+        padding: 30px 18px 24px;
+    }
+
+    .successMark {
+        width: 72px;
+        height: 72px;
+    }
+
+    .successShareCard {
+        grid-template-columns: 1fr;
+        gap: 13px;
+        text-align: center;
+    }
+
+    .paymentShare {
+        width: 100%;
+    }
+
     .amountGrid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -3141,6 +3343,10 @@
         grid-template-columns: auto 1fr;
         gap: 9px 12px;
         padding: 14px 18px 17px;
+    }
+
+    .modalFooterSuccess {
+        grid-template-columns: 1fr;
     }
 
     .modalFooter > button {
