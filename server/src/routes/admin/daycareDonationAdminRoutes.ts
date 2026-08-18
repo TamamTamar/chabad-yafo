@@ -14,12 +14,17 @@ import { DaycareDonationIntent } from "../../models/DaycareDonationIntent";
 import { DaycareDonationLead } from "../../models/DaycareDonationLead";
 import { DaycareDonationRecord } from "../../models/DaycareDonationRecord";
 import {
+    convertDaycareDonationToIls,
     ensureDefaultDaycareDonationCampaign,
     getDaycareDonationCampaignSnapshot,
     normalizeDaycareDonationAllocations,
     synchronizeDaycareDonationGoals,
 } from "../../services/daycareDonationService";
 import { writeDaycareDonationAudit } from "../../services/daycareDonationAuditService";
+import {
+    getBankOfIsraelUsdExchangeRate,
+    getBankOfIsraelUsdExchangeRateForDate,
+} from "../../services/daycareExchangeRateService";
 import {
     createAvailableDaycareAmbassadorSlug,
     normalizeDaycareAmbassadorSlug,
@@ -177,6 +182,24 @@ router.get("/campaign", async (_req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to get donation campaign",
+        });
+    }
+});
+
+router.get("/exchange-rates/USD", async (req, res) => {
+    try {
+        const requestedDate = cleanText(req.query.date, 10);
+        return res.json({
+            success: true,
+            data: requestedDate
+                ? await getBankOfIsraelUsdExchangeRateForDate(requestedDate)
+                : await getBankOfIsraelUsdExchangeRate(),
+        });
+    } catch (error) {
+        console.error("Failed to get Bank of Israel USD exchange rate:", error);
+        return res.status(502).json({
+            success: false,
+            message: "Failed to get the current USD exchange rate",
         });
     }
 });
@@ -1233,7 +1256,25 @@ router.post("/diagnostic-intents", async (req, res) => {
 router.post("/records", async (req, res) => {
     try {
         const campaign = await ensureDefaultDaycareDonationCampaign();
-        const amount = Number(req.body.amount);
+        const originalAmount = Number(req.body.amount);
+        if (
+            req.body.currency !== undefined &&
+            req.body.currency !== "ILS" &&
+            req.body.currency !== "USD"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Donation currency must be ILS or USD",
+            });
+        }
+        const originalCurrency = req.body.currency === "USD" ? "USD" : "ILS";
+        const exchangeRate =
+            originalCurrency === "USD" ? Number(req.body.exchangeRate) : 1;
+        const amount = convertDaycareDonationToIls(
+            originalAmount,
+            originalCurrency,
+            exchangeRate
+        );
         const itemId = cleanText(req.body.itemId, 80) || undefined;
         const ambassadorId = cleanText(req.body.ambassadorId, 80) || undefined;
         const manualSource = req.body.manualSource;
@@ -1244,10 +1285,29 @@ router.post("/records", async (req, res) => {
             ? new Date(req.body.receivedAt)
             : null;
 
-        if (!Number.isFinite(amount) || amount <= 0) {
+        if (!Number.isFinite(originalAmount) || originalAmount <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Donation amount must be greater than zero",
+            });
+        }
+
+        if (
+            originalCurrency === "USD" &&
+            (!Number.isFinite(exchangeRate) ||
+                exchangeRate <= 0 ||
+                exchangeRate > 100)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "A valid USD to ILS exchange rate is required",
+            });
+        }
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Converted donation amount must be greater than zero",
             });
         }
 
@@ -1303,6 +1363,9 @@ router.post("/records", async (req, res) => {
             source: "manual",
             status: "confirmed",
             amount,
+            originalAmount,
+            originalCurrency,
+            exchangeRate,
             itemId,
             ambassadorId: ambassadorId
                 ? new mongoose.Types.ObjectId(ambassadorId)
@@ -1327,6 +1390,9 @@ router.post("/records", async (req, res) => {
             ...getAdminAuditActor(res.locals.adminActor),
             after: {
                 amount: record.amount,
+                originalAmount: record.originalAmount,
+                originalCurrency: record.originalCurrency,
+                exchangeRate: record.exchangeRate,
                 itemId: record.itemId ?? null,
                 ambassadorId: record.ambassadorId ?? null,
                 status: record.status,

@@ -23,6 +23,12 @@ const daycareDonationRecordSchema =
                 index: true,
             },
             amount: { type: Number, required: true, min: 0.01 },
+            originalAmount: { type: Number, min: 0.01 },
+            originalCurrency: {
+                type: String,
+                enum: ["ILS", "USD"],
+            },
+            exchangeRate: { type: Number, min: 0.0001 },
             paymentType: {
                 type: String,
                 enum: ["HK", "Ragil"],

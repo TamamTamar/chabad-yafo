@@ -17,6 +17,7 @@ import {
 } from "../services/daycareDonationCallbackSecurity";
 import {
     calculateDaycareDonationTotals,
+    convertDaycareDonationToIls,
     deriveDaycareDonationGoals,
     normalizeDaycareDonationAllocations,
     toPublicDaycareDonation,
@@ -26,6 +27,10 @@ import {
     findActiveDaycareDonationAmbassador,
     normalizeDaycareAmbassadorSlug,
 } from "../services/daycareDonationAmbassadorService";
+import {
+    parseBankOfIsraelHistoricalUsdExchangeRate,
+    parseBankOfIsraelUsdExchangeRate,
+} from "../services/daycareExchangeRateService";
 
 test("daycare donation defaults preserve the approved 100,000 ILS budget", () => {
     const categoryGoal = defaultDaycareDonationCampaign.categories.reduce(
@@ -163,12 +168,23 @@ test("public donor feed shows names by default and respects an explicit opt-out"
         displayDonorName: false,
         receivedAt,
     });
+    const usdDonation = toPublicDaycareDonation({
+        _id: "usd",
+        amount: 298.6,
+        originalAmount: 100,
+        originalCurrency: "USD",
+        donorName: "תורם בדולרים",
+        receivedAt,
+    });
 
     assert.equal(legacyDonation.donorName, "תורם ותיק");
     assert.equal(legacyDonation.dedication, "לזכות משפחת ישראל");
     assert.equal(privateDonation.donorName, "תרומה אנונימית");
     assert.equal("phone" in privateDonation, false);
     assert.equal("email" in privateDonation, false);
+    assert.equal(usdDonation.amount, 298.6);
+    assert.equal(usdDonation.originalAmount, 100);
+    assert.equal(usdDonation.originalCurrency, "USD");
 });
 
 test("campaign and category goals are derived from item goals", () => {
@@ -451,6 +467,71 @@ test("manual donation requires source and note or reference", async () => {
         receivedAt: new Date(),
     });
     await validManualDonation.validate();
+});
+
+test("manual USD donation preserves the original amount and ILS conversion", async () => {
+    assert.equal(convertDaycareDonationToIls(100, "USD", 3.72), 372);
+    assert.equal(convertDaycareDonationToIls(10.01, "USD", 3.3333), 33);
+    assert.equal(convertDaycareDonationToIls(180, "ILS", 9), 180);
+
+    const usdDonation = new DaycareDonationRecord({
+        campaignSlug: "daycare-2026",
+        source: "manual",
+        manualSource: "bank_transfer",
+        reference: "USD-123",
+        enteredById: "primary-admin",
+        enteredByLabel: "מנהל ראשי",
+        status: "confirmed",
+        amount: 372,
+        originalAmount: 100,
+        originalCurrency: "USD",
+        exchangeRate: 3.72,
+        receivedAt: new Date(),
+    });
+
+    await usdDonation.validate();
+    assert.equal(usdDonation.amount, 372);
+    assert.equal(usdDonation.originalAmount, 100);
+    assert.equal(usdDonation.originalCurrency, "USD");
+    assert.equal(usdDonation.exchangeRate, 3.72);
+});
+
+test("Bank of Israel USD response is normalized for the admin form", () => {
+    assert.deepEqual(
+        parseBankOfIsraelUsdExchangeRate({
+            key: "USD",
+            currentExchangeRate: 3.72,
+            lastUpdate: "2026-08-18T12:00:00Z",
+        }),
+        {
+            currency: "USD",
+            rate: 3.72,
+            updatedAt: "2026-08-18T12:00:00.000Z",
+            source: "bank_of_israel",
+        }
+    );
+    assert.throws(() =>
+        parseBankOfIsraelUsdExchangeRate({
+            key: "USD",
+            currentExchangeRate: 0,
+            lastUpdate: "invalid",
+        })
+    );
+});
+
+test("historical Bank of Israel USD data uses the latest available business day", () => {
+    const csv = [
+        "SERIES_CODE,TIME_PERIOD,OBS_VALUE,RELEASE_STATUS",
+        "RER_USD_ILS,D,USD,ILS,2026-08-13,2.983,YP",
+        "RER_USD_ILS,D,USD,ILS,2026-08-14,2.954,YP",
+    ].join("\n");
+
+    assert.deepEqual(parseBankOfIsraelHistoricalUsdExchangeRate(csv), {
+        currency: "USD",
+        rate: 2.954,
+        updatedAt: "2026-08-14T00:00:00.000Z",
+        source: "bank_of_israel",
+    });
 });
 
 test("unsigned Nedarim callbacks require an explicit production opt-in", () => {

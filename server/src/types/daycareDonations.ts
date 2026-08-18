@@ -29,6 +29,7 @@ export type DaycareDonationIntentStatus =
     | "expired";
 export type DaycareDonationIntentMode = "live" | "diagnostic";
 export type DaycareDonationPaymentType = "HK" | "Ragil";
+export type DaycareDonationCurrency = "ILS" | "USD";
 
 export type DaycareDonationAmbassadorDocument = {
     name: string;
@@ -124,6 +125,9 @@ export type DaycareDonationRecordDocument = {
     source: DaycareDonationSource;
     status: DaycareDonationRecordStatus;
     amount: number;
+    originalAmount?: number;
+    originalCurrency?: DaycareDonationCurrency;
+    exchangeRate?: number;
     paymentType?: DaycareDonationPaymentType;
     installments?: number;
     itemId?: string;

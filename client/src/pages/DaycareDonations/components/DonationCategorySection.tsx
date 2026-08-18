@@ -33,7 +33,7 @@ const openingPriority: Record<string, number> = {
 };
 
 const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("he-IL").format(value);
+    new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 }).format(value);
 
 const DonationCategorySection = ({
     category,

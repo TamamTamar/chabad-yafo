@@ -13,6 +13,8 @@ import type {
 
 export type ManualDonationInput = {
     amount: number;
+    currency: "ILS" | "USD";
+    exchangeRate?: number;
     itemId?: string;
     ambassadorId?: string;
     donorName?: string;
@@ -91,6 +93,21 @@ export const createAdminDiagnosticDonationIntent = async (
 export const getAdminDaycareDonationCampaign = async () => {
     const response = await http.get<ApiResponse<DaycareDonationCampaignData>>(
         "/admin/daycare/donations/campaign"
+    );
+    return response.data.data;
+};
+
+export type DaycareUsdExchangeRate = {
+    currency: "USD";
+    rate: number;
+    updatedAt: string;
+    source: "bank_of_israel";
+};
+
+export const getAdminDaycareUsdExchangeRate = async (date?: string) => {
+    const response = await http.get<ApiResponse<DaycareUsdExchangeRate>>(
+        "/admin/daycare/donations/exchange-rates/USD",
+        { params: date ? { date } : undefined }
     );
     return response.data.data;
 };

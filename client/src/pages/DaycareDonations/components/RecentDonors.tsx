@@ -9,7 +9,15 @@ type RecentDonorsProps = {
 };
 
 const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("he-IL").format(value);
+    new Intl.NumberFormat("he-IL", {
+        maximumFractionDigits: 0,
+    }).format(Math.round(value));
+
+const formatDonationAmount = (donation: PublicDaycareDonation) =>
+    donation.originalCurrency === "USD" &&
+    donation.originalAmount !== undefined
+        ? `$${formatCurrency(donation.originalAmount)}`
+        : `₪${formatCurrency(donation.amount)}`;
 
 const RecentDonors = ({ donationCount, donations }: RecentDonorsProps) => {
     const [open, setOpen] = useState(false);
@@ -45,7 +53,7 @@ const RecentDonors = ({ donationCount, donations }: RecentDonorsProps) => {
                                 <small dir="auto">{donation.dedication}</small>
                             )}
                         </span>
-                        <b>₪{formatCurrency(donation.amount)}</b>
+                        <b dir="ltr">{formatDonationAmount(donation)}</b>
                     </article>
                 ))}
             </div>
@@ -87,7 +95,7 @@ const RecentDonors = ({ donationCount, donations }: RecentDonorsProps) => {
                                         <small dir="auto">{donation.dedication}</small>
                                     )}
                                 </div>
-                                <b>₪{formatCurrency(donation.amount)}</b>
+                                <b dir="ltr">{formatDonationAmount(donation)}</b>
                             </div>
                         ))}
                     </div>

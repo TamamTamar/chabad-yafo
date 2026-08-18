@@ -4,7 +4,7 @@ import type { DonationCategory, DonationItem } from "../types";
 import styles from "../DaycareDonations.module.scss";
 
 const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("he-IL").format(value);
+    new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 }).format(value);
 
 type CompletedProjectsProps = {
     categories: DonationCategory[];

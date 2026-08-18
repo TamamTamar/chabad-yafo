@@ -6,6 +6,12 @@ import { areDaycareDonationPaymentsEnabled } from "../config/daycareDonationSecu
 import { DaycareDonationCampaign } from "../models/DaycareDonationCampaign";
 import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
 
+export const convertDaycareDonationToIls = (
+    amount: number,
+    currency: "ILS" | "USD",
+    exchangeRate = 1
+) => Math.round(amount * (currency === "USD" ? exchangeRate : 1));
+
 type ConfirmedDonationAmount = {
     amount: number;
     itemId?: string | null;
@@ -26,6 +32,8 @@ type GoalItem = { categoryId: string; goal: number };
 type PublicDonationSource = {
     _id: unknown;
     amount: number;
+    originalAmount?: number | null;
+    originalCurrency?: "ILS" | "USD" | null;
     donorName?: string | null;
     dedication?: string | null;
     displayDonorName?: boolean | null;
@@ -39,6 +47,12 @@ export const toPublicDaycareDonation = (record: PublicDonationSource) => ({
             ? record.donorName
             : "תרומה אנונימית",
     amount: record.amount,
+    originalAmount:
+        record.originalCurrency === "USD" && record.originalAmount
+            ? record.originalAmount
+            : undefined,
+    originalCurrency:
+        record.originalCurrency === "USD" ? "USD" as const : undefined,
     dedication: record.dedication || undefined,
     receivedAt: record.receivedAt,
 });
@@ -209,6 +223,8 @@ export const getDaycareDonationCampaignSnapshot = async (options?: {
     })
         .select({
             amount: 1,
+            originalAmount: 1,
+            originalCurrency: 1,
             itemId: 1,
             allocations: 1,
             donorName: 1,

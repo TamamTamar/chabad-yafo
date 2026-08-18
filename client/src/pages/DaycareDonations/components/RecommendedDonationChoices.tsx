@@ -14,7 +14,7 @@ type RecommendedDonationChoicesProps = {
 };
 
 const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("he-IL").format(value);
+    new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 }).format(value);
 
 const getRemaining = (item: DonationItem) =>
     Math.max(0, item.remaining ?? item.goal - item.raised);

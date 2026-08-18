@@ -10,6 +10,7 @@ import {
     getAdminDaycareDonationCampaign,
     getAdminDaycareDonationDiagnostics,
     getAdminDaycareDonationRecords,
+    getAdminDaycareUsdExchangeRate,
     updateDaycareDonationCampaign,
     updateDaycareDonationItem,
     updateDaycareDonationRecord,
@@ -42,6 +43,14 @@ const formatDate = (value: string) =>
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
+    }).format(new Date(value));
+
+const formatShortDate = (value: string) =>
+    new Intl.DateTimeFormat("he-IL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        timeZone: "UTC",
     }).format(new Date(value));
 
 const toLocalDateTimeInputValue = (date = new Date()) => {
@@ -210,6 +219,15 @@ const DaycareDonationsAdmin = () => {
     const [recordStatus, setRecordStatus] = useState<
         "all" | DaycareDonationRecord["status"]
     >("all");
+    const [manualCurrency, setManualCurrency] = useState<"ILS" | "USD">("ILS");
+    const [manualAmount, setManualAmount] = useState("");
+    const [manualExchangeRate, setManualExchangeRate] = useState("");
+    const [manualRateUpdatedAt, setManualRateUpdatedAt] = useState("");
+    const [manualRateLoading, setManualRateLoading] = useState(false);
+    const [manualRateError, setManualRateError] = useState("");
+    const [manualReceivedAt, setManualReceivedAt] = useState(() =>
+        toLocalDateTimeInputValue()
+    );
     const [pendingRecordUpdate, setPendingRecordUpdate] =
         useState<PendingRecordUpdate | null>(null);
     const [allocationRecord, setAllocationRecord] =
@@ -277,6 +295,25 @@ const DaycareDonationsAdmin = () => {
         });
     }, [recordQuery, recordStatus, records]);
 
+    const loadAutomaticUsdRate = async () => {
+        setManualRateLoading(true);
+        setManualRateError("");
+        try {
+            const exchangeRate = await getAdminDaycareUsdExchangeRate(
+                manualReceivedAt.slice(0, 10)
+            );
+            setManualExchangeRate(String(exchangeRate.rate));
+            setManualRateUpdatedAt(exchangeRate.updatedAt);
+        } catch (rateError) {
+            console.error("Failed to load USD exchange rate:", rateError);
+            setManualRateError(
+                "לא הצלחנו לקבל שער אוטומטי. אפשר להזין את השער ידנית."
+            );
+        } finally {
+            setManualRateLoading(false);
+        }
+    };
+
     const handleManualDonation = async (
         event: React.FormEvent<HTMLFormElement>
     ) => {
@@ -293,6 +330,11 @@ const DaycareDonationsAdmin = () => {
         try {
             await createManualDaycareDonation({
                 amount: Number(data.get("amount")),
+                currency: manualCurrency,
+                exchangeRate:
+                    manualCurrency === "USD"
+                        ? Number(data.get("exchangeRate"))
+                        : undefined,
                 itemId: String(data.get("itemId") ?? "") || undefined,
                 ambassadorId:
                     String(data.get("ambassadorId") ?? "") || undefined,
@@ -315,6 +357,12 @@ const DaycareDonationsAdmin = () => {
                     : receivedAt.toISOString(),
             });
             form.reset();
+            setManualCurrency("ILS");
+            setManualAmount("");
+            setManualExchangeRate("");
+            setManualRateUpdatedAt("");
+            setManualRateError("");
+            setManualReceivedAt(toLocalDateTimeInputValue());
             await loadData();
             setActiveView("records");
             setMessage("התרומה הידנית נשמרה והמדדים עודכנו.");
@@ -896,15 +944,93 @@ const DaycareDonationsAdmin = () => {
                     onSubmit={handleManualDonation}
                 >
                     <label>
-                        סכום
+                        מטבע
+                        <select
+                            name="currency"
+                            value={manualCurrency}
+                            onChange={(event) => {
+                                const currency = event.target.value as
+                                    | "ILS"
+                                    | "USD";
+                                setManualCurrency(currency);
+                                if (currency === "USD") {
+                                    void loadAutomaticUsdRate();
+                                } else {
+                                    setManualRateError("");
+                                    setManualRateUpdatedAt("");
+                                }
+                            }}
+                        >
+                            <option value="ILS">שקל חדש (₪)</option>
+                            <option value="USD">דולר ארה״ב ($)</option>
+                        </select>
+                    </label>
+                    <label>
+                        סכום {manualCurrency === "USD" ? "בדולרים" : "בשקלים"}
                         <input
                             name="amount"
                             type="number"
                             min="1"
                             step="0.01"
+                            value={manualAmount}
+                            onChange={(event) =>
+                                setManualAmount(event.target.value)
+                            }
                             required
                         />
                     </label>
+                    {manualCurrency === "USD" && (
+                        <>
+                            <label>
+                                שער דולר לשקל
+                                <input
+                                    name="exchangeRate"
+                                    type="number"
+                                    min="0.0001"
+                                    max="100"
+                                    step="0.0001"
+                                    value={manualExchangeRate}
+                                    onChange={(event) => {
+                                        setManualExchangeRate(event.target.value);
+                                        setManualRateUpdatedAt("");
+                                    }}
+                                    placeholder="לדוגמה: 3.72"
+                                    required
+                                    disabled={manualRateLoading}
+                                />
+                            </label>
+                            <div className={`${styles.conversionPreview} ${styles.fullField}`}>
+                                <span>הסכום שייכנס ליעדים ולסיכומים</span>
+                                <strong>
+                                    ₪{formatCurrency(
+                                        Math.round(
+                                            Number(manualAmount || 0) *
+                                                Number(manualExchangeRate || 0)
+                                        )
+                                    )}
+                                </strong>
+                                <small>
+                                    ${formatCurrency(Number(manualAmount || 0))} × {manualExchangeRate || "שער"}
+                                </small>
+                                <div className={styles.rateStatus}>
+                                    <span>
+                                        {manualRateLoading
+                                            ? "טוען שער יציג מבנק ישראל..."
+                                            : manualRateUpdatedAt
+                                              ? `שער יציג של בנק ישראל לתאריך ${formatShortDate(manualRateUpdatedAt)}`
+                                              : manualRateError || "אפשר לערוך את השער ידנית"}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        disabled={manualRateLoading}
+                                        onClick={() => void loadAutomaticUsdRate()}
+                                    >
+                                        רענון שער
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    )}
                     <label>
                         שיוך
                         <select name="itemId" defaultValue="">
@@ -973,7 +1099,15 @@ const DaycareDonationsAdmin = () => {
                         <input
                             name="receivedAt"
                             type="datetime-local"
-                            defaultValue={toLocalDateTimeInputValue()}
+                            value={manualReceivedAt}
+                            onChange={(event) =>
+                                setManualReceivedAt(event.target.value)
+                            }
+                            onBlur={() => {
+                                if (manualCurrency === "USD") {
+                                    void loadAutomaticUsdRate();
+                                }
+                            }}
                             step="60"
                             required
                         />
@@ -1308,6 +1442,12 @@ const DaycareDonationsAdmin = () => {
                                                 <strong>
                                                     ₪{formatCurrency(record.amount)}
                                                 </strong>
+                                                {record.originalCurrency === "USD" &&
+                                                    record.originalAmount !== undefined && (
+                                                        <small>
+                                                            ${formatCurrency(record.originalAmount)} לפי שער {record.exchangeRate}
+                                                        </small>
+                                                    )}
                                                 {record.paymentType === "HK" && (
                                                     <small>
                                                         הו״ק: ₪{formatCurrency(

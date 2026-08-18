@@ -46,7 +46,7 @@ type DonationStep = 1 | 2 | 3 | 4;
 type PaymentMode = "once" | "monthly";
 
 const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("he-IL").format(value);
+    new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 }).format(value);
 
 const DonationModalPreview = ({
     open,

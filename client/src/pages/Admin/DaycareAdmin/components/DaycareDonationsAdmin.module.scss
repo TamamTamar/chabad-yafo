@@ -413,6 +413,46 @@
     grid-column: 1 / -1;
 }
 
+.conversionPreview {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3px 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba($brand-gold-rich, 0.32);
+    border-radius: 12px;
+    background: rgba($brand-gold-light, 0.1);
+    color: $brand-blue-ink;
+}
+
+.conversionPreview strong {
+    font-size: 1.1rem;
+}
+
+.conversionPreview small {
+    grid-column: 1 / -1;
+    color: $ui-text-muted;
+}
+
+.rateStatus {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 5px;
+    color: $ui-text-muted;
+    font-size: $type-caption;
+}
+
+.manualForm .rateStatus button {
+    min-height: 32px;
+    padding: 5px 12px;
+    border: 1px solid $ui-border-soft;
+    background: $color-white;
+    color: $brand-primary;
+    cursor: pointer;
+}
+
 .manualForm button,
 .itemRow button {
     min-height: 44px;

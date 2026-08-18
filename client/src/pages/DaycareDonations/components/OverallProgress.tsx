@@ -3,7 +3,7 @@ import styles from "../DaycareDonations.module.scss";
 import ProgressBar from "./ProgressBar";
 
 const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("he-IL").format(value);
+    new Intl.NumberFormat("he-IL", { maximumFractionDigits: 0 }).format(value);
 
 type OverallProgressProps = {
     goal: number;
