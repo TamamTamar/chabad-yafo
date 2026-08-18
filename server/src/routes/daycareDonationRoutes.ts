@@ -17,7 +17,7 @@ import {
 } from "../services/daycareDonationCallbackSecurity";
 import type { DaycareDonationItemConfig } from "../types/daycareDonations";
 import { findActiveDaycareDonationAmbassador } from "../services/daycareDonationAmbassadorService";
-import { getDaycareStorageProvider } from "../services/daycareStorageService";
+import { downloadDaycareDonationFieldUpdateImage } from "../services/daycareDonationFieldUpdateImageService";
 
 const router = Router();
 
@@ -105,7 +105,7 @@ router.get("/field-updates/:id/image", async (req, res) => {
                 message: "Field update image was not found",
             });
         }
-        const bytes = await getDaycareStorageProvider().download(
+        const bytes = await downloadDaycareDonationFieldUpdateImage(
             update.image.storageKey
         );
         res.set({

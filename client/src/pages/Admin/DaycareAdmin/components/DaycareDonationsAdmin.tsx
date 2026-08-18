@@ -294,6 +294,8 @@ const DaycareDonationsAdmin = () => {
             await createManualDaycareDonation({
                 amount: Number(data.get("amount")),
                 itemId: String(data.get("itemId") ?? "") || undefined,
+                ambassadorId:
+                    String(data.get("ambassadorId") ?? "") || undefined,
                 donorName: String(data.get("donorName") ?? "") || undefined,
                 displayDonorName: data.get("displayDonorName") === "on",
                 phone: String(data.get("phone") ?? "") || undefined,
@@ -916,6 +918,22 @@ const DaycareDonationsAdmin = () => {
                                         : "היעד הושלם"}
                                 </option>
                             ))}
+                        </select>
+                    </label>
+                    <label>
+                        שגריר
+                        <select name="ambassadorId" defaultValue="">
+                            <option value="">ללא שגריר — תרומה כללית</option>
+                            {ambassadors
+                                .filter((ambassador) => ambassador.active)
+                                .map((ambassador) => (
+                                    <option
+                                        key={ambassador._id}
+                                        value={ambassador._id}
+                                    >
+                                        {ambassador.name}
+                                    </option>
+                                ))}
                         </select>
                     </label>
                     <label>

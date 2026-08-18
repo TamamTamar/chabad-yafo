@@ -14,6 +14,7 @@ import type {
 export type ManualDonationInput = {
     amount: number;
     itemId?: string;
+    ambassadorId?: string;
     donorName?: string;
     displayDonorName?: boolean;
     phone?: string;

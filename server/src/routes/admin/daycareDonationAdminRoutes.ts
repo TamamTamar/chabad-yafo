@@ -28,7 +28,10 @@ import {
     buildDaycareDonationCallbackUrl,
     isDaycareDonationCallbackConfigured,
 } from "../../services/daycareDonationCallbackSecurity";
-import { getDaycareStorageProvider } from "../../services/daycareStorageService";
+import {
+    deleteDaycareDonationFieldUpdateImage,
+    uploadDaycareDonationFieldUpdateImage,
+} from "../../services/daycareDonationFieldUpdateImageService";
 import type {
     DaycareDonationItemConfig,
     DaycareDonationContactMethod,
@@ -180,7 +183,7 @@ router.get("/campaign", async (_req, res) => {
 
 router.post("/field-updates", receiveFieldUpdateImage, async (req, res) => {
     let storedImage: Awaited<
-        ReturnType<ReturnType<typeof getDaycareStorageProvider>["upload"]>
+        ReturnType<typeof uploadDaycareDonationFieldUpdateImage>
     > | null = null;
     try {
         const campaign = await ensureDefaultDaycareDonationCampaign();
@@ -209,11 +212,10 @@ router.post("/field-updates", receiveFieldUpdateImage, async (req, res) => {
             });
         }
 
-        storedImage = await getDaycareStorageProvider().upload({
+        storedImage = await uploadDaycareDonationFieldUpdateImage({
             bytes: req.file.buffer,
             mimeType: req.file.mimetype,
             originalName: req.file.originalname,
-            category: "campaign-updates",
         });
         const now = new Date();
         const update = {
@@ -251,8 +253,7 @@ router.post("/field-updates", receiveFieldUpdateImage, async (req, res) => {
         });
     } catch (error) {
         if (storedImage) {
-            await getDaycareStorageProvider()
-                .delete(storedImage.storageKey)
+            await deleteDaycareDonationFieldUpdateImage(storedImage.storageKey)
                 .catch(() => undefined);
         }
         console.error("Failed to create field update:", error);
@@ -265,7 +266,7 @@ router.post("/field-updates", receiveFieldUpdateImage, async (req, res) => {
 
 router.patch("/field-updates/:id", receiveFieldUpdateImage, async (req, res) => {
     let replacementImage: Awaited<
-        ReturnType<ReturnType<typeof getDaycareStorageProvider>["upload"]>
+        ReturnType<typeof uploadDaycareDonationFieldUpdateImage>
     > | null = null;
     try {
         const campaign = await ensureDefaultDaycareDonationCampaign();
@@ -325,11 +326,10 @@ router.patch("/field-updates/:id", receiveFieldUpdateImage, async (req, res) => 
                     message: "אפשר להעלות תמונת JPG, PNG או WebP בלבד.",
                 });
             }
-            replacementImage = await getDaycareStorageProvider().upload({
+            replacementImage = await uploadDaycareDonationFieldUpdateImage({
                 bytes: req.file.buffer,
                 mimeType: req.file.mimetype,
                 originalName: req.file.originalname,
-                category: "campaign-updates",
             });
             update.image.src = undefined;
             update.image.storageKey = replacementImage.storageKey;
@@ -340,7 +340,7 @@ router.patch("/field-updates/:id", receiveFieldUpdateImage, async (req, res) => 
         await campaign.save();
 
         if (replacementImage && previousStorageKey) {
-            await getDaycareStorageProvider().delete(previousStorageKey).catch(() => undefined);
+            await deleteDaycareDonationFieldUpdateImage(previousStorageKey).catch(() => undefined);
         }
         await writeDaycareDonationAudit({
             action: "fieldUpdate.updated",
@@ -362,8 +362,7 @@ router.patch("/field-updates/:id", receiveFieldUpdateImage, async (req, res) => 
         });
     } catch (error) {
         if (replacementImage) {
-            await getDaycareStorageProvider()
-                .delete(replacementImage.storageKey)
+            await deleteDaycareDonationFieldUpdateImage(replacementImage.storageKey)
                 .catch(() => undefined);
         }
         console.error("Failed to update field update:", error);
@@ -384,7 +383,7 @@ router.delete("/field-updates/:id", async (req, res) => {
         campaign.markModified("fieldUpdates");
         await campaign.save();
         if (removed.image.storageKey) {
-            await getDaycareStorageProvider().delete(removed.image.storageKey).catch(() => undefined);
+            await deleteDaycareDonationFieldUpdateImage(removed.image.storageKey).catch(() => undefined);
         }
         await writeDaycareDonationAudit({
             action: "fieldUpdate.deleted",
@@ -1236,6 +1235,7 @@ router.post("/records", async (req, res) => {
         const campaign = await ensureDefaultDaycareDonationCampaign();
         const amount = Number(req.body.amount);
         const itemId = cleanText(req.body.itemId, 80) || undefined;
+        const ambassadorId = cleanText(req.body.ambassadorId, 80) || undefined;
         const manualSource = req.body.manualSource;
         const reference = cleanText(req.body.reference, 200) || undefined;
         const note = cleanText(req.body.note, 600) || undefined;
@@ -1284,12 +1284,29 @@ router.post("/records", async (req, res) => {
             });
         }
 
+        if (
+            ambassadorId &&
+            (!mongoose.isValidObjectId(ambassadorId) ||
+                !(await DaycareDonationAmbassador.exists({
+                    _id: ambassadorId,
+                    active: true,
+                })))
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Donation ambassador was not found or is inactive",
+            });
+        }
+
         const record = await DaycareDonationRecord.create({
             campaignSlug: campaign.slug,
             source: "manual",
             status: "confirmed",
             amount,
             itemId,
+            ambassadorId: ambassadorId
+                ? new mongoose.Types.ObjectId(ambassadorId)
+                : undefined,
             donorName: cleanText(req.body.donorName, 160) || undefined,
             displayDonorName,
             phone: cleanText(req.body.phone, 40) || undefined,
@@ -1311,6 +1328,7 @@ router.post("/records", async (req, res) => {
             after: {
                 amount: record.amount,
                 itemId: record.itemId ?? null,
+                ambassadorId: record.ambassadorId ?? null,
                 status: record.status,
                 manualSource,
                 displayDonorName,

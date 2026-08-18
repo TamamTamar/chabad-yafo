@@ -10,6 +10,7 @@ import { DaycareDonationAmbassador } from "../models/DaycareDonationAmbassador";
 import { DaycareDonationIntent } from "../models/DaycareDonationIntent";
 import { DaycareDonationLead } from "../models/DaycareDonationLead";
 import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
+import { DaycareDonationFieldUpdateImage } from "../models/DaycareDonationFieldUpdateImage";
 import {
     isValidDaycareDonationIntentSignature,
     signDaycareDonationIntent,
@@ -54,6 +55,22 @@ test("default campaign includes a published field update linked to a valid item"
             defaultDaycareDonationCampaign.items.some(
                 (item) => item.id === update.itemId
             )
+    );
+});
+
+test("field update images are stored separately and hidden from ordinary queries", async () => {
+    const image = new DaycareDonationFieldUpdateImage({
+        storageKey: "mongo/daycare/campaign-updates/example.png",
+        bytes: Buffer.from("image-bytes"),
+        mimeType: "image/png",
+        size: 11,
+        sha256: "0".repeat(64),
+    });
+
+    await image.validate();
+    assert.equal(
+        DaycareDonationFieldUpdateImage.schema.path("bytes").options.select,
+        false
     );
 });
 
