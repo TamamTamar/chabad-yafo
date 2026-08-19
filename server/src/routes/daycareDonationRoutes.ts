@@ -18,6 +18,10 @@ import {
 import type { DaycareDonationItemConfig } from "../types/daycareDonations";
 import { findActiveDaycareDonationAmbassador } from "../services/daycareDonationAmbassadorService";
 import { downloadDaycareDonationFieldUpdateImage } from "../services/daycareDonationFieldUpdateImageService";
+import {
+    isSafeNedarimDiagnosticValueField,
+    resolveNedarimExternalTransactionId,
+} from "../services/daycareDonationProvider";
 
 const router = Router();
 
@@ -31,39 +35,6 @@ const toAmount = (value: unknown) => {
     return Number.isFinite(amount) ? amount : 0;
 };
 
-const getTransactionId = (body: Record<string, unknown>) => {
-    const aliases = [
-        "TransactionId",
-        "TransactionID",
-        "Transaction",
-        "Confirmation",
-        "ConfirmationNumber",
-        "Approval",
-        "Shovar",
-        "KevaId",
-    ];
-
-    for (const key of aliases) {
-        const value = cleanText(body[key], 160);
-        if (value) return value;
-    }
-
-    return null;
-};
-
-const diagnosticValueFields = new Set([
-    "Status",
-    "Amount",
-    "TransactionId",
-    "TransactionID",
-    "Transaction",
-    "Confirmation",
-    "ConfirmationNumber",
-    "Approval",
-    "Shovar",
-    "KevaId",
-]);
-
 const getSafeProviderDiagnostic = (body: Record<string, unknown>) => {
     const fields = Object.keys(body)
         .filter((field) => !/card|credit|cvv|password|secret|param2/i.test(field))
@@ -71,7 +42,7 @@ const getSafeProviderDiagnostic = (body: Record<string, unknown>) => {
         .slice(0, 100);
     const values = Object.fromEntries(
         fields
-            .filter((field) => diagnosticValueFields.has(field))
+            .filter(isSafeNedarimDiagnosticValueField)
             .map((field) => [field, cleanText(body[field], 300)])
     );
 
@@ -394,7 +365,12 @@ router.post(
                 return res.status(409).send("AMOUNT_MISMATCH");
             }
 
-            const externalTransactionId = getTransactionId(body);
+            const externalTransactionId =
+                resolveNedarimExternalTransactionId({
+                    body,
+                    paymentType: intent.paymentType ?? "Ragil",
+                    intentPublicId: publicId,
+                });
             if (!externalTransactionId) {
                 intent.status = "failed";
                 intent.providerMessage = "Provider transaction ID missing";

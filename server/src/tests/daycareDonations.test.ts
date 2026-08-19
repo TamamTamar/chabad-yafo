@@ -31,6 +31,40 @@ import {
     parseBankOfIsraelHistoricalUsdExchangeRate,
     parseBankOfIsraelUsdExchangeRate,
 } from "../services/daycareExchangeRateService";
+import {
+    getNedarimTransactionId,
+    resolveNedarimExternalTransactionId,
+} from "../services/daycareDonationProvider";
+
+test("Nedarim transaction IDs are matched case-insensitively for standing orders", () => {
+    assert.equal(
+        getNedarimTransactionId({ Status: "OK", KevaID: "2421257" }),
+        "2421257"
+    );
+    assert.equal(
+        getNedarimTransactionId({ status: "OK", transaction_id: "76780256" }),
+        "76780256"
+    );
+});
+
+test("successful standing-order callbacks remain idempotent without a provider ID", () => {
+    assert.equal(
+        resolveNedarimExternalTransactionId({
+            body: { Status: "OK", Amount: "1" },
+            paymentType: "HK",
+            intentPublicId: "standing-order-intent",
+        }),
+        "nedarim-hk-intent:standing-order-intent"
+    );
+    assert.equal(
+        resolveNedarimExternalTransactionId({
+            body: { Status: "OK", Amount: "1" },
+            paymentType: "Ragil",
+            intentPublicId: "regular-intent",
+        }),
+        null
+    );
+});
 
 test("daycare donation defaults preserve the approved 100,000 ILS budget", () => {
     const categoryGoal = defaultDaycareDonationCampaign.categories.reduce(
