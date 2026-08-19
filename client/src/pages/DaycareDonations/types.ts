@@ -129,7 +129,6 @@ export type DaycareDonationAmbassador = {
     active: boolean;
     raised: number;
     donationCount: number;
-    ownerLabel?: string;
     notes?: string;
     createdAt: string;
     updatedAt: string;

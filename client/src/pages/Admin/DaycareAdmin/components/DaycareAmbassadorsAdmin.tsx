@@ -34,7 +34,6 @@ type AmbassadorFormValues = {
     name: string;
     linkSlug: string;
     goal: number;
-    ownerLabel: string;
     notes: string;
 };
 
@@ -63,7 +62,6 @@ const AmbassadorEditForm = ({
             name: ambassador.name,
             linkSlug: ambassador.linkSlug ?? "",
             goal: ambassador.goal,
-            ownerLabel: ambassador.ownerLabel ?? "",
             notes: ambassador.notes ?? "",
         },
     });
@@ -134,19 +132,6 @@ const AmbassadorEditForm = ({
                 />
                 <span className={styles.fieldError} role="alert">
                     {errors.goal?.message || ""}
-                </span>
-            </label>
-            <label className={styles.editField}>
-                <input
-                    {...register("ownerLabel", {
-                        maxLength: { value: 160, message: "שם האחראי ארוך מדי" },
-                    })}
-                    maxLength={160}
-                    placeholder="אחראי/ת"
-                    aria-invalid={Boolean(errors.ownerLabel)}
-                />
-                <span className={styles.fieldError} role="alert">
-                    {errors.ownerLabel?.message || ""}
                 </span>
             </label>
             <label className={styles.editField}>
@@ -237,7 +222,6 @@ const DaycareAmbassadorsAdmin = ({
             name: "",
             linkSlug: "",
             goal: undefined,
-            ownerLabel: "",
             notes: "",
         },
     });
@@ -298,7 +282,6 @@ const DaycareAmbassadorsAdmin = ({
                     name: values.name.trim(),
                     linkSlug,
                     goal: values.goal,
-                    ownerLabel: values.ownerLabel.trim() || undefined,
                     notes: values.notes.trim() || undefined,
                 }),
             "השגריר נוסף והלינק האישי מוכן."
@@ -316,13 +299,11 @@ const DaycareAmbassadorsAdmin = ({
     ) => {
         const name = values.name.trim();
         const linkSlug = normalizeAmbassadorSlug(values.linkSlug);
-        const ownerLabel = values.ownerLabel.trim();
         const notes = values.notes.trim();
         if (
             name === ambassador.name &&
             linkSlug === (ambassador.linkSlug ?? "") &&
             values.goal === ambassador.goal &&
-            ownerLabel === (ambassador.ownerLabel ?? "") &&
             notes === (ambassador.notes ?? "")
         ) {
             setEditingId(null);
@@ -334,7 +315,6 @@ const DaycareAmbassadorsAdmin = ({
                     name,
                     linkSlug,
                     goal: values.goal,
-                    ownerLabel,
                     notes,
                 }),
             "פרטי השגריר והיעד עודכנו."
@@ -459,23 +439,6 @@ const DaycareAmbassadorsAdmin = ({
                             {createErrors.goal?.message || ""}
                         </span>
                     </label>
-                    <label>
-                        אחראי/ת פנימי/ת
-                        <input
-                            {...registerCreate("ownerLabel", {
-                                maxLength: {
-                                    value: 160,
-                                    message: "שם האחראי ארוך מדי",
-                                },
-                            })}
-                            type="text"
-                            maxLength={160}
-                            aria-invalid={Boolean(createErrors.ownerLabel)}
-                        />
-                        <span className={styles.fieldError} role="alert">
-                            {createErrors.ownerLabel?.message || ""}
-                        </span>
-                    </label>
                     <label className={styles.wideField}>
                         הערה פנימית
                         <textarea
@@ -564,11 +527,6 @@ const DaycareAmbassadorsAdmin = ({
                                                     >
                                                         {ambassador.name}
                                                     </button>
-                                                )}
-                                                {editingId !== ambassador._id && ambassador.ownerLabel && (
-                                                    <small className={styles.ownerLabel}>
-                                                        אחראי/ת: {ambassador.ownerLabel}
-                                                    </small>
                                                 )}
                                             </td>
                                             <td data-label="סטטוס">
@@ -720,16 +678,9 @@ const DaycareAmbassadorsAdmin = ({
                                             <tr className={styles.detailsRow} key={`${ambassador._id}-details`}>
                                                 <td colSpan={6} className={styles.details}>
                                                     <strong>תרומות דרך {ambassador.name}</strong>
-                                                    {(ambassador.ownerLabel || ambassador.notes) && (
+                                                    {ambassador.notes && (
                                                         <div className={styles.internalMeta}>
-                                                            {ambassador.ownerLabel && (
-                                                                <span>
-                                                                    אחראי/ת: {ambassador.ownerLabel}
-                                                                </span>
-                                                            )}
-                                                            {ambassador.notes && (
-                                                                <span>{ambassador.notes}</span>
-                                                            )}
+                                                            <span>{ambassador.notes}</span>
                                                         </div>
                                                     )}
                                                     {ambassadorRecords.length === 0 ? (

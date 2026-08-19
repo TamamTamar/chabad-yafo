@@ -223,13 +223,11 @@ test("ambassador references are URL-safe, unique and deactivatable", async () =>
         linkSlug: "mushky-cohen",
         refCode: "a1b2c3d4",
         goal: 10_000,
-        ownerLabel: "תמר",
         notes: "מעקב שבועי",
     });
     await ambassador.validate();
     assert.equal(ambassador.active, true);
     assert.equal(ambassador.goal, 10_000);
-    assert.equal(ambassador.ownerLabel, "תמר");
     assert.equal(ambassador.linkSlug, "mushky-cohen");
 
     const invalidAmbassador = new DaycareDonationAmbassador({

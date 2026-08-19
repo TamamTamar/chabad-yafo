@@ -56,11 +56,6 @@ const daycareDonationAmbassadorSchema =
                 default: true,
                 index: true,
             },
-            ownerLabel: {
-                type: String,
-                trim: true,
-                maxlength: 160,
-            },
             notes: {
                 type: String,
                 trim: true,

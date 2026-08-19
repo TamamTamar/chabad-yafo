@@ -137,7 +137,6 @@
 }
 
 .nameButton { border: 0; background: transparent; color: $brand-primary; font: inherit; font-weight: 900; cursor: pointer; }
-.ownerLabel { display: block; margin-top: 3px; color: $ui-text-muted; font-size: $type-caption; }
 .linkInput { width: min(310px, 30vw); min-width: 220px; padding: 8px 10px; border: 1px solid $ui-border-soft; border-radius: 9px; background: $brand-surface-cool; font: inherit; }
 .actions { display: flex; gap: 6px; }
 .actions button,

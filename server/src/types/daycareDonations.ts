@@ -38,7 +38,6 @@ export type DaycareDonationAmbassadorDocument = {
     refCode: string;
     goal: number;
     active: boolean;
-    ownerLabel?: string;
     notes?: string;
     createdAt?: Date;
     updatedAt?: Date;

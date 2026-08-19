@@ -131,7 +131,6 @@ export const createDaycareDonationAmbassador = async (
         name: string;
         linkSlug: string;
         goal: number;
-        ownerLabel?: string;
         notes?: string;
     }
 ) => {
@@ -149,7 +148,6 @@ export const updateDaycareDonationAmbassador = async (
         linkSlug?: string;
         goal?: number;
         active?: boolean;
-        ownerLabel?: string;
         notes?: string;
     }
 ) => {

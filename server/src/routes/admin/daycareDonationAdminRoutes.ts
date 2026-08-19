@@ -542,7 +542,6 @@ router.post("/ambassadors", async (req, res) => {
             goal,
             refCode: await createUniqueAmbassadorRef(),
             active: true,
-            ownerLabel: cleanText(req.body.ownerLabel, 160) || undefined,
             notes: cleanText(req.body.notes, 800) || undefined,
         });
         await writeDaycareDonationAudit({
@@ -556,7 +555,6 @@ router.post("/ambassadors", async (req, res) => {
                 goal: ambassador.goal,
                 refCode: ambassador.refCode,
                 active: ambassador.active,
-                ownerLabel: ambassador.ownerLabel ?? null,
                 notes: ambassador.notes ?? null,
             },
         });
@@ -598,7 +596,6 @@ router.patch("/ambassadors/:id", async (req, res) => {
             linkAliases: ambassador.linkAliases ?? [],
             goal: ambassador.goal,
             active: ambassador.active,
-            ownerLabel: ambassador.ownerLabel ?? null,
             notes: ambassador.notes ?? null,
         };
         if (req.body.name !== undefined) {
@@ -648,10 +645,6 @@ router.patch("/ambassadors/:id", async (req, res) => {
         if (req.body.active !== undefined) {
             ambassador.active = Boolean(req.body.active);
         }
-        if (req.body.ownerLabel !== undefined) {
-            ambassador.ownerLabel =
-                cleanText(req.body.ownerLabel, 160) || undefined;
-        }
         if (req.body.notes !== undefined) {
             ambassador.notes = cleanText(req.body.notes, 800) || undefined;
         }
@@ -660,7 +653,6 @@ router.patch("/ambassadors/:id", async (req, res) => {
             (ambassador.linkSlug ?? null) === before.linkSlug &&
             ambassador.goal === before.goal &&
             ambassador.active === before.active &&
-            (ambassador.ownerLabel ?? null) === before.ownerLabel &&
             (ambassador.notes ?? null) === before.notes
         ) {
             return res.status(400).json({
@@ -682,7 +674,6 @@ router.patch("/ambassadors/:id", async (req, res) => {
                 linkAliases: ambassador.linkAliases ?? [],
                 goal: ambassador.goal,
                 active: ambassador.active,
-                ownerLabel: ambassador.ownerLabel ?? null,
                 notes: ambassador.notes ?? null,
             },
         });
@@ -747,7 +738,6 @@ router.delete("/ambassadors/:id", async (req, res) => {
                 goal: ambassador.goal,
                 refCode: ambassador.refCode,
                 active: ambassador.active,
-                ownerLabel: ambassador.ownerLabel ?? null,
                 notes: ambassador.notes ?? null,
             },
             after: null,
