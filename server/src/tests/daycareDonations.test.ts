@@ -28,8 +28,8 @@ import {
     normalizeDaycareAmbassadorSlug,
 } from "../services/daycareDonationAmbassadorService";
 import {
-    parseBankOfIsraelHistoricalUsdExchangeRate,
-    parseBankOfIsraelUsdExchangeRate,
+    parseBankOfIsraelExchangeRate,
+    parseBankOfIsraelHistoricalExchangeRate,
 } from "../services/daycareExchangeRateService";
 import {
     getNedarimTransactionId,
@@ -504,6 +504,7 @@ test("manual donation requires source and note or reference", async () => {
 test("manual USD donation preserves the original amount and ILS conversion", async () => {
     assert.equal(convertDaycareDonationToIls(100, "USD", 3.72), 372);
     assert.equal(convertDaycareDonationToIls(10.01, "USD", 3.3333), 33);
+    assert.equal(convertDaycareDonationToIls(100, "EUR", 3.5), 350);
     assert.equal(convertDaycareDonationToIls(180, "ILS", 9), 180);
 
     const usdDonation = new DaycareDonationRecord({
@@ -530,11 +531,14 @@ test("manual USD donation preserves the original amount and ILS conversion", asy
 
 test("Bank of Israel USD response is normalized for the admin form", () => {
     assert.deepEqual(
-        parseBankOfIsraelUsdExchangeRate({
-            key: "USD",
-            currentExchangeRate: 3.72,
-            lastUpdate: "2026-08-18T12:00:00Z",
-        }),
+        parseBankOfIsraelExchangeRate(
+            {
+                key: "USD",
+                currentExchangeRate: 3.72,
+                lastUpdate: "2026-08-18T12:00:00Z",
+            },
+            "USD"
+        ),
         {
             currency: "USD",
             rate: 3.72,
@@ -543,11 +547,14 @@ test("Bank of Israel USD response is normalized for the admin form", () => {
         }
     );
     assert.throws(() =>
-        parseBankOfIsraelUsdExchangeRate({
-            key: "USD",
-            currentExchangeRate: 0,
-            lastUpdate: "invalid",
-        })
+        parseBankOfIsraelExchangeRate(
+            {
+                key: "USD",
+                currentExchangeRate: 0,
+                lastUpdate: "invalid",
+            },
+            "USD"
+        )
     );
 });
 
@@ -558,12 +565,31 @@ test("historical Bank of Israel USD data uses the latest available business day"
         "RER_USD_ILS,D,USD,ILS,2026-08-14,2.954,YP",
     ].join("\n");
 
-    assert.deepEqual(parseBankOfIsraelHistoricalUsdExchangeRate(csv), {
+    assert.deepEqual(parseBankOfIsraelHistoricalExchangeRate(csv, "USD"), {
         currency: "USD",
         rate: 2.954,
         updatedAt: "2026-08-14T00:00:00.000Z",
         source: "bank_of_israel",
     });
+});
+
+test("Bank of Israel EUR responses use the same exchange-rate path", () => {
+    assert.deepEqual(
+        parseBankOfIsraelExchangeRate(
+            {
+                key: "EUR",
+                currentExchangeRate: 3.52,
+                lastUpdate: "2026-08-18T12:00:00Z",
+            },
+            "EUR"
+        ),
+        {
+            currency: "EUR",
+            rate: 3.52,
+            updatedAt: "2026-08-18T12:00:00.000Z",
+            source: "bank_of_israel",
+        }
+    );
 });
 
 test("unsigned Nedarim callbacks require an explicit production opt-in", () => {
