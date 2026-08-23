@@ -28,8 +28,8 @@ const parseDocuments = (value: unknown): DaycareParentDocumentBundle["documents"
     const menuTitle = text(menu.title, 200), menuSubtitle = text(menu.subtitle, 300), menuNote = optionalText(menu.note, 1000);
     if (!routineTitle || !routineSubtitle || !routineNote || !holidaysTitle || !holidaysSubtitle || !menuTitle || !menuSubtitle || menuNote === null) return null;
     return {
-        routine: { key: "routine", title: routineTitle, subtitle: routineSubtitle, filename: "daycare-routine.pdf", items: routineItems as Array<{ time: string; activity: string }>, note: routineNote },
-        holidays: { key: "holidays", title: holidaysTitle, subtitle: holidaysSubtitle, filename: "daycare-holidays.pdf", items: holidayItems as Array<{ occasion: string; hebrewDate: string; vacationDates: string }>, clarifications: clarifications as string[] },
+        routine: { key: "routine", title: routineTitle, subtitle: routineSubtitle, filename: "סדר יום מעון חבד יפו.pdf", items: routineItems as Array<{ time: string; activity: string }>, note: routineNote },
+        holidays: { key: "holidays", title: holidaysTitle, subtitle: holidaysSubtitle, filename: "לוח חופשות מעון חבד יפו.pdf", items: holidayItems as Array<{ occasion: string; hebrewDate: string; vacationDates: string }>, clarifications: clarifications as string[] },
         menu: { key: "menu", title: menuTitle, subtitle: menuSubtitle, filename: "daycare-menu.pdf", items: menuItems as Array<{ meal: string; description: string }>, note: menuNote },
     };
 };
