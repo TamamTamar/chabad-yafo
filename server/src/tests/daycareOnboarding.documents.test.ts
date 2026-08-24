@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 import { DAYCARE_ONBOARDING_AUDIT_ACTIONS } from "../config/daycareOnboardingAuditActions";
 import { DAYCARE_ONBOARDING_STEP_DEFINITIONS } from "../config/daycareOnboardingDefaults";
 import { DAYCARE_PARENT_DOCUMENTS_2026_2027 } from "../config/daycareParentDocuments";
-import { inlinePdfContentDisposition } from "../controllers/daycareParentDocumentController";
+import { inlinePdfContentDisposition, parentDocumentDownloadFilename } from "../controllers/daycareParentDocumentController";
 import { DaycareChild } from "../models/DaycareChild";
 import { DaycareAgreement } from "../models/DaycareAgreement";
 import { DaycareAgreementVersion } from "../models/DaycareAgreementVersion";
@@ -243,6 +243,8 @@ test("parent document downloads preserve Hebrew filenames", () => {
     ] as const;
 
     for (const [filename, fallbackFilename] of filenames) {
+        const key = fallbackFilename.includes("routine") ? "routine" : "holidays";
+        assert.equal(parentDocumentDownloadFilename(key, fallbackFilename), filename);
         const header = inlinePdfContentDisposition(filename, fallbackFilename);
         assert.match(header, new RegExp(`^inline; filename="${fallbackFilename}"; filename\\*=UTF-8''`));
         assert.equal(decodeURIComponent(header.split("filename*=UTF-8''")[1]), filename);

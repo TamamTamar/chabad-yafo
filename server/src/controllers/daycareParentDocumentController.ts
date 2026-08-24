@@ -7,6 +7,15 @@ import { logger } from "../utils/logger";
 const keyFrom = (value: string): DaycareParentDocumentKey | null =>
     value === "routine" || value === "holidays" || value === "menu" ? value : null;
 
+export const parentDocumentDownloadFilename = (
+    key: DaycareParentDocumentKey,
+    configuredFilename: string
+) => key === "routine"
+    ? "סדר יום מעון חבד יפו.pdf"
+    : key === "holidays"
+        ? "לוח חופשות מעון חבד יפו.pdf"
+        : configuredFilename;
+
 export const inlinePdfContentDisposition = (
     filename: string,
     fallbackFilename: string
@@ -55,10 +64,11 @@ const handleError = (res: Response, error: unknown) => {
 
 const sendPdf = async (res: Response, bundle: Awaited<ReturnType<typeof getParentDocumentBundleForToken>>, key: DaycareParentDocumentKey) => {
     const file = await createParentDocumentDownload(bundle, key);
+    const downloadFilename = parentDocumentDownloadFilename(key, file.filename);
     res.setHeader("Content-Type", file.mimeType);
     res.setHeader(
         "Content-Disposition",
-        inlinePdfContentDisposition(file.filename, `daycare-${key}.pdf`)
+        inlinePdfContentDisposition(downloadFilename, `daycare-${key}.pdf`)
     );
     res.setHeader("Cache-Control", "private, no-store");
     return res.send(file.bytes);
