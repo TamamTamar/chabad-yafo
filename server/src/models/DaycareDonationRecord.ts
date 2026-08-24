@@ -26,7 +26,7 @@ const daycareDonationRecordSchema =
             originalAmount: { type: Number, min: 0.01 },
             originalCurrency: {
                 type: String,
-                enum: ["ILS", "USD"],
+                enum: ["ILS", "USD", "EUR"],
             },
             exchangeRate: { type: Number, min: 0.0001 },
             paymentType: {

@@ -75,7 +75,7 @@ export type PublicDaycareDonation = {
     donorName: string;
     amount: number;
     originalAmount?: number;
-    originalCurrency?: "USD";
+    originalCurrency?: "USD" | "EUR";
     dedication?: string;
     receivedAt: string;
 };
@@ -87,7 +87,7 @@ export type DaycareDonationRecord = {
     status: "confirmed" | "refunded" | "cancelled";
     amount: number;
     originalAmount?: number;
-    originalCurrency?: "ILS" | "USD";
+    originalCurrency?: "ILS" | "USD" | "EUR";
     exchangeRate?: number;
     paymentType?: "HK" | "Ragil";
     installments?: number;

@@ -10,7 +10,7 @@ import {
     getAdminDaycareDonationCampaign,
     getAdminDaycareDonationDiagnostics,
     getAdminDaycareDonationRecords,
-    getAdminDaycareUsdExchangeRate,
+    getAdminDaycareExchangeRate,
     updateDaycareDonationCampaign,
     updateDaycareDonationItem,
     updateDaycareDonationRecord,
@@ -35,6 +35,25 @@ import styles from "./DaycareDonationsAdmin.module.scss";
 
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat("he-IL").format(value);
+
+type ManualCurrency = "ILS" | "USD" | "EUR";
+
+const currencySymbol: Record<ManualCurrency, string> = {
+    ILS: "₪",
+    USD: "$",
+    EUR: "€",
+};
+
+const currencyAmountLabel: Record<ManualCurrency, string> = {
+    ILS: "בשקלים",
+    USD: "בדולרים",
+    EUR: "ביורו",
+};
+
+const currencyRateLabel: Record<Exclude<ManualCurrency, "ILS">, string> = {
+    USD: "דולר",
+    EUR: "אירו",
+};
 
 const formatDate = (value: string) =>
     new Intl.DateTimeFormat("he-IL", {
@@ -219,7 +238,7 @@ const DaycareDonationsAdmin = () => {
     const [recordStatus, setRecordStatus] = useState<
         "all" | DaycareDonationRecord["status"]
     >("all");
-    const [manualCurrency, setManualCurrency] = useState<"ILS" | "USD">("ILS");
+    const [manualCurrency, setManualCurrency] = useState<ManualCurrency>("ILS");
     const [manualAmount, setManualAmount] = useState("");
     const [manualExchangeRate, setManualExchangeRate] = useState("");
     const [manualRateUpdatedAt, setManualRateUpdatedAt] = useState("");
@@ -295,17 +314,23 @@ const DaycareDonationsAdmin = () => {
         });
     }, [recordQuery, recordStatus, records]);
 
-    const loadAutomaticUsdRate = async () => {
+    const loadAutomaticRate = async (
+        currency: Exclude<ManualCurrency, "ILS"> = manualCurrency as Exclude<
+            ManualCurrency,
+            "ILS"
+        >
+    ) => {
         setManualRateLoading(true);
         setManualRateError("");
         try {
-            const exchangeRate = await getAdminDaycareUsdExchangeRate(
+            const exchangeRate = await getAdminDaycareExchangeRate(
+                currency,
                 manualReceivedAt.slice(0, 10)
             );
             setManualExchangeRate(String(exchangeRate.rate));
             setManualRateUpdatedAt(exchangeRate.updatedAt);
         } catch (rateError) {
-            console.error("Failed to load USD exchange rate:", rateError);
+            console.error("Failed to load exchange rate:", rateError);
             setManualRateError(
                 "לא הצלחנו לקבל שער אוטומטי. אפשר להזין את השער ידנית."
             );
@@ -332,7 +357,7 @@ const DaycareDonationsAdmin = () => {
                 amount: Number(data.get("amount")),
                 currency: manualCurrency,
                 exchangeRate:
-                    manualCurrency === "USD"
+                    manualCurrency !== "ILS"
                         ? Number(data.get("exchangeRate"))
                         : undefined,
                 itemId: String(data.get("itemId") ?? "") || undefined,
@@ -949,12 +974,10 @@ const DaycareDonationsAdmin = () => {
                             name="currency"
                             value={manualCurrency}
                             onChange={(event) => {
-                                const currency = event.target.value as
-                                    | "ILS"
-                                    | "USD";
+                                const currency = event.target.value as ManualCurrency;
                                 setManualCurrency(currency);
-                                if (currency === "USD") {
-                                    void loadAutomaticUsdRate();
+                                if (currency !== "ILS") {
+                                    void loadAutomaticRate(currency);
                                 } else {
                                     setManualRateError("");
                                     setManualRateUpdatedAt("");
@@ -963,10 +986,11 @@ const DaycareDonationsAdmin = () => {
                         >
                             <option value="ILS">שקל חדש (₪)</option>
                             <option value="USD">דולר ארה״ב ($)</option>
+                            <option value="EUR">אירו (€)</option>
                         </select>
                     </label>
                     <label>
-                        סכום {manualCurrency === "USD" ? "בדולרים" : "בשקלים"}
+                        סכום {currencyAmountLabel[manualCurrency]}
                         <input
                             name="amount"
                             type="number"
@@ -979,10 +1003,10 @@ const DaycareDonationsAdmin = () => {
                             required
                         />
                     </label>
-                    {manualCurrency === "USD" && (
+                    {manualCurrency !== "ILS" && (
                         <>
                             <label>
-                                שער דולר לשקל
+                                שער {currencyRateLabel[manualCurrency]} לשקל
                                 <input
                                     name="exchangeRate"
                                     type="number"
@@ -1010,7 +1034,7 @@ const DaycareDonationsAdmin = () => {
                                     )}
                                 </strong>
                                 <small>
-                                    ${formatCurrency(Number(manualAmount || 0))} × {manualExchangeRate || "שער"}
+                                    {currencySymbol[manualCurrency]}{formatCurrency(Number(manualAmount || 0))} × {manualExchangeRate || "שער"}
                                 </small>
                                 <div className={styles.rateStatus}>
                                     <span>
@@ -1023,7 +1047,7 @@ const DaycareDonationsAdmin = () => {
                                     <button
                                         type="button"
                                         disabled={manualRateLoading}
-                                        onClick={() => void loadAutomaticUsdRate()}
+                                        onClick={() => void loadAutomaticRate(manualCurrency)}
                                     >
                                         רענון שער
                                     </button>
@@ -1104,8 +1128,8 @@ const DaycareDonationsAdmin = () => {
                                 setManualReceivedAt(event.target.value)
                             }
                             onBlur={() => {
-                                if (manualCurrency === "USD") {
-                                    void loadAutomaticUsdRate();
+                                if (manualCurrency !== "ILS") {
+                                    void loadAutomaticRate(manualCurrency);
                                 }
                             }}
                             step="60"
@@ -1442,10 +1466,11 @@ const DaycareDonationsAdmin = () => {
                                                 <strong>
                                                     ₪{formatCurrency(record.amount)}
                                                 </strong>
-                                                {record.originalCurrency === "USD" &&
+                                                {(record.originalCurrency === "USD" ||
+                                                    record.originalCurrency === "EUR") &&
                                                     record.originalAmount !== undefined && (
                                                         <small>
-                                                            ${formatCurrency(record.originalAmount)} לפי שער {record.exchangeRate}
+                                                            {record.originalCurrency === "USD" ? "$" : "€"}{formatCurrency(record.originalAmount)} לפי שער {record.exchangeRate}
                                                         </small>
                                                     )}
                                                 {record.paymentType === "HK" && (

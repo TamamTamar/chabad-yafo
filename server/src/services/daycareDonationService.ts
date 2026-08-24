@@ -8,9 +8,9 @@ import { DaycareDonationRecord } from "../models/DaycareDonationRecord";
 
 export const convertDaycareDonationToIls = (
     amount: number,
-    currency: "ILS" | "USD",
+    currency: "ILS" | "USD" | "EUR",
     exchangeRate = 1
-) => Math.round(amount * (currency === "USD" ? exchangeRate : 1));
+) => Math.round(amount * (currency === "ILS" ? 1 : exchangeRate));
 
 type ConfirmedDonationAmount = {
     amount: number;
@@ -33,7 +33,7 @@ type PublicDonationSource = {
     _id: unknown;
     amount: number;
     originalAmount?: number | null;
-    originalCurrency?: "ILS" | "USD" | null;
+    originalCurrency?: "ILS" | "USD" | "EUR" | null;
     donorName?: string | null;
     dedication?: string | null;
     displayDonorName?: boolean | null;
@@ -48,11 +48,15 @@ export const toPublicDaycareDonation = (record: PublicDonationSource) => ({
             : "תרומה אנונימית",
     amount: record.amount,
     originalAmount:
-        record.originalCurrency === "USD" && record.originalAmount
+        (record.originalCurrency === "USD" ||
+            record.originalCurrency === "EUR") &&
+        record.originalAmount
             ? record.originalAmount
             : undefined,
     originalCurrency:
-        record.originalCurrency === "USD" ? "USD" as const : undefined,
+        record.originalCurrency === "USD" || record.originalCurrency === "EUR"
+            ? record.originalCurrency
+            : undefined,
     dedication: record.dedication || undefined,
     receivedAt: record.receivedAt,
 });

@@ -6,52 +6,58 @@ type BankOfIsraelExchangeRateResponse = {
     lastUpdate?: unknown;
 };
 
-export type DaycareUsdExchangeRate = {
-    currency: "USD";
+export type DaycareForeignCurrency = "USD" | "EUR";
+
+export type DaycareExchangeRate = {
+    currency: DaycareForeignCurrency;
     rate: number;
     updatedAt: string;
     source: "bank_of_israel";
 };
 
-export const parseBankOfIsraelUsdExchangeRate = (
-    data: BankOfIsraelExchangeRateResponse
-): DaycareUsdExchangeRate => {
+export const parseBankOfIsraelExchangeRate = (
+    data: BankOfIsraelExchangeRateResponse,
+    currency: DaycareForeignCurrency
+): DaycareExchangeRate => {
     const rate = Number(data.currentExchangeRate);
     const updatedAt = new Date(String(data.lastUpdate ?? ""));
 
     if (
-        data.key !== "USD" ||
+        data.key !== currency ||
         !Number.isFinite(rate) ||
         rate <= 0 ||
         rate > 100 ||
         Number.isNaN(updatedAt.getTime())
     ) {
-        throw new Error("Bank of Israel returned an invalid USD exchange rate");
+        throw new Error(`Bank of Israel returned an invalid ${currency} exchange rate`);
     }
 
     return {
-        currency: "USD",
+        currency,
         rate,
         updatedAt: updatedAt.toISOString(),
         source: "bank_of_israel",
     };
 };
 
-export const getBankOfIsraelUsdExchangeRate = async () => {
+export const getBankOfIsraelExchangeRate = async (
+    currency: DaycareForeignCurrency
+) => {
     const response = await axios.get<BankOfIsraelExchangeRateResponse>(
         "https://www.boi.org.il/PublicApi/GetExchangeRate",
         {
-            params: { key: "USD" },
+            params: { key: currency },
             timeout: 8_000,
         }
     );
 
-    return parseBankOfIsraelUsdExchangeRate(response.data);
+    return parseBankOfIsraelExchangeRate(response.data, currency);
 };
 
-export const parseBankOfIsraelHistoricalUsdExchangeRate = (
-    csv: string
-): DaycareUsdExchangeRate => {
+export const parseBankOfIsraelHistoricalExchangeRate = (
+    csv: string,
+    currency: DaycareForeignCurrency
+): DaycareExchangeRate => {
     const observations = csv
         .split(/\r?\n/)
         .map((line) =>
@@ -67,18 +73,19 @@ export const parseBankOfIsraelHistoricalUsdExchangeRate = (
     const latest = observations.at(-1);
 
     if (!latest) {
-        throw new Error("Bank of Israel returned no USD observations");
+        throw new Error(`Bank of Israel returned no ${currency} observations`);
     }
 
     return {
-        currency: "USD",
+        currency,
         rate: latest.rate,
         updatedAt: `${latest.date}T00:00:00.000Z`,
         source: "bank_of_israel",
     };
 };
 
-export const getBankOfIsraelUsdExchangeRateForDate = async (
+export const getBankOfIsraelExchangeRateForDate = async (
+    currency: DaycareForeignCurrency,
     requestedDate: string
 ) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
@@ -93,7 +100,7 @@ export const getBankOfIsraelUsdExchangeRateForDate = async (
     startDate.setUTCDate(startDate.getUTCDate() - 7);
 
     const response = await axios.get<string>(
-        "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_USD_ILS",
+        `https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_${currency}_ILS`,
         {
             params: {
                 startPeriod: startDate.toISOString().slice(0, 10),
@@ -105,5 +112,5 @@ export const getBankOfIsraelUsdExchangeRateForDate = async (
         }
     );
 
-    return parseBankOfIsraelHistoricalUsdExchangeRate(response.data);
+    return parseBankOfIsraelHistoricalExchangeRate(response.data, currency);
 };

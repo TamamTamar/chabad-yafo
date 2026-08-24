@@ -14,9 +14,12 @@ const formatCurrency = (value: number) =>
     }).format(Math.round(value));
 
 const formatDonationAmount = (donation: PublicDaycareDonation) =>
-    donation.originalCurrency === "USD" &&
+    (donation.originalCurrency === "USD" ||
+        donation.originalCurrency === "EUR") &&
     donation.originalAmount !== undefined
-        ? `$${formatCurrency(donation.originalAmount)}`
+        ? `${donation.originalCurrency === "USD" ? "$" : "€"}${formatCurrency(
+              donation.originalAmount
+          )}`
         : `₪${formatCurrency(donation.amount)}`;
 
 const RecentDonors = ({ donationCount, donations }: RecentDonorsProps) => {

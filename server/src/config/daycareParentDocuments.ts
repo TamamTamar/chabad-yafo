@@ -38,7 +38,7 @@ const routine: DaycareRoutineDocument = {
     key: "routine",
     title: "סדר יום במעון",
     subtitle: "מסגרת יומית | 07:30-16:00",
-    filename: "daycare-routine.pdf",
+    filename: "סדר יום מעון חבד יפו.pdf",
     items: [
         { time: "07:30-08:15", activity: "קבלת הילדים ומשחק בתיבות פעילות" },
         { time: "08:15-08:25", activity: "התארגנות לארוחת הבוקר" },
@@ -66,7 +66,7 @@ const holidays: DaycareHolidaysDocument = {
     key: "holidays",
     title: "לוח חופשות - מעון חב״ד יפו",
     subtitle: "שנת הלימודים תשפ״ז | 1.9.2026-9.8.2027",
-    filename: "daycare-holidays.pdf",
+    filename: "לוח חופשות מעון חבד יפו.pdf",
     items: [
         { occasion: "ראש השנה", hebrewDate: "כ״ט באלול תשפ״ו-ב׳ בתשרי תשפ״ז", vacationDates: "יום שישי-ראשון, 11-13.9.2026" },
         { occasion: "יום הכיפורים", hebrewDate: "ט׳-י׳ בתשרי תשפ״ז", vacationDates: "יום ראשון-שני, 20-21.9.2026" },

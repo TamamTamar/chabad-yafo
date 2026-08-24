@@ -22,8 +22,9 @@ import {
 } from "../../services/daycareDonationService";
 import { writeDaycareDonationAudit } from "../../services/daycareDonationAuditService";
 import {
-    getBankOfIsraelUsdExchangeRate,
-    getBankOfIsraelUsdExchangeRateForDate,
+    getBankOfIsraelExchangeRate,
+    getBankOfIsraelExchangeRateForDate,
+    type DaycareForeignCurrency,
 } from "../../services/daycareExchangeRateService";
 import {
     createAvailableDaycareAmbassadorSlug,
@@ -186,20 +187,30 @@ router.get("/campaign", async (_req, res) => {
     }
 });
 
-router.get("/exchange-rates/USD", async (req, res) => {
+router.get("/exchange-rates/:currency", async (req, res) => {
     try {
+        const currency = req.params.currency as DaycareForeignCurrency;
+        if (currency !== "USD" && currency !== "EUR") {
+            return res.status(400).json({
+                success: false,
+                message: "Exchange-rate currency must be USD or EUR",
+            });
+        }
         const requestedDate = cleanText(req.query.date, 10);
         return res.json({
             success: true,
             data: requestedDate
-                ? await getBankOfIsraelUsdExchangeRateForDate(requestedDate)
-                : await getBankOfIsraelUsdExchangeRate(),
+                ? await getBankOfIsraelExchangeRateForDate(
+                      currency,
+                      requestedDate
+                  )
+                : await getBankOfIsraelExchangeRate(currency),
         });
     } catch (error) {
-        console.error("Failed to get Bank of Israel USD exchange rate:", error);
+        console.error("Failed to get Bank of Israel exchange rate:", error);
         return res.status(502).json({
             success: false,
-            message: "Failed to get the current USD exchange rate",
+            message: "Failed to get the current exchange rate",
         });
     }
 });
@@ -1250,16 +1261,20 @@ router.post("/records", async (req, res) => {
         if (
             req.body.currency !== undefined &&
             req.body.currency !== "ILS" &&
-            req.body.currency !== "USD"
+            req.body.currency !== "USD" &&
+            req.body.currency !== "EUR"
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Donation currency must be ILS or USD",
+                message: "Donation currency must be ILS, USD or EUR",
             });
         }
-        const originalCurrency = req.body.currency === "USD" ? "USD" : "ILS";
+        const originalCurrency =
+            req.body.currency === "USD" || req.body.currency === "EUR"
+                ? req.body.currency
+                : "ILS";
         const exchangeRate =
-            originalCurrency === "USD" ? Number(req.body.exchangeRate) : 1;
+            originalCurrency !== "ILS" ? Number(req.body.exchangeRate) : 1;
         const amount = convertDaycareDonationToIls(
             originalAmount,
             originalCurrency,
@@ -1283,14 +1298,14 @@ router.post("/records", async (req, res) => {
         }
 
         if (
-            originalCurrency === "USD" &&
+            originalCurrency !== "ILS" &&
             (!Number.isFinite(exchangeRate) ||
                 exchangeRate <= 0 ||
                 exchangeRate > 100)
         ) {
             return res.status(400).json({
                 success: false,
-                message: "A valid USD to ILS exchange rate is required",
+                message: "A valid foreign-currency to ILS exchange rate is required",
             });
         }
 

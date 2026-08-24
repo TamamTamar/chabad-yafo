@@ -158,13 +158,11 @@ const finishPdf = (
     document.end();
 };
 
-const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: DaycareParentDocument, bundle: DaycareParentDocumentBundle) => {
+const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: DaycareParentDocument) => {
     document.font("AssistantBold").fontSize(20).fillColor("#0b3158");
     rtlText(document, source.title);
     document.moveDown(0.25).font("Assistant").fontSize(11.5).fillColor("#b7791f");
     rtlText(document, source.subtitle);
-    document.moveDown(0.35).fontSize(9).fillColor("#4b5563");
-    rtlText(document, `גרסה ${bundle.version}`);
     document.moveDown(0.75);
 };
 
@@ -204,8 +202,8 @@ const drawTableHeader = (document: PDFKit.PDFDocument, cells: Array<{ text: stri
     return y + 32;
 };
 
-const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParentDocument, bundle: DaycareParentDocumentBundle) => {
-    renderParentDocumentTitle(document, source, bundle);
+const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParentDocument) => {
+    renderParentDocumentTitle(document, source);
     let y = document.y;
     if (source.key === "routine") {
         y = drawTableHeader(document, [{ text: "פעילות", width: 365 }, { text: "שעה", width: 122 }], y);
@@ -283,14 +281,14 @@ export const createParentDocumentPdf = (bundle: DaycareParentDocumentBundle, key
             size: "A4",
             margins: { top: 116, right: 54, bottom: 62, left: 54 },
             bufferPages: true,
-            info: { Title: source.title, Author: "מעון חב״ד יפו", Subject: `גרסה ${bundle.version}` },
+            info: { Title: source.title, Author: "מעון חב״ד יפו" },
         });
         const chunks: Buffer[] = [];
         document.on("data", (chunk: Buffer) => chunks.push(chunk));
         document.on("error", reject);
         document.on("end", () => resolve(Buffer.concat(chunks)));
         registerFonts(document);
-        renderParentDocument(document, source, bundle);
+        renderParentDocument(document, source);
         finishPdf(document, (pageIndex, pageCount) => `${source.title} | עמוד ${pageIndex + 1} מתוך ${pageCount}`);
     });
 

@@ -29,7 +29,7 @@ export type DaycareDonationIntentStatus =
     | "expired";
 export type DaycareDonationIntentMode = "live" | "diagnostic";
 export type DaycareDonationPaymentType = "HK" | "Ragil";
-export type DaycareDonationCurrency = "ILS" | "USD";
+export type DaycareDonationCurrency = "ILS" | "USD" | "EUR";
 
 export type DaycareDonationAmbassadorDocument = {
     name: string;
