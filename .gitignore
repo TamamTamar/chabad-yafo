@@ -44,3 +44,4 @@ server/private-uploads/
 # Generated PDF previews and the server-side source-image duplicate
 server/tmp/
 server/assets/logo-maon.jpeg
+output/

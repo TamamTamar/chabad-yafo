@@ -141,12 +141,14 @@ const renderManualSignaturePage = (document: PDFKit.PDFDocument) => {
 
 const finishPdf = (
     document: PDFKit.PDFDocument,
-    footer: (pageIndex: number, pageCount: number) => string
+    footer: (pageIndex: number, pageCount: number) => string,
+    includeLetterhead = true
 ) => {
     const range = document.bufferedPageRange();
     for (let index = range.start; index < range.start + range.count; index += 1) {
         document.switchToPage(index);
-        addLetterhead(document);
+        document.y = 116;
+        if (includeLetterhead) addLetterhead(document);
         document.font("Assistant").fontSize(8.5).fillColor("#4b5563");
         document.text(
             prepareMixedRtlText(footer(index, range.count)),
@@ -158,23 +160,52 @@ const finishPdf = (
     document.end();
 };
 
-const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: DaycareParentDocument) => {
+const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: DaycareParentDocument, y: number) => {
+    document.font("AssistantBold").fontSize(8.8).fillColor("#b7791f");
+    document.text(prepareMixedRtlText("מסמך מידע להורים"), 54, y, {
+        width: 487,
+        align: "right",
+        lineBreak: false,
+        features: ["rtla"],
+    });
     document.font("AssistantBold").fontSize(20).fillColor("#0b3158");
-    rtlText(document, source.title);
-    document.moveDown(0.25).font("Assistant").fontSize(11.5).fillColor("#b7791f");
-    rtlText(document, source.subtitle);
-    document.moveDown(0.75);
+    document.text(prepareMixedRtlText(source.title), 54, y + 18, {
+        width: 487,
+        align: "right",
+        lineBreak: false,
+        features: ["rtla"],
+    });
+    document.font("Assistant").fontSize(10.8).fillColor("#8a5a12");
+    document.text(prepareMixedRtlText(source.subtitle), 54, y + 47, {
+        width: 487,
+        align: "right",
+        lineBreak: false,
+        features: ["rtla"],
+    });
+    return y + 69;
 };
 
-const drawCellText = (document: PDFKit.PDFDocument, text: string, x: number, y: number, width: number, bold = false, color = "#243447") => {
+const drawCellText = (
+    document: PDFKit.PDFDocument,
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    bold = false,
+    color = "#243447"
+) => {
     const isAsciiTime = /^[0-9:.-]+$/.test(text);
-    document.font(bold ? "AssistantBold" : "Assistant").fontSize(8.8).fillColor(color);
-    document.text(isAsciiTime ? text : prepareMixedRtlText(text), x + 8, y + 5, {
+    const preparedText = isAsciiTime ? text : prepareMixedRtlText(text);
+    const textOptions: PDFKit.Mixins.TextOptions = {
         width: width - 16,
         align: isAsciiTime ? "center" : "right",
         features: isAsciiTime ? [] : ["rtla"],
-        lineGap: 2,
-    });
+        lineGap: 1.5,
+    };
+    document.font(bold ? "AssistantBold" : "Assistant").fontSize(8.7).fillColor(color);
+    const textHeight = document.heightOfString(preparedText, textOptions);
+    document.text(preparedText, x + 8, y + Math.max(4, (height - textHeight) / 2), textOptions);
 };
 
 const drawTableRow = (
@@ -187,24 +218,28 @@ const drawTableRow = (
     let x = 54;
     cells.forEach((cell) => {
         document.rect(x, y, cell.width, height).fill(fill);
-        drawCellText(document, cell.text, x, y, cell.width, cell.bold, cell.bold ? "#0b3158" : "#243447");
+        drawCellText(document, cell.text, x, y, cell.width, height, cell.bold, cell.bold ? "#0b3158" : "#243447");
         x += cell.width;
     });
+    document.strokeColor("#dce6ed").lineWidth(0.45).moveTo(54, y + height).lineTo(541, y + height).stroke();
 };
 
 const drawTableHeader = (document: PDFKit.PDFDocument, cells: Array<{ text: string; width: number }>, y: number) => {
+    const height = 30;
+    document.roundedRect(54, y, 487, height, 6).fill("#143a63");
     let x = 54;
-    cells.forEach((cell) => {
-        document.rect(x, y, cell.width, 32).fill("#143a63");
-        drawCellText(document, cell.text, x, y + 1, cell.width, true, "#ffffff");
+    cells.forEach((cell, index) => {
+        drawCellText(document, cell.text, x, y, cell.width, height, true, "#ffffff");
         x += cell.width;
+        if (index < cells.length - 1) {
+            document.save().opacity(0.22).strokeColor("#ffffff").lineWidth(0.6).moveTo(x, y + 7).lineTo(x, y + height - 7).stroke().restore();
+        }
     });
-    return y + 32;
+    return y + height;
 };
 
 const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParentDocument) => {
-    renderParentDocumentTitle(document, source);
-    let y = document.y;
+    let y = renderParentDocumentTitle(document, source, 116);
     if (source.key === "routine") {
         y = drawTableHeader(document, [{ text: "פעילות", width: 365 }, { text: "שעה", width: 122 }], y);
         source.items.forEach((item, index) => {
@@ -212,13 +247,14 @@ const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParen
             drawTableRow(document, [
                 { text: item.activity, width: 365 },
                 { text: item.time, width: 122, bold: true },
-            ], y, rowHeight, index % 2 ? "#eef4f8" : "#ffffff");
+            ], y, rowHeight, index % 2 ? "#f1f6f9" : "#ffffff");
             y += rowHeight;
         });
-        y += 16;
-        document.rect(54, y, 487, 44).fill("#f8f1de");
-        drawCellText(document, source.note, 54, y + 1, 487, true, "#143a63");
-        document.y = y + 54;
+        y += 14;
+        document.roundedRect(54, y, 487, 46, 7).fill("#fbf5e5");
+        document.rect(537, y, 4, 46).fill("#c69b2d");
+        drawCellText(document, source.note, 54, y, 487, 46, true, "#143a63");
+        document.y = y + 56;
         return;
     }
 
@@ -229,13 +265,13 @@ const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParen
             drawTableRow(document, [
                 { text: item.description, width: 347 },
                 { text: item.meal, width: 140, bold: true },
-            ], y, rowHeight, index % 2 ? "#eef4f8" : "#ffffff");
+            ], y, rowHeight, index % 2 ? "#f1f6f9" : "#ffffff");
             y += rowHeight;
         });
         if (source.note) {
             y += 16;
-            document.rect(54, y, 487, 44).fill("#f8f1de");
-            drawCellText(document, source.note, 54, y + 1, 487, true, "#143a63");
+            document.roundedRect(54, y, 487, 44, 7).fill("#fbf5e5");
+            drawCellText(document, source.note, 54, y, 487, 44, true, "#143a63");
             y += 54;
         }
         document.y = y;
@@ -248,30 +284,30 @@ const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParen
         { text: "מועד", width: 185 },
     ], y);
     source.items.forEach((item, index) => {
-        const rowHeight = 48;
+        const rowHeight = item.occasion.length > 24 || item.vacationDates.length > 25 ? 44 : 40;
         drawTableRow(document, [
             { text: item.vacationDates, width: 145 },
             { text: item.hebrewDate, width: 157 },
             { text: item.occasion, width: 185, bold: true },
-        ], y, rowHeight, index % 2 ? "#eef4f8" : "#ffffff");
+        ], y, rowHeight, index % 2 ? "#f1f6f9" : "#ffffff");
         y += rowHeight;
     });
-    y += 13;
-    document.font("AssistantBold").fontSize(12).fillColor("#0b3158");
-    document.text(prepareMixedRtlText("הבהרות"), 54, y, { width: 487, align: "right", features: ["rtla"] });
-    y += 24;
-    document.rect(54, y, 487, 88).fill("#f8f1de");
-    document.font("Assistant").fontSize(8.8).fillColor("#243447");
+    y += 14;
+    document.roundedRect(54, y, 487, 104, 8).fill("#fbf5e5");
+    document.rect(537, y, 4, 104).fill("#c69b2d");
+    document.font("AssistantBold").fontSize(11.5).fillColor("#0b3158");
+    document.text(prepareMixedRtlText("הבהרות חשובות"), 68, y + 10, { width: 455, align: "right", features: ["rtla"] });
+    document.font("Assistant").fontSize(8.6).fillColor("#243447");
     source.clarifications.forEach((item, index) => {
-        document.text(prepareMixedRtlText(`${index + 1}. ${item}`), 66, y + 8 + index * 19, {
-            width: 463,
-            height: 18,
+        document.text(prepareMixedRtlText(`${index + 1}. ${item}`), 68, y + 34 + index * 16, {
+            width: 455,
+            height: 16,
             align: "right",
             lineBreak: false,
             features: ["rtla"],
         });
     });
-    document.y = y + 98;
+    document.y = y + 114;
 };
 
 export const createParentDocumentPdf = (bundle: DaycareParentDocumentBundle, key: DaycareParentDocument["key"]) =>
@@ -288,8 +324,15 @@ export const createParentDocumentPdf = (bundle: DaycareParentDocumentBundle, key
         document.on("error", reject);
         document.on("end", () => resolve(Buffer.concat(chunks)));
         registerFonts(document);
+        addLetterhead(document);
         renderParentDocument(document, source);
-        finishPdf(document, (pageIndex, pageCount) => `${source.title} | עמוד ${pageIndex + 1} מתוך ${pageCount}`);
+        finishPdf(
+            document,
+            (pageIndex, pageCount) => pageCount === 1
+                ? "מעון חב״ד יפו | מידע להורים"
+                : `${source.title} | עמוד ${pageIndex + 1} מתוך ${pageCount}`,
+            false
+        );
     });
 
 export const createAgreementPdf = (input: AgreementPdfInput) =>
