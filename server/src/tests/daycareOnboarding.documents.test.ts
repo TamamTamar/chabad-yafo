@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 import { DAYCARE_ONBOARDING_AUDIT_ACTIONS } from "../config/daycareOnboardingAuditActions";
 import { DAYCARE_ONBOARDING_STEP_DEFINITIONS } from "../config/daycareOnboardingDefaults";
 import { DAYCARE_PARENT_DOCUMENTS_2026_2027 } from "../config/daycareParentDocuments";
+import { inlinePdfContentDisposition } from "../controllers/daycareParentDocumentController";
 import { DaycareChild } from "../models/DaycareChild";
 import { DaycareAgreement } from "../models/DaycareAgreement";
 import { DaycareAgreementVersion } from "../models/DaycareAgreementVersion";
@@ -233,6 +234,19 @@ test("yearly parent documents have a stable version, hash and dynamic PDFs", asy
     assert.equal(holidaysPdf.subarray(0, 5).toString("ascii"), "%PDF-");
     assert.ok(routinePdf.length > 5000);
     assert.ok(holidaysPdf.length > 5000);
+});
+
+test("parent document downloads preserve Hebrew filenames", () => {
+    const filenames = [
+        ["סדר יום מעון חבד יפו.pdf", "daycare-routine.pdf"],
+        ["לוח חופשות מעון חבד יפו.pdf", "daycare-holidays.pdf"],
+    ] as const;
+
+    for (const [filename, fallbackFilename] of filenames) {
+        const header = inlinePdfContentDisposition(filename, fallbackFilename);
+        assert.match(header, new RegExp(`^inline; filename="${fallbackFilename}"; filename\\*=UTF-8''`));
+        assert.equal(decodeURIComponent(header.split("filename*=UTF-8''")[1]), filename);
+    }
 });
 
 test("final signed agreement PDF includes a stable snapshot and is generated as a PDF", async () => {

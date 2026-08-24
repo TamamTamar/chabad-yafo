@@ -7,6 +7,17 @@ import { logger } from "../utils/logger";
 const keyFrom = (value: string): DaycareParentDocumentKey | null =>
     value === "routine" || value === "holidays" || value === "menu" ? value : null;
 
+export const inlinePdfContentDisposition = (
+    filename: string,
+    fallbackFilename: string
+) => {
+    const encodedFilename = encodeURIComponent(filename).replace(
+        /[!'()*]/g,
+        (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`
+    );
+    return `inline; filename="${fallbackFilename}"; filename*=UTF-8''${encodedFilename}`;
+};
+
 const text = (value: unknown, max: number) => typeof value === "string" && value.trim().length > 0 && value.trim().length <= max ? value.trim() : null;
 const optionalText = (value: unknown, max: number) => value === undefined || value === "" ? undefined : text(value, max);
 const validSchoolYear = (value: string) => /^(\d{4})-(\d{4})$/.test(value) && Number(value.slice(5)) === Number(value.slice(0, 4)) + 1;
@@ -45,7 +56,10 @@ const handleError = (res: Response, error: unknown) => {
 const sendPdf = async (res: Response, bundle: Awaited<ReturnType<typeof getParentDocumentBundleForToken>>, key: DaycareParentDocumentKey) => {
     const file = await createParentDocumentDownload(bundle, key);
     res.setHeader("Content-Type", file.mimeType);
-    res.setHeader("Content-Disposition", `inline; filename="${file.filename}"`);
+    res.setHeader(
+        "Content-Disposition",
+        inlinePdfContentDisposition(file.filename, `daycare-${key}.pdf`)
+    );
     res.setHeader("Cache-Control", "private, no-store");
     return res.send(file.bytes);
 };
