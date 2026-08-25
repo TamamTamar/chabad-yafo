@@ -43,6 +43,14 @@ const prepareMixedRtlText = (text: string) =>
         run.includes("@") ? `\u200E${run}\u200E` : [...run].reverse().join("")
     );
 
+const prepareWelcomeMixedRtlText = (text: string) =>
+    text
+        .replace(/[A-Za-z][A-Za-z0-9._:/@+-]*/g, (run) => `\u200E${run}\u200E`)
+        .replace(/[0-9][0-9._:/+-]*/g, (run) => [...run].reverse().join(""));
+
+const prepareLtrRunsInRtlText = (text: string) =>
+    text.replace(/[A-Za-z0-9][A-Za-z0-9.,_:/@+\-\u2013\u2014]*/g, (run) => `\u200E${run}\u200E`);
+
 // Agreement prose contains full LTR values (email addresses, dates and time
 // ranges) inside Hebrew sentences. Reverse each complete value before PDFKit's
 // RTL layout so its visual result remains exactly as entered.
@@ -57,43 +65,43 @@ const registerFonts = (document: PDFKit.PDFDocument) => {
     document.registerFont("AssistantBold", boldFontPath);
 };
 
-const addLetterhead = (document: PDFKit.PDFDocument, contactFontSize = 9.5) => {
+const addLetterhead = (document: PDFKit.PDFDocument, contactFontSize = 9.5, compact = false) => {
     const contentY = document.y;
-    document.rect(0, 0, document.page.width, 110).fill("#ffffff");
-    document.image(letterheadLogoPath, 469, 16, { fit: [72, 72] });
-    document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
-    document.text(prepareMixedRtlText("מעון חב״ד יפו"), 54, 27, {
+    document.rect(0, 0, document.page.width, compact ? 84 : 110).fill("#ffffff");
+    document.image(letterheadLogoPath, compact ? 491 : 469, compact ? 9 : 16, { fit: compact ? [50, 50] : [72, 72] });
+    document.font("AssistantBold").fontSize(compact ? 12 : 14).fillColor("#0b3158");
+    document.text(prepareMixedRtlText("מעון חב״ד יפו"), 54, compact ? 15 : 27, {
         align: "right",
-        width: 394,
+        width: compact ? 416 : 394,
         lineBreak: false,
         features: ["rtla"],
     });
     document.font("Assistant").fontSize(contactFontSize).fillColor("#334155");
-    document.text(prepareMixedRtlText("יוסי בן יוסי 1, יפו | 054-219-3770"), 250, 50, {
+    document.text(prepareMixedRtlText("יוסי בן יוסי 1, יפו | 054-219-3770"), 250, compact ? 35 : 50, {
         align: "right",
-        width: 198,
+        width: compact ? 220 : 198,
         lineBreak: false,
         features: ["rtla"],
     });
-    document.text("LchabadYaffo@gmail.com", 250, 68, {
+    document.text("LchabadYaffo@gmail.com", 250, compact ? 50 : 68, {
         align: "right",
-        width: 198,
+        width: compact ? 220 : 198,
         lineBreak: false,
     });
     document
         .strokeColor("#c69b2d")
         .lineWidth(1.2)
-        .moveTo(54, 98)
-        .lineTo(541, 98)
+        .moveTo(54, compact ? 72 : 98)
+        .lineTo(541, compact ? 72 : 98)
         .stroke();
     document.y = contentY;
 };
 
 const addHeader = (document: PDFKit.PDFDocument, input: AgreementPdfInput) => {
-    document.font("AssistantBold").fontSize(20).fillColor("#0b3158");
+    document.font("AssistantBold").fontSize(18).fillColor("#0b3158");
     rtlText(document, input.contentSnapshot.title);
     if (input.contentSnapshot.subtitle) {
-        document.moveDown(0.25).font("Assistant").fontSize(14).fillColor("#24364b");
+        document.moveDown(0.12).font("Assistant").fontSize(14).fillColor("#24364b");
         input.contentSnapshot.subtitle.split("\n").forEach((line) => {
             if (/^[0-9.–-]+$/.test(line.trim())) {
                 document.text(line.trim(), { align: "right" });
@@ -102,37 +110,37 @@ const addHeader = (document: PDFKit.PDFDocument, input: AgreementPdfInput) => {
             }
         });
     }
-    document.moveDown(0.35).font("Assistant").fontSize(14).fillColor("#405064");
+    document.moveDown(0.18).font("Assistant").fontSize(14).fillColor("#405064");
     rtlText(document, `שנת לימודים ${input.schoolYear}`);
-    document.moveDown(0.8).strokeColor("#c69b2d").lineWidth(1.2).moveTo(54, document.y).lineTo(541, document.y).stroke();
-    document.moveDown(0.9);
+    document.moveDown(0.4).strokeColor("#c69b2d").lineWidth(1.2).moveTo(54, document.y).lineTo(541, document.y).stroke();
+    document.moveDown(0.45);
 };
 
 const startAgreementPage = (document: PDFKit.PDFDocument, addPage = false) => {
     if (addPage) document.addPage();
     document.x = 54;
-    document.y = 116;
-    addLetterhead(document, 11.5);
+    document.y = 82;
+    addLetterhead(document, 9.5, true);
     document.x = 54;
-    document.y = 116;
+    document.y = 82;
 };
 
 const keepAgreementPageMargins = (document: PDFKit.PDFDocument) => {
     document.on("pageAdded", () => {
-        document.page.margins.top = 116;
+        document.page.margins.top = 82;
         document.x = 54;
-        document.y = 116;
+        document.y = 82;
     });
 };
 
 const ensureAgreementSpace = (document: PDFKit.PDFDocument, requiredHeight: number) => {
-    if (document.y + requiredHeight > 760) startAgreementPage(document, true);
+    if (document.y + requiredHeight > 770) startAgreementPage(document, true);
     document.x = 54;
 };
 
 const renderReviewBanner = (document: PDFKit.PDFDocument) => {
     const y = document.y;
-    const height = 92;
+    const height = 78;
     document.roundedRect(54, y, 487, height, 8).fill("#fbf5e5");
     document.rect(537, y, 4, height).fill("#c69b2d");
     document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
@@ -141,7 +149,7 @@ const renderReviewBanner = (document: PDFKit.PDFDocument) => {
     rtlText(document, "עותק לעיון בלבד", { width: 455, lineBreak: false });
     document.font("Assistant").fontSize(14).fillColor("#243447");
     document.x = 70;
-    document.y = y + 36;
+    document.y = y + 32;
     rtlText(document, "ההרשמה והחתימה על ההסכם מתבצעות באופן מקוון באמצעות קישור אישי שיישלח על ידי המעון.", {
         width: 455,
         lineGap: 2,
@@ -151,14 +159,14 @@ const renderReviewBanner = (document: PDFKit.PDFDocument) => {
 };
 
 const renderReviewClosing = (document: PDFKit.PDFDocument) => {
-    const height = 64;
+    const height = 56;
     if (document.y + height + 12 > document.page.height - document.page.margins.bottom) startAgreementPage(document, true);
     const y = document.y + 4;
     document.roundedRect(54, y, 487, height, 8).fill("#fbf5e5");
     document.rect(537, y, 4, height).fill("#c69b2d");
     document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
     document.x = 70;
-    document.y = y + 21;
+    document.y = y + 17;
     rtlText(document, "אין לחתום על עותק זה. החתימה מתבצעת באופן מקוון בלבד.", {
         width: 455,
         lineBreak: false,
@@ -173,26 +181,26 @@ const renderAgreement = (document: PDFKit.PDFDocument, input: AgreementPdfInput,
     const renderBlock = (block: IDaycareAgreementContentSnapshot["intro"][number]) => {
         document.font("Assistant").fontSize(14).fillColor("#111827");
         const lines = block.type === "paragraph"
-            ? [{ text: block.text, lineGap: 4.5, indent: 0 }]
+            ? [{ text: block.text, lineGap: 2, indent: 0 }]
             : block.items.map((item, index) => ({
                 text: `${block.type === "numberedList" ? `${index + 1}.` : "•"} ${item.text}`,
-                lineGap: 3.5,
+                lineGap: 2,
                 indent: 12,
             }));
         const blockHeight = lines.reduce((height, line) => height + document.heightOfString(
             prepareAgreementMixedRtlText(line.text),
             { width: 487, align: "right", features: ["rtla"], lineGap: line.lineGap, indent: line.indent }
-        ), 0) + 18;
+        ), 0) + 10;
         ensureAgreementSpace(document, blockHeight);
         lines.forEach((line) => rtlText(document, line.text, { width: 487, indent: line.indent, lineGap: line.lineGap }));
-        document.y += 12;
+        document.y += 6;
     };
     input.contentSnapshot.intro.forEach(renderBlock);
     input.contentSnapshot.sections.forEach((section, index) => {
-        document.font("AssistantBold").fontSize(16).fillColor("#0b3158");
-        ensureAgreementSpace(document, 120);
-        rtlText(document, `${index + 1}. ${section.title}`, { width: 487, lineGap: 3 });
-        document.y += 8;
+        document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
+        ensureAgreementSpace(document, 100);
+        rtlText(document, `${index + 1}. ${section.title}`, { width: 487, lineGap: 2 });
+        document.y += 5;
         section.blocks.forEach(renderBlock);
     });
     if (mode === "review") renderReviewClosing(document);
@@ -226,13 +234,13 @@ const finishPdf = (
     document: PDFKit.PDFDocument,
     footer: (pageIndex: number, pageCount: number) => string,
     includeLetterhead = true,
-    typography: { contactFontSize?: number; footerFontSize?: number } = {}
+    typography: { contactFontSize?: number; footerFontSize?: number; compactLetterhead?: boolean } = {}
 ) => {
     const range = document.bufferedPageRange();
     for (let index = range.start; index < range.start + range.count; index += 1) {
         document.switchToPage(index);
         document.y = 116;
-        if (includeLetterhead) addLetterhead(document, typography.contactFontSize);
+        if (includeLetterhead) addLetterhead(document, typography.contactFontSize, typography.compactLetterhead);
         const footerFontSize = typography.footerFontSize ?? 8.5;
         const useLargeFooter = footerFontSize >= 14;
         document.font("Assistant").fontSize(footerFontSize).fillColor("#4b5563");
@@ -246,7 +254,7 @@ const finishPdf = (
     document.end();
 };
 
-const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: DaycareParentDocument, y: number) => {
+const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: DaycareParentDocument, y: number, compact = false) => {
     document.font("AssistantBold").fontSize(14).fillColor("#b7791f");
     document.text(prepareMixedRtlText("מסמך מידע להורים"), 54, y, {
         width: 487,
@@ -254,33 +262,33 @@ const renderParentDocumentTitle = (document: PDFKit.PDFDocument, source: Daycare
         lineBreak: false,
         features: ["rtla"],
     });
-    document.font("AssistantBold").fontSize(22).fillColor("#0b3158");
-    document.text(prepareMixedRtlText(source.title), 54, y + 24, {
+    document.font("AssistantBold").fontSize(compact ? 18 : 22).fillColor("#0b3158");
+    document.text(prepareMixedRtlText(source.title), 54, y + (compact ? 20 : 24), {
         width: 487,
         align: "right",
         lineBreak: false,
         features: ["rtla"],
     });
     document.font("Assistant").fontSize(14).fillColor("#8a5a12");
-    document.text(prepareMixedRtlText(source.subtitle), 54, y + 56, {
+    document.text(prepareMixedRtlText(source.subtitle), 54, y + (compact ? 44 : 56), {
         width: 487,
         align: "right",
         lineBreak: false,
         features: ["rtla"],
     });
-    return y + 84;
+    return y + (compact ? 66 : 84);
 };
 
-const PARENT_CONTENT_BOTTOM = 760;
+const PARENT_CONTENT_BOTTOM = 770;
 
 const startParentDocumentPage = (document: PDFKit.PDFDocument) => {
     document.addPage();
     document.x = 54;
-    document.y = 116;
-    addLetterhead(document, 11.5);
+    document.y = 82;
+    addLetterhead(document, 9.5, true);
     document.x = 54;
-    document.y = 116;
-    return 116;
+    document.y = 82;
+    return 82;
 };
 
 const ensureParentSpace = (document: PDFKit.PDFDocument, y: number, requiredHeight: number) =>
@@ -296,10 +304,33 @@ const drawCellText = (
     bold = false,
     color = "#243447",
     fontSize = 14,
-    direction: "auto" | "ltr" = "auto"
+    direction: "auto" | "ltr" | "mixed-ltr" | "holiday-date" = "auto"
 ) => {
+    if (direction === "holiday-date") {
+        const match = text.match(/^(.*?),\s*([0-9].*)$/);
+        if (match) {
+            document.font(bold ? "AssistantBold" : "Assistant").fontSize(fontSize).fillColor(color);
+            const firstLineY = y + Math.max(3, (height - 34) / 2);
+            document.text(prepareMixedRtlText(`${match[1]},`), x + 8, firstLineY, {
+                width: width - 16,
+                align: "right",
+                features: ["rtla"],
+                lineBreak: false,
+            });
+            document.text(`\u200E${match[2]}\u200E`, x + 8, firstLineY + 18, {
+                width: width - 16,
+                align: "center",
+                lineBreak: false,
+            });
+            return;
+        }
+    }
     const isLtr = direction === "ltr" || /^[0-9:.-]+$/.test(text);
-    const preparedText = isLtr ? `\u200E${text}\u200E` : prepareMixedRtlText(text);
+    const preparedText = isLtr
+        ? `\u200E${text}\u200E`
+        : direction === "mixed-ltr"
+            ? prepareLtrRunsInRtlText(text)
+            : prepareMixedRtlText(text);
     const textOptions: PDFKit.Mixins.TextOptions = {
         width: width - 16,
         align: isLtr ? "center" : "right",
@@ -313,7 +344,7 @@ const drawCellText = (
 
 const drawTableRow = (
     document: PDFKit.PDFDocument,
-    cells: Array<{ text: string; width: number; bold?: boolean; direction?: "ltr" }>,
+    cells: Array<{ text: string; width: number; bold?: boolean; direction?: "ltr" | "mixed-ltr" | "holiday-date" }>,
     y: number,
     height: number,
     fill: string,
@@ -360,15 +391,15 @@ const drawTableHeader = (
 };
 
 const drawWelcomeSectionTitle = (document: PDFKit.PDFDocument, title: string, y: number) => {
-    document.font("AssistantBold").fontSize(16).fillColor("#0b3158");
+    document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
     document.text(prepareMixedRtlText(title), 54, y, {
         width: 487,
         align: "right",
         lineBreak: false,
         features: ["rtla"],
     });
-    document.strokeColor("#c69b2d").lineWidth(1).moveTo(54, y + 24).lineTo(541, y + 24).stroke();
-    return y + 36;
+    document.strokeColor("#c69b2d").lineWidth(1).moveTo(54, y + 19).lineTo(541, y + 19).stroke();
+    return y + 25;
 };
 
 const drawWelcomeParagraphs = (
@@ -384,7 +415,7 @@ const drawWelcomeParagraphs = (
     const gap = options.gap ?? 7;
     document.font("Assistant").fontSize(fontSize).fillColor(options.color ?? "#243447");
     paragraphs.forEach((paragraph) => {
-        const prepared = prepareMixedRtlText(paragraph);
+        const prepared = prepareWelcomeMixedRtlText(paragraph);
         const textOptions: PDFKit.Mixins.TextOptions = { width, align: "right", features: ["rtla"], lineGap };
         const paragraphHeight = document.heightOfString(prepared, textOptions);
         if (options.paginate && y + paragraphHeight + gap > PARENT_CONTENT_BOTTOM) y = startParentDocumentPage(document);
@@ -395,62 +426,54 @@ const drawWelcomeParagraphs = (
 };
 
 const renderWelcomeDocument = (document: PDFKit.PDFDocument, source: Extract<DaycareParentDocument, { key: "welcome" }>, startY: number) => {
-    let y = drawWelcomeParagraphs(document, source.intro, startY + 1, { fontSize: 14, lineGap: 3, gap: 7, paginate: true });
+    let y = drawWelcomeParagraphs(document, source.intro, startY, { fontSize: 14, lineGap: 0.5, gap: 2 });
 
-    y = ensureParentSpace(document, y + 5, 126);
-    y = drawWelcomeSectionTitle(document, "שעות הפעילות", y + 3);
-    const hoursBoxHeight = 84;
+    y = drawWelcomeSectionTitle(document, "שעות הפעילות", y + 1);
+    const hoursBoxHeight = 58;
     document.roundedRect(54, y, 487, hoursBoxHeight, 8).fill("#f1f6f9");
     document.rect(537, y, 4, hoursBoxHeight).fill("#c69b2d");
     document.font("AssistantBold").fontSize(14).fillColor("#143a63");
-    document.text(prepareMixedRtlText(source.hours.weekdays), 300, y + 12, { width: 225, align: "right", features: ["rtla"] });
-    document.text(prepareMixedRtlText(source.hours.friday), 70, y + 12, { width: 215, align: "right", features: ["rtla"] });
+    document.text(prepareMixedRtlText(source.hours.weekdays), 300, y + 7, { width: 225, align: "right", features: ["rtla"] });
+    document.text(prepareMixedRtlText(source.hours.friday), 70, y + 7, { width: 215, align: "right", features: ["rtla"] });
     document.font("Assistant").fontSize(14).fillColor("#243447");
-    document.text(prepareMixedRtlText(source.hours.address), 70, y + 50, { width: 455, align: "right", features: ["rtla"], lineBreak: false });
-    y += hoursBoxHeight + 14;
+    document.text(prepareMixedRtlText(source.hours.address), 70, y + 32, { width: 455, align: "right", features: ["rtla"], lineBreak: false });
+    y += hoursBoxHeight + 3;
 
-    y = ensureParentSpace(document, y, 80);
     y = drawWelcomeSectionTitle(document, "היום שלנו", y);
-    y = drawWelcomeParagraphs(document, source.day, y, { fontSize: 14, lineGap: 3, gap: 7, paginate: true });
+    y = drawWelcomeParagraphs(document, source.day, y, { fontSize: 14, lineGap: 0.5, gap: 2 });
 
-    // Keep the complete parent-contact section together with the joining box.
-    // At the larger print size, splitting only the contact line onto the next
-    // page leaves an orphaned continuation at the top of the page.
-    y = ensureParentSpace(document, y + 4, 400);
-    y = drawWelcomeSectionTitle(document, "קשר עם ההורים", y + 2);
-    y = drawWelcomeParagraphs(document, source.parents, y, { fontSize: 14, lineGap: 3, gap: 7, paginate: true });
-    y = ensureParentSpace(document, y, 30);
+    y = drawWelcomeSectionTitle(document, "קשר עם ההורים", y + 1);
+    y = drawWelcomeParagraphs(document, source.parents, y, { fontSize: 14, lineGap: 0.5, gap: 2 });
     document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
     document.text(prepareMixedRtlText(`${source.contactName} | ${source.contactPhone}`), 54, y, { width: 487, align: "right", features: ["rtla"], lineBreak: false });
-    y += 32;
+    y += 20;
 
     const joinTextX = 176;
     const joinTextWidth = 349;
-    const joinTextOptions: PDFKit.Mixins.TextOptions = { width: joinTextWidth, align: "right", features: ["rtla"], lineGap: 3 };
+    const joinTextOptions: PDFKit.Mixins.TextOptions = { width: joinTextWidth, align: "right", features: ["rtla"], lineGap: 0.5 };
     document.font("Assistant").fontSize(14);
-    const joinTextHeight = source.join.reduce((sum, paragraph) => sum + document.heightOfString(prepareMixedRtlText(paragraph), joinTextOptions) + 7, 0);
-    const joinBoxHeight = Math.max(180, 70 + joinTextHeight);
-    y = ensureParentSpace(document, y, joinBoxHeight + 10);
+    const joinTextHeight = source.join.reduce((sum, paragraph) => sum + document.heightOfString(prepareWelcomeMixedRtlText(paragraph), joinTextOptions) + 2, 0);
+    const joinBoxHeight = Math.max(132, 48 + joinTextHeight);
     document.roundedRect(54, y, 487, joinBoxHeight, 9).fill("#fbf5e5");
     document.rect(537, y, 4, joinBoxHeight).fill("#c69b2d");
-    document.image(whatsappQrPath, 72, y + 18, { fit: [88, 88] });
+    document.image(whatsappQrPath, 78, y + 12, { fit: [70, 70] });
     document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
-    document.text(prepareMixedRtlText("סרקו לשיחה בוואטסאפ"), 62, y + 112, {
+    document.text(prepareMixedRtlText("סרקו לשיחה בוואטסאפ"), 62, y + 86, {
         width: 102,
         align: "center",
         features: ["rtla"],
     });
-    document.font("AssistantBold").fontSize(16).fillColor("#0b3158");
-    document.text(prepareMixedRtlText("רוצים להצטרף אלינו?"), joinTextX, y + 14, { width: joinTextWidth, align: "right", features: ["rtla"], lineBreak: false });
-    let joinY = y + 46;
-    joinY = drawWelcomeParagraphs(document, source.join, joinY, { x: joinTextX, width: joinTextWidth, fontSize: 14, lineGap: 3, gap: 7, color: "#243447" });
+    document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
+    document.text(prepareMixedRtlText("רוצים להצטרף אלינו?"), joinTextX, y + 10, { width: joinTextWidth, align: "right", features: ["rtla"], lineBreak: false });
+    let joinY = y + 34;
+    joinY = drawWelcomeParagraphs(document, source.join, joinY, { x: joinTextX, width: joinTextWidth, fontSize: 14, lineGap: 0.5, gap: 2, color: "#243447" });
     document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
     document.text(prepareMixedRtlText(`${source.contactName} | ${source.contactPhone}`), joinTextX, joinY, { width: joinTextWidth, align: "right", features: ["rtla"], lineBreak: false });
     document.y = y + joinBoxHeight + 8;
 };
 
 const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParentDocument) => {
-    let y = renderParentDocumentTitle(document, source, 116);
+    let y = renderParentDocumentTitle(document, source, 82, true);
     if (source.key === "welcome") {
         renderWelcomeDocument(document, source, y);
         return;
@@ -562,7 +585,7 @@ const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParen
         { text: "תאריך עברי", width: 157 },
         { text: "מועד", width: 185 },
     ];
-    const drawHolidayHeader = (headerY: number) => drawTableHeader(document, holidayColumns, headerY, 40, 14);
+    const drawHolidayHeader = (headerY: number) => drawTableHeader(document, holidayColumns, headerY, 36, 14);
     const holidayTextHeight = (text: string, width: number, bold = false) => {
         document.font(bold ? "AssistantBold" : "Assistant").fontSize(14);
         return document.heightOfString(prepareMixedRtlText(text), {
@@ -575,41 +598,41 @@ const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParen
     y = drawHolidayHeader(y);
     source.items.forEach((item, index) => {
         const rowHeight = Math.max(
-            56,
-            holidayTextHeight(item.vacationDates, 145) + 18,
-            holidayTextHeight(item.hebrewDate, 157) + 18,
-            holidayTextHeight(item.occasion, 185, true) + 18
+            48,
+            holidayTextHeight(item.vacationDates, 145) + 12,
+            holidayTextHeight(item.hebrewDate, 157) + 12,
+            holidayTextHeight(item.occasion, 185, true) + 12
         );
         if (y + rowHeight > PARENT_CONTENT_BOTTOM) y = drawHolidayHeader(startParentDocumentPage(document));
         drawTableRow(document, [
-            { text: item.vacationDates, width: 145 },
+            { text: item.vacationDates, width: 145, direction: "holiday-date" },
             { text: item.hebrewDate, width: 157 },
             { text: item.occasion, width: 185, bold: true },
         ], y, rowHeight, index % 2 ? "#f1f6f9" : "#ffffff", 14, 14);
         y += rowHeight;
     });
-    y += 14;
+    y += 6;
     document.font("Assistant").fontSize(14);
     const clarificationHeights = source.clarifications.map((item, index) => document.heightOfString(
         prepareMixedRtlText(`${index + 1}. ${item}`),
-        { width: 455, align: "right", features: ["rtla"], lineGap: 2.5 }
+        { width: 455, align: "right", features: ["rtla"], lineGap: 0.5 }
     ));
-    const clarificationBoxHeight = 50 + clarificationHeights.reduce((sum, height) => sum + height + 7, 0);
+    const clarificationBoxHeight = 30 + clarificationHeights.reduce((sum, height) => sum + height + 1, 0);
     y = ensureParentSpace(document, y, clarificationBoxHeight);
     document.roundedRect(54, y, 487, clarificationBoxHeight, 8).fill("#fbf5e5");
     document.rect(537, y, 4, clarificationBoxHeight).fill("#c69b2d");
-    document.font("AssistantBold").fontSize(16).fillColor("#0b3158");
-    document.text(prepareMixedRtlText("הבהרות חשובות"), 68, y + 12, { width: 455, align: "right", features: ["rtla"] });
+    document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
+    document.text(prepareMixedRtlText("הבהרות חשובות"), 68, y + 5, { width: 455, align: "right", features: ["rtla"] });
     document.font("Assistant").fontSize(14).fillColor("#243447");
-    let clarificationY = y + 42;
+    let clarificationY = y + 25;
     source.clarifications.forEach((item, index) => {
         document.text(prepareMixedRtlText(`${index + 1}. ${item}`), 68, clarificationY, {
             width: 455,
             align: "right",
-            lineGap: 2.5,
+            lineGap: 0.5,
             features: ["rtla"],
         });
-        clarificationY += clarificationHeights[index] + 7;
+        clarificationY += clarificationHeights[index] + 1;
     });
     document.y = y + clarificationBoxHeight + 10;
 };
@@ -619,7 +642,7 @@ export const createParentDocumentPdf = (bundle: DaycareParentDocumentBundle, key
         const source: DaycareParentDocument = bundle.documents[key];
         const document = new PDFDocument({
             size: "A4",
-            margins: { top: 116, right: 54, bottom: 62, left: 54 },
+            margins: { top: 82, right: 54, bottom: 62, left: 54 },
             bufferPages: true,
             info: { Title: source.title, Author: "מעון חב״ד יפו" },
         });
@@ -628,7 +651,7 @@ export const createParentDocumentPdf = (bundle: DaycareParentDocumentBundle, key
         document.on("error", reject);
         document.on("end", () => resolve(Buffer.concat(chunks)));
         registerFonts(document);
-        addLetterhead(document, 11.5);
+        addLetterhead(document, 9.5, true);
         renderParentDocument(document, source);
         finishPdf(
             document,
@@ -636,7 +659,7 @@ export const createParentDocumentPdf = (bundle: DaycareParentDocumentBundle, key
                 ? "מעון חב״ד יפו | מידע להורים"
                 : `${source.title} | עמוד ${pageIndex + 1} מתוך ${pageCount}`,
             true,
-            { contactFontSize: 11.5, footerFontSize: 10.5 }
+            { contactFontSize: 9.5, footerFontSize: 10.5, compactLetterhead: true }
         );
     });
 
@@ -660,12 +683,12 @@ export const createAgreementPdf = (input: AgreementPdfInput, mode: AgreementPdfM
         if (mode === "standard") renderManualSignaturePage(document);
         finishPdf(document, (pageIndex, pageCount) => mode === "review"
             ? `הסכם התקשרות - עותק לעיון בלבד | עמוד ${pageIndex + 1} מתוך ${pageCount}`
-            : `הסכם התקשרות | עמוד ${pageIndex + 1} מתוך ${pageCount}`, true, { contactFontSize: 11.5, footerFontSize: 10.5 });
+            : `הסכם התקשרות | עמוד ${pageIndex + 1} מתוך ${pageCount}`, true, { contactFontSize: 9.5, footerFontSize: 10.5, compactLetterhead: true });
     });
 
 export const createSignedAgreementPdf = (input: SignedAgreementPdfInput) =>
     new Promise<Buffer>((resolve, reject) => {
-        const document = new PDFDocument({ size: "A4", margins: { top: 116, right: 54, bottom: 62, left: 54 }, bufferPages: true, info: { Title: input.contentSnapshot.title, Author: "מעון חב״ד יפו", Subject: `מסמך ${input.documentId}` } });
+        const document = new PDFDocument({ size: "A4", margins: { top: 82, right: 54, bottom: 62, left: 54 }, bufferPages: true, info: { Title: input.contentSnapshot.title, Author: "מעון חב״ד יפו", Subject: `מסמך ${input.documentId}` } });
         const chunks: Buffer[] = [];
         document.on("data", (chunk: Buffer) => chunks.push(chunk));
         document.on("error", reject);
@@ -701,5 +724,5 @@ export const createSignedAgreementPdf = (input: SignedAgreementPdfInput) =>
         document.moveDown(1).fontSize(14).fillColor("#24364b");
         rtlText(document, input.acceptedStatement, { lineGap: 5 });
 
-        finishPdf(document, (pageIndex, pageCount) => `מסמך ${input.documentId} | עמוד ${pageIndex + 1} מתוך ${pageCount}`, true, { contactFontSize: 11.5, footerFontSize: 10.5 });
+        finishPdf(document, (pageIndex, pageCount) => `מסמך ${input.documentId} | עמוד ${pageIndex + 1} מתוך ${pageCount}`, true, { contactFontSize: 9.5, footerFontSize: 10.5, compactLetterhead: true });
     });
