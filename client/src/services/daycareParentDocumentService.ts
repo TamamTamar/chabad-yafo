@@ -1,7 +1,20 @@
 import type { ApiResponse } from "../types/api";
 import http, { apiBaseUrl } from "./http";
 
-export type DaycareParentDocumentKey = "routine" | "holidays" | "menu";
+export type DaycareParentDocumentKey = "welcome" | "routine" | "holidays" | "menu" | "equipment";
+export interface DaycareWelcomeDocument {
+    key: "welcome";
+    title: string;
+    subtitle: string;
+    filename: string;
+    intro: string[];
+    hours: { weekdays: string; friday: string; address: string };
+    day: string[];
+    parents: string[];
+    join: string[];
+    contactName: string;
+    contactPhone: string;
+}
 export interface DaycareRoutineDocument {
     key: "routine";
     title: string;
@@ -23,16 +36,32 @@ export interface DaycareMenuDocument {
     title: string;
     subtitle: string;
     filename: string;
-    items: Array<{ meal: string; description: string }>;
+    items: Array<{
+        day: string;
+        breakfast: string;
+        lunch?: string;
+        afternoon?: string;
+    }>;
     note?: string;
+}
+export interface DaycareEquipmentDocument {
+    key: "equipment";
+    title: string;
+    subtitle: string;
+    filename: string;
+    items: string[];
+    important: string;
+    note: string;
 }
 export interface DaycareParentDocumentBundle {
     version: string;
     schoolYear: string;
     documents: {
+        welcome: DaycareWelcomeDocument;
         routine: DaycareRoutineDocument;
         holidays: DaycareHolidaysDocument;
         menu: DaycareMenuDocument;
+        equipment: DaycareEquipmentDocument;
     };
 }
 export interface AdminDaycareParentDocumentYear extends DaycareParentDocumentBundle {
@@ -63,6 +92,14 @@ export const saveAdminDaycareParentDocumentYear = async (schoolYear: string, doc
     const response = await http.put<ApiResponse<AdminDaycareParentDocumentYear>>(
         `/admin/daycare/parent-documents/${encode(schoolYear)}`,
         { documents }
+    );
+    return response.data.data;
+};
+
+export const unlockAdminDaycareParentDocumentYear = async (schoolYear: string) => {
+    const response = await http.post<ApiResponse<AdminDaycareParentDocumentYear>>(
+        `/admin/daycare/parent-documents/${encode(schoolYear)}/unlock`,
+        {}
     );
     return response.data.data;
 };

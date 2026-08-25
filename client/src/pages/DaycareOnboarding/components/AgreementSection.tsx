@@ -8,7 +8,7 @@ import {
     signPublicDaycareAgreement,
     uploadPublicSignedAgreementPdf,
 } from "../../../services/daycareAgreementService";
-import daycareLogo from "../../../assets/logo-maon.jpeg";
+import daycareLogo from "../../../assets/logo-maon.png";
 import type { PublicDaycareAgreement } from "../../../types/daycareAgreement";
 import type { DaycareDocumentBlock } from "../../../types/daycareAgreement";
 import styles from "../DaycareOnboarding.module.scss";

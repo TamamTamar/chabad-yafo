@@ -6,6 +6,7 @@ import { DaycareHealthDeclaration } from "../../models/DaycareHealthDeclaration"
 import { DaycareOnboarding } from "../../models/DaycareOnboarding";
 import { DaycareOnboardingAudit } from "../../models/DaycareOnboardingAudit";
 import { DaycarePickupAuthorization } from "../../models/DaycarePickupAuthorization";
+import { DaycareParentDocumentYear } from "../../models/DaycareParentDocumentYear";
 import { DaycareRegistration } from "../../models/DaycareRegistration";
 import type { AdminOnboardingListItemDto, IDaycareOnboarding } from "../../types/daycareOnboarding";
 import { logger } from "../../utils/logger";
@@ -156,6 +157,7 @@ export const deleteDaycareOnboarding = async (onboardingId: string) => {
 
     let childDeleted = false;
     let familyDeleted = false;
+    let parentDocumentsUnlocked = false;
     const session = await startSession();
     try {
         await session.withTransaction(async () => {
@@ -201,6 +203,22 @@ export const deleteDaycareOnboarding = async (onboardingId: string) => {
             await DaycarePickupAuthorization.deleteMany({ onboardingId: current._id }).session(session);
             await DaycareOnboardingAudit.deleteMany({ onboardingId: current._id }).session(session);
             await DaycareOnboarding.deleteOne({ _id: current._id }).session(session);
+
+            const remainingOnboardingIds = await DaycareOnboarding.find({ schoolYear: current.schoolYear })
+                .session(session)
+                .distinct("_id");
+            const remainingSignedAgreement = await DaycareAgreement.exists({
+                onboardingId: { $in: remainingOnboardingIds },
+                signedAt: { $exists: true },
+            }).session(session);
+            if (!remainingSignedAgreement) {
+                const unlockResult = await DaycareParentDocumentYear.updateOne(
+                    { schoolYear: current.schoolYear, lockedAt: { $exists: true } },
+                    { $unset: { lockedAt: 1, lockedByAgreementId: 1 } },
+                    { session }
+                );
+                parentDocumentsUnlocked = unlockResult.modifiedCount === 1;
+            }
 
             if (current.childId) {
                 const [otherOnboarding, otherRegistration] = await Promise.all([
@@ -265,6 +283,7 @@ export const deleteDaycareOnboarding = async (onboardingId: string) => {
         childDeleted,
         familyDeleted,
         filesCleanupFailed,
+        parentDocumentsUnlocked,
     };
 };
 

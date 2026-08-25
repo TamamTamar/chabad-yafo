@@ -4,7 +4,7 @@ import { requireAdmin } from "../middleware/adminAuth";
 import { requireSecureAdminMutation } from "../middleware/adminMutationSecurity";
 import { publicOnboardingRateLimit, setPublicOnboardingSecurityHeaders } from "../middleware/publicOnboardingSecurity";
 import {
-    createAdminAgreementDraft, downloadAdminAgreementFile, downloadPublicDaycareAgreementPdf, downloadPublicSignedAgreement, getAdminAgreementByOnboarding, getPublicDaycareAgreement,
+    createAdminAgreementDraft, downloadAdminAgreementFile, downloadAdminAgreementReviewPdf, downloadPublicDaycareAgreementPdf, downloadPublicSignedAgreement, getAdminAgreementByOnboarding, getPublicDaycareAgreement,
     listAdminAgreementVersions, patchAdminAgreementDraft, publishAdminAgreementDraft,
     reviewAdminAgreement, signPublicDaycareAgreement, uploadPublicSignedAgreement,
 } from "../controllers/daycareAgreementController";
@@ -42,6 +42,7 @@ adminRouter.get("/by-onboarding/:onboardingId", getAdminAgreementByOnboarding);
 adminRouter.post("/versions", createAdminAgreementDraft);
 adminRouter.patch("/versions/:id", patchAdminAgreementDraft);
 adminRouter.post("/versions/:id/publish", publishAdminAgreementDraft);
+adminRouter.get("/versions/:id/review-pdf", downloadAdminAgreementReviewPdf);
 adminRouter.patch("/:id/review", reviewAdminAgreement);
 adminRouter.get("/:id/files/:kind", downloadAdminAgreementFile);
 

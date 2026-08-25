@@ -4,6 +4,7 @@ import {
     createAgreementDraft,
     downloadAgreementFileForAdmin,
     downloadAgreementPdfForParent,
+    downloadAgreementReviewPdfForAdmin,
     downloadSignedAgreementForParent,
     getAgreementByOnboardingForAdmin,
     getPublicAgreement,
@@ -84,6 +85,24 @@ export const patchAdminAgreementDraft = async (req: Request, res: Response) => {
 
 export const publishAdminAgreementDraft = async (req: Request, res: Response) => {
     try { return res.json({ success: true, data: await publishAgreementDraft(req.params.id, req.body?.legalReviewConfirmed === true) }); } catch (error) { return errorResponse(res, error); }
+};
+
+const attachmentContentDisposition = (filename: string, fallbackFilename: string) => {
+    const encodedFilename = encodeURIComponent(filename).replace(
+        /[!'()*]/g,
+        (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`
+    );
+    return `attachment; filename="${fallbackFilename}"; filename*=UTF-8''${encodedFilename}`;
+};
+
+export const downloadAdminAgreementReviewPdf = async (req: Request, res: Response) => {
+    try {
+        const file = await downloadAgreementReviewPdfForAdmin(req.params.id);
+        res.setHeader("Content-Type", file.mimeType);
+        res.setHeader("Content-Disposition", attachmentContentDisposition(file.filename, "daycare-agreement-review.pdf"));
+        res.setHeader("Cache-Control", "no-store");
+        return res.send(file.bytes);
+    } catch (error) { return errorResponse(res, error); }
 };
 
 export const getPublicDaycareAgreement = async (req: Request, res: Response) => {

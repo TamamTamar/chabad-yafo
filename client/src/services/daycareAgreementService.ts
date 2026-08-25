@@ -108,6 +108,14 @@ export const publishAdminAgreementDraft = async (id: string) => {
     return response.data.data;
 };
 
+export const downloadAdminAgreementReviewPdf = async (id: string) => {
+    const response = await http.get<Blob>(
+        `/admin/daycare/agreements/versions/${encode(id)}/review-pdf`,
+        { responseType: "blob" }
+    );
+    return response.data;
+};
+
 export const getAdminAgreementByOnboarding = async (onboardingId: string) => {
     const response = await http.get<ApiResponse<AdminAgreementByOnboarding>>(
         `/admin/daycare/agreements/by-onboarding/${encode(onboardingId)}`

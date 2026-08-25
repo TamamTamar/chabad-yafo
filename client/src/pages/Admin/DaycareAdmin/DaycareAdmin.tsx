@@ -19,12 +19,14 @@ type DaycareAdminTab =
     | "finance"
     | "donations"
     | "parent-info";
-type ParentInfoTab = "routine" | "holidays" | "menu" | "agreements";
+type ParentInfoTab = "welcome" | "routine" | "holidays" | "menu" | "equipment" | "agreements";
 
 const parentInfoTabs: Array<{ id: ParentInfoTab; label: string }> = [
+    { id: "welcome", label: "ברוכים הבאים" },
     { id: "routine", label: "סדר יום" },
     { id: "holidays", label: "לוח חופשות" },
     { id: "menu", label: "תפריט" },
+    { id: "equipment", label: "ציוד אישי" },
     { id: "agreements", label: "הסכם התקשרות" },
 ];
 
@@ -58,9 +60,9 @@ const DaycareAdmin = () => {
     const [parentInfoTab, setParentInfoTab] = useState<ParentInfoTab>(
         requestedTab === "agreements" || requestedParentInfoTab === "agreements"
             ? "agreements"
-            : requestedParentInfoTab === "holidays" || requestedParentInfoTab === "menu"
+            : requestedParentInfoTab === "welcome" || requestedParentInfoTab === "routine" || requestedParentInfoTab === "holidays" || requestedParentInfoTab === "menu" || requestedParentInfoTab === "equipment"
                 ? requestedParentInfoTab
-                : "routine"
+                : "welcome"
     );
 
     const selectTab = (tab: DaycareAdminTab) => {

@@ -1,4 +1,23 @@
-export type DaycareParentDocumentKey = "routine" | "holidays" | "menu";
+export type DaycareStoredParentDocumentKey = "welcome" | "routine" | "holidays" | "menu" | "equipment";
+export type DaycareParentDocumentKey = DaycareStoredParentDocumentKey;
+
+export type DaycareWelcomeDocument = {
+    key: "welcome";
+    title: string;
+    subtitle: string;
+    filename: string;
+    intro: string[];
+    hours: {
+        weekdays: string;
+        friday: string;
+        address: string;
+    };
+    day: string[];
+    parents: string[];
+    join: string[];
+    contactName: string;
+    contactPhone: string;
+};
 
 export type DaycareRoutineDocument = {
     key: "routine";
@@ -23,15 +42,88 @@ export type DaycareMenuDocument = {
     title: string;
     subtitle: string;
     filename: string;
-    items: Array<{ meal: string; description: string }>;
+    items: Array<{
+        day: string;
+        breakfast: string;
+        lunch?: string;
+        afternoon?: string;
+    }>;
     note?: string;
 };
 
-export type DaycareParentDocument = DaycareRoutineDocument | DaycareHolidaysDocument | DaycareMenuDocument;
+export type DaycareEquipmentDocument = {
+    key: "equipment";
+    title: string;
+    subtitle: string;
+    filename: string;
+    items: string[];
+    important: string;
+    note: string;
+};
+
+export type DaycareParentDocument = DaycareWelcomeDocument | DaycareRoutineDocument | DaycareHolidaysDocument | DaycareMenuDocument | DaycareEquipmentDocument;
 export type DaycareParentDocumentBundle = {
     version: string;
     schoolYear: string;
-    documents: Record<DaycareParentDocumentKey, DaycareParentDocument>;
+    documents: {
+        welcome: DaycareWelcomeDocument;
+        routine: DaycareRoutineDocument;
+        holidays: DaycareHolidaysDocument;
+        menu: DaycareMenuDocument;
+        equipment: DaycareEquipmentDocument;
+    };
+};
+
+export const DAYCARE_WELCOME_DOCUMENT: DaycareWelcomeDocument = {
+    key: "welcome",
+    title: "ברוכים הבאים למעון חב״ד יפו",
+    subtitle: "קבוצה קטנה • יחס אישי • סביבה חמה וערכית",
+    filename: "ברוכים הבאים למעון חבד יפו.pdf",
+    intro: [
+        "ברוכים הבאים למעון חב״ד יפו.",
+        "המעון מעניק לילדים מסגרת חמה, משפחתית ומקצועית, באווירה יהודית ובתכנים המותאמים לגילם.",
+        "הקבוצה הקטנה מאפשרת לנו להכיר כל ילד, לתת לו יחס אישי וללוות אותו לאורך היום בחום, באהבה ובתשומת לב.",
+    ],
+    hours: {
+        weekdays: "ימים א׳-ה׳: 07:30-16:00",
+        friday: "יום שישי: 07:30-11:45",
+        address: "כתובת: יוסי בן יוסי 1, יפו",
+    },
+    day: [
+        "במהלך היום הילדים נהנים ממפגש בוקר ותפילה, משחקי הרכבה ודמיון, פעילות בחצר, יצירה והנגשת חומרים, מוזיקה, תנועה ופעילות מוטורית, ספרים וסיפורים.",
+        "במהלך היום מוגשות ארוחת בוקר, פרי ושתייה, ארוחת צהריים וארוחת מנחה.",
+        "מנוחת הצהריים מתקיימת בין השעות 12:00-14:00.",
+        "את סדר היום המלא ניתן לראות בדף המצורף.",
+    ],
+    parents: [
+        "חשוב לנו לקיים קשר פתוח, נעים ומכבד עם ההורים ולעדכן בכל דבר משמעותי הנוגע לילד.",
+        "לשאלות, עדכונים או התייעצות ניתן לפנות לתמר:",
+    ],
+    join: [
+        "משפחה המעוניינת להמשיך לתהליך הרישום מוזמנת לשלוח הודעת WhatsApp לתמר.",
+        "לאחר הפנייה יישלח קישור אישי להשלמת פרטי הרישום, האישורים והחתימה על הסכם ההתקשרות באופן מקוון.",
+    ],
+    contactName: "תמר",
+    contactPhone: "054-219-3770",
+};
+
+export const DAYCARE_EQUIPMENT_DOCUMENT: DaycareEquipmentDocument = {
+    key: "equipment",
+    title: "ציוד אישי - מה להביא למעון",
+    subtitle: "לקראת תחילת השנה | מעון חב״ד יפו",
+    filename: "ציוד אישי מה להביא למעון חבד יפו.pdf",
+    items: [
+        "חיתולים - בכמות מספקת ובהתאם לצורך",
+        "מגבונים",
+        "2-3 סטים של בגדי החלפה",
+        "מוצץ - לילדים המשתמשים במוצץ. מומלץ להביא גם מוצץ נוסף",
+        "בקבוק או כוס אישית - לפי הצורך",
+        "משחה אישית להחתלה - אם משתמשים",
+        "שמיכה אישית לשינה",
+        "חפץ מעבר - במידת הצורך ובהתאם להרגלי הילד",
+    ],
+    important: "חשוב: יש לסמן את שמו של הילד על כל הציוד האישי.",
+    note: "המעון מספק מצעים. את השמיכה האישית יש לקחת לכביסה בסוף כל שבוע ולהחזירה בתחילת השבוע.",
 };
 
 const routine: DaycareRoutineDocument = {
@@ -43,21 +135,16 @@ const routine: DaycareRoutineDocument = {
         { time: "07:30-08:15", activity: "קבלת הילדים ומשחק בתיבות פעילות" },
         { time: "08:15-08:25", activity: "התארגנות לארוחת הבוקר" },
         { time: "08:25-08:45", activity: "ארוחת בוקר" },
-        { time: "08:45-09:00", activity: "מפגש בוקר: תפילה ונושא נלמד" },
-        { time: "09:00-09:20", activity: "משחקי הרכבה" },
-        { time: "09:20-09:50", activity: "פעילות בחצר" },
-        { time: "09:50-10:00", activity: "הפסקת פרי ושתייה" },
-        { time: "10:00-10:20", activity: "הנגשת חומרים" },
-        { time: "10:20-10:40", activity: "משחקי דמיון (פינת מטבח)" },
-        { time: "10:40-10:55", activity: "החתלות והיגיינה" },
-        { time: "10:55-11:25", activity: "ג׳ימבורי" },
-        { time: "11:25-11:50", activity: "ארוחת צהריים" },
-        { time: "11:50-12:00", activity: "התארגנות לשינה" },
+        { time: "08:45-09:00", activity: "מפגש בוקר - תפילה ונושא נלמד" },
+        { time: "09:00-09:30", activity: "משחקי הרכבה ופעילות חופשית" },
+        { time: "09:30-10:00", activity: "פעילות בחצר, פרי ושתייה" },
+        { time: "10:00-10:40", activity: "פעילות מונחית - יצירה, חומרים ומשחקי דמיון" },
+        { time: "10:40-11:00", activity: "החתלות, היגיינה והתארגנות" },
+        { time: "11:00-11:25", activity: "מוזיקה, תנועה ופעילות מוטורית" },
+        { time: "11:25-12:00", activity: "ארוחת צהריים והתארגנות לשינה" },
         { time: "12:00-14:00", activity: "מנוחת צהריים" },
-        { time: "14:00-14:25", activity: "השכמה, התארגנות לאחר המנוחה וטיפוח אישי" },
-        { time: "14:25-14:40", activity: "כריך, פרי ושתייה" },
-        { time: "14:40-15:20", activity: "פעילות במוזיקה ותנועה" },
-        { time: "15:20-16:00", activity: "ספרייה, שעת סיפור, משחקים קוגניטיביים ואיסוף הילדים" },
+        { time: "14:00-14:40", activity: "השכמה, טיפוח אישי וארוחת מנחה" },
+        { time: "14:40-16:00", activity: "פעילות רגועה - ספרים, סיפור, משחק ואיסוף הילדים" },
     ],
     note: "סדר היום הוא מסגרת מנחה ועשוי להשתנות במהלך היום לפי הקצב והצרכים של הילדים.",
 };
@@ -97,7 +184,7 @@ const menu: DaycareMenuDocument = {
 export const DAYCARE_PARENT_DOCUMENTS_2026_2027: DaycareParentDocumentBundle = {
     version: "2026-2027-v1",
     schoolYear: "2026-2027",
-    documents: { routine, holidays, menu },
+    documents: { welcome: DAYCARE_WELCOME_DOCUMENT, routine, holidays, menu, equipment: DAYCARE_EQUIPMENT_DOCUMENT },
 };
 
 // Published yearly bundles are immutable. Add a new entry for each school year;

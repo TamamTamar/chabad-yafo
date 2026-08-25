@@ -48,7 +48,7 @@ import { isFatherCollectorForFamily } from "../services/daycarePickupAuthorizati
 import { mergeGuardiansForSibling } from "../services/daycareOnboarding/publicFlow";
 import { convertHealthImageUploadToPdf, createBlankHealthDeclarationPdf, createSignedHealthDeclarationPdf } from "../services/daycareHealthDeclarationPdfService";
 import { convertPickupImageUploadToPdf, createBlankPickupAuthorizationPdf, createSignedPickupAuthorizationPdf } from "../services/daycarePickupAuthorizationPdfService";
-import { hashParentDocumentBundle } from "../services/daycareParentDocumentService";
+import { hashParentDocumentBundle, normalizeParentDocumentBundle } from "../services/daycareParentDocumentService";
 import { decryptDaycarePrivateValue, encryptDaycarePrivateValue, fingerprintDaycareIsraeliId, isValidIsraeliId, normalizeIsraeliId } from "../services/daycarePiiEncryptionService";
 import type { IDaycareEnrollment } from "../types/daycareEnrollment";
 import type {
@@ -221,29 +221,102 @@ test("yearly parent documents have a stable version, hash and dynamic PDFs", asy
     const bundle = DAYCARE_PARENT_DOCUMENTS_2026_2027;
     assert.equal(bundle.schoolYear, "2026-2027");
     assert.equal(bundle.version, "2026-2027-v1");
-    assert.equal(bundle.documents.routine.items.length, 18);
+    assert.equal(bundle.documents.welcome.title, "ברוכים הבאים למעון חב״ד יפו");
+    assert.deepEqual(bundle.documents.routine.items, [
+        { time: "07:30-08:15", activity: "קבלת הילדים ומשחק בתיבות פעילות" },
+        { time: "08:15-08:25", activity: "התארגנות לארוחת הבוקר" },
+        { time: "08:25-08:45", activity: "ארוחת בוקר" },
+        { time: "08:45-09:00", activity: "מפגש בוקר - תפילה ונושא נלמד" },
+        { time: "09:00-09:30", activity: "משחקי הרכבה ופעילות חופשית" },
+        { time: "09:30-10:00", activity: "פעילות בחצר, פרי ושתייה" },
+        { time: "10:00-10:40", activity: "פעילות מונחית - יצירה, חומרים ומשחקי דמיון" },
+        { time: "10:40-11:00", activity: "החתלות, היגיינה והתארגנות" },
+        { time: "11:00-11:25", activity: "מוזיקה, תנועה ופעילות מוטורית" },
+        { time: "11:25-12:00", activity: "ארוחת צהריים והתארגנות לשינה" },
+        { time: "12:00-14:00", activity: "מנוחת צהריים" },
+        { time: "14:00-14:40", activity: "השכמה, טיפוח אישי וארוחת מנחה" },
+        { time: "14:40-16:00", activity: "פעילות רגועה - ספרים, סיפור, משחק ואיסוף הילדים" },
+    ]);
+    assert.doesNotMatch(JSON.stringify(bundle.documents), /ג׳ימבורי/);
     assert.equal(bundle.documents.holidays.items.length, 9);
     const hash = hashParentDocumentBundle(bundle);
     assert.match(hash, /^[a-f0-9]{64}$/);
     assert.notEqual(hash, hashParentDocumentBundle({ ...bundle, version: "2026-2027-v2" }));
-    const [routinePdf, holidaysPdf] = await Promise.all([
+    const [welcomePdf, routinePdf, holidaysPdf, equipmentPdf] = await Promise.all([
+        createParentDocumentPdf(bundle, "welcome"),
         createParentDocumentPdf(bundle, "routine"),
         createParentDocumentPdf(bundle, "holidays"),
+        createParentDocumentPdf(bundle, "equipment"),
     ]);
+    assert.equal(welcomePdf.subarray(0, 5).toString("ascii"), "%PDF-");
     assert.equal(routinePdf.subarray(0, 5).toString("ascii"), "%PDF-");
     assert.equal(holidaysPdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.equal(equipmentPdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.ok(welcomePdf.length > 5000);
     assert.ok(routinePdf.length > 5000);
     assert.ok(holidaysPdf.length > 5000);
+    assert.ok(equipmentPdf.length > 5000);
+    assert.equal((routinePdf.toString("latin1").match(/\/Type \/Page\b/g) ?? []).length, 1);
+
+    const denseRoutinePdf = await createParentDocumentPdf({
+        ...bundle,
+        documents: {
+            ...bundle.documents,
+            routine: {
+                ...bundle.documents.routine,
+                items: [
+                    ...bundle.documents.routine.items,
+                    { time: "16:00–16:15", activity: "פעילות רגועה" },
+                    { time: "16:15-16:30", activity: "משחק חופשי" },
+                    { time: "16:30-16:45", activity: "איסוף הילדים" },
+                ],
+            },
+        },
+    }, "routine");
+    assert.equal((denseRoutinePdf.toString("latin1").match(/\/Type \/Page\b/g) ?? []).length, 1);
+});
+
+test("parent menu data supports daily meals and normalizes legacy rows", async () => {
+    const normalized = normalizeParentDocumentBundle({
+        ...DAYCARE_PARENT_DOCUMENTS_2026_2027,
+        documents: {
+            ...DAYCARE_PARENT_DOCUMENTS_2026_2027.documents,
+            menu: {
+                ...DAYCARE_PARENT_DOCUMENTS_2026_2027.documents.menu,
+                items: [{ meal: "יום בדיקה", description: "ארוחת בוקר ישנה" }],
+            },
+        },
+    });
+    assert.deepEqual(normalized.documents.menu.items, [{ day: "יום בדיקה", breakfast: "ארוחת בוקר ישנה" }]);
+
+    const bundle = {
+        ...normalized,
+        documents: {
+            ...normalized.documents,
+            menu: {
+                ...normalized.documents.menu,
+                items: [
+                    { day: "יום ראשון", breakfast: "לחם וגבינה", lunch: "אורז ועדשים", afternoon: "פרי" },
+                    { day: "יום קצר", breakfast: "לחמנייה" },
+                ],
+            },
+        },
+    };
+    const menuPdf = await createParentDocumentPdf(bundle, "menu");
+    assert.equal(menuPdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.ok(menuPdf.length > 5000);
 });
 
 test("parent document downloads preserve Hebrew filenames", () => {
     const filenames = [
+        ["ברוכים הבאים למעון חבד יפו.pdf", "daycare-welcome.pdf"],
         ["סדר יום מעון חבד יפו.pdf", "daycare-routine.pdf"],
         ["לוח חופשות מעון חבד יפו.pdf", "daycare-holidays.pdf"],
+        ["ציוד אישי מה להביא למעון חבד יפו.pdf", "daycare-equipment.pdf"],
     ] as const;
 
     for (const [filename, fallbackFilename] of filenames) {
-        const key = fallbackFilename.includes("routine") ? "routine" : "holidays";
+        const key = fallbackFilename.includes("welcome") ? "welcome" : fallbackFilename.includes("routine") ? "routine" : fallbackFilename.includes("holidays") ? "holidays" : "equipment";
         assert.equal(parentDocumentDownloadFilename(key, fallbackFilename), filename);
         const header = inlinePdfContentDisposition(filename, fallbackFilename);
         assert.match(header, new RegExp(`^inline; filename="${fallbackFilename}"; filename\\*=UTF-8''`));
@@ -272,12 +345,20 @@ test("final signed agreement PDF includes a stable snapshot and is generated as 
 });
 
 test("downloadable agreement PDF is generated without browser headers or page URLs", async () => {
-    const pdf = await createAgreementPdf({
+    const input: Parameters<typeof createAgreementPdf>[0] = {
         version: "2026.1",
         schoolYear: "2026-2027",
         contentSnapshot: { format: "structured-v1", title: "הסכם בדיקה", intro: [], sections: [{ id: "section-1", title: "סעיף ראשון", blocks: [{ id: "paragraph-1", type: "paragraph", text: "תוכן ההסכם." }] }] },
-    });
+    };
+    const pdf = await createAgreementPdf(input);
+    const reviewPdf = await createAgreementPdf(input, "review");
     assert.equal(pdf.subarray(0, 5).toString("ascii"), "%PDF-");
     assert.ok(pdf.length > 5000);
     assert.equal(pdf.includes(Buffer.from("localhost")), false);
+    assert.equal(reviewPdf.subarray(0, 5).toString("ascii"), "%PDF-");
+    assert.ok(reviewPdf.length > 5000);
+    assert.equal(reviewPdf.includes(Buffer.from("localhost")), false);
+    const pageCount = (bytes: Buffer) => (bytes.toString("latin1").match(/\/Type \/Page\b/g) ?? []).length;
+    assert.equal(pageCount(pdf), 2, "the regular PDF keeps its manual-signature page");
+    assert.equal(pageCount(reviewPdf), 1, "the review PDF omits the manual-signature page");
 });

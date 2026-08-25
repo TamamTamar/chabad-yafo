@@ -256,6 +256,22 @@ export const downloadAgreementPdfForParent = async (token: string, now = new Dat
     };
 };
 
+export const downloadAgreementReviewPdfForAdmin = async (versionId: string) => {
+    if (!Types.ObjectId.isValid(versionId)) throw new DaycareOnboardingServiceError("Agreement version not found", 404, "AGREEMENT_VERSION_NOT_FOUND");
+    const version = await DaycareAgreementVersion.findById(versionId);
+    if (!version) throw new DaycareOnboardingServiceError("Agreement version not found", 404, "AGREEMENT_VERSION_NOT_FOUND");
+    const bytes = await createAgreementPdf({
+        version: version.version,
+        schoolYear: version.schoolYear,
+        contentSnapshot: structuredDocumentFromVersion(version),
+    }, "review");
+    return {
+        bytes,
+        mimeType: "application/pdf",
+        filename: `הסכם-התקשרות-לעיון-${version.schoolYear}.pdf`,
+    };
+};
+
 const markPendingReview = async (onboarding: InstanceType<typeof DaycareOnboarding>, stepIndex: number, agreementId: Types.ObjectId, source: "online" | "uploadedFile", action: "agreementSignedOnline" | "agreementPdfUploaded", now: Date) => {
     const previousStatus = onboarding.steps[stepIndex].status;
     onboarding.steps[stepIndex].status = "pendingReview";

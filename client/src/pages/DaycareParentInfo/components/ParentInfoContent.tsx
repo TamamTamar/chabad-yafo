@@ -18,6 +18,9 @@ interface ParentInfoContentProps {
 
 const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProps) => {
     const baseSection = sections[activeTab];
+    const menuItems = activeTab === "menu" && parentDocuments
+        ? parentDocuments.documents.menu.items
+        : [];
     const displayedDocuments = documents.map((document) => document.id === "menu" && parentDocuments
         ? { ...document, pdfAvailable: parentDocuments.documents.menu.items.length > 0 }
         : document);
@@ -43,7 +46,7 @@ const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProp
                 ...baseSection,
                 title: parentDocuments.documents.menu.title,
                 summary: parentDocuments.documents.menu.subtitle,
-                details: parentDocuments.documents.menu.items.map((item) => `${item.meal} · ${item.description}`),
+                details: [],
                 note: parentDocuments.documents.menu.note ?? (parentDocuments.documents.menu.items.length ? undefined : "התפריט עדיין לא פורסם."),
             }
           : baseSection;
@@ -110,6 +113,34 @@ const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProp
                         </ul>
                     )}
 
+                    {!section.kind && activeTab === "menu" && menuItems.length > 0 && (
+                        <div className={styles.menuGrid} aria-label="התפריט השבועי">
+                            {menuItems.map((item, index) => {
+                                const meals = [
+                                    { label: "בוקר", content: item.breakfast },
+                                    { label: "צהריים", content: item.lunch },
+                                    { label: "מנחה", content: item.afternoon },
+                                ].filter((meal): meal is { label: string; content: string } => Boolean(meal.content?.trim()));
+                                return (
+                                    <article className={styles.menuCard} key={`${item.day}-${index}`}>
+                                        <header className={styles.menuCardHeader}>
+                                            <span className={styles.menuDayEyebrow}>התפריט היומי</span>
+                                            <h3 className={styles.menuDayTitle}>{item.day}</h3>
+                                        </header>
+                                        <dl className={styles.menuMeals}>
+                                            {meals.map((meal) => (
+                                                <div className={styles.menuMealRow} key={meal.label}>
+                                                    <dt className={styles.menuMealLabel}>{meal.label}</dt>
+                                                    <dd className={styles.menuMealContent}>{meal.content}</dd>
+                                                </div>
+                                            ))}
+                                        </dl>
+                                    </article>
+                                );
+                            })}
+                        </div>
+                    )}
+
                     {!section.kind && section.accordionItems && (
                         <ParentInfoAccordion
                             key={section.id}
@@ -119,10 +150,10 @@ const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProp
                     )}
 
                     {!section.kind && section.note && (
-                        <aside className={styles.importantNote} aria-label="חשוב לדעת">
+                        <aside className={styles.importantNote} aria-label={activeTab === "menu" ? "הערה להורים" : "חשוב לדעת"}>
                             <Info size={20} aria-hidden="true" />
                             <div className={styles.importantCopy}>
-                                <h3 className={styles.importantTitle}>חשוב לדעת</h3>
+                                <h3 className={styles.importantTitle}>{activeTab === "menu" ? "הערה להורים" : "חשוב לדעת"}</h3>
                                 <p className={styles.importantText}>{section.note}</p>
                             </div>
                         </aside>

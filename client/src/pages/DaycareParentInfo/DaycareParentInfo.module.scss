@@ -347,6 +347,82 @@
     list-style: none;
 }
 
+.menuGrid {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    direction: rtl;
+}
+
+.menuCard {
+    display: grid;
+    align-content: start;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba($brand-primary, 0.12);
+    border-radius: $radius-card;
+    background: $brand-bg;
+    box-shadow: 0 12px 28px $ui-shadow-blue-soft;
+}
+
+.menuCardHeader {
+    display: grid;
+    gap: 3px;
+    padding: 17px 18px 15px;
+    border-bottom: 1px solid rgba($brand-primary, 0.09);
+    background: linear-gradient(135deg, rgba($brand-secondary, 0.3), rgba($brand-secondary, 0.12));
+}
+
+.menuDayEyebrow {
+    color: $brand-gold-dark;
+    font-size: $type-caption;
+    font-weight: 900;
+}
+
+.menuDayTitle {
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.menuMeals {
+    display: grid;
+    margin: 0;
+    padding: 8px 18px 13px;
+}
+
+.menuMealRow {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 11px 0;
+    border-bottom: 1px solid $ui-border-soft;
+}
+
+.menuMealRow:last-child {
+    border-bottom: 0;
+}
+
+.menuMealLabel {
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    font-weight: 900;
+}
+
+.menuMealContent {
+    min-width: 0;
+    margin: 0;
+    color: $brand-text;
+    font-size: $type-body-sm;
+    font-weight: 700;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
 .tabContentWide,
 .documentsGrid {
     grid-column: 1 / -1;
@@ -833,6 +909,10 @@
         grid-template-columns: 1fr;
     }
 
+    .menuGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .importantNote {
         grid-column: 1;
     }
@@ -992,6 +1072,18 @@
         min-height: 0;
         padding: 23px 18px;
         border-radius: $radius-lg;
+    }
+
+    .menuGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .menuCardHeader {
+        padding: 15px 16px 13px;
+    }
+
+    .menuMeals {
+        padding-inline: 16px;
     }
 
     .contentHeader {

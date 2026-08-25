@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { downloadCurrentParentDocument, downloadParentDocumentForToken, getCurrentParentDocuments, getParentDocumentsForToken, listAdminParentDocumentYears, saveAdminParentDocumentYear } from "../controllers/daycareParentDocumentController";
+import { downloadCurrentParentDocument, downloadParentDocumentForToken, getCurrentParentDocuments, getParentDocumentsForToken, listAdminParentDocumentYears, saveAdminParentDocumentYear, unlockAdminParentDocumentYear } from "../controllers/daycareParentDocumentController";
 import { publicOnboardingRateLimit, setPublicOnboardingSecurityHeaders } from "../middleware/publicOnboardingSecurity";
 import { requireAdmin } from "../middleware/adminAuth";
 import { requireSecureAdminMutation } from "../middleware/adminMutationSecurity";
@@ -14,6 +14,7 @@ router.get("/public/:token/:key/pdf", downloadParentDocumentForToken);
 const adminRouter = Router();
 adminRouter.use(requireAdmin, requireSecureAdminMutation);
 adminRouter.get("/", listAdminParentDocumentYears);
+adminRouter.post("/:schoolYear/unlock", unlockAdminParentDocumentYear);
 adminRouter.put("/:schoolYear", saveAdminParentDocumentYear);
 
 export { router as daycareParentDocumentRoutes, adminRouter as daycareParentDocumentAdminRoutes };

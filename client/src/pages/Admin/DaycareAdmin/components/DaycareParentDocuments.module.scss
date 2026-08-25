@@ -7,20 +7,45 @@
 .intro { max-width: 720px; margin: 0; color: $ui-text-muted; font-weight: 600; line-height: 1.6; }
 .yearRow { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; }
 .label { display: grid; flex: 1; gap: 6px; color: $brand-text; font-size: .88rem; font-weight: 800; }
-.input, .textarea, .smallTextarea { width: 100%; padding: 10px 12px; border: 1px solid $ui-border-strong; border-radius: 10px; background: $brand-bg; color: $brand-text; font: inherit; }
+.input, .textarea, .smallTextarea, .menuMealInput { width: 100%; padding: 10px 12px; border: 1px solid $ui-border-strong; border-radius: 10px; background: $brand-bg; color: $brand-text; font: inherit; }
 .textarea { min-height: 230px; resize: vertical; direction: rtl; line-height: 1.65; }
 .smallTextarea { min-height: 86px; resize: vertical; line-height: 1.55; }
-.input:disabled, .textarea:disabled, .smallTextarea:disabled { background: $ui-surface-neutral; color: $ui-text-muted; }
+.menuMealInput { min-height: 74px; resize: vertical; line-height: 1.5; }
+.input:disabled, .textarea:disabled, .smallTextarea:disabled, .menuMealInput:disabled { background: $ui-surface-neutral; color: $ui-text-muted; }
 .editable, .locked { padding: 8px 12px; border-radius: $radius-pill; font-size: .82rem; font-weight: 900; }
 .editable { background: rgba($ui-success-dark, .1); color: $ui-success-dark; }
 .locked { background: rgba($brand-secondary, .22); color: $brand-gold-dark; }
 .cards { display: grid; gap: 16px; }
 .card { display: grid; gap: 13px; padding: 18px; border: 1px solid $ui-border-soft; border-radius: $radius-card; background: rgba($brand-primary, .02); }
 .card h3 { margin: 0; color: $brand-primary-deep; font-size: 1.12rem; }
+.welcomeFieldGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.menuEditor { display: grid; gap: 14px; padding: 16px; border: 1px solid $ui-border-soft; border-radius: $radius-card; background: $brand-bg; }
+.menuEditorHeader { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.menuEditorHeader h4 { margin: 0; color: $brand-primary-deep; font-size: 1rem; }
+.menuEditorHeader p, .emptyMenu { margin: 5px 0 0; color: $ui-text-muted; font-size: .86rem; font-weight: 600; line-height: 1.55; }
+.menuDayList { display: grid; gap: 12px; }
+.menuDayEditor { display: grid; gap: 12px; padding: 14px; border: 1px solid $ui-border-soft; border-radius: $radius-card; background: rgba($brand-primary, .025); }
+.menuDayHeader { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.menuDayNumber { color: $brand-gold-dark; font-size: .8rem; font-weight: 900; }
+.menuDayActions { display: flex; gap: 6px; }
+.menuDayActions button { display: inline-grid; width: 36px; height: 36px; place-items: center; border: 1px solid $ui-border-soft; border-radius: 10px; background: $brand-bg; color: $brand-primary; cursor: pointer; }
+.menuDayActions button:last-child { color: $ui-danger-deep; }
+.menuDayActions button:disabled { cursor: not-allowed; opacity: .4; }
+.menuDayFields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.menuDayFields > :first-child { grid-column: 1 / -1; }
+.addDayButton { display: inline-flex; min-height: 40px; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid $brand-primary; border-radius: $radius-pill; background: $brand-primary; color: #fff; font: inherit; font-weight: 900; cursor: pointer; }
+.addDayButton:disabled { cursor: not-allowed; opacity: .5; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.primaryButton, .secondaryButton { min-height: 44px; padding: 9px 17px; border-radius: $radius-pill; font: inherit; font-weight: 900; cursor: pointer; }
+.primaryButton, .secondaryButton { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: 9px 17px; border-radius: $radius-pill; font: inherit; font-weight: 900; text-decoration: none; cursor: pointer; }
 .primaryButton { border: 1px solid $brand-primary; background: $brand-primary; color: #fff; }
 .secondaryButton { border: 1px solid $ui-border-strong; background: $brand-bg; color: $brand-primary; }
 .primaryButton:disabled, .secondaryButton:disabled { cursor: not-allowed; opacity: .55; }
 .success { margin: 0; color: $ui-success-dark; font-weight: 800; }
 .error { margin: 0; color: $ui-danger-deep; font-weight: 800; }
+
+@media (max-width: 760px) {
+    .welcomeFieldGrid { grid-template-columns: 1fr; }
+    .menuDayFields { grid-template-columns: 1fr; }
+    .menuDayFields > :first-child { grid-column: auto; }
+    .menuEditor { padding: 12px; }
+}

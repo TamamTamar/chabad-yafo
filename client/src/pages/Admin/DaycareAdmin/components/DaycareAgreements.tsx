@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
 import {
+    createAdminAgreementDraft,
+    downloadAdminAgreementReviewPdf,
     listAdminAgreementVersions,
     publishAdminAgreementDraft,
     updateAdminAgreementDraft,
@@ -20,6 +22,19 @@ const emptyDocument = (): DaycareStructuredDocument => ({
     intro: [],
     sections: [],
 });
+
+const nextAgreementYear = (versions: DaycareAgreementVersion[]) => {
+    if (!versions.length || versions.some((item) => item.status === "draft")) return null;
+    const source = [...versions].sort((left, right) => right.schoolYear.localeCompare(left.schoolYear))[0];
+    const match = source.schoolYear.match(/^(\d{4})-(\d{4})$/);
+    if (!match) return null;
+    const startYear = Number(match[1]) + 1;
+    return {
+        source,
+        schoolYear: `${startYear}-${startYear + 1}`,
+        version: `${startYear}.01`,
+    };
+};
 
 const fromVersion = (value: DaycareAgreementVersion): DaycareStructuredDocument => structuredClone({
     format: value.format,
@@ -103,10 +118,12 @@ const DaycareAgreements = () => {
     const [legalReviewConfirmed, setLegalReviewConfirmed] = useState(false);
     const [isBusy, setIsBusy] = useState(false);
     const [publishConfirmationOpen, setPublishConfirmationOpen] = useState(false);
+    const [createConfirmationOpen, setCreateConfirmationOpen] = useState(false);
     const [notice, setNotice] = useState("");
     const [error, setError] = useState("");
     const selected = versions.find((item) => item.id === selectedId);
     const isEditable = selected?.status === "draft";
+    const nextAgreement = nextAgreementYear(versions);
 
     const applyVersion = (item: DaycareAgreementVersion) => {
         const nextDocument = fromVersion(item);
@@ -158,6 +175,55 @@ const DaycareAgreements = () => {
             const published = await publishAdminAgreementDraft(draft.id);
             await load(published.id);
             setNotice("הנוסח אושר ופורסם להורים.");
+        } catch (actionError) {
+            setError(errorMessage(actionError));
+        } finally {
+            setIsBusy(false);
+        }
+    };
+
+    const downloadReviewCopy = async () => {
+        if (!selected || (isEditable && !valid)) return;
+        setIsBusy(true);
+        setError("");
+        setNotice("");
+        try {
+            let sourceVersion = selected;
+            if (isEditable) {
+                const nextDocument = documentFromText(document, agreementText);
+                sourceVersion = await updateAdminAgreementDraft(selected.id, nextDocument);
+                setDocument(nextDocument);
+                setVersions((current) => current.map((item) => item.id === sourceVersion.id ? sourceVersion : item));
+            }
+            const blob = await downloadAdminAgreementReviewPdf(sourceVersion.id);
+            const objectUrl = URL.createObjectURL(blob);
+            const anchor = window.document.createElement("a");
+            anchor.href = objectUrl;
+            anchor.download = `הסכם-התקשרות-לעיון-${sourceVersion.schoolYear}.pdf`;
+            anchor.click();
+            URL.revokeObjectURL(objectUrl);
+            setNotice("עותק לעיון הופק מהנוסח העדכני.");
+        } catch (actionError) {
+            setError(errorMessage(actionError));
+        } finally {
+            setIsBusy(false);
+        }
+    };
+
+    const createNextYearAgreement = async () => {
+        if (!nextAgreement) return;
+        setCreateConfirmationOpen(false);
+        setIsBusy(true);
+        setError("");
+        setNotice("");
+        try {
+            const created = await createAdminAgreementDraft({
+                version: nextAgreement.version,
+                schoolYear: nextAgreement.schoolYear,
+                document: fromVersion(nextAgreement.source),
+            });
+            await load(created.id);
+            setNotice(`נוצרה טיוטת הסכם לשנת ${created.schoolYear}. אפשר לערוך ולאחר בדיקה לפרסם אותה.`);
         } catch (actionError) {
             setError(errorMessage(actionError));
         } finally {
@@ -231,6 +297,14 @@ const DaycareAgreements = () => {
                 </label>
             ) : null}
             <div className={styles.actions}>
+                {nextAgreement ? (
+                    <button className={styles.secondaryButton} type="button" disabled={isBusy} onClick={() => setCreateConfirmationOpen(true)}>
+                        יצירת הסכם לשנה חדשה
+                    </button>
+                ) : null}
+                <button className={styles.secondaryButton} type="button" disabled={isBusy || !selected || (isEditable && !valid)} onClick={() => void downloadReviewCopy()}>
+                    {isBusy ? "מפיק..." : "הפקת עותק לעיון"}
+                </button>
                 {isEditable ? (
                     <button className={styles.publishButton} type="button" disabled={isBusy || !legalReviewConfirmed || !valid || !version || !schoolYear} onClick={() => setPublishConfirmationOpen(true)}>
                         {isBusy ? "מפרסם..." : "אישור ופרסום להורים"}
@@ -246,6 +320,16 @@ const DaycareAgreements = () => {
                 tone="danger"
                 onConfirm={() => void approveAndPublish()}
                 onClose={() => setPublishConfirmationOpen(false)}
+            />
+            <ConfirmDialog
+                open={createConfirmationOpen}
+                title="יצירת הסכם לשנה חדשה"
+                message={nextAgreement
+                    ? `ליצור טיוטת הסכם לשנת ${nextAgreement.schoolYear} על בסיס ההסכם האחרון? לאחר היצירה ניתן יהיה לערוך אותה לפני הפרסום.`
+                    : "לא ניתן ליצור כרגע הסכם לשנה חדשה."}
+                confirmLabel="יצירת טיוטה"
+                onConfirm={() => void createNextYearAgreement()}
+                onClose={() => setCreateConfirmationOpen(false)}
             />
         </section>
     );
