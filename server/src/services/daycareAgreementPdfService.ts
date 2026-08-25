@@ -552,30 +552,32 @@ const renderParentDocument = (document: PDFKit.PDFDocument, source: DaycareParen
     if (source.key === "equipment") {
         const equipmentTextHeight = (text: string, width: number, bold = false) => {
             document.font(bold ? "AssistantBold" : "Assistant").fontSize(14);
-            return document.heightOfString(prepareMixedRtlText(text), { width, align: "right", features: ["rtla"], lineGap: 2 });
+            return document.heightOfString(prepareMixedRtlText(text), { width, align: "right", features: ["rtla"], lineGap: 0.5 });
         };
         source.items.forEach((item, index) => {
-            const rowHeight = Math.max(50, equipmentTextHeight(item, 432) + 18);
+            const textHeight = equipmentTextHeight(item, 425);
+            const rowHeight = Math.max(44, textHeight + 10);
             y = ensureParentSpace(document, y, rowHeight);
             document.roundedRect(54, y, 487, rowHeight - 4, 7).fill(index % 2 ? "#f1f6f9" : "#ffffff");
             document.circle(521, y + (rowHeight - 4) / 2, 11).fill("#c69b2d");
             document.font("AssistantBold").fontSize(14).fillColor("#ffffff");
             document.text(String(index + 1), 510, y + (rowHeight - 4) / 2 - 8, { width: 22, align: "center", lineBreak: false });
             document.font("Assistant").fontSize(14).fillColor("#243447");
-            document.text(prepareMixedRtlText(item), 72, y + 9, { width: 425, align: "right", features: ["rtla"], lineGap: 2 });
+            document.text(prepareMixedRtlText(item), 72, y + Math.max(3, (rowHeight - 4 - textHeight) / 2), { width: 425, align: "right", features: ["rtla"], lineGap: 0.5 });
             y += rowHeight;
         });
-        const importantHeight = Math.max(64, equipmentTextHeight(source.important, 455, true) + 22);
-        y = ensureParentSpace(document, y + 12, importantHeight);
+        const importantHeight = Math.max(56, equipmentTextHeight(source.important, 455, true) + 16);
+        y = ensureParentSpace(document, y + 8, importantHeight);
         document.roundedRect(54, y, 487, importantHeight, 8).fill("#fbf5e5");
         document.rect(537, y, 4, importantHeight).fill("#c69b2d");
         drawCellText(document, source.important, 54, y, 487, importantHeight, true, "#143a63", 14);
-        y += importantHeight + 12;
-        const noteHeight = Math.max(78, equipmentTextHeight(source.note, 455) + 28);
+        y += importantHeight + 8;
+        const noteTextHeight = equipmentTextHeight(source.note, 455);
+        const noteHeight = Math.max(64, noteTextHeight + 18);
         y = ensureParentSpace(document, y, noteHeight);
         document.roundedRect(54, y, 487, noteHeight, 8).fill("#f1f6f9");
         document.font("Assistant").fontSize(14).fillColor("#243447");
-        document.text(prepareMixedRtlText(source.note), 70, y + 14, { width: 455, align: "right", features: ["rtla"], lineGap: 2 });
+        document.text(prepareMixedRtlText(source.note), 70, y + Math.max(7, (noteHeight - noteTextHeight) / 2), { width: 455, align: "right", features: ["rtla"], lineGap: 0.5 });
         document.y = y + noteHeight + 10;
         return;
     }
