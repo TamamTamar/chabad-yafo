@@ -79,8 +79,8 @@ const definitions: readonly DaycareOnboardingStepDefinition[] = [
     {
         ...adminStep,
         key: "registrationFeeReceived",
-        title: "ממתין להסדרת תשלום",
-        description: "לאחר אישור כל המסמכים, צוות המעון יאשר שהתשלום ואמצעי התשלום הוסדרו.",
+        title: "הוראת קבע לשכר לימוד",
+        description: "אפשר להקים את הוראת הקבע בכל שלב. לאחר אישור נדרים, צוות המעון יאשר אותה ידנית.",
         order: 6,
     },
     {

@@ -47,9 +47,9 @@ const toFamilyAddressDto = (
 
 const getStepDisplayTitle = (step: IOnboardingStep) => {
     if (step.key === "registrationFeeReceived") {
-        return step.status === "completed"
-            ? "התשלום אושר"
-            : "ממתין להסדרת תשלום";
+        if (step.status === "completed") return "הוראת הקבע אושרה";
+        if (step.status === "pendingReview") return "הוראת הקבע ממתינה לאישור";
+        return "הקמת הוראת קבע";
     }
 
     if (step.key === "registrationApproved") {
@@ -139,6 +139,15 @@ export const toPublicOnboardingDto = (
                 : undefined,
         profile,
         steps: visibleSteps,
+        tuitionPayment: {
+            paymentType: "daycare_payment" as const,
+            childName: child
+                ? `${child.firstName} ${child.lastName}`.trim()
+                : "הרישום האישי",
+            amount: onboarding.monthlyTuitionAmount ?? 5500,
+            status: onboarding.standingOrderStatus ?? "pending",
+            establishedAt: cloneDate(onboarding.standingOrderEstablishedAt),
+        },
     };
 };
 
@@ -208,6 +217,12 @@ export const toAdminOnboardingDetail = (
         createdAt: new Date(onboarding.parentAccessTokenCreatedAt),
         expiresAt: cloneDate(onboarding.parentAccessTokenExpiresAt),
         lastAccessAt: cloneDate(onboarding.lastParentAccessAt),
+    },
+    tuitionPayment: {
+        monthlyTuitionAmount: onboarding.monthlyTuitionAmount ?? 5500,
+        status: onboarding.standingOrderStatus ?? "pending",
+        establishedAt: cloneDate(onboarding.standingOrderEstablishedAt),
+        transactionId: onboarding.standingOrderTransactionId,
     },
     createdAt: cloneDate(onboarding.createdAt),
     updatedAt: cloneDate(onboarding.updatedAt),

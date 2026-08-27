@@ -931,6 +931,91 @@
     margin-top: 34px;
 }
 
+.tuitionCard {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+    padding: 24px 20px;
+    border: 2px solid rgba($brand-secondary, 0.72);
+    border-radius: $radius-card-lg;
+    background: linear-gradient(145deg, $brand-bg, rgba($brand-secondary, 0.11));
+    box-shadow: 0 18px 42px rgba($brand-primary, 0.12);
+}
+
+.tuitionPaid {
+    border-color: rgba($ui-success, 0.35);
+    background: $ui-success-soft;
+}
+
+.tuitionIcon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border-radius: 15px;
+    background: $brand-primary;
+    color: white;
+}
+
+.tuitionPaid .tuitionIcon { background: $ui-success; }
+
+.tuitionHeader {
+    display: grid;
+    gap: 5px;
+}
+
+.tuitionHeader h2,
+.tuitionHeader p { margin: 0; }
+.tuitionHeader h2 { color: $brand-primary-deep; font-size: 1.35rem; }
+.tuitionHeader p { color: $ui-text-muted; font-weight: 650; }
+.tuitionEyebrow { color: $brand-gold-dark; font-size: 0.8rem; font-weight: 900; }
+
+.tuitionAmount,
+.securePaymentButton,
+.paymentFrameArea,
+.tuitionSecurityNote,
+.tuitionCard > .profileError,
+.tuitionCard > .profileSuccess {
+    grid-column: 1 / -1;
+}
+
+.tuitionAmount {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px 17px;
+    border-radius: $radius-md;
+    background: rgba($brand-primary, 0.07);
+    color: $brand-primary-deep;
+    font-weight: 800;
+}
+
+.tuitionAmount strong { font-size: 1.65rem; font-weight: 900; }
+
+.securePaymentButton {
+    display: flex;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 0;
+    border-radius: $radius-pill;
+    background: $brand-primary;
+    color: white;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.securePaymentButton:disabled { cursor: wait; opacity: 0.62; }
+.paymentFrameArea { display: grid; gap: 14px; }
+.paymentFrameWrap { overflow: hidden; border: 1px solid $ui-border-soft; border-radius: $radius-md; background: white; }
+.paymentFrameWrap p { margin: 0; padding: 14px; color: $ui-text-muted; text-align: center; }
+.paymentFrameWrap iframe { display: block; width: 100%; min-height: 390px; border: 0; }
+.tuitionSecurityNote { color: $ui-text-muted; font-weight: 650; text-align: center; }
+
 .formsGroupHeader {
     padding-inline: 4px;
 }

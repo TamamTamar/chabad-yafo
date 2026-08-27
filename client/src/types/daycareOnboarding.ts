@@ -136,6 +136,13 @@ export type PublicDaycareOnboarding = {
     };
     profile?: DaycareIdentityProfile;
     steps: PublicOnboardingStep[];
+    tuitionPayment?: {
+        paymentType: "daycare_payment";
+        childName: string;
+        amount: number;
+        status: "pending" | "active";
+        establishedAt?: string;
+    };
 };
 
 export type DaycareGuardianSummary = {
@@ -234,6 +241,12 @@ export type AdminDaycareOnboarding = {
         createdAt: string;
         expiresAt?: string;
         lastAccessAt?: string;
+    };
+    tuitionPayment: {
+        monthlyTuitionAmount: number;
+        status: "pending" | "active";
+        establishedAt?: string;
+        transactionId?: string;
     };
     createdAt?: string;
     updatedAt?: string;

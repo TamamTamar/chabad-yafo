@@ -16,6 +16,7 @@ import IdentityProfileForm from "./components/IdentityProfileForm";
 import AgreementSection from "./components/AgreementSection";
 import HealthDeclarationSection from "./components/HealthDeclarationSection";
 import PickupAuthorizationSection from "./components/PickupAuthorizationSection";
+import TuitionPaymentSection from "./components/TuitionPaymentSection";
 
 type PageState =
     | { status: "loading" }
@@ -355,7 +356,10 @@ const DaycareOnboarding = () => {
         revealedParentSteps.map((step) => step.key)
     );
 
-    if (allDocumentsApproved && paymentStep) {
+    if (
+        paymentStep &&
+        (allDocumentsApproved || onboarding.tuitionPayment?.status === "active")
+    ) {
         revealedStepKeys.add(paymentStep.key);
     }
 
@@ -381,8 +385,12 @@ const DaycareOnboarding = () => {
     const parentBundleSubmitted = onboarding.parentSubmission.isSubmitted;
     const waitingAdminStage = allDocumentsApproved && paymentStep?.status !== "completed" && paymentStep?.status !== "notRequired"
         ? {
-              title: "ממתין להסדרת תשלום",
-              text: "צוות המעון אישר את כל הפרטים והטפסים. נשארו עוד 2 משימות לצוות: הסדרת התשלום ושיבוץ בקבוצה.",
+              title: onboarding.tuitionPayment?.status === "active"
+                  ? "הוראת הקבע ממתינה לאישור הצוות"
+                  : "ממתין להקמת הוראת קבע",
+              text: onboarding.tuitionPayment?.status === "active"
+                  ? "נדרים אישרו את הקמת הוראת הקבע. צוות המעון צריך לבדוק ולאשר אותה."
+                  : "כל המסמכים אושרו. אפשר להקים את הוראת הקבע בכל עת דרך הכרטיס שמופיע למעלה.",
           }
         : allDocumentsApproved && placementStep?.status !== "completed" && placementStep?.status !== "notRequired"
           ? {
@@ -419,6 +427,14 @@ const DaycareOnboarding = () => {
                     overallStatus={onboarding.overallStatus}
                     progress={fullProcessProgress}
                 />
+
+                {token && onboarding.tuitionPayment ? (
+                    <TuitionPaymentSection
+                        token={token}
+                        payment={onboarding.tuitionPayment}
+                        onConfirmed={refreshOnboarding}
+                    />
+                ) : null}
 
                 {waitingAdminStage || (!parentBundleSubmitted && nextStepTitle) ? (
                     <aside className={styles.nextStepCard} aria-label="השלב הבא">

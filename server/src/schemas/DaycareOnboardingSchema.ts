@@ -256,6 +256,21 @@ export const daycareOnboardingSchema = new Schema<IDaycareOnboarding>(
         },
         parentSubmissionRequired: Boolean,
         parentSubmittedAt: Date,
+        monthlyTuitionAmount: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 1_000_000,
+            default: 5500,
+        },
+        standingOrderStatus: {
+            type: String,
+            required: true,
+            enum: ["pending", "active"],
+            default: "pending",
+        },
+        standingOrderEstablishedAt: Date,
+        standingOrderTransactionId: { type: String, trim: true, maxlength: 160 },
         steps: {
             type: [onboardingStepSchema],
             required: true,

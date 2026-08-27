@@ -19,6 +19,7 @@ import OnboardingControls from "./components/OnboardingControls";
 import OnboardingDialogs from "./components/OnboardingDialogs";
 import OnboardingOverview from "./components/OnboardingOverview";
 import OperationalStepsSection from "./components/OperationalStepsSection";
+import TuitionPaymentAdmin from "./components/TuitionPaymentAdmin";
 import {
     createDraftMap,
     createStepDraft,
@@ -424,7 +425,7 @@ const DaycareOnboardingAdmin = () => {
                     reviewChecklist={reviewChecklist}
                     allDocumentsReady={allDocumentsReady}
                     allDocumentsSubmitted={allDocumentsSubmitted}
-                    allDocumentsApproved={allDocumentsApproved}
+                    standingOrderActive={onboarding.tuitionPayment.status === "active"}
                     nextStep={nextStep}
                     scrollToCaseSection={scrollToCaseSection}
                 />
@@ -444,6 +445,14 @@ const DaycareOnboardingAdmin = () => {
                     setLinkConfirmation={setLinkConfirmation}
                     freshParentLink={freshParentLink}
                     copyParentLink={copyParentLink}
+                />
+
+                <TuitionPaymentAdmin
+                    key={`${onboarding.tuitionPayment.monthlyTuitionAmount}-${onboarding.tuitionPayment.status}-${onboarding.tuitionPayment.transactionId ?? ""}`}
+                    onboarding={onboarding}
+                    onUpdated={setOnboarding}
+                    onNotice={setNotice}
+                    onError={setError}
                 />
 
                 <DocumentReviewSections

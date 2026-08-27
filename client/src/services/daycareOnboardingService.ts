@@ -49,6 +49,59 @@ export const submitPublicDaycareOnboarding = async (token: string) => {
     return response.data.data;
 };
 
+export type DaycarePaymentIntent = {
+    intentId: string;
+    amount: number;
+    childName: string;
+    payer: { name: string; phone: string; email: string };
+    callbackUrl: string;
+    param1: string;
+    param2: string;
+    expiresAt: string;
+};
+
+export const createDaycarePaymentIntent = async (token: string) => {
+    const response = await http.post<ApiResponse<DaycarePaymentIntent>>(
+        `/daycare-payments/onboarding/${encodePathSegment(token)}/intents`,
+        {}
+    );
+    return response.data.data;
+};
+
+export const updateAdminTuitionPayment = async (
+    onboardingId: string,
+    input: { monthlyTuitionAmount: number }
+) => {
+    await http.patch(
+        `/admin/daycare/payments/onboarding/${encodePathSegment(onboardingId)}/settings`,
+        input
+    );
+    return getAdminDaycareOnboarding(onboardingId);
+};
+
+export type DaycarePaymentHistoryItem = {
+    _id: string;
+    paymentType: "daycare_payment";
+    providerPaymentType: "HK";
+    installments: 12;
+    childName: string;
+    billingPeriod?: string;
+    monthlyTuitionAmount: number;
+    requestedAmount: number;
+    paidAmount?: number;
+    externalTransactionId?: string;
+    status: "created" | "confirmed" | "failed" | "expired";
+    paidAt?: string;
+    createdAt?: string;
+};
+
+export const getAdminTuitionPaymentHistory = async (onboardingId: string) => {
+    const response = await http.get<ApiResponse<DaycarePaymentHistoryItem[]>>(
+        `/admin/daycare/payments/onboarding/${encodePathSegment(onboardingId)}/history`
+    );
+    return response.data.data;
+};
+
 export const getAdminDaycareOnboardings = async () => {
     const response = await http.get<ApiResponse<AdminDaycareOnboardingListItem[]>>(
         "/admin/daycare/onboarding"

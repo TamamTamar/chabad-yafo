@@ -136,22 +136,11 @@ export const updateAdminOnboardingStep = async (
     }
 
     if (patch.status === "completed" && stepKey === "registrationFeeReceived") {
-        const requiredDocumentSteps = [
-            "childAndGuardianDetails",
-            "agreementSigned",
-            "healthDeclarationSubmitted",
-            "pickupAuthorizationSubmitted",
-        ];
-        const documentsApproved = requiredDocumentSteps.every((requiredKey) => {
-            const requiredStep = onboarding.steps.find((step) => step.key === requiredKey);
-            return requiredStep?.status === "completed" || requiredStep?.status === "notRequired";
-        });
-
-        if (!documentsApproved) {
+        if ((onboarding.standingOrderStatus ?? "pending") !== "active") {
             throw new DaycareOnboardingServiceError(
-                "אפשר לאשר את התשלום רק לאחר שכל הפרטים והמסמכים אושרו.",
+                "אפשר לאשר את הוראת הקבע רק לאחר שהתקבל אישור מנדרים.",
                 409,
-                "PAYMENT_REQUIRES_APPROVED_DOCUMENTS"
+                "PAYMENT_REQUIRES_ACTIVE_STANDING_ORDER"
             );
         }
     }
@@ -215,7 +204,7 @@ export const updateAdminOnboardingStep = async (
     let registrationWasCompleted = false;
 
     if (next.status === "requiresCorrection" && correctionStepKeys.has(stepKey)) {
-        for (const downstreamKey of ["registrationFeeReceived", "registrationApproved"]) {
+        for (const downstreamKey of ["registrationApproved"]) {
             const downstreamIndex = onboarding.steps.findIndex(
                 (step) => step.key === downstreamKey
             );

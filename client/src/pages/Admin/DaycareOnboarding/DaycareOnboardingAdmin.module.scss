@@ -260,6 +260,27 @@
     margin-bottom: 28px;
 }
 
+.tuitionAdminGrid {
+    display: grid;
+    gap: 14px;
+    margin-block: 16px;
+}
+
+@media (min-width: 720px) {
+    .tuitionAdminGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.paymentHistoryList { display: grid; gap: 10px; margin-top: 12px; }
+.paymentHistoryItem {
+    display: grid;
+    gap: 5px;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.72);
+}
+.paymentHistoryItem span { color: #5f6670; font-size: 0.88rem; }
+
 .linkControlCard {
     grid-column: 1 / -1;
 }

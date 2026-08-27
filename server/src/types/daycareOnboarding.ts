@@ -140,6 +140,10 @@ export interface IDaycareOnboarding {
     overallStatusOverride?: OnboardingOverallStatus;
     parentSubmissionRequired?: boolean;
     parentSubmittedAt?: Date;
+    monthlyTuitionAmount?: number;
+    standingOrderStatus?: "pending" | "active";
+    standingOrderEstablishedAt?: Date;
+    standingOrderTransactionId?: string;
     steps: IOnboardingStep[];
     parentAccessTokenHash: string;
     parentAccessTokenCreatedAt: Date;
@@ -221,6 +225,13 @@ export interface PublicDaycareOnboardingDto {
     };
     profile?: DaycareIdentityProfileDto;
     steps: PublicOnboardingStep[];
+    tuitionPayment?: {
+        paymentType: "daycare_payment";
+        childName: string;
+        amount: number;
+        status: "pending" | "active";
+        establishedAt?: Date;
+    };
 }
 
 export interface AdminOnboardingListItemDto {
@@ -290,6 +301,12 @@ export interface AdminOnboardingDetailDto {
         createdAt: Date;
         expiresAt?: Date;
         lastAccessAt?: Date;
+    };
+    tuitionPayment: {
+        monthlyTuitionAmount: number;
+        status: "pending" | "active";
+        establishedAt?: Date;
+        transactionId?: string;
     };
     createdAt?: Date;
     updatedAt?: Date;

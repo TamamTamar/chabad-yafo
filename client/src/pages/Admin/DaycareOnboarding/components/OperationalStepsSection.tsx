@@ -8,7 +8,7 @@ type Props = {
     drafts: Record<string, StepDraft>;
     dirtyStepKeys: Set<string>;
     savingStepKey: string | null;
-    allDocumentsApproved: boolean;
+    standingOrderActive: boolean;
     isDirty: boolean;
     nextStep?: AdminOnboardingStep;
     updateDraft: <Field extends keyof StepDraft>(stepKey: string, field: Field, value: StepDraft[Field]) => void;
@@ -16,14 +16,14 @@ type Props = {
 };
 
 const OperationalStepsSection = ({
-    operationalSteps, drafts, dirtyStepKeys, savingStepKey, allDocumentsApproved,
+    operationalSteps, drafts, dirtyStepKeys, savingStepKey, standingOrderActive,
     isDirty, nextStep, updateDraft, saveStep,
 }: Props) => (
 <section className={`${styles.stepsSection} ${styles.caseSectionAnchor}`} id="payment-and-placement">
                     <div className={styles.sectionHeading}>
                         <div>
-                            <span className={styles.eyebrow}>לאחר אישור המסמכים</span>
-                            <h2 className={styles.sectionTitle}>תשלום ושיבוץ</h2>
+                            <span className={styles.eyebrow}>ניהול תפעולי</span>
+                            <h2 className={styles.sectionTitle}>הוראת קבע ושיבוץ</h2>
                         </div>
                         <span className={styles.dirtySummary}>
                             {isDirty ? `${dirtyStepKeys.size} שלבים עם שינויים שלא נשמרו` : "כל השינויים שמורים"}
@@ -53,8 +53,8 @@ const OperationalStepsSection = ({
                                 !profileAwaitingReview;
                             const statusManaged = bundleStatusManaged || parentStatusManaged;
                             const paymentStep = operationalSteps.find((candidate) => candidate.key === "registrationFeeReceived");
-                            const operationalBlockedReason = step.key === "registrationFeeReceived" && !allDocumentsApproved
-                                ? "זמין לאחר אישור כל הפרטים והמסמכים"
+                            const operationalBlockedReason = step.key === "registrationFeeReceived" && !standingOrderActive
+                                ? "זמין לאחר קבלת אישור הקמת הוראת הקבע מנדרים"
                                 : step.key === "registrationApproved" && !isStepComplete(paymentStep?.status ?? "notStarted")
                                   ? "זמין לאחר אישור הסדר התשלום"
                                   : "";

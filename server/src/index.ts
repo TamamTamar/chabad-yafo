@@ -29,6 +29,8 @@ import { ensureDaycareAgreementIndexes } from "./services/daycareAgreementIndexS
 import { daycarePickupAuthorizationAdminRoutes, daycarePickupAuthorizationPublicRoutes } from "./routes/daycarePickupAuthorizationRoutes";
 import { daycareDonationRoutes } from "./routes/daycareDonationRoutes";
 import { daycareDonationAdminRoutes } from "./routes/admin/daycareDonationAdminRoutes";
+import { daycarePaymentAdminRoutes, daycarePaymentPublicRoutes } from "./routes/daycarePaymentRoutes";
+import { ensureDaycarePaymentStorage } from "./services/daycarePaymentIndexService";
 
 dotenv.config();
 
@@ -71,6 +73,8 @@ app.use("/api/daycare/parent-documents", daycareParentDocumentRoutes);
 app.use("/api/daycare/health-declarations/public", daycareHealthDeclarationPublicRoutes);
 app.use("/api/daycare/pickup-authorizations/public", daycarePickupAuthorizationPublicRoutes);
 app.use("/api/daycare-donations", daycareDonationRoutes);
+app.use("/api/daycare-payments", daycarePaymentPublicRoutes);
+app.use("/api/admin/daycare/payments", daycarePaymentAdminRoutes);
 app.use("/api/admin/daycare/donations", daycareDonationAdminRoutes);
 app.use("/api/admin/daycare/parent-documents", daycareParentDocumentAdminRoutes);
 app.use("/api/admin/daycare/health-declarations", daycareHealthDeclarationAdminRoutes);
@@ -96,6 +100,7 @@ const startServer = async () => {
         await connectDB();
         await ensureDaycareOnboardingIndexes();
         await ensureDaycareAgreementIndexes();
+        await ensureDaycarePaymentStorage();
         await syncDaycareOnboardingStepTitles();
         await ensureDefaultAgreementDraft();
         await reconcileAgreementOnboardingSteps();
