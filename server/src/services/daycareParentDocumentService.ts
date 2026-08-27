@@ -3,8 +3,11 @@ import { DAYCARE_EQUIPMENT_DOCUMENT, DAYCARE_PARENT_DOCUMENTS_2026_2027, DAYCARE
 import { DaycareAgreement } from "../models/DaycareAgreement";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
 import { DaycareParentDocumentYear } from "../models/DaycareParentDocumentYear";
+import { DaycareAnnualPlan } from "../models/DaycareAnnualPlan";
 import { createParentDocumentPdf } from "./daycareAgreementPdfService";
 import { DaycareOnboardingServiceError, getPublicOnboardingDocumentByToken } from "./daycareOnboardingService";
+import { syncAnnualPlanWithHolidays } from "./daycareAnnualPlanService";
+import { logger } from "../utils/logger";
 
 const cloneBundle = (bundle: DaycareParentDocumentBundle): DaycareParentDocumentBundle =>
     JSON.parse(JSON.stringify(bundle)) as DaycareParentDocumentBundle;
@@ -67,10 +70,25 @@ const bundleFromRecord = (record: InstanceType<typeof DaycareParentDocumentYear>
 
 const adminDto = (record: InstanceType<typeof DaycareParentDocumentYear>) => ({
     ...bundleFromRecord(record),
+    sharedDocumentKeys: record.sharedDocumentKeys ?? [],
     lockedAt: record.lockedAt,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
 });
+
+export const getSharedParentDocumentKeys = async (schoolYear: string) => {
+    await ensureDefaultParentDocumentYear();
+    const record = await DaycareParentDocumentYear.findOne({ schoolYear }).select("sharedDocumentKeys");
+    if (!record) throw new DaycareOnboardingServiceError("מסמכי ההורים לשנת הלימודים לא הוגדרו.", 404, "PARENT_DOCUMENTS_NOT_PUBLISHED");
+    return record.sharedDocumentKeys ?? [];
+};
+
+export const updateParentDocumentSharingForAdmin = async (schoolYear: string, key: DaycareParentDocumentKey, shared: boolean) => {
+    const update = shared ? { $addToSet: { sharedDocumentKeys: key } } : { $pull: { sharedDocumentKeys: key } };
+    const record = await DaycareParentDocumentYear.findOneAndUpdate({ schoolYear }, update, { new: true, runValidators: true });
+    if (!record) throw new DaycareOnboardingServiceError("מסמכי ההורים לשנת הלימודים לא הוגדרו.", 404, "PARENT_DOCUMENTS_NOT_PUBLISHED");
+    return adminDto(record);
+};
 
 export const hashParentDocumentBundle = (bundle: DaycareParentDocumentBundle) =>
     createHash("sha256").update(JSON.stringify(bundle), "utf8").digest("hex");
@@ -81,6 +99,10 @@ export const ensureDefaultParentDocumentYear = async () => {
         { schoolYear: seed.schoolYear },
         { $setOnInsert: seed },
         { upsert: true }
+    );
+    await DaycareParentDocumentYear.updateMany(
+        { sharedDocumentKeys: { $exists: false } },
+        { $set: { sharedDocumentKeys: ["routine", "holidays", "menu"] } }
     );
     return result.upsertedCount === 1;
 };
@@ -184,6 +206,11 @@ export const saveParentDocumentYearForAdmin = async (schoolYear: string, documen
         { $set: { documents }, $setOnInsert: { schoolYear, version } },
         { new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true }
     );
+    const annualPlanExists = await DaycareAnnualPlan.exists({ schoolYear });
+    if (annualPlanExists) {
+        try { await syncAnnualPlanWithHolidays(schoolYear, documents.holidays); }
+        catch (error) { logger.error("Daycare annual plan holiday sync failed", error); }
+    }
     return adminDto(record);
 };
 

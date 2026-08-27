@@ -1,41 +1,24 @@
 import PDFDocument from "pdfkit";
-import path from "node:path";
 import type { DaycarePickupAuthorizationPayload } from "../types/daycarePickupAuthorization";
+import {
+    applyDaycarePdfChrome,
+    createDaycarePdfDocument,
+    DAYCARE_PDF_TYPOGRAPHY,
+    prepareDaycareMixedRtlText,
+    writeDaycareRtl,
+} from "./daycarePdfLayout";
 
 type SignedInput = { documentId: string; revision: number; schoolYear: string; childName: string; payload: DaycarePickupAuthorizationPayload; contentHash: string; signatureImage: Buffer; submittedAt: Date };
 type BlankInput = { schoolYear: string; childName: string; guardians: DaycarePickupAuthorizationPayload["guardians"] };
 
-const regularFontPath = path.resolve(__dirname, "..", "..", "assets", "Assistant-Regular.ttf");
-const boldFontPath = path.resolve(__dirname, "..", "..", "assets", "Assistant-Bold.ttf");
-const logoPath = path.resolve(__dirname, "..", "..", "assets", "logo-maon.png");
-const prepareMixedRtlText = (text: string) => text.replace(/[A-Za-z0-9][A-Za-z0-9._:/@+-]*/g, (run) => [...run].reverse().join(""));
-const rtl = (document: PDFKit.PDFDocument, text: string, options: PDFKit.Mixins.TextOptions = {}) => document.text(prepareMixedRtlText(text), { ...options, align: "right", features: ["rtla"] });
+const prepareMixedRtlText = prepareDaycareMixedRtlText;
+const rtl = writeDaycareRtl;
 const roleLabels = { mother: "אם", father: "אב", guardian: "אפוטרופוס/ית" } as const;
 
-const addLetterhead = (document: PDFKit.PDFDocument) => {
-    document.rect(0, 0, document.page.width, 84).fill("#ffffff");
-    document.image(logoPath, 491, 9, { fit: [50, 50] });
-    document.font("AssistantBold").fontSize(12).fillColor("#0b3158");
-    document.text(prepareMixedRtlText("מעון חב״ד יפו"), 54, 15, { align: "right", width: 416, features: ["rtla"] });
-    document.font("Assistant").fontSize(9.5).fillColor("#334155");
-    document.text(prepareMixedRtlText("יוסי בן יוסי 1, יפו | 054-219-3770"), 250, 35, { align: "right", width: 220, features: ["rtla"] });
-    document.strokeColor("#c69b2d").lineWidth(1.2).moveTo(54, 72).lineTo(541, 72).stroke();
-};
-
-const setup = (title: string) => {
-    const document = new PDFDocument({ size: "A4", margins: { top: 82, right: 54, bottom: 54, left: 54 }, bufferPages: true, info: { Title: title, Author: "מעון חב״ד יפו" } });
-    document.registerFont("Assistant", regularFontPath);
-    document.registerFont("AssistantBold", boldFontPath);
-    return document;
-};
+const setup = (title: string) => createDaycarePdfDocument({ title });
 
 const finish = (document: PDFKit.PDFDocument, chunks: Buffer[], resolve: (value: Buffer) => void, footer: string) => {
-    const range = document.bufferedPageRange();
-    for (let index = range.start; index < range.start + range.count; index += 1) {
-        document.switchToPage(index); addLetterhead(document);
-        document.font("Assistant").fontSize(10.5).fillColor("#4b5563");
-        document.text(prepareMixedRtlText(`${footer} | עמוד ${index + 1} מתוך ${range.count}`), 54, 790, { width: 487, height: 18, align: "right", lineBreak: false, features: ["rtla"] });
-    }
+    applyDaycarePdfChrome(document, (pageIndex, pageCount) => `${footer} | עמוד ${pageIndex + 1} מתוך ${pageCount}`);
     document.on("end", () => resolve(Buffer.concat(chunks)));
     document.end();
 };
@@ -65,7 +48,7 @@ export const createSignedPickupAuthorizationPdf = (input: SignedInput) => new Pr
     document.moveDown(.65); rtl(document, `שם החותם/ת: ${input.payload.signedBy} | תפקיד: ${roleLabels[input.payload.signerRole]}`);
     rtl(document, `מועד החתימה: ${new Intl.DateTimeFormat("he-IL", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jerusalem" }).format(input.submittedAt)}`);
     const signatureY = document.y + 8; document.image(input.signatureImage, 341, signatureY, { fit: [200, 70] }); document.rect(341, signatureY, 200, 70).strokeColor("#c7d1da").stroke(); document.y = signatureY + 80;
-    document.font("Assistant").fontSize(9.5).fillColor("#64748b"); rtl(document, `מזהה מסמך: ${input.documentId}`); rtl(document, `טביעת תוכן SHA-256: ${input.contentHash}`);
+    document.font("Assistant").fontSize(DAYCARE_PDF_TYPOGRAPHY.technicalFooter).fillColor("#64748b"); rtl(document, `מזהה מסמך: ${input.documentId}`); rtl(document, `טביעת תוכן SHA-256: ${input.contentHash}`);
     finish(document, chunks, resolve, "מורשי איסוף");
 });
 

@@ -1,6 +1,12 @@
 import PDFDocument from "pdfkit";
-import path from "node:path";
 import type { DaycareHealthDeclarationPayload } from "../types/daycareHealthDeclaration";
+import {
+    applyDaycarePdfChrome,
+    createDaycarePdfDocument,
+    DAYCARE_PDF_TYPOGRAPHY,
+    prepareDaycareMixedRtlText,
+    writeDaycareRtl,
+} from "./daycarePdfLayout";
 
 type HealthDeclarationPdfInput = {
     documentId: string;
@@ -18,27 +24,10 @@ type BlankHealthDeclarationPdfInput = {
     childName: string;
 };
 
-const regularFontPath = path.resolve(__dirname, "..", "..", "assets", "Assistant-Regular.ttf");
-const boldFontPath = path.resolve(__dirname, "..", "..", "assets", "Assistant-Bold.ttf");
-const logoPath = path.resolve(__dirname, "..", "..", "assets", "logo-maon.png");
-
-const prepareMixedRtlText = (text: string) =>
-    text.replace(/[A-Za-z0-9][A-Za-z0-9._:/@+-]*/g, (run) => [...run].reverse().join(""));
-
-const rtl = (document: PDFKit.PDFDocument, text: string, options: PDFKit.Mixins.TextOptions = {}) =>
-    document.text(prepareMixedRtlText(text), { ...options, align: "right", features: ["rtla"] });
+const prepareMixedRtlText = prepareDaycareMixedRtlText;
+const rtl = writeDaycareRtl;
 
 const roleLabels = { mother: "אם", father: "אב", guardian: "אפוטרופוס/ית" } as const;
-
-const addLetterhead = (document: PDFKit.PDFDocument) => {
-    document.rect(0, 0, document.page.width, 84).fill("#ffffff");
-    document.image(logoPath, 491, 9, { fit: [50, 50] });
-    document.font("AssistantBold").fontSize(12).fillColor("#0b3158");
-    document.text(prepareMixedRtlText("מעון חב״ד יפו"), 54, 15, { align: "right", width: 416, features: ["rtla"] });
-    document.font("Assistant").fontSize(9.5).fillColor("#334155");
-    document.text(prepareMixedRtlText("יוסי בן יוסי 1, יפו | 054-219-3770"), 250, 35, { align: "right", width: 220, features: ["rtla"] });
-    document.strokeColor("#c69b2d").lineWidth(1.2).moveTo(54, 72).lineTo(541, 72).stroke();
-};
 
 const field = (document: PDFKit.PDFDocument, label: string, value: string) => {
     document.font("AssistantBold").fontSize(14).fillColor("#0b3158");
@@ -55,19 +44,14 @@ const field = (document: PDFKit.PDFDocument, label: string, value: string) => {
 
 export const createSignedHealthDeclarationPdf = (input: HealthDeclarationPdfInput) =>
     new Promise<Buffer>((resolve, reject) => {
-        const document = new PDFDocument({
-            size: "A4",
-            margins: { top: 82, right: 54, bottom: 54, left: 54 },
-            bufferPages: true,
-            info: { Title: `הצהרת בריאות - ${input.childName}`, Author: "מעון חב״ד יפו", Subject: input.documentId },
+        const document = createDaycarePdfDocument({
+            title: `הצהרת בריאות - ${input.childName}`,
+            subject: input.documentId,
         });
         const chunks: Buffer[] = [];
         document.on("data", (chunk: Buffer) => chunks.push(chunk));
         document.on("error", reject);
         document.on("end", () => resolve(Buffer.concat(chunks)));
-        document.registerFont("Assistant", regularFontPath);
-        document.registerFont("AssistantBold", boldFontPath);
-
         document.font("AssistantBold").fontSize(18).fillColor("#0b3158");
         rtl(document, "הצהרת בריאות לילד/ה");
         document.moveDown(0.12).font("Assistant").fontSize(14).fillColor("#526174");
@@ -103,17 +87,11 @@ export const createSignedHealthDeclarationPdf = (input: HealthDeclarationPdfInpu
         document.y = signatureY + 82;
         // Audit identifiers are technical footer metadata, so they use the
         // compact footer size and stay with the signed declaration.
-        document.font("Assistant").fontSize(9.5).fillColor("#64748b");
+        document.font("Assistant").fontSize(DAYCARE_PDF_TYPOGRAPHY.technicalFooter).fillColor("#64748b");
         rtl(document, `מזהה מסמך: ${input.documentId}`);
         rtl(document, `טביעת תוכן SHA-256: ${input.contentHash}`);
 
-        const range = document.bufferedPageRange();
-        for (let index = range.start; index < range.start + range.count; index += 1) {
-            document.switchToPage(index);
-            addLetterhead(document);
-            document.font("Assistant").fontSize(10.5).fillColor("#4b5563");
-            document.text(prepareMixedRtlText(`הצהרת בריאות | עמוד ${index + 1} מתוך ${range.count}`), 54, 790, { width: 487, height: 18, align: "right", lineBreak: false, features: ["rtla"] });
-        }
+        applyDaycarePdfChrome(document, (pageIndex, pageCount) => `הצהרת בריאות | עמוד ${pageIndex + 1} מתוך ${pageCount}`);
         document.end();
     });
 
@@ -127,14 +105,11 @@ const blankLine = (document: PDFKit.PDFDocument, label: string, height = 34) => 
 
 export const createBlankHealthDeclarationPdf = (input: BlankHealthDeclarationPdfInput) =>
     new Promise<Buffer>((resolve, reject) => {
-        const document = new PDFDocument({ size: "A4", margins: { top: 82, right: 54, bottom: 54, left: 54 }, bufferPages: true, info: { Title: `הצהרת בריאות למילוי - ${input.childName}`, Author: "מעון חב״ד יפו" } });
+        const document = createDaycarePdfDocument({ title: `הצהרת בריאות למילוי - ${input.childName}` });
         const chunks: Buffer[] = [];
         document.on("data", (chunk: Buffer) => chunks.push(chunk));
         document.on("error", reject);
         document.on("end", () => resolve(Buffer.concat(chunks)));
-        document.registerFont("Assistant", regularFontPath);
-        document.registerFont("AssistantBold", boldFontPath);
-
         document.font("AssistantBold").fontSize(18).fillColor("#0b3158");
         rtl(document, "הצהרת בריאות לילד/ה - למילוי ידני");
         document.moveDown(0.12).font("Assistant").fontSize(14).fillColor("#526174");
@@ -158,13 +133,7 @@ export const createBlankHealthDeclarationPdf = (input: BlankHealthDeclarationPdf
         document.moveDown(0.5);
         rtl(document, "תאריך: ____________________   חתימה: ____________________");
 
-        const range = document.bufferedPageRange();
-        for (let index = range.start; index < range.start + range.count; index += 1) {
-            document.switchToPage(index);
-            addLetterhead(document);
-            document.font("Assistant").fontSize(10.5).fillColor("#4b5563");
-            document.text(prepareMixedRtlText(`הצהרת בריאות למילוי ידני | עמוד ${index + 1} מתוך ${range.count}`), 54, 790, { width: 487, height: 18, align: "right", lineBreak: false, features: ["rtla"] });
-        }
+        applyDaycarePdfChrome(document, (pageIndex, pageCount) => `הצהרת בריאות למילוי ידני | עמוד ${pageIndex + 1} מתוך ${pageCount}`);
         document.end();
     });
 

@@ -8,6 +8,7 @@ import DaycareRegistrations from "./components/DaycareRegistrations";
 import DaycareTasks from "./components/DaycareTasks";
 import DaycareAgreements from "./components/DaycareAgreements";
 import DaycareParentDocuments from "./components/DaycareParentDocuments";
+import DaycareAnnualPlanEditor from "./components/DaycareAnnualPlan";
 import DaycareDonationsAdmin from "./components/DaycareDonationsAdmin";
 import { getDaycareOverview } from "./daycareAdminService";
 import styles from "./DaycareAdmin.module.scss";
@@ -18,15 +19,16 @@ type DaycareAdminTab =
     | "registrations"
     | "finance"
     | "donations"
-    | "parent-info";
-type ParentInfoTab = "welcome" | "routine" | "holidays" | "menu" | "equipment" | "agreements";
+    | "documents";
+type DocumentTab = "welcome" | "routine" | "holidays" | "menu" | "equipment" | "annual-plan" | "agreements";
 
-const parentInfoTabs: Array<{ id: ParentInfoTab; label: string }> = [
+const documentTabs: Array<{ id: DocumentTab; label: string }> = [
     { id: "welcome", label: "ברוכים הבאים" },
     { id: "routine", label: "סדר יום" },
     { id: "holidays", label: "לוח חופשות" },
     { id: "menu", label: "תפריט" },
     { id: "equipment", label: "ציוד אישי" },
+    { id: "annual-plan", label: "תוכנית לימודים שנתית" },
     { id: "agreements", label: "הסכם התקשרות" },
 ];
 
@@ -38,7 +40,7 @@ const daycareAdminTabs: Array<{
     { id: "registrations", label: "רישום" },
     { id: "finance", label: "כספים" },
     { id: "donations", label: "תרומות" },
-    { id: "parent-info", label: "מידע להורים" },
+    { id: "documents", label: "מחולל מסמכים" },
 ];
 
 const DaycareAdmin = () => {
@@ -51,28 +53,28 @@ const DaycareAdmin = () => {
         requestedTab === "registrations" ||
         requestedTab === "finance" ||
         requestedTab === "donations" ||
-        requestedTab === "parent-info"
+        requestedTab === "documents"
             ? requestedTab
             : requestedTab === "agreements"
-                ? "parent-info"
+                ? "documents"
             : "registrations"
     );
-    const [parentInfoTab, setParentInfoTab] = useState<ParentInfoTab>(
+    const [documentTab, setDocumentTab] = useState<DocumentTab>(
         requestedTab === "agreements" || requestedParentInfoTab === "agreements"
             ? "agreements"
-            : requestedParentInfoTab === "welcome" || requestedParentInfoTab === "routine" || requestedParentInfoTab === "holidays" || requestedParentInfoTab === "menu" || requestedParentInfoTab === "equipment"
+            : requestedParentInfoTab === "welcome" || requestedParentInfoTab === "routine" || requestedParentInfoTab === "holidays" || requestedParentInfoTab === "menu" || requestedParentInfoTab === "equipment" || requestedParentInfoTab === "annual-plan"
                 ? requestedParentInfoTab
-                : "welcome"
+                : "annual-plan"
     );
 
     const selectTab = (tab: DaycareAdminTab) => {
         setActiveTab(tab);
-        setSearchParams(tab === "registrations" ? {} : tab === "parent-info" ? { tab, section: parentInfoTab } : { tab });
+        setSearchParams(tab === "registrations" ? {} : tab === "documents" ? { tab, section: documentTab } : { tab });
     };
 
-    const selectParentInfoTab = (tab: ParentInfoTab) => {
-        setParentInfoTab(tab);
-        setSearchParams({ tab: "parent-info", section: tab });
+    const selectDocumentTab = (tab: DocumentTab) => {
+        setDocumentTab(tab);
+        setSearchParams({ tab: "documents", section: tab });
     };
 
     const loadOverview = async () => {
@@ -109,7 +111,7 @@ const DaycareAdmin = () => {
                         <span className={styles.eyebrow}>Admin</span>
                         <h1 className={styles.title}>ניהול מעון</h1>
                         <p className={styles.description}>
-                            רישום משפחות, תיקי הצטרפות, תשלומים ומידע להורים במקום אחד.
+                            רישום משפחות, תיקי הצטרפות, תשלומים ומחולל מסמכים במקום אחד.
                         </p>
                     </div>
 
@@ -184,24 +186,26 @@ const DaycareAdmin = () => {
                     </div>
                 )}
 
-                {activeTab === "parent-info" && (
+                {activeTab === "documents" && (
                     <div className={styles.tabPanel}>
-                        <nav className={styles.innerTabBar} aria-label="ניהול מידע והסכמים להורים">
-                            {parentInfoTabs.map((tab) => (
+                        <nav className={styles.innerTabBar} aria-label="בחירת מסמך לעריכה">
+                            {documentTabs.map((tab) => (
                                 <button
-                                    aria-pressed={parentInfoTab === tab.id}
-                                    className={parentInfoTab === tab.id ? styles.innerTabButtonActive : styles.innerTabButton}
+                                    aria-pressed={documentTab === tab.id}
+                                    className={documentTab === tab.id ? styles.innerTabButtonActive : styles.innerTabButton}
                                     key={tab.id}
                                     type="button"
-                                    onClick={() => selectParentInfoTab(tab.id)}
+                                    onClick={() => selectDocumentTab(tab.id)}
                                 >
                                     {tab.label}
                                 </button>
                             ))}
                         </nav>
-                        {parentInfoTab === "agreements"
+                        {documentTab === "agreements"
                             ? <DaycareAgreements />
-                            : <DaycareParentDocuments visibleDocument={parentInfoTab} />}
+                            : documentTab === "annual-plan"
+                                ? <DaycareAnnualPlanEditor />
+                                : <DaycareParentDocuments visibleDocument={documentTab} />}
                     </div>
                 )}
             </Container>

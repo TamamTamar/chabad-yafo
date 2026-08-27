@@ -14,6 +14,18 @@ const http = axios.create({
 http.interceptors.request.use((config) => {
     const localAdminToken = window.sessionStorage.getItem("local_admin_token");
 
+    // Axios removes Content-Type from bodyless DELETE requests. Admin mutations
+    // intentionally require JSON as a CSRF safeguard, so keep DELETE requests
+    // compliant by sending an explicit empty JSON object.
+    if (
+        config.method?.toLowerCase() === "delete" &&
+        config.url?.startsWith("/admin/") &&
+        config.data === undefined
+    ) {
+        config.data = {};
+        config.headers["Content-Type"] = "application/json";
+    }
+
     if (localAdminToken) {
         config.headers.Authorization = `Bearer ${localAdminToken}`;
     }

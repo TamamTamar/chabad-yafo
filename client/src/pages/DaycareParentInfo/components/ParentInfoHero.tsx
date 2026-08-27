@@ -2,11 +2,11 @@ import { ArrowLeft, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { documents } from "../parentInfoConfig";
 import styles from "../DaycareParentInfo.module.scss";
-import type { DaycareParentDocumentBundle } from "../../../services/daycareParentDocumentService";
+import type { PublicDaycareParentDocumentBundle } from "../../../services/daycareParentDocumentService";
 
 interface ParentInfoHeroProps {
     onRegistrationClick: (location: string) => void;
-    parentDocuments: DaycareParentDocumentBundle | null | undefined;
+    parentDocuments: PublicDaycareParentDocumentBundle | null | undefined;
 }
 
 const ParentInfoHero = ({ onRegistrationClick, parentDocuments }: ParentInfoHeroProps) => (
@@ -30,7 +30,9 @@ const ParentInfoHero = ({ onRegistrationClick, parentDocuments }: ParentInfoHero
                     <ArrowLeft size={18} aria-hidden="true" />
                 </Link>
                 {documents
-                    .filter((document) => document.pdfAvailable || (document.id === "menu" && Boolean(parentDocuments?.documents.menu.items.length)))
+                    .filter((document) => document.id === "routine" || document.id === "holidays" || document.id === "menu"
+                        ? parentDocuments?.sharedDocumentKeys.includes(document.id) && (document.id !== "menu" || Boolean(parentDocuments.documents.menu?.items.length))
+                        : document.pdfAvailable)
                     .map((document) => (
                         <a
                             className={styles.quickDocumentAction}

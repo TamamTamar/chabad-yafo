@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { DAYCARE_EQUIPMENT_DOCUMENT, DAYCARE_WELCOME_DOCUMENT, type DaycareParentDocumentBundle, type DaycareParentDocumentKey } from "../config/daycareParentDocuments";
 import { DaycareOnboardingServiceError } from "../services/daycareOnboardingService";
-import { createParentDocumentDownload, getCurrentParentDocumentBundle, getParentDocumentBundleForToken, listParentDocumentYearsForAdmin, saveParentDocumentYearForAdmin, unlockParentDocumentYearForAdmin } from "../services/daycareParentDocumentService";
+import { createParentDocumentDownload, getCurrentParentDocumentBundle, getParentDocumentBundleForToken, getPublishedParentDocumentBundle, getSharedParentDocumentKeys, listParentDocumentYearsForAdmin, saveParentDocumentYearForAdmin, unlockParentDocumentYearForAdmin, updateParentDocumentSharingForAdmin } from "../services/daycareParentDocumentService";
 import { logger } from "../utils/logger";
 
 const keyFrom = (value: string): DaycareParentDocumentKey | null =>
@@ -114,14 +114,24 @@ const sendPdf = async (res: Response, bundle: Awaited<ReturnType<typeof getParen
 };
 
 export const getCurrentParentDocuments = async (_req: Request, res: Response) => {
-    try { return res.json({ success: true, data: await getCurrentParentDocumentBundle() }); }
+    try {
+        const bundle = await getCurrentParentDocumentBundle();
+        const sharedDocumentKeys = await getSharedParentDocumentKeys(bundle.schoolYear);
+        const documents = Object.fromEntries(sharedDocumentKeys.map((key) => [key, bundle.documents[key]]));
+        return res.json({ success: true, data: { version: bundle.version, schoolYear: bundle.schoolYear, sharedDocumentKeys, documents } });
+    }
     catch (error) { return handleError(res, error); }
 };
 
 export const downloadCurrentParentDocument = async (req: Request, res: Response) => {
     const key = keyFrom(req.params.key);
     if (!key) return res.status(404).end();
-    try { return await sendPdf(res, await getCurrentParentDocumentBundle(), key); }
+    try {
+        const bundle = await getCurrentParentDocumentBundle();
+        const sharedKeys = await getSharedParentDocumentKeys(bundle.schoolYear);
+        if (!sharedKeys.includes(key)) return res.status(404).json({ success: false, message: "המסמך אינו משותף להורים." });
+        return await sendPdf(res, bundle, key);
+    }
     catch (error) { return handleError(res, error); }
 };
 
@@ -146,13 +156,37 @@ export const unlockAdminParentDocumentYear = async (req: Request, res: Response)
 };
 
 export const getParentDocumentsForToken = async (req: Request, res: Response) => {
-    try { return res.json({ success: true, data: await getParentDocumentBundleForToken(req.params.token) }); }
+    try {
+        const bundle = await getParentDocumentBundleForToken(req.params.token);
+        return res.json({ success: true, data: { version: bundle.version, schoolYear: bundle.schoolYear, sharedDocumentKeys: await getSharedParentDocumentKeys(bundle.schoolYear) } });
+    }
     catch (error) { return handleError(res, error); }
 };
 
 export const downloadParentDocumentForToken = async (req: Request, res: Response) => {
     const key = keyFrom(req.params.key);
     if (!key) return res.status(404).end();
-    try { return await sendPdf(res, await getParentDocumentBundleForToken(req.params.token), key); }
+    try {
+        const bundle = await getParentDocumentBundleForToken(req.params.token);
+        const sharedKeys = await getSharedParentDocumentKeys(bundle.schoolYear);
+        if (!sharedKeys.includes(key)) return res.status(404).json({ success: false, message: "המסמך אינו משותף להורים." });
+        return await sendPdf(res, bundle, key);
+    }
+    catch (error) { return handleError(res, error); }
+};
+
+export const updateAdminParentDocumentSharing = async (req: Request, res: Response) => {
+    const schoolYear = req.params.schoolYear;
+    const key = keyFrom(req.params.key);
+    if (!validSchoolYear(schoolYear) || !key || typeof req.body?.shared !== "boolean") return res.status(400).json({ success: false, message: "יש לבדוק את המסמך ואת הגדרת השיתוף." });
+    try { return res.json({ success: true, data: await updateParentDocumentSharingForAdmin(schoolYear, key, req.body.shared) }); }
+    catch (error) { return handleError(res, error); }
+};
+
+export const downloadAdminParentDocument = async (req: Request, res: Response) => {
+    const schoolYear = req.params.schoolYear;
+    const key = keyFrom(req.params.key);
+    if (!validSchoolYear(schoolYear) || !key) return res.status(404).end();
+    try { return await sendPdf(res, await getPublishedParentDocumentBundle(schoolYear), key); }
     catch (error) { return handleError(res, error); }
 };

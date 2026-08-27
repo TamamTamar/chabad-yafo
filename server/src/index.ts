@@ -22,6 +22,7 @@ import { daycareAgreementAdminRoutes, daycareAgreementPublicRoutes } from "./rou
 import { ensureDefaultAgreementDraft, reconcileAgreementOnboardingSteps } from "./services/daycareAgreementService";
 import { projectRoutes } from "./routes/projectRoutes";
 import { daycareParentDocumentAdminRoutes, daycareParentDocumentRoutes } from "./routes/daycareParentDocumentRoutes";
+import { daycareAnnualPlanAdminRoutes } from "./routes/daycareAnnualPlanRoutes";
 import { backfillParentDocumentSnapshots } from "./services/daycareParentDocumentService";
 import { daycareHealthDeclarationAdminRoutes, daycareHealthDeclarationPublicRoutes } from "./routes/daycareHealthDeclarationRoutes";
 import { syncDaycareOnboardingStepTitles } from "./services/daycareOnboardingTitleSyncService";
@@ -77,6 +78,7 @@ app.use("/api/daycare-payments", daycarePaymentPublicRoutes);
 app.use("/api/admin/daycare/payments", daycarePaymentAdminRoutes);
 app.use("/api/admin/daycare/donations", daycareDonationAdminRoutes);
 app.use("/api/admin/daycare/parent-documents", daycareParentDocumentAdminRoutes);
+app.use("/api/admin/daycare/annual-plans", daycareAnnualPlanAdminRoutes);
 app.use("/api/admin/daycare/health-declarations", daycareHealthDeclarationAdminRoutes);
 app.use("/api/admin/daycare/pickup-authorizations", daycarePickupAuthorizationAdminRoutes);
 app.use("/api/admin/daycare/agreements", daycareAgreementAdminRoutes);

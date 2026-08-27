@@ -44,6 +44,11 @@ export const daycareParentDocumentYearSchema = new Schema<IDaycareParentDocument
         menu: { type: menuSchema, required: true },
         equipment: { type: equipmentSchema, required: true },
     },
+    sharedDocumentKeys: {
+        type: [String],
+        enum: ["welcome", "routine", "holidays", "menu", "equipment"],
+        default: ["routine", "holidays", "menu"],
+    },
     lockedAt: Date,
     lockedByAgreementId: { type: Schema.Types.ObjectId, ref: "DaycareAgreement" },
 }, { timestamps: true });

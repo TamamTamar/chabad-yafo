@@ -45,7 +45,11 @@ export type PublicDaycareAgreement =
           acceptanceStatement: string;
           version: Omit<DaycareAgreementVersion, "id" | "createdAt" | "updatedAt">;
           agreement: Omit<DaycareAgreementSubmission, "id"> | null;
-          parentDocuments: { version: string; menuAvailable: boolean };
+          parentDocuments: {
+              version: string;
+              sharedDocumentKeys: Array<"welcome" | "routine" | "holidays" | "menu" | "equipment">;
+              annualPlanShared: boolean;
+          };
       };
 
 export interface AdminAgreementByOnboarding {

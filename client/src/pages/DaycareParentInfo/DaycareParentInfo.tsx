@@ -17,7 +17,7 @@ import {
     type ParentInfoSectionId,
 } from "./parentInfoConfig";
 import styles from "./DaycareParentInfo.module.scss";
-import { getCurrentDaycareParentDocuments, type DaycareParentDocumentBundle } from "../../services/daycareParentDocumentService";
+import { getCurrentDaycareParentDocuments, type PublicDaycareParentDocumentBundle } from "../../services/daycareParentDocumentService";
 
 const trackCta = (ctaText: string, location: string) => {
     trackDaycareCtaClick({
@@ -62,7 +62,7 @@ const usePageMetadata = () => {
 const DaycareParentInfo = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = resolveParentInfoSection(searchParams.get("section"));
-    const [parentDocuments, setParentDocuments] = useState<DaycareParentDocumentBundle | null>();
+    const [parentDocuments, setParentDocuments] = useState<PublicDaycareParentDocumentBundle | null>();
 
     usePageMetadata();
 

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
-import { currentParentDocumentPdfUrl, listAdminDaycareParentDocumentYears, saveAdminDaycareParentDocumentYear, unlockAdminDaycareParentDocumentYear, type AdminDaycareParentDocumentYear, type DaycareParentDocumentBundle } from "../../../../services/daycareParentDocumentService";
+import { adminParentDocumentPdfUrl, listAdminDaycareParentDocumentYears, saveAdminDaycareParentDocumentYear, unlockAdminDaycareParentDocumentYear, updateAdminDaycareParentDocumentSharing, type AdminDaycareParentDocumentYear, type DaycareParentDocumentBundle, type DaycareParentDocumentKey } from "../../../../services/daycareParentDocumentService";
 import styles from "./DaycareParentDocuments.module.scss";
 
 const rowsToText = <T,>(items: T[], fields: Array<keyof T>) =>
@@ -40,6 +40,8 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
     const [lockedAt, setLockedAt] = useState<string>();
     const [isNewYear, setIsNewYear] = useState(false);
     const [busy, setBusy] = useState(false);
+    const [sharingBusy, setSharingBusy] = useState(false);
+    const [sharedDocumentKeys, setSharedDocumentKeys] = useState<DaycareParentDocumentKey[]>([]);
     const [unlockDialogOpen, setUnlockDialogOpen] = useState(false);
     const [notice, setNotice] = useState("");
     const [error, setError] = useState("");
@@ -53,6 +55,7 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
         setClarifications(nextDocuments.holidays.clarifications.join("\n"));
         setEquipmentRows(nextDocuments.equipment.items.join("\n"));
         setLockedAt(creating ? undefined : item.lockedAt);
+        setSharedDocumentKeys(creating ? [] : item.sharedDocumentKeys ?? []);
         setIsNewYear(creating);
         setNotice("");
         setError("");
@@ -80,6 +83,7 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
                 setClarifications(nextDocuments.holidays.clarifications.join("\n"));
                 setEquipmentRows(nextDocuments.equipment.items.join("\n"));
                 setLockedAt(first.lockedAt);
+                setSharedDocumentKeys(first.sharedDocumentKeys ?? []);
             }
         }).catch((loadError) => { if (active) setError(messageFromError(loadError)); });
         return () => { active = false; };
@@ -126,9 +130,22 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
             });
             await load(saved.schoolYear);
             setIsNewYear(false);
-            setNotice("המידע נשמר ומוצג להורים.");
+            setNotice("המסמך נשמר. הגדרת השיתוף להורים לא השתנתה.");
         } catch (saveError) { setError(messageFromError(saveError)); }
         finally { setBusy(false); }
+    };
+
+    const toggleSharing = async () => {
+        if (isNewYear || sharingBusy) return;
+        const shared = !sharedDocumentKeys.includes(visibleDocument);
+        setSharingBusy(true); setError(""); setNotice("");
+        try {
+            const updated = await updateAdminDaycareParentDocumentSharing(selectedYear, visibleDocument, shared);
+            setSharedDocumentKeys(updated.sharedDocumentKeys);
+            setYears((items) => items.map((item) => item.schoolYear === updated.schoolYear ? updated : item));
+            setNotice(shared ? "המסמך נוסף לקישור האישי של ההורים." : "השיתוף הוסר. המסמך נשאר זמין רק לך ולהורדת PDF.");
+        } catch (sharingError) { setError(messageFromError(sharingError)); }
+        finally { setSharingBusy(false); }
     };
 
     const unlock = async () => {
@@ -182,7 +199,7 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
                 <div>
                     <span className={styles.eyebrow}>מידע שנתי</span>
                     <h2 className={styles.title} id="parent-documents-title">{documentLabels[visibleDocument].title}</h2>
-                    <p className={styles.intro}>שומרים ישירות. בחתימה הראשונה של הורה המסמכים לשנה הזו ננעלים אוטומטית.</p>
+                    <p className={styles.intro}>עריכת המסמך אינה מפרסמת אותו. אפשר לשתף אותו בנפרד בקישור האישי של ההורים או להוריד PDF לשימוש פנימי.</p>
                 </div>
                 <button className={styles.secondaryButton} type="button" disabled={!years.length || isNewYear} onClick={() => apply(years[0], true)}>פתיחת שנת לימודים חדשה</button>
             </header>
@@ -281,7 +298,8 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
                 {!lockedAt ? <button className={styles.primaryButton} type="button" disabled={busy} onClick={() => void save()}>{busy ? "שומר..." : documentLabels[visibleDocument].save}</button> : null}
                 {lockedAt ? <button className={styles.secondaryButton} type="button" disabled={busy} onClick={() => setUnlockDialogOpen(true)}>בדיקה ושחרור נעילה</button> : null}
                 {isNewYear ? <button className={styles.secondaryButton} type="button" onClick={() => apply(years[0])}>ביטול</button> : null}
-                <a className={styles.secondaryButton} href={currentParentDocumentPdfUrl(visibleDocument)} target="_blank" rel="noreferrer">צפייה ב-PDF הנוכחי</a>
+                {!isNewYear ? <button className={sharedDocumentKeys.includes(visibleDocument) ? styles.sharedButton : styles.secondaryButton} type="button" disabled={sharingBusy} onClick={() => void toggleSharing()}>{sharingBusy ? "מעדכן שיתוף..." : sharedDocumentKeys.includes(visibleDocument) ? "משותף להורים · הסרת שיתוף" : "שיתוף להורים"}</button> : null}
+                {!isNewYear ? <a className={styles.secondaryButton} href={adminParentDocumentPdfUrl(selectedYear, visibleDocument)} target="_blank" rel="noreferrer">הורדת PDF לשימוש פנימי</a> : null}
             </div>
             <div aria-live="polite">{notice ? <p className={styles.success}>{notice}</p> : null}{error ? <p className={styles.error}>{error}</p> : null}</div>
             <ConfirmDialog

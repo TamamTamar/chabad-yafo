@@ -12,7 +12,7 @@ import daycareLogo from "../../../assets/logo-maon.png";
 import type { PublicDaycareAgreement } from "../../../types/daycareAgreement";
 import type { DaycareDocumentBlock } from "../../../types/daycareAgreement";
 import styles from "../DaycareOnboarding.module.scss";
-import { tokenParentDocumentPdfUrl } from "../../../services/daycareParentDocumentService";
+import { tokenAnnualPlanPdfUrl, tokenParentDocumentPdfUrl, type DaycareParentDocumentKey } from "../../../services/daycareParentDocumentService";
 
 interface AgreementSectionProps {
     token: string;
@@ -71,6 +71,13 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
     const [notice, setNotice] = useState("");
     const [error, setError] = useState("");
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const sharedDocumentLabels: Record<DaycareParentDocumentKey, string> = {
+        welcome: "ברוכים הבאים",
+        routine: "סדר היום",
+        holidays: "לוח החופשות",
+        menu: "התפריט",
+        equipment: "ציוד אישי",
+    };
     const drawingRef = useRef(false);
     const signatureDrawnRef = useRef(false);
     const {
@@ -257,11 +264,11 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                 <h3 className={styles.preSigningInfoTitle} id="parent-documents-title">מידע ומסמכים להורים</h3>
                 <p className={styles.preSigningInfoText}>המסמכים זמינים לצפייה ולהורדה בכל עת, גם לאחר החתימה:</p>
                 <div className={styles.preSigningLinks}>
-                    <a href={tokenParentDocumentPdfUrl(token, "routine")} target="_blank" rel="noreferrer">צפייה והורדת סדר היום</a>
-                    <a href={tokenParentDocumentPdfUrl(token, "holidays")} target="_blank" rel="noreferrer">צפייה והורדת לוח החופשות</a>
-                    {agreement.parentDocuments.menuAvailable
-                        ? <a href={tokenParentDocumentPdfUrl(token, "menu")} target="_blank" rel="noreferrer">צפייה והורדת התפריט</a>
-                        : <span>התפריט יפורסם בהמשך</span>}
+                    {agreement.parentDocuments.sharedDocumentKeys.map((key) => (
+                        <a href={tokenParentDocumentPdfUrl(token, key)} target="_blank" rel="noreferrer" key={key}>צפייה והורדת {sharedDocumentLabels[key]}</a>
+                    ))}
+                    {agreement.parentDocuments.annualPlanShared ? <a href={tokenAnnualPlanPdfUrl(token)} target="_blank" rel="noreferrer">צפייה והורדת תוכנית נושאי הלימוד</a> : null}
+                    {!agreement.parentDocuments.sharedDocumentKeys.length && !agreement.parentDocuments.annualPlanShared ? <span>אין כרגע מסמכים משותפים.</span> : null}
                 </div>
             </aside>
 
@@ -338,7 +345,7 @@ const AgreementSection = ({ token, onSubmitted }: AgreementSectionProps) => {
                         <span className={styles.formFieldError} role="alert">{errors.accepted?.message || ""}</span>
                     </div>
                     <div>
-                        <label className={styles.acceptLabel}><input type="checkbox" {...register("parentInfoAccepted", { required: "יש לאשר שקראת את המידע והמסמכים להורים." })} />קראתי את סדר היום ואת לוח החופשות, וידוע לי שהתפריט יפורסם בהמשך.</label>
+                        <label className={styles.acceptLabel}><input type="checkbox" {...register("parentInfoAccepted", { required: "יש לאשר שקראת את המידע והמסמכים המשותפים." })} />קראתי את המידע והמסמכים שהמעון שיתף איתי.</label>
                         <span className={styles.formFieldError} role="alert">{errors.parentInfoAccepted?.message || ""}</span>
                     </div>
                     <button className={styles.agreementPrimaryButton} type="submit" disabled={isBusy}>{isBusy ? "מאשר ושומר..." : "אישור וחתימה על ההסכם"}</button>

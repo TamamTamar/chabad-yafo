@@ -20,7 +20,8 @@ import {
     DAYCARE_AGREEMENT_DRAFT_2026_SCHOOL_YEAR,
     DAYCARE_AGREEMENT_DRAFT_2026_VERSION,
 } from "../config/daycareAgreementDraft2026";
-import { getPublishedParentDocumentBundle, hashParentDocumentBundle, lockParentDocumentYear } from "./daycareParentDocumentService";
+import { getPublishedParentDocumentBundle, getSharedParentDocumentKeys, hashParentDocumentBundle, lockParentDocumentYear } from "./daycareParentDocumentService";
+import { DaycareAnnualPlan } from "../models/DaycareAnnualPlan";
 import { logger } from "../utils/logger";
 
 export const ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT = "קראתי את הסכם ההתקשרות במלואו, הבנתי את תוכנו, ניתנה לי אפשרות לשאול שאלות ולקבל הבהרות, ואני מסכים/ה לכל תנאיו. ידוע לי כי הזנת פרטיי, סימון תיבה זו ולחיצה על 'אישור וחתימה על ההסכם' מהווים את אישורי והסכמתי להתקשר בהסכם.";
@@ -229,7 +230,12 @@ export const getPublicAgreement = async (token: string, now = new Date()) => {
     if (!version) return { available: false, reason: "agreementNotPublished", signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured() };
     const agreement = await DaycareAgreement.findOne({ onboardingId: onboarding._id }).sort({ revision: -1 }).select("+parentDocumentsSnapshot");
     const parentDocuments = agreement?.parentDocumentsSnapshot ?? await getPublishedParentDocumentBundle(onboarding.schoolYear);
-    return { available: true, signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured(), canSubmit: !isParentBundleSubmitted(onboarding), acceptanceStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, version: publicVersionDto(version), agreement: publicAgreementDto(agreement), parentDocuments: { version: parentDocuments.version, menuAvailable: parentDocuments.documents.menu.items.length > 0 } };
+    const [sharedDocumentKeys, annualPlanShared] = await Promise.all([
+        getSharedParentDocumentKeys(onboarding.schoolYear),
+        DaycareAnnualPlan.exists({ schoolYear: onboarding.schoolYear, sharedWithParents: true }),
+    ]);
+    const availableSharedDocumentKeys = sharedDocumentKeys.filter((key) => key !== "menu" || parentDocuments.documents.menu.items.length > 0);
+    return { available: true, signingAvailable: isDaycareStorageConfigured() && isDaycarePiiEncryptionConfigured(), canSubmit: !isParentBundleSubmitted(onboarding), acceptanceStatement: ONLINE_AGREEMENT_ACCEPTANCE_STATEMENT, version: publicVersionDto(version), agreement: publicAgreementDto(agreement), parentDocuments: { version: parentDocuments.version, sharedDocumentKeys: availableSharedDocumentKeys, annualPlanShared: Boolean(annualPlanShared) } };
 };
 
 const getSignableContext = async (token: string, now: Date) => {

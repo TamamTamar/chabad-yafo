@@ -64,7 +64,14 @@ export interface DaycareParentDocumentBundle {
         equipment: DaycareEquipmentDocument;
     };
 }
+export interface PublicDaycareParentDocumentBundle {
+    version: string;
+    schoolYear: string;
+    sharedDocumentKeys: DaycareParentDocumentKey[];
+    documents: Partial<DaycareParentDocumentBundle["documents"]>;
+}
 export interface AdminDaycareParentDocumentYear extends DaycareParentDocumentBundle {
+    sharedDocumentKeys: DaycareParentDocumentKey[];
     lockedAt?: string;
     createdAt: string;
     updatedAt: string;
@@ -73,12 +80,15 @@ export interface AdminDaycareParentDocumentYear extends DaycareParentDocumentBun
 const encode = encodeURIComponent;
 
 export const getCurrentDaycareParentDocuments = async () => {
-    const response = await http.get<ApiResponse<DaycareParentDocumentBundle>>("/daycare/parent-documents/current");
+    const response = await http.get<ApiResponse<PublicDaycareParentDocumentBundle>>("/daycare/parent-documents/current");
     return response.data.data;
 };
 
 export const currentParentDocumentPdfUrl = (key: DaycareParentDocumentKey) =>
     `${apiBaseUrl}/daycare/parent-documents/current/${key}/pdf`;
+
+export const adminParentDocumentPdfUrl = (schoolYear: string, key: DaycareParentDocumentKey) =>
+    `${apiBaseUrl}/admin/daycare/parent-documents/${encode(schoolYear)}/${key}/pdf`;
 
 export const tokenParentDocumentPdfUrl = (token: string, key: DaycareParentDocumentKey) =>
     `${apiBaseUrl}/daycare/parent-documents/public/${encode(token)}/${key}/pdf`;
@@ -103,3 +113,14 @@ export const unlockAdminDaycareParentDocumentYear = async (schoolYear: string) =
     );
     return response.data.data;
 };
+
+export const updateAdminDaycareParentDocumentSharing = async (schoolYear: string, key: DaycareParentDocumentKey, shared: boolean) => {
+    const response = await http.patch<ApiResponse<AdminDaycareParentDocumentYear>>(
+        `/admin/daycare/parent-documents/${encode(schoolYear)}/${key}/sharing`,
+        { shared }
+    );
+    return response.data.data;
+};
+
+export const tokenAnnualPlanPdfUrl = (token: string) =>
+    `${apiBaseUrl}/daycare/parent-documents/public/${encode(token)}/annualPlan/pdf`;

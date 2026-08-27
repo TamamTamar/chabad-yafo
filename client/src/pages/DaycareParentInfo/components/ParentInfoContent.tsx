@@ -9,22 +9,26 @@ import {
 import DocumentCard from "./DocumentCard";
 import ParentInfoAccordion from "./ParentInfoAccordion";
 import styles from "../DaycareParentInfo.module.scss";
-import type { DaycareParentDocumentBundle } from "../../../services/daycareParentDocumentService";
+import type { PublicDaycareParentDocumentBundle } from "../../../services/daycareParentDocumentService";
 
 interface ParentInfoContentProps {
     activeTab: ParentInfoSectionId;
-    parentDocuments: DaycareParentDocumentBundle | null | undefined;
+    parentDocuments: PublicDaycareParentDocumentBundle | null | undefined;
 }
 
 const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProps) => {
     const baseSection = sections[activeTab];
-    const menuItems = activeTab === "menu" && parentDocuments
+    const menuItems = activeTab === "menu" && parentDocuments?.documents.menu
         ? parentDocuments.documents.menu.items
         : [];
-    const displayedDocuments = documents.map((document) => document.id === "menu" && parentDocuments
-        ? { ...document, pdfAvailable: parentDocuments.documents.menu.items.length > 0 }
-        : document);
-    const section = activeTab === "routine" && parentDocuments
+    const displayedDocuments = documents
+        .filter((document) => document.id === "routine" || document.id === "holidays" || document.id === "menu"
+            ? Boolean(parentDocuments?.sharedDocumentKeys.includes(document.id))
+            : true)
+        .map((document) => document.id === "menu" && parentDocuments?.documents.menu
+            ? { ...document, pdfAvailable: parentDocuments.documents.menu.items.length > 0 }
+            : document);
+    const section = activeTab === "routine" && parentDocuments?.documents.routine
         ? {
             ...baseSection,
             title: parentDocuments.documents.routine.title,
@@ -32,7 +36,7 @@ const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProp
             details: parentDocuments.documents.routine.items.map((item) => `${item.time} · ${item.activity}`),
             note: parentDocuments.documents.routine.note,
         }
-        : activeTab === "holidays" && parentDocuments
+        : activeTab === "holidays" && parentDocuments?.documents.holidays
           ? {
               ...baseSection,
               title: parentDocuments.documents.holidays.title,
@@ -41,7 +45,7 @@ const ParentInfoContent = ({ activeTab, parentDocuments }: ParentInfoContentProp
               accordionItems: [{ title: "הבהרות חשובות", content: parentDocuments.documents.holidays.clarifications.join("\n") }],
               note: undefined,
           }
-          : activeTab === "menu" && parentDocuments
+          : activeTab === "menu" && parentDocuments?.documents.menu
             ? {
                 ...baseSection,
                 title: parentDocuments.documents.menu.title,
