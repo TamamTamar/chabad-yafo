@@ -55,31 +55,26 @@ const ShabbatTimesBadge: React.FC<Props> = ({ variant = "topbar" }) => {
     );
   }
 
-  const parashaClean = data.parasha?.replace(/^פרשת\s+/, "") ?? "";
   const dateLine = `${data.hebrewDate} · ${data.gregorianDate}`;
-  const titleText = parashaClean
-    ? `שבת פרשת ${parashaClean} ביפו`
-    : "זמני שבת וחג ביפו";
 
   return (
     <div className={cls} dir="rtl" aria-label="זמני שבת ביפו">
       <div className={styles.content}>
-        <div className={styles.title}>{titleText}</div>
+        <div className={styles.title}>{data.title}</div>
         <div className={styles.date}>{dateLine}</div>
       </div>
 
       <div className={styles.timesBox}>
-        <div className={styles.timeItem}>
-          <div className={styles.timeLabel}>כניסה</div>
-          <div className={styles.timeValue}>{data.candles}</div>
-        </div>
-
-        <div className={styles.divider} />
-
-        <div className={styles.timeItem}>
-          <div className={styles.timeLabel}>יציאה</div>
-          <div className={styles.timeValue}>{data.havdalah}</div>
-        </div>
+        {data.events.map((event, index) => (
+          <React.Fragment key={`${event.date}-${event.label}`}>
+            {index > 0 && <div className={styles.divider} />}
+            <div className={styles.timeItem}>
+              <div className={styles.timeLabel}>{event.label}</div>
+              <div className={styles.timeValue}>{event.time}</div>
+              <div className={styles.date}>{event.date}</div>
+            </div>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );

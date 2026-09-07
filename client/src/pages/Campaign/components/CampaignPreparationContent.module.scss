@@ -1,0 +1,151 @@
+@use "../../../styles/variables" as *;
+
+.container {
+    position: relative;
+    max-width: 1100px;
+    margin-top: -60px;
+    margin-bottom: 56px;
+}
+
+.hero {
+    gap: 0;
+}
+
+.title {
+    line-height: $line-title;
+}
+
+.intro {
+    max-width: 760px;
+    margin: 16px 0 0;
+    color: $ui-text-muted;
+    font-size: $type-hero-subtitle;
+    line-height: $line-body;
+}
+
+.occasions {
+    padding: 32px 40px 0;
+}
+
+.sectionTitle {
+    margin: 0;
+    color: $brand-primary;
+    font-size: $type-section-title-sm;
+    font-weight: 800;
+    line-height: $line-title;
+}
+
+.text {
+    margin: 10px 0 0;
+    font-size: $type-body-lg;
+    line-height: $line-body;
+    color: $ui-text-muted;
+}
+
+.occasionList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.occasion {
+    padding: 7px 16px;
+    border: 1px solid rgba($brand-secondary, 0.45);
+    border-radius: $radius-sm;
+    background: rgba($brand-secondary, 0.12);
+    color: $brand-primary;
+    font-size: $type-body;
+    font-weight: 700;
+}
+
+.before {
+    margin: 24px 40px 32px;
+    padding: 20px 24px;
+    border-inline-start: 4px solid $brand-secondary;
+    border-radius: $radius-sm;
+    background: rgba($brand-secondary, 0.12);
+}
+
+.donation {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    text-align: center;
+}
+
+.donationContent {
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.donationTitle {
+    margin: 0;
+    color: $brand-primary;
+    font-size: $type-section-title;
+    font-weight: 900;
+    line-height: $line-title;
+}
+
+.donationText {
+    margin: 14px 0 0;
+    color: $ui-text-muted;
+    font-size: $type-body-lg;
+    line-height: $line-body;
+}
+
+.donationButton {
+    margin-top: 28px;
+    min-height: 52px;
+    color: $color-white;
+    font-size: $type-card-title;
+    font-weight: 900;
+
+    &:focus-visible {
+        outline: 3px solid $brand-gold-dark;
+        outline-offset: 4px;
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        margin-top: -20px;
+        margin-bottom: 40px;
+    }
+
+    .hero {
+        text-align: center;
+    }
+
+    .title {
+        font-size: $type-hero-title-compact;
+    }
+
+    .occasions {
+        padding: 28px 4px 0;
+    }
+
+    .occasionList {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .occasion {
+        padding: 9px 8px;
+        text-align: center;
+    }
+
+    .before {
+        margin: 24px 0;
+        padding: 18px 16px;
+    }
+
+    .donationButton {
+        width: 100%;
+        min-width: 0;
+        padding-inline: 16px;
+    }
+}

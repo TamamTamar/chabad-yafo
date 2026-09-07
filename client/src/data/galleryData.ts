@@ -1,81 +1,81 @@
 // src/data/galleryData.ts
 
 // === Holidays 1-19 ===
-import holiday1 from "../assets/gallery/holidays/h1.jpg";
-import holiday2 from "../assets/gallery/holidays/h2.jpg";
-import holiday3 from "../assets/gallery/holidays/h3.jpg";
-import holiday4 from "../assets/gallery/holidays/h4.jpg";
-import holiday5 from "../assets/gallery/holidays/h5.jpg";
-import holiday6 from "../assets/gallery/holidays/h6.jpg";
-import holiday7 from "../assets/gallery/holidays/h7.jpg";
-import holiday8 from "../assets/gallery/holidays/h8.jpg";
-import holiday9 from "../assets/gallery/holidays/h9.jpg";
-import holiday10 from "../assets/gallery/holidays/h10.jpg";
-import holiday11 from "../assets/gallery/holidays/h11.jpg";
-import holiday12 from "../assets/gallery/holidays/h12.jpg";
-import holiday13 from "../assets/gallery/holidays/h13.jpg";
-import holiday14 from "../assets/gallery/holidays/h14.jpg";
-import holiday15 from "../assets/gallery/holidays/h15.jpg";
-import holiday16 from "../assets/gallery/holidays/h16.jpg";
-import holiday17 from "../assets/gallery/holidays/h17.jpg";
+import holiday1 from "../assets/gallery/optimized/full/holidays/h1.webp";
+import holiday2 from "../assets/gallery/optimized/full/holidays/h2.webp";
+import holiday3 from "../assets/gallery/optimized/full/holidays/h3.webp";
+import holiday4 from "../assets/gallery/optimized/full/holidays/h4.webp";
+import holiday5 from "../assets/gallery/optimized/full/holidays/h5.webp";
+import holiday6 from "../assets/gallery/optimized/full/holidays/h6.webp";
+import holiday7 from "../assets/gallery/optimized/full/holidays/h7.webp";
+import holiday8 from "../assets/gallery/optimized/full/holidays/h8.webp";
+import holiday9 from "../assets/gallery/optimized/full/holidays/h9.webp";
+import holiday10 from "../assets/gallery/optimized/full/holidays/h10.webp";
+import holiday11 from "../assets/gallery/optimized/full/holidays/h11.webp";
+import holiday12 from "../assets/gallery/optimized/full/holidays/h12.webp";
+import holiday13 from "../assets/gallery/optimized/full/holidays/h13.webp";
+import holiday14 from "../assets/gallery/optimized/full/holidays/h14.webp";
+import holiday15 from "../assets/gallery/optimized/full/holidays/h15.webp";
+import holiday16 from "../assets/gallery/optimized/full/holidays/h16.webp";
+import holiday17 from "../assets/gallery/optimized/full/holidays/h17.webp";
 
 
 // === Community 1-5 ===
-import community1 from "../assets/gallery/community/c1.jpg";
-import community2 from "../assets/gallery/community/c2.jpg";
-import community3 from "../assets/gallery/community/c3.jpg";
-import community4 from "../assets/gallery/community/c4.jpg";
-import community5 from "../assets/gallery/community/c5.jpg";
+import community1 from "../assets/gallery/optimized/full/community/c1.webp";
+import community2 from "../assets/gallery/optimized/full/community/c2.webp";
+import community3 from "../assets/gallery/optimized/full/community/c3.webp";
+import community4 from "../assets/gallery/optimized/full/community/c4.webp";
+import community5 from "../assets/gallery/optimized/full/community/c5.webp";
 
 // === Street 1-17 ===
-import street1 from "../assets/gallery/street/s1.jpg";
-import street2 from "../assets/gallery/street/s2.jpg";
-import street3 from "../assets/gallery/street/s3.jpg";
-import street4 from "../assets/gallery/street/s4.jpg";
-import street5 from "../assets/gallery/street/s5.jpg";
-import street6 from "../assets/gallery/street/s6.jpg";
-import street7 from "../assets/gallery/street/s7.jpg";
-import street8 from "../assets/gallery/street/s8.jpg";
-import street9 from "../assets/gallery/street/s9.jpg";
-import street10 from "../assets/gallery/street/s10.jpg";
-import street11 from "../assets/gallery/street/s11.jpg";
-import street12 from "../assets/gallery/street/s12.jpg";
-import street13 from "../assets/gallery/street/s13.jpg";
-import street14 from "../assets/gallery/street/s14.jpg";
-import street15 from "../assets/gallery/street/s15.jpg";
-import street16 from "../assets/gallery/street/s16.jpg";
-import street17 from "../assets/gallery/street/s17.jpg";
+import street1 from "../assets/gallery/optimized/full/street/s1.webp";
+import street2 from "../assets/gallery/optimized/full/street/s2.webp";
+import street3 from "../assets/gallery/optimized/full/street/s3.webp";
+import street4 from "../assets/gallery/optimized/full/street/s4.webp";
+import street5 from "../assets/gallery/optimized/full/street/s5.webp";
+import street6 from "../assets/gallery/optimized/full/street/s6.webp";
+import street7 from "../assets/gallery/optimized/full/street/s7.webp";
+import street8 from "../assets/gallery/optimized/full/street/s8.webp";
+import street9 from "../assets/gallery/optimized/full/street/s9.webp";
+import street10 from "../assets/gallery/optimized/full/street/s10.webp";
+import street11 from "../assets/gallery/optimized/full/street/s11.webp";
+import street12 from "../assets/gallery/optimized/full/street/s12.webp";
+import street13 from "../assets/gallery/optimized/full/street/s13.webp";
+import street14 from "../assets/gallery/optimized/full/street/s14.webp";
+import street15 from "../assets/gallery/optimized/full/street/s15.webp";
+import street16 from "../assets/gallery/optimized/full/street/s16.webp";
+import street17 from "../assets/gallery/optimized/full/street/s17.webp";
 
 
 
 // === light 1-27 ===
 
-import light1 from "../assets/gallery/light/l1.jpg";
-import light2 from "../assets/gallery/light/l2.jpg";
-import light3 from "../assets/gallery/light/l3.jpg";
-import light4 from "../assets/gallery/light/l4.jpg";
-import light5 from "../assets/gallery/light/l5.jpg";
-import light6 from "../assets/gallery/light/l6.jpg";
-import light7 from "../assets/gallery/light/l7.jpg";
-import light8 from "../assets/gallery/light/l8.jpg";
-import light9 from "../assets/gallery/light/l9.jpg";
-import light10 from "../assets/gallery/light/l10.jpg";
-import light11 from "../assets/gallery/light/l11.jpg";
-import light12 from "../assets/gallery/light/l12.jpg";
-import light13 from "../assets/gallery/light/l18.jpg";
-import light14 from "../assets/gallery/light/l14.jpg";
-import light15 from "../assets/gallery/light/l15.jpg";
-import light16 from "../assets/gallery/light/l16.jpg";
-import light17 from "../assets/gallery/light/l17.jpg";
-import light18 from "../assets/gallery/light/l18.jpg";
-import light19 from "../assets/gallery/light/l19.jpg";
-import light20 from "../assets/gallery/light/l20.jpg";
-import light21 from "../assets/gallery/light/l21.jpg";
-import light22 from "../assets/gallery/light/l22.jpg";
-import light23 from "../assets/gallery/light/l23.jpg";
-import light24 from "../assets/gallery/light/l24.jpg";
-import light25 from "../assets/gallery/light/l25.jpg";
-import light26 from "../assets/gallery/light/l26.jpg";
+import light1 from "../assets/gallery/optimized/full/light/l1.webp";
+import light2 from "../assets/gallery/optimized/full/light/l2.webp";
+import light3 from "../assets/gallery/optimized/full/light/l3.webp";
+import light4 from "../assets/gallery/optimized/full/light/l4.webp";
+import light5 from "../assets/gallery/optimized/full/light/l5.webp";
+import light6 from "../assets/gallery/optimized/full/light/l6.webp";
+import light7 from "../assets/gallery/optimized/full/light/l7.webp";
+import light8 from "../assets/gallery/optimized/full/light/l8.webp";
+import light9 from "../assets/gallery/optimized/full/light/l9.webp";
+import light10 from "../assets/gallery/optimized/full/light/l10.webp";
+import light11 from "../assets/gallery/optimized/full/light/l11.webp";
+import light12 from "../assets/gallery/optimized/full/light/l12.webp";
+import light13 from "../assets/gallery/optimized/full/light/l18.webp";
+import light14 from "../assets/gallery/optimized/full/light/l14.webp";
+import light15 from "../assets/gallery/optimized/full/light/l15.webp";
+import light16 from "../assets/gallery/optimized/full/light/l16.webp";
+import light17 from "../assets/gallery/optimized/full/light/l17.webp";
+import light18 from "../assets/gallery/optimized/full/light/l18.webp";
+import light19 from "../assets/gallery/optimized/full/light/l19.webp";
+import light20 from "../assets/gallery/optimized/full/light/l20.webp";
+import light21 from "../assets/gallery/optimized/full/light/l21.webp";
+import light22 from "../assets/gallery/optimized/full/light/l22.webp";
+import light23 from "../assets/gallery/optimized/full/light/l23.webp";
+import light24 from "../assets/gallery/optimized/full/light/l24.webp";
+import light25 from "../assets/gallery/optimized/full/light/l25.webp";
+import light26 from "../assets/gallery/optimized/full/light/l26.webp";
 
 
 
@@ -85,19 +85,19 @@ import light26 from "../assets/gallery/light/l26.jpg";
 
 // === partnerships 1-3 ===
 
-import partnership1 from "../assets/gallery/partnerships/p1.jpg";
-import partnership2 from "../assets/gallery/partnerships/p2.jpg";
-import partnership3 from "../assets/gallery/partnerships/p3.jpg";
+import partnership1 from "../assets/gallery/optimized/full/partnerships/p1.webp";
+import partnership2 from "../assets/gallery/optimized/full/partnerships/p2.webp";
+import partnership3 from "../assets/gallery/optimized/full/partnerships/p3.webp";
 
 // === support 1-8 ===
-import support1 from "../assets/gallery/support/su1.jpg";
-import support2 from "../assets/gallery/support/su2.jpg";
-import support3 from "../assets/gallery/support/su3.jpg";
-import support4 from "../assets/gallery/support/su4.jpg";
-import support5 from "../assets/gallery/support/su5.jpg";
-import support6 from "../assets/gallery/support/su6.jpg";
-import support7 from "../assets/gallery/support/su7.jpg";
-import support8 from "../assets/gallery/support/su8.jpg";
+import support1 from "../assets/gallery/optimized/full/support/su1.webp";
+import support2 from "../assets/gallery/optimized/full/support/su2.webp";
+import support3 from "../assets/gallery/optimized/full/support/su3.webp";
+import support4 from "../assets/gallery/optimized/full/support/su4.webp";
+import support5 from "../assets/gallery/optimized/full/support/su5.webp";
+import support6 from "../assets/gallery/optimized/full/support/su6.webp";
+import support7 from "../assets/gallery/optimized/full/support/su7.webp";
+import support8 from "../assets/gallery/optimized/full/support/su8.webp";
 import type { GalleryItem } from "../types/chabad";
 
 

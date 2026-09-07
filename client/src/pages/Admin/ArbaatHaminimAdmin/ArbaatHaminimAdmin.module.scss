@@ -1,0 +1,21 @@
+@use '../../../styles/variables' as *;
+.page { padding: 32px 0 72px; }
+.back { color: $brand-primary; font-weight: 800; }
+.title { color: $brand-primary; font-size: $type-section-title; }
+.sectionTitle { margin: 0; color: $brand-primary; font-size: $type-section-title-sm; }
+.intro { color: $ui-text-muted; line-height: $line-body; }
+.status { padding: 16px; border: 1px solid $brand-secondary; background: $ui-surface-warm; border-radius: $radius-sm; line-height: 1.6; }
+.error { padding: 16px; color: $ui-error; background: $ui-error-soft; border-radius: $radius-sm; }
+.toolbar, .panel, .row { display: grid; gap: 16px; padding: 20px; border: 1px solid $ui-border-cool; border-radius: $radius-md; background: $color-white; margin: 0 0 20px; min-width: 0; }
+.editor { border: 0; padding: 0; margin: 0; min-width: 0; }
+.field { display: grid; gap: 8px; font-weight: 800; color: $brand-primary; min-width: 0; }
+.input { min-height: 48px; width: 100%; padding: 12px; font: inherit; font-size: 16px; border: 1px solid $ui-border-strong; border-radius: $radius-sm; color: $brand-text; background: $color-white; resize: vertical; }
+.input:focus-visible, .primary:focus-visible, .secondary:focus-visible { outline: 3px solid $brand-gold-dark; outline-offset: 2px; }
+.legend { padding-inline: 8px; color: $brand-primary; font-weight: 800; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.primary, .secondary { min-height: 48px; padding: 12px 20px; border-radius: $radius-sm; font: inherit; font-weight: 800; border: 1px solid $brand-primary; }
+.primary { background: $brand-primary; color: $color-white; }
+.secondary { background: $color-white; color: $brand-primary; }
+.primary:disabled, .secondary:disabled { opacity: .5; cursor: not-allowed; }
+.preview { margin-top: 32px; padding: 16px; border: 2px solid $brand-secondary; border-radius: $radius-md; }
+@media (min-width: 800px) { .toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; } }

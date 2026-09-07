@@ -6,7 +6,7 @@ import DaycareAmbassadorsAdmin from "./DaycareAmbassadorsAdmin";
 import DonationAllocationDialog from "./DonationAllocationDialog";
 import DaycareFieldUpdatesAdmin from "./DaycareFieldUpdatesAdmin";
 import styles from "./DaycareDonationsAdmin.module.scss";
-import type { useDaycareDonationsAdmin } from "./useDaycareDonationsAdmin";
+import type { AdminView, useDaycareDonationsAdmin } from "./useDaycareDonationsAdmin";
 import DonationOverviewAdminView from "./DonationOverviewAdminView";
 import DonationManualAdminView from "./DonationManualAdminView";
 import DonationItemsAdminView from "./DonationItemsAdminView";

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { galleryItems } from "../../data/galleryData";
+import { getGalleryThumbnail } from "../../data/galleryImageVariants";
 import styles from "./GalleryCategoryPage.module.scss";
 import Container from "../../components/Container/Container";
 
@@ -61,9 +62,10 @@ const GalleryCategoryPage = () => {
                             onClick={() => openImage(image)}
                         >
                             <img
-                                src={image}
+                                src={getGalleryThumbnail(image)}
                                 alt="פעילות בית חב״ד יפו"
                                 loading="lazy"
+                                decoding="async"
                             />
 
                         </button>

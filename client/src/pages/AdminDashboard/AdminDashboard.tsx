@@ -60,6 +60,7 @@ const AdminDashboard = () => {
                 </section>
 
                 <nav className={styles.tabs} aria-label="לשוניות ניהול">
+                    <button type="button" className={styles.tab} onClick={() => navigate("/admin/arbaat-haminim")}>ארבעת המינים</button>
                     <button
                         type="button"
                         className={activeTab === "projects" ? styles.tabActive : styles.tab}

@@ -9,7 +9,7 @@ const DonationItemsAdminView = ({ model }: Props) => {
     const {
         campaign, saving, activeView, inactiveRecommendedItems,
         effectiveRecommendationIds, handleItemUpdate, handleRecommendationsUpdate, resetRecommendations,
-        formatCurrency, getRecommendationLabel, getInactiveRecommendationLabel,
+        formatCurrency, getRecommendationLabel, getInactiveRecommendationLabel, getAutomaticRecommendationIds,
     } = model;
 
     return (

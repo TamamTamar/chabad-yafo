@@ -1,30 +1,30 @@
-import holiday5 from "../assets/gallery/holidays/h5.jpg";
-import holiday6 from "../assets/gallery/holidays/h6.jpg";
-import holiday8 from "../assets/gallery/holidays/h8.jpg";
-import holiday10 from "../assets/gallery/holidays/h10.jpg";
-import holiday15 from "../assets/gallery/holidays/h15.jpg";
+import holiday5 from "../assets/gallery/optimized/thumbnails/holidays/h5.webp";
+import holiday6 from "../assets/gallery/optimized/thumbnails/holidays/h6.webp";
+import holiday8 from "../assets/gallery/optimized/thumbnails/holidays/h8.webp";
+import holiday10 from "../assets/gallery/optimized/thumbnails/holidays/h10.webp";
+import holiday15 from "../assets/gallery/optimized/thumbnails/holidays/h15.webp";
 
 
-import community1 from "../assets/gallery/community/c1.jpg";
-import community2 from "../assets/gallery/community/c2.jpg";
-import community3 from "../assets/gallery/community/c3.jpg";
-import community4 from "../assets/gallery/community/c4.jpg";
+import community1 from "../assets/gallery/optimized/thumbnails/community/c1.webp";
+import community2 from "../assets/gallery/optimized/thumbnails/community/c2.webp";
+import community3 from "../assets/gallery/optimized/thumbnails/community/c3.webp";
+import community4 from "../assets/gallery/optimized/thumbnails/community/c4.webp";
 
-import street1 from "../assets/gallery/street/s1.jpg";
-import street12 from "../assets/gallery/street/s12.jpg";
-import street5 from "../assets/gallery/street/s5.jpg";
-import street7 from "../assets/gallery/street/s7.jpg";
-import street9 from "../assets/gallery/street/s9.jpg";
+import street1 from "../assets/gallery/optimized/thumbnails/street/s1.webp";
+import street12 from "../assets/gallery/optimized/thumbnails/street/s12.webp";
+import street5 from "../assets/gallery/optimized/thumbnails/street/s5.webp";
+import street7 from "../assets/gallery/optimized/thumbnails/street/s7.webp";
+import street9 from "../assets/gallery/optimized/thumbnails/street/s9.webp";
 
-import light3 from "../assets/gallery/light/l3.jpg";
-import light7 from "../assets/gallery/light/l7.jpg";
-import light23 from "../assets/gallery/light/l23.jpg";
+import light3 from "../assets/gallery/optimized/thumbnails/light/l3.webp";
+import light7 from "../assets/gallery/optimized/thumbnails/light/l7.webp";
+import light23 from "../assets/gallery/optimized/thumbnails/light/l23.webp";
 
 
-import partnership1 from "../assets/gallery/partnerships/p1.jpg";
-import partnership2 from "../assets/gallery/partnerships/p2.jpg";
+import partnership1 from "../assets/gallery/optimized/thumbnails/partnerships/p1.webp";
+import partnership2 from "../assets/gallery/optimized/thumbnails/partnerships/p2.webp";
 
-import support3 from "../assets/gallery/support/su3.jpg";
+import support3 from "../assets/gallery/optimized/thumbnails/support/su3.webp";
 
 
 

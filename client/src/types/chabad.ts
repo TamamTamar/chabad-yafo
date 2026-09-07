@@ -15,6 +15,7 @@ export type HebcalItem = {
   date: string;
   category: "candles" | "havdalah" | "parashat" | "holiday" | "zmanim" | string;
   hebrew?: string;
+  yomtov?: boolean;
   hdate?: string; // למשל: "11 Adar 5786"
 };
 
@@ -23,11 +24,10 @@ export type HebcalResponse = {
 };
 
 export type ShabbatTimes = {
-  parasha: string;
-  candles: string;
-  havdalah: string;
-  hebrewDate: string;     // בעברית
-  gregorianDate: string;  // 27.02.2026
+  title: string;
+  events: { label: string; time: string; date: string }[];
+  hebrewDate: string;
+  gregorianDate: string;
 };
 export type GalleryItem = {
   id: string;

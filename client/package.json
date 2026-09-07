@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "node scripts/test-admin-regressions.mjs && node scripts/test-shabbat-times.mjs",
     "preview": "vite preview",
     "clean": "rm -rf node_modules package-lock.json && npm install"
   },

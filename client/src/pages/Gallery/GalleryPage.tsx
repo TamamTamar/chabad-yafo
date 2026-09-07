@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import Container from "../../components/Container/Container";
 import { galleryItems } from "../../data/galleryData";
+import { getGalleryThumbnail } from "../../data/galleryImageVariants";
 
 import styles from "./GalleryPage.module.scss";
 
@@ -27,8 +28,10 @@ const GalleryPage = () => {
                             className={styles.categoryCard}
                         >
                             <img
-                                src={item.coverImage ?? item.images[0]}
+                                src={getGalleryThumbnail(item.coverImage ?? item.images[0])}
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className={styles.categoryImage}
                             />
 

@@ -48,7 +48,7 @@ const usePageMetadata = () => {
         return () => {
             document.title = previousTitle;
 
-            if (existingMeta && previousContent !== null) {
+            if (existingMeta && previousContent != null) {
                 existingMeta.setAttribute("content", previousContent);
             } else if (existingMeta) {
                 existingMeta.removeAttribute("content");

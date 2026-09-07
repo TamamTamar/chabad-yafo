@@ -185,7 +185,7 @@ export const getTaanitConfig = (referenceDate = new Date()): DonationCampaignCon
     .sort((a, b) => a.activationDay - b.activationDay);
 
   const activeFast =
-    scheduledFasts.findLast((fast) => fast.activationDay <= referenceDay) ?? scheduledFasts[0];
+    scheduledFasts.slice().reverse().find((fast) => fast.activationDay <= referenceDay) ?? scheduledFasts[0];
 
   if (!activeFast) {
     throw new Error("Unable to resolve a fast-day campaign from the Hebrew calendar");

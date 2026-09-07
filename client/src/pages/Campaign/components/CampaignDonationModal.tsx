@@ -24,6 +24,7 @@ type Props = {
   onClose: () => void;
   presetAmount: number;
   startWithCustom?: boolean;
+  defaultCustomAmount?: number;
   shaliachName: string;
   yearLabel: string;
   campaignTitle: string;
@@ -46,6 +47,7 @@ const CampaignDonationModal: React.FC<Props> = ({
   onClose,
   presetAmount,
   startWithCustom = false,
+  defaultCustomAmount,
   shaliachName,
   yearLabel,
   campaignTitle,
@@ -103,7 +105,7 @@ const CampaignDonationModal: React.FC<Props> = ({
       setErrorText("");
       resetPaymentUi();
       setSelectedAmount(presetAmount);
-      setCustomRaw("");
+      setCustomRaw(defaultCustomAmount === undefined ? "" : String(defaultCustomAmount));
       setAmountMode(startWithCustom ? "custom" : "preset");
       reset(prefilledDonor || EMPTY_DONOR);
     }, 0);
@@ -113,6 +115,7 @@ const CampaignDonationModal: React.FC<Props> = ({
     open,
     presetAmount,
     startWithCustom,
+    defaultCustomAmount,
     resetPaymentUi,
     setErrorText,
     prefilledDonor,

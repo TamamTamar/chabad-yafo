@@ -45,6 +45,20 @@ export type DonationCampaignConfig = {
 
   // content
   paragraphs: string[];
+  preparation?: {
+    sections: Array<{
+      title: string;
+      paragraphs: string[];
+      occasions?: string[];
+      variant?: "note";
+    }>;
+    donation: {
+      title: string;
+      paragraphs: string[];
+      buttonLabel: string;
+      defaultAmount?: number;
+    };
+  };
 
   // donate
   presetAmounts: number[];

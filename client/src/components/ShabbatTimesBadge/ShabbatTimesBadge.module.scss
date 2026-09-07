@@ -67,6 +67,8 @@
 .timesBox {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 16px;
   padding-inline-start: 22px;
   border-inline-start: 1px solid rgba($brand-primary, 0.14);

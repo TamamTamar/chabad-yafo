@@ -13,6 +13,7 @@ import CampaignDonationModal from "./components/CampaignDonationModal";
 import CampaignCompactForm from "./components/CampaignCompactForm";
 import CampaignCalculator from "./components/CampaignCalculator";
 import CampaignInstructions from "./components/CampaignInstructions";
+import CampaignPreparationContent from "./components/CampaignPreparationContent";
 
 type Props = {
   config: DonationCampaignConfig;
@@ -83,6 +84,29 @@ const DonationCampaignPage: React.FC<Props> = ({ config }) => {
   const handleCalculatorSelect = (amount: number) => {
     setSyncAmount(amount);
   };
+
+  if (config.preparation) {
+    return (
+      <main className={styles.page} dir="rtl" lang="he">
+        <CampaignHeroImage imageUrl={config.heroImage} variant={config.heroVariant} />
+        <CampaignPreparationContent
+          title={config.title}
+          paragraphs={config.paragraphs}
+          preparation={config.preparation}
+          onDonate={openCustomDonation}
+        />
+        <CampaignDonationModal
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          presetAmount={presetAmount}
+          startWithCustom={startWithCustom}
+          defaultCustomAmount={config.preparation.donation.defaultAmount}
+          collectBlessingNames={config.collectBlessingNames}
+          {...modalContext}
+        />
+      </main>
+    );
+  }
 
   const donationForm = config.isCompact ? (
     <CampaignCompactForm

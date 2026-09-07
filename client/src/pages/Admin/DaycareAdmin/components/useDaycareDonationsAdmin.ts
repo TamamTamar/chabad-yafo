@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { getInactiveRecommendedItems } from "./donationRecommendations";
 import {
     clearAdminDaycareDonationDiagnostics,
     createManualDaycareDonation,
@@ -170,7 +171,7 @@ const auditLabels: Record<string, string> = {
     "lead.updated": "פנייה לתורם עודכנה",
 };
 
-type AdminView =
+export type AdminView =
     | "overview"
     | "records"
     | "ambassadors"
@@ -544,15 +545,11 @@ export const useDaycareDonationsAdmin = () => {
         }
     };
 
-    const inactiveRecommendedItems = (campaign?.recommendedChoiceIds ?? [])
-        .map((choiceId) =>
-            campaign?.items ?? [].find((item) => item.id === choiceId)
-        )
-        .filter(
-            (item): item is DonationItem =>
-                item !== undefined &&
-                Boolean(getInactiveRecommendationLabel(item))
-        );
+    const inactiveRecommendedItems = getInactiveRecommendedItems(
+        campaign?.items ?? [],
+        campaign?.recommendedChoiceIds ?? [],
+        getInactiveRecommendationLabel
+    );
     const effectiveRecommendationIds = getEffectiveRecommendationIds(
         campaign?.items ?? [],
         campaign?.recommendedChoiceIds ?? []
@@ -575,7 +572,7 @@ export const useDaycareDonationsAdmin = () => {
         resetRecommendations, handleRecordUpdate, handleClearDiagnostics,
         formatCurrency, formatDate, formatShortDate, currencySymbol,
         currencyAmountLabel, currencyRateLabel, getRecommendationLabel,
-        getInactiveRecommendationLabel, sortItemsByNeed, statusLabels,
+        getInactiveRecommendationLabel, getAutomaticRecommendationIds, getItemRemaining, sortItemsByNeed, statusLabels,
         auditLabels, adminViews, primaryAdminViews,
     };
 };

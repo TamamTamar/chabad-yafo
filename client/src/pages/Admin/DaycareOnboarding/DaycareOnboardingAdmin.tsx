@@ -425,7 +425,7 @@ const DaycareOnboardingAdmin = () => {
                     reviewChecklist={reviewChecklist}
                     allDocumentsReady={allDocumentsReady}
                     allDocumentsSubmitted={allDocumentsSubmitted}
-                    standingOrderActive={onboarding.tuitionPayment.status === "active"}
+                    allDocumentsApproved={allDocumentsApproved}
                     nextStep={nextStep}
                     scrollToCaseSection={scrollToCaseSection}
                 />
@@ -493,7 +493,7 @@ const DaycareOnboardingAdmin = () => {
                     drafts={drafts}
                     dirtyStepKeys={dirtyStepKeys}
                     savingStepKey={savingStepKey}
-                    allDocumentsApproved={allDocumentsApproved}
+                    standingOrderActive={onboarding.tuitionPayment.status === "active"}
                     isDirty={isDirty}
                     nextStep={nextStep}
                     updateDraft={updateDraft}

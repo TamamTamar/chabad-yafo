@@ -25,7 +25,7 @@ type DaycareTasksProps = {
     onFinanceChanged?: () => void;
 };
 
-type CategoryFilter =
+export type CategoryFilter =
     | DaycareTaskCategory
     | "הכל"
     | "פתוחות"

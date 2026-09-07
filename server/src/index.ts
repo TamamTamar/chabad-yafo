@@ -1,3 +1,4 @@
+import { arbaatHaminimAdminRoutes, arbaatHaminimPublicRoutes } from "./routes/arbaatHaminimRoutes";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -62,6 +63,8 @@ app.use(express.json());
 
 app.get("/", (_req, res) => res.send("OK"));
 
+app.use("/api/arbaat-haminim", arbaatHaminimPublicRoutes);
+app.use("/api/admin/arbaat-haminim", arbaatHaminimAdminRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/shabbat", shabbatRoutes);
 app.use("/api/families", familyRoutes);

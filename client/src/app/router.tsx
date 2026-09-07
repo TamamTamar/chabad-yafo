@@ -4,6 +4,8 @@ import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRout
 import Root from "./Root";
 import RouteErrorPage from "./RouteErrorPage";
 
+const ArbaatHaminimAdmin = lazy(() => import("../pages/Admin/ArbaatHaminimAdmin/ArbaatHaminimAdmin"));
+const ArbaatHaminim = lazy(() => import("../pages/ArbaatHaminim/ArbaatHaminim"));
 const AboutPage = lazy(() => import("../pages/AboutPage/AboutPage"));
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard/AdminDashboard"));
 const AdminLogin = lazy(() => import("../pages/AdminLogin/AdminLogin"));
@@ -30,6 +32,7 @@ const PurimMatanotLaEvyonim = lazy(
 );
 const Taanit = lazy(() => import("../pages/Taanit/Taanit"));
 const WriteToRebbe = lazy(() => import("../pages/WriteToRebbe/WriteToRebbe"));
+const Yizkor = lazy(() => import("../pages/Yizkor/Yizkor"));
 
 
 export const router = createBrowserRouter([
@@ -48,10 +51,13 @@ export const router = createBrowserRouter([
         errorElement: <RouteErrorPage />,
         children: [
             { index: true, element: <Home /> },
+            { path: "arbaat-haminim", element: <ArbaatHaminim /> },
+            { path: "admin/arbaat-haminim", element: <ProtectedRouteAdmin><ArbaatHaminimAdmin /></ProtectedRouteAdmin> },
             { path: "purim", element: <PurimMatanotLaEvyonim /> },
             { path: "machatzit-hashekel", element: <MachatzitHashekel /> },
             { path: "kaparot", element: <Kaparot /> },
             { path: "taanit", element: <Taanit /> },
+            { path: "yizkor", element: <Yizkor /> },
             { path: "*", element: <ErrorPage /> },
             {
                 path: "families", element: <Families />

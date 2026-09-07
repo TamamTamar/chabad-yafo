@@ -14,7 +14,7 @@ const DonationManualAdminView = ({ model }: Props) => {
         setManualAmount, setManualExchangeRate, setManualRateUpdatedAt, setManualRateError,
         setManualReceivedAt, loadAutomaticRate, handleManualDonation, formatCurrency,
         formatShortDate, currencySymbol, currencyAmountLabel, currencyRateLabel,
-        sortItemsByNeed,
+        sortItemsByNeed, getItemRemaining,
     } = model;
 
     return (

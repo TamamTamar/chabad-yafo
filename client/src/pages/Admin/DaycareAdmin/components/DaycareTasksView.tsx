@@ -1,7 +1,7 @@
 import { ChevronDown, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import styles from "../DaycareAdmin.module.scss";
 import type { DaycarePriority, DaycareTaskCategory } from "../types";
-import type { useDaycareTasks } from "./useDaycareTasks";
+import type { CategoryFilter, useDaycareTasks } from "./useDaycareTasks";
 
 type DaycareTasksViewProps = { model: ReturnType<typeof useDaycareTasks> };
 
@@ -227,7 +227,7 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                         }
                         onChange={(event) => {
                             const nextCategory = event.target
-                                .value as CategoryFilter;
+                                .value as CategoryFilter | "";
 
                             setSelectedCategory(
                                 nextCategory === "" ? "הכל" : nextCategory
