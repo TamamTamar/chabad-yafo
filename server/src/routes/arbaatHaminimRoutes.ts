@@ -1,51 +1,45 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
-import { isValidObjectId } from 'mongoose';
 import { requireAdmin } from '../middleware/adminAuth';
 import { requireSecureAdminMutation } from '../middleware/adminMutationSecurity';
-import { ArbaatHaminimSeason, ArbaatHaminimPublication } from '../models/ArbaatHaminimSeason';
+import { ArbaatHaminimSettings } from '../models/ArbaatHaminimSettings';
 import { parseSaleContent, parseRevision } from '../services/arbaatHaminimValidation';
 
 export const arbaatHaminimPublicRoutes = Router();
 export const arbaatHaminimAdminRoutes = Router();
 const handle = (fn: (req: Request, res: Response) => Promise<unknown>) => (req: Request, res: Response, next: NextFunction) => { void fn(req, res).catch(next); };
+const conflict = (res: Response) => res.status(409).json({ success: false, message: 'פרטי המכירה השתנו בחלון אחר. יש לרענן את העמוד לפני שמירה.' });
 
 arbaatHaminimPublicRoutes.get('/', handle(async (_req, res) => {
     res.set('Cache-Control', 'no-store');
-    const publication = await ArbaatHaminimPublication.findById('current').lean();
-    return res.json({ success: true, data: publication?.content ?? null });
+    const settings = await ArbaatHaminimSettings.findById('current').lean();
+    return res.json({ success: true, data: settings?.content ?? null });
 }));
-
 arbaatHaminimAdminRoutes.use(requireAdmin, requireSecureAdminMutation);
 arbaatHaminimAdminRoutes.get('/', handle(async (_req, res) => {
     res.set('Cache-Control', 'no-store');
-    const [seasons, publication] = await Promise.all([
-        ArbaatHaminimSeason.find().sort({ updatedAt: -1 }).lean(),
-        ArbaatHaminimPublication.findById('current').lean(),
-    ]);
-    return res.json({ success: true, data: { seasons, publication } });
+    const settings = await ArbaatHaminimSettings.findById('current').lean();
+    return res.json({ success: true, data: settings ? { content: settings.content, revision: settings.revision } : null });
 }));
-arbaatHaminimAdminRoutes.post('/', handle(async (req, res) => {
-    let content;
-    try { content = parseSaleContent(req.body.content); } catch (error) { return res.status(400).json({ success: false, message: (error as Error).message }); }
-    const season = await ArbaatHaminimSeason.create({ content });
-    return res.status(201).json({ success: true, data: season });
-}));
-arbaatHaminimAdminRoutes.put('/:id', handle(async (req, res) => {
-    if (!isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'מזהה עונה אינו תקין' });
+arbaatHaminimAdminRoutes.put('/', handle(async (req, res) => {
     let content, revision;
-    try { content = parseSaleContent(req.body.content); revision = parseRevision(req.body.revision); } catch (error) { return res.status(400).json({ success: false, message: (error as Error).message }); }
-    const season = await ArbaatHaminimSeason.findOneAndUpdate({ _id: req.params.id, revision }, { $set: { content }, $inc: { revision: 1 } }, { new: true });
-    if (!season) return res.status(409).json({ success: false, message: 'העונה השתנתה בחלון אחר. יש לטעון אותה מחדש לפני שמירה.' });
-    return res.json({ success: true, data: season });
-}));
-arbaatHaminimAdminRoutes.post('/:id/publish', handle(async (req, res) => {
-    if (!isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'מזהה עונה אינו תקין' });
-    let revision;
-    try { revision = parseRevision(req.body.revision); } catch (error) { return res.status(400).json({ success: false, message: (error as Error).message }); }
-    const season = await ArbaatHaminimSeason.findOne({ _id: req.params.id, revision }).lean();
-    if (!season) return res.status(409).json({ success: false, message: 'הטיוטה השתנתה. יש לטעון אותה מחדש לפני פרסום.' });
-    const publication = await ArbaatHaminimPublication.findOneAndUpdate({ _id: 'current' }, { $set: { seasonId: String(season._id), revision: season.revision, content: season.content } }, { new: true, upsert: true });
-    return res.json({ success: true, data: publication });
+    try {
+        content = parseSaleContent(req.body.content);
+        revision = req.body.revision === null ? null : parseRevision(req.body.revision);
+    } catch (error) { return res.status(400).json({ success: false, message: (error as Error).message }); }
+    if (revision === null) {
+        try {
+            const settings = await ArbaatHaminimSettings.create({ _id: 'current', content, revision: 0 });
+            return res.json({ success: true, data: { content: settings.content, revision: settings.revision } });
+        } catch (error) {
+            if ((error as { code?: number }).code === 11000) return conflict(res);
+            throw error;
+        }
+    }
+    const settings = await ArbaatHaminimSettings.findOneAndUpdate(
+        { _id: 'current', revision }, { $set: { content }, $inc: { revision: 1 } }, { returnDocument: 'after' }
+    );
+    if (!settings) return conflict(res);
+    return res.json({ success: true, data: { content: settings.content, revision: settings.revision } });
 }));
 const reportError = (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     console.error('Arbaat haminim content request failed', error);

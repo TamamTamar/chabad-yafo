@@ -13,5 +13,4 @@ export type SaleContent = {
     saleDetails: { label: string; value: string }[];
     faq: { question: string; answer: string }[];
 };
-export type SaleSeason = { _id: string; content: SaleContent; revision: number; updatedAt: string };
-export type SalePublication = { seasonId: string; revision: number; content: SaleContent };
+export type SaleSettings = { content: SaleContent; revision: number };

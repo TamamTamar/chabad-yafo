@@ -55,6 +55,6 @@ export const parseSaleContent = (value: unknown): SaleContent => {
     };
 };
 export const parseRevision = (value: unknown) => {
-    if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) throw new Error('גרסת טיוטה אינה תקינה');
+    if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) throw new Error('גרסת הנתונים אינה תקינה');
     return value;
 };
