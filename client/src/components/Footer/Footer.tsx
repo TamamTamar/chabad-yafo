@@ -74,7 +74,13 @@ const Footer = () => {
                     </div>
 
                     <div className={styles.bottom}>
-                        © {year} Tamar Tamam
+                        <div className={styles.organization}>
+                            האתר הרשמי של מרכז חב״ד יפו (ע״ר) | עמותה מס׳ 580798684
+                        </div>
+
+                        <div className={styles.credit}>
+                            © {year} Tamar Tamam
+                        </div>
                     </div>
                 </div>
             </Container>
