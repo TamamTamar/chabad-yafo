@@ -1,4 +1,4 @@
-import heroImage from "../../assets/yizkor-hero.png";
+import heroImage from "../../assets/yizkor-memorial-candle-hero.webp";
 import type { DonationCampaignConfig } from "../Campaign/types";
 
 export const yizkorConfig: DonationCampaignConfig = {

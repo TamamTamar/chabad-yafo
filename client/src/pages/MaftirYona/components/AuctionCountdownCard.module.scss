@@ -1,6 +1,4 @@
 @use "../../../styles/variables" as *;
-@value note, status from "../MaftirYona.module.scss";
-
 .leading {
     text-align: center;
     border-color: $brand-secondary;

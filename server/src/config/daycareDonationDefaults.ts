@@ -18,7 +18,7 @@ export const defaultDaycareDonationCampaign: DaycareDonationCampaignDocument = {
             published: true,
             publishedAt: new Date("2026-08-17T00:00:00.000Z"),
             image: {
-                src: "/daycare-donations/field-update-kitchen.jpg",
+                src: "/daycare-donations/daycare-kitchen-renovation.webp",
                 alt: "ארונות המטבח החדשים שהותקנו במעון",
             },
             createdAt: new Date("2026-08-17T00:00:00.000Z"),

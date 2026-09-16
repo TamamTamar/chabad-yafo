@@ -1,7 +1,7 @@
 import type { ChabadHouseCard } from "../types/chabad";
 
-import tzahalon from "../assets/chabad-houses/tzahalon.jpeg";
-import center from "../assets/chabad-houses/center.jpeg";
+import tzahalon from "../assets/chabad-houses/tzahalon-synagogue-entrance.webp";
+import center from "../assets/chabad-houses/chabad-center-rabbi-speaking.webp";
 import kampus from "../assets/chabad-houses/kampus.jpeg";
 
 

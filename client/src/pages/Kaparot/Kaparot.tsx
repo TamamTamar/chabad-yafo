@@ -1,6 +1,6 @@
 import React from "react";
 
-import heroImg from "../../assets/kaparot-hero.jpg";
+import heroImg from "../../assets/kaparot-charity-coins-hero.webp";
 import DonationCampaignPage from "../Campaign/DonationCampaignPage";
 import type { DonationCampaignConfig } from "../Campaign/types";
 

@@ -11,7 +11,7 @@
             rgba($brand-primary-deep, .90),
             rgba($brand-primary-deep, .64) 50%,
             rgba($brand-blue-ink-dark, .68)),
-        url("/maftir-yona/torah-atmosphere.jpg");
+        url("/maftir-yona/hero.webp");
 
     background-size: cover;
 background-position: 45% 58%;
@@ -216,7 +216,7 @@ background-position: 45% 58%;
     .publicHero {
             background-image:
                 linear-gradient(180deg, rgba($brand-primary-deep, .94), rgba($brand-primary-deep, .88) 45%, rgba($brand-blue-ink-dark, .96)),
-                url("/maftir-yona/torah-atmosphere.jpg");
+            url("/maftir-yona/hero.webp");
             background-position: 72% center;
         }
 

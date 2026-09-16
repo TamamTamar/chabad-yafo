@@ -1,7 +1,7 @@
 import { HDate } from "@hebcal/hdate";
 import { getHolidaysForYearArray } from "@hebcal/core/dist/esm/holidays";
 import type { DonationCampaignConfig } from "../Campaign/types";
-import heroImg from "../../assets/taanit-hero.png";
+import heroImg from "../../assets/taanit-jerusalem-prayer-hero.webp";
 
 type FastDayKey =
   | "tzomGedaliah"

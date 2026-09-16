@@ -1,5 +1,5 @@
 import Container from "../../../../components/Container/Container";
-import rebbeImage from "../../../../assets/rebbe.png";
+import rebbeImage from "../../../../assets/rebbe-writing-letter.webp";
 
 import styles from "./RebbeLetterHero.module.scss";
 import { writeToRebbeConfigs } from "../../writeToRebbeConfig";

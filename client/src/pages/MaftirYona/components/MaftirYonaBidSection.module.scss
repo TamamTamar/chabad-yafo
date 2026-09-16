@@ -1,7 +1,4 @@
 @use "../../../styles/variables" as *;
-@value fields, form, sectionTitle from "../MaftirYona.module.scss";
-@value checkbox, checkboxLabel from "./BidderDetailsForm.module.scss";
-
 .fieldset {
     padding: 0;
     margin: 0;
@@ -106,4 +103,3 @@
     flex-shrink: 0;
     color: $brand-primary;
 }
-

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { parseSaleContent, parseRevision } from '../services/arbaatHaminimValidation';
 const fixture = () => ({
     year: 'תשפ״ז', heroSubtitle: 'הזמנה או בחירה במקום', seoDescription: 'תיאור', catalogIntro: 'סטים', extrasIntro: 'תוספות', visitIntro: 'בחירה במקום',
-    heroImage: { src: '/arbaat-haminim/hero.jpg', alt: 'המחשה' },
+    heroImage: { src: '/arbaat-haminim/hero.webp', alt: 'המחשה' },
     sets: [{ id: 'regular', name: 'סט', price: null, description: 'תיאור', included: 'יעודכן' }],
     extras: [], fulfillmentOptions: [{ id: 'pickup', name: 'איסוף', details: 'יעודכן' }], saleDetails: [], faq: [],
 });

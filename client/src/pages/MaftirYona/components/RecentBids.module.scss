@@ -1,6 +1,4 @@
 @use "../../../styles/variables" as *;
-@value bid, bidAmount, bidList, sectionTitle from "../MaftirYona.module.scss";
-
 .recentCard {
     grid-column: 1 / -1;
     min-width: 0;

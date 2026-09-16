@@ -67,7 +67,7 @@ const fallbackCampaign: DaycareDonationCampaignData = {
             itemId: "plumbing",
             published: true,
             publishedAt: "2026-08-17T00:00:00.000Z",
-            imageUrl: "/daycare-donations/field-update-kitchen.jpg",
+            imageUrl: "/daycare-donations/daycare-kitchen-renovation.webp",
             imageAlt: "ארונות המטבח החדשים שהותקנו במעון",
             createdAt: "2026-08-17T00:00:00.000Z",
             updatedAt: "2026-08-17T00:00:00.000Z",
