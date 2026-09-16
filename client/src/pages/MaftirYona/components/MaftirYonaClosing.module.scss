@@ -1,0 +1,54 @@
+@use "../../../styles/variables" as *;
+
+.mobileBidLink:focus-visible {
+    outline: 3px solid $brand-secondary;
+    outline-offset: 5px;
+}
+
+.ctaIcon {
+    flex-shrink: 0;
+}
+
+.closingNote {
+    text-align: center;
+    padding: 20px 20px 0;
+}
+
+.closingText {
+    color: $brand-primary;
+    font-size: 1rem;
+    line-height: 1.65;
+    margin: 0;
+}
+
+.mobileBidLink {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .closingNote {
+            padding-top: 16px;
+        }
+
+    .mobileBidLink {
+            position: fixed;
+            bottom: 14px;
+            left: 16px;
+            right: 76px;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: $brand-secondary;
+            color: $brand-primary-deep;
+            box-shadow: 0 5px 28px $ui-shadow-blue-strong;
+            padding: 14px;
+            border-radius: $radius-pill;
+        }
+
+    .mobileBidText {
+            font-size: .95rem;
+            font-weight: 900;
+        }
+}

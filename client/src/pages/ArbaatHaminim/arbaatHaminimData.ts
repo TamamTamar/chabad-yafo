@@ -27,7 +27,7 @@ export const faq = [
     { question: 'אפשר להזמין יותר מסט אחד?', answer: 'הטופס מאפשר לבחור כמות של סטים מהסוג שנבחר. פרטי הזמינות יעודכנו לקראת פתיחת ההזמנות.' },
     { question: 'למי פונים במקרה של שאלה?', answer: 'פרטי הטלפון וה־WhatsApp לשאלות יפורסמו בהמשך.' },
 ];
-export const heroImage = { src: '/arbaat-haminim/hero.jpg', alt: 'אתרוג, לולב, הדסים וערבות על רקע אבן בהירה — תמונת המחשה' };
+export const heroImage = { src: '/arbaat-haminim/hero2.png', alt: 'אתרוג, לולב, הדסים וערבות על רקע אבן בהירה — תמונת המחשה' };
 export const defaultSaleContent: SaleContent = {
     year: 'תשפ״ז',
     heroSubtitle: 'הזמנת ארבעת המינים דרך בית חב״ד יפו',

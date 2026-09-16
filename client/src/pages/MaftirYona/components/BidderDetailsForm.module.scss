@@ -1,0 +1,28 @@
+@use "../../../styles/variables" as *;
+
+.checkbox:focus-visible {
+    outline: 3px solid $brand-secondary;
+    outline-offset: 3px;
+}
+
+.checkboxLabel {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 20px;
+    line-height: $line-body;
+}
+
+.checkbox {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    margin-top: 5px;
+    accent-color: $brand-primary;
+}
+
+.contactHeading {
+    color: $brand-primary;
+    font-size: 1rem;
+    margin: 0 0 8px;
+}

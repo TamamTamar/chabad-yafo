@@ -1,0 +1,163 @@
+@use "../../../styles/variables" as *;
+@value note, status from "../MaftirYona.module.scss";
+
+.leading {
+    text-align: center;
+    border-color: $brand-secondary;
+    border-top: 5px solid $brand-secondary;
+    margin-bottom: 28px;
+}
+
+.amount {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    color: $brand-primary;
+    font-weight: 900;
+    margin: 4px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.leader {
+    font-size: $type-card-title;
+    margin: 0 0 24px;
+}
+
+.countdown {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 440px;
+    margin: 0 auto 20px;
+}
+
+.timeBox {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 4px;
+    background: $brand-surface-cool;
+    border-radius: $radius-sm;
+}
+
+.timeNumber {
+    font-size: $type-display-number;
+    font-weight: 800;
+    color: $brand-primary;
+    font-variant-numeric: tabular-nums;
+}
+
+.timeLabel {
+    color: $ui-text-muted;
+    font-size: $type-body-sm;
+}
+
+@media (max-width: 480px) {
+    .countdown {
+            gap: 6px;
+        }
+}
+
+.publicLeading {
+    margin: 0;
+    border-top-width: 4px;
+    padding-block: 20px;
+}
+
+.publicLeading .status {
+    margin-bottom: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.liveDot,
+.quietDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: $ui-success-dark;
+}
+
+.quietDot {
+    background: $ui-neutral-slate;
+}
+
+.publicLeading .status + .note {
+    margin: 4px 0 2px;
+}
+
+.publicLeading .amount {
+    font-size: clamp(2.8rem, 4vw, 3.7rem);
+    margin: 2px 0;
+    line-height: 1.2;
+}
+
+.publicLeading .leader {
+    margin-bottom: 10px;
+}
+
+.countdownHeading {
+    border-top: 1px solid $ui-border-soft;
+    padding-top: 12px;
+    margin: 12px 0 8px;
+    font-weight: 700;
+    color: $brand-primary;
+}
+
+.publicLeading .countdown {
+    direction: ltr;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.publicLeading .timeBox {
+    background: $ui-surface-warm;
+    min-width: 0;
+    padding: 8px 2px;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.publicLeading .timeNumber {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    line-height: 1.2;
+}
+
+.endDate {
+    margin: 0;
+    color: $brand-primary;
+    font-size: .85rem;
+    line-height: 1.5;
+}
+
+.extensionNote {
+    margin: 4px 0 0;
+    color: $ui-text-muted;
+    font-size: .75rem;
+    line-height: 1.5;
+}
+
+@media (min-width: 1024px) {
+    .endDate {
+            white-space: nowrap;
+        }
+}
+
+@media (max-width: 800px) {
+    .publicLeading {
+            padding-block: 18px;
+        }
+
+    .publicLeading .countdown {
+            max-width: 350px;
+        }
+
+    .publicLeading .leader {
+            margin-bottom: 10px;
+        }
+}
+
+@media (max-width: 480px) {
+    .publicLeading .note {
+            font-size: .82rem;
+        }
+}

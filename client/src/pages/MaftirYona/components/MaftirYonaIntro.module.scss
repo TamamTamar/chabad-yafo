@@ -1,0 +1,80 @@
+@use "../../../styles/variables" as *;
+
+.auctionIntro {
+    text-align: center;
+    padding: 40px 20px 28px;
+    scroll-margin-top: 82px;
+}
+
+.sectionEyebrow {
+    font-size: .85rem;
+    color: $brand-gold-dark;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.auctionTitle {
+    font-size: $type-section-title;
+    color: $brand-primary-deep;
+    margin: 10px 0;
+    line-height: 1.25;
+}
+
+.auctionDescription {
+    color: $ui-text-muted;
+    margin: 0;
+    line-height: 1.7;
+}
+
+@media (max-width: 800px) {
+    .auctionIntro {
+            padding-top: 28px;
+        }
+}
+
+.meritSection {
+    max-width: 920px;
+    margin: 28px auto 0;
+    padding: 20px 24px;
+    border-inline-start: 3px solid $brand-secondary;
+    background: $ui-surface-warm;
+    border-radius: $radius-md;
+}
+
+.meritHeading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.meritIcon {
+    color: $brand-gold-dark;
+    flex-shrink: 0;
+}
+
+.meritTitle {
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: $type-section-title-sm;
+}
+
+.meritText {
+    margin: 0;
+    color: $brand-text;
+    font-size: $type-body;
+    line-height: 1.7;
+}
+
+@media (max-width: 960px) {
+    .meritSection {
+            margin-inline: 20px;
+        }
+}
+
+@media (max-width: 480px) {
+    .meritSection {
+            margin: 20px 12px 0;
+            padding: 16px;
+        }
+}

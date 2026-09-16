@@ -61,6 +61,40 @@ const slides: HeroSlide[] = [
             },
         ],
     },
+    {
+        id: "arbaat-haminim",
+        eyebrow: "ארבעת המינים לחג הסוכות",
+        title: "בחרו את הסט שמתאים לכם",
+        description: "סטים מהודרים של ארבעת המינים, עם אפשרות להזמנה מראש או להגיע ולבחור במקום.",
+        contentPosition: "right",
+        desktopImage: "/arbaat-haminim/hero2.png",
+        mobileImage: "/arbaat-haminim/hero2.png",
+        imagePosition: "center",
+        actions: [
+            {
+                label: "להזמנת ארבעת המינים",
+                to: "/arbaat-haminim",
+                variant: "primary",
+            },
+        ],
+    },
+    {
+        id: "maftir-yona",
+        eyebrow: "סגולת מפטיר יונה ביום הכיפורים",
+        title: "מכירת הזכות למפטיר יונה",
+        description: "הצטרפו למכירה הפומבית על הזכות לעלות למפטיר יונה בבית חב״ד יפו.",
+        contentPosition: "right",
+        desktopImage: "/maftir-yona/torah-atmosphere.jpg",
+        mobileImage: "/maftir-yona/torah-atmosphere.jpg",
+        imagePosition: "center",
+        actions: [
+            {
+                label: "להשתתפות במכירה הפומבית",
+                to: "/maftir-yona",
+                variant: "primary",
+            },
+        ],
+    },
 ];
 
 const Hero = () => {

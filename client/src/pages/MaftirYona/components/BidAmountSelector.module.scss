@@ -1,0 +1,129 @@
+@use "../../../styles/variables" as *;
+
+.offerChoice:focus-visible {
+    outline: 3px solid $brand-secondary;
+    outline-offset: 5px;
+}
+
+.amountSelection {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid $ui-border-soft;
+}
+
+.offerChoices {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0 0 10px;
+}
+
+.offerChoice {
+    min-height: 44px;
+    padding: 8px 6px;
+    cursor: pointer;
+    border-radius: $radius-sm;
+    background: $ui-surface-warm;
+    color: $brand-primary;
+    border: 1px solid rgba($brand-secondary, .8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: background .15s, border-color .15s;
+}
+
+.offerChoice:hover {
+    background: $brand-gold-pale;
+}
+
+.offerSelected {
+    background: $brand-primary-deep;
+    color: $color-white;
+    border-color: $brand-primary-deep;
+}
+
+.offerSelected:hover {
+    background: $brand-primary;
+}
+
+.offerChoice:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.offerTotal {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.amountInputWrap {
+    position: relative;
+    display: block;
+}
+
+.currency {
+    position: absolute;
+    inset-inline-end: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $brand-primary;
+    font-size: 1.5rem;
+    pointer-events: none;
+}
+
+.offerInput {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: $brand-primary;
+    padding-block: 8px;
+    padding-inline-end: 44px;
+}
+
+.minimumNote {
+    font-size: .85rem;
+    color: $ui-text-muted;
+    margin: 8px 0 0;
+}
+
+@media (max-width: 480px) {
+    .offerChoices {
+            gap: 7px;
+        }
+
+    .offerTotal {
+            font-size: 1.06rem;
+        }
+}
+
+.incrementChoices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.incrementButton {
+    padding: 7px 10px;
+    color: $brand-primary;
+    background: $brand-bg;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-pill;
+    font-size: .8rem;
+}
+
+.incrementButton:hover {
+    background: $ui-surface-warm;
+    border-color: $brand-secondary;
+}
+
+.incrementButton:focus-visible {
+    outline: 3px solid $brand-secondary;
+    outline-offset: 2px;
+}
+
+.incrementButton:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}

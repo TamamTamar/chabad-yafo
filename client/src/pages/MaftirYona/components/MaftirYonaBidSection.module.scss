@@ -1,0 +1,109 @@
+@use "../../../styles/variables" as *;
+@value fields, form, sectionTitle from "../MaftirYona.module.scss";
+@value checkbox, checkboxLabel from "./BidderDetailsForm.module.scss";
+
+.fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.success {
+    border-radius: $radius-sm;
+    padding: 14px 18px;
+    line-height: $line-body;
+}
+
+.success {
+    color: $ui-success-dark;
+    background: $ui-success-soft;
+}
+
+.bidCard {
+    scroll-margin-top: 82px;
+    padding: 20px;
+    border: 1px solid rgba($brand-secondary, .6);
+    box-shadow: 0 18px 55px $ui-shadow-blue;
+}
+
+.formHeading {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.formHeading .sectionTitle {
+    font-size: clamp(1.35rem, 2vw, 1.65rem);
+    margin: 0;
+}
+
+.formIcon {
+    color: $brand-gold-dark;
+    flex-shrink: 0;
+}
+
+.bidCard .form {
+    margin-top: 12px;
+    gap: 10px;
+}
+
+.bidCard .fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.bidCard .checkboxLabel {
+    gap: 8px;
+    margin-top: 12px;
+    cursor: pointer;
+    font-size: .9rem;
+    line-height: 1.5;
+}
+
+.bidCard .checkbox {
+    margin: 1px 0 0;
+}
+
+@media (max-width: 800px) {
+    .bidCard .fields {
+            grid-template-columns: 1fr;
+        }
+}
+
+@media (max-width: 480px) {
+    .bidCard {
+            padding: 16px;
+        }
+}
+
+.bidSubmit {
+    background: $brand-secondary;
+    color: $brand-primary-deep;
+    border-color: $brand-secondary;
+    font-size: 1.17rem;
+    min-height: 50px;
+    width: 100%;
+}
+
+.bidSubmit:hover:not(:disabled) {
+    background: $brand-gold-pale;
+}
+
+.paymentReassurance {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: $ui-text-muted;
+    font-size: .85rem;
+    line-height: 1.5;
+    margin: 0;
+    text-align: center;
+}
+
+.reassuranceIcon {
+    flex-shrink: 0;
+    color: $brand-primary;
+}
+
