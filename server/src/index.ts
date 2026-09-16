@@ -1,3 +1,4 @@
+import { maftirYonaPublicRoutes, maftirYonaAdminRoutes } from "./routes/maftirYonaRoutes";
 import { arbaatHaminimAdminRoutes, arbaatHaminimPublicRoutes } from "./routes/arbaatHaminimRoutes";
 import express from "express";
 import cors from "cors";
@@ -63,6 +64,8 @@ app.use(express.json());
 
 app.get("/", (_req, res) => res.send("OK"));
 
+app.use("/api/maftir-yona", maftirYonaPublicRoutes);
+app.use("/api/admin/maftir-yona", maftirYonaAdminRoutes);
 app.use("/api/arbaat-haminim", arbaatHaminimPublicRoutes);
 app.use("/api/admin/arbaat-haminim", arbaatHaminimAdminRoutes);
 app.use("/api/health", healthRoutes);

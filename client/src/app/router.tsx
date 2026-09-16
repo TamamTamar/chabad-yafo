@@ -4,6 +4,8 @@ import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRout
 import Root from "./Root";
 import RouteErrorPage from "./RouteErrorPage";
 
+const MaftirYonaPage = lazy(() => import("../pages/MaftirYona/MaftirYonaPage"));
+const MaftirYonaAdmin = lazy(() => import("../pages/Admin/MaftirYonaAdmin/MaftirYonaAdmin"));
 const ArbaatHaminimAdmin = lazy(() => import("../pages/Admin/ArbaatHaminimAdmin/ArbaatHaminimAdmin"));
 const ArbaatHaminim = lazy(() => import("../pages/ArbaatHaminim/ArbaatHaminim"));
 const AboutPage = lazy(() => import("../pages/AboutPage/AboutPage"));
@@ -51,6 +53,9 @@ export const router = createBrowserRouter([
         errorElement: <RouteErrorPage />,
         children: [
             { index: true, element: <Home /> },
+            { path: "maftir-yona", element: <MaftirYonaPage /> },
+            { path: "admin", element: <Navigate to="/admin/dashboard" replace /> },
+            { path: "admin/maftir-yona", element: <ProtectedRouteAdmin><MaftirYonaAdmin /></ProtectedRouteAdmin> },
             { path: "arbaat-haminim", element: <ArbaatHaminim /> },
             { path: "admin/arbaat-haminim", element: <ProtectedRouteAdmin><ArbaatHaminimAdmin /></ProtectedRouteAdmin> },
             { path: "purim", element: <PurimMatanotLaEvyonim /> },

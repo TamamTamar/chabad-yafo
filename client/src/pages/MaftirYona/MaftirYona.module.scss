@@ -1,0 +1,1146 @@
+@use "../../styles/variables" as *;
+
+.page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 56px 20px 64px;
+    color: $brand-text;
+}
+
+.hero {
+    max-width: 760px;
+    margin: 0 auto 32px;
+    text-align: center;
+}
+
+.eyebrow {
+    color: $brand-gold-dark;
+    font-weight: 800;
+    font-size: $type-eyebrow;
+}
+
+.title {
+    color: $brand-primary;
+    font-size: $type-hero-title;
+    line-height: $line-title;
+    margin: 12px 0 20px;
+}
+
+.intro {
+    font-size: $type-body-lg;
+    line-height: $line-body;
+    margin: 0;
+}
+
+.card {
+    min-width: 0;
+    background: $brand-bg;
+    border: 1px solid $ui-border-soft;
+    border-radius: $radius-card;
+    padding: 28px;
+    box-shadow: 0 15px 45px $ui-shadow-blue-soft;
+}
+
+.leading {
+    text-align: center;
+    border-color: $brand-secondary;
+    border-top: 5px solid $brand-secondary;
+    margin-bottom: 28px;
+}
+
+.status {
+    display: inline-block;
+    margin: 0 0 12px;
+    border-radius: $radius-pill;
+    padding: 7px 18px;
+    background: $ui-surface-warm;
+    color: $brand-primary;
+    font-weight: 800;
+}
+
+.amount {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    color: $brand-primary;
+    font-weight: 900;
+    margin: 4px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.leader {
+    font-size: $type-card-title;
+    margin: 0 0 24px;
+}
+
+.countdown {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 440px;
+    margin: 0 auto 20px;
+}
+
+.timeBox {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 4px;
+    background: $brand-surface-cool;
+    border-radius: $radius-sm;
+}
+
+.timeNumber {
+    font-size: $type-display-number;
+    font-weight: 800;
+    color: $brand-primary;
+    font-variant-numeric: tabular-nums;
+}
+
+.timeLabel {
+    color: $ui-text-muted;
+    font-size: $type-body-sm;
+}
+
+.columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.sectionTitle {
+    color: $brand-primary;
+    font-size: $type-form-title;
+    margin: 0 0 12px;
+}
+
+.note {
+    font-size: $type-body-sm;
+    color: $ui-text-muted;
+    line-height: $line-body;
+    margin: 8px 0;
+}
+
+.form {
+    display: grid;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.label {
+    font-weight: 700;
+    color: $brand-primary;
+}
+
+.input {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-sm;
+    padding: 12px;
+    font: inherit;
+    font-size: 16px;
+    background: $brand-bg;
+    color: $brand-text;
+}
+
+.input:focus-visible,
+.primary:focus-visible,
+.secondary:focus-visible,
+.checkbox:focus-visible {
+    outline: 3px solid $brand-secondary;
+    outline-offset: 3px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.primary,
+.secondary {
+    min-height: 46px;
+    border-radius: $radius-sm;
+    padding: 12px 18px;
+    font-size: $type-button;
+    font-weight: 800;
+}
+
+.primary {
+    background: $brand-primary;
+    color: $color-white;
+    border: 1px solid $brand-primary;
+}
+
+.secondary {
+    background: $brand-bg;
+    color: $brand-primary;
+    border: 1px solid $brand-secondary;
+}
+
+.primary:disabled,
+.secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.checkboxLabel {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 20px;
+    line-height: $line-body;
+}
+
+.checkbox {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    margin-top: 5px;
+    accent-color: $brand-primary;
+}
+
+.text {
+    overflow-wrap: anywhere;
+}
+
+.success,
+.error {
+    border-radius: $radius-sm;
+    padding: 14px 18px;
+    line-height: $line-body;
+}
+
+.success {
+    color: $ui-success-dark;
+    background: $ui-success-soft;
+}
+
+.error {
+    color: $ui-error;
+    background: $ui-error-soft;
+}
+
+.bidList {
+    padding: 0;
+    list-style: none;
+    margin: 20px 0 0;
+}
+
+.bid {
+    padding: 16px 0;
+    border-bottom: 1px solid $ui-border-soft;
+}
+
+.bidHeading {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.bidAmount {
+    color: $brand-primary;
+    font-size: $type-card-title;
+}
+
+@media (max-width: 800px) {
+    .columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .page {
+        padding: 32px 12px 40px;
+    }
+
+    .card {
+        padding: 22px 16px;
+        border-radius: $radius-md;
+    }
+
+    .fields {
+        grid-template-columns: 1fr;
+    }
+
+    .countdown {
+        gap: 6px;
+    }
+
+    .secondary {
+        padding-inline: 12px;
+        flex: 1;
+    }
+}
+
+.adminPage {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.phone {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+// Public campaign presentation. Admin layout keeps the shared, quieter card styles.
+.publicPage {
+    max-width: none;
+    padding: 0 0 24px;
+}
+
+.publicHero {
+    position: relative;
+    overflow: hidden;
+    color: $color-white;
+    background-color: $brand-primary-deep;
+
+    background-image:
+    linear-gradient(90deg,
+            rgba($brand-primary-deep, .90),
+            rgba($brand-primary-deep, .64) 50%,
+            rgba($brand-blue-ink-dark, .68)),
+        url("/maftir-yona/torah-atmosphere.jpg");
+
+    background-size: cover;
+background-position: 45% 58%;
+    background-repeat: no-repeat;
+}
+.heroInner {
+    max-width: 1180px;
+    margin: auto;
+    padding: 48px 32px;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 56px;
+    align-items: start;
+}
+
+.heroCopy {
+    min-width: 0;
+}
+
+.heroEyebrow {
+    display: block;
+    margin-bottom: 10px;
+    color: rgba($color-white, .85);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0;
+}
+
+.publicTitle {
+    margin: 0 0 18px;
+    font-size: clamp(3rem, 5.5vw, 5rem);
+    line-height: 1.1;
+    font-weight: 900;
+    letter-spacing: -.035em;
+}
+
+.goldTitle {
+    display: block;
+    color: $brand-secondary;
+}
+
+.heroDescription {
+    max-width: 570px;
+    margin: 0;
+    color: rgba($color-white, .72);
+    font-size: 1.12rem;
+    line-height: 1.8;
+}
+
+.heroSegulah {
+    margin: 0 0 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.heroSegulahAttribution {
+    color: rgba($color-white, .7);
+    font-size: $type-body-sm;
+    line-height: 1.6;
+}
+
+.heroSegulahMessage {
+    color: rgba($brand-secondary, .82);
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 500;
+    line-height: 1.55;
+}
+
+.heroCta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: $brand-secondary;
+    color: $brand-primary-deep;
+    padding: 13px 22px;
+    font-weight: 900;
+    font-size: 1.13rem;
+    border-radius: $radius-sm;
+    box-shadow: 0 8px 30px rgba($color-black, .15);
+    transition: background .2s, transform .2s;
+}
+
+.heroCta:hover {
+    background: $brand-gold-pale;
+    transform: translateY(-2px);
+}
+
+.heroCta:focus-visible,
+.offerChoice:focus-visible,
+.mobileBidLink:focus-visible {
+    outline: 3px solid $brand-secondary;
+    outline-offset: 5px;
+}
+
+.ctaIcon {
+    flex-shrink: 0;
+}
+
+.heroArtwork {
+    min-width: 0;
+    text-align: center;
+}
+
+.archOuter {
+    padding: 10px;
+    border: 1px solid rgba($brand-secondary, .5);
+    border-radius: 210px 210px 8px 8px;
+    max-width: 400px;
+    margin: auto;
+    box-shadow: 0 12px 32px rgba($color-black, .12), 0 0 80px rgba($brand-secondary, .07);
+}
+
+.archInner {
+    min-height: 384px;
+    padding: 58px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba($brand-secondary, .2);
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba($brand-secondary, .08), transparent);
+}
+
+.heroBidHeading {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: rgba($color-white, .8);
+}
+
+.heroBidAmount {
+    margin: 0 0 16px;
+    color: $brand-secondary;
+    font-size: clamp(2.5rem, 4.6vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.heroCountdown {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 260px;
+}
+
+.heroTimeBox {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.heroTimeNumber {
+    color: rgba($color-white, .85);
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.heroTimeLabel {
+    font-size: .78rem;
+    color: rgba($color-white, .7);
+}
+
+.heroBidCount {
+    margin: 12px 0 16px;
+    font-size: .9rem;
+    color: rgba($color-white, .72);
+}
+
+.heroBidTerms {
+    margin: 12px 0 0;
+    font-size: .75rem;
+    line-height: 1.65;
+    color: rgba($color-white, .7);
+}
+
+.heroBidTerms span {
+    white-space: nowrap;
+}
+
+.auctionIntro {
+    text-align: center;
+    padding: 40px 20px 28px;
+    scroll-margin-top: 82px;
+}
+
+.sectionEyebrow {
+    font-size: .85rem;
+    color: $brand-gold-dark;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.auctionTitle {
+    font-size: $type-section-title;
+    color: $brand-primary-deep;
+    margin: 10px 0;
+    line-height: 1.25;
+}
+
+.auctionDescription {
+    color: $ui-text-muted;
+    margin: 0;
+    line-height: 1.7;
+}
+
+.auctionGrid {
+    max-width: 1136px;
+    margin: auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    gap: 12px 24px;
+    align-items: start;
+}
+
+.publicColumns {
+    display: contents;
+}
+
+.publicLeading {
+    margin: 0;
+    border-top-width: 4px;
+    padding-block: 20px;
+}
+
+.publicLeading .status {
+    margin-bottom: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.liveDot,
+.quietDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: $ui-success-dark;
+}
+
+.quietDot {
+    background: $ui-neutral-slate;
+}
+
+.publicLeading .status + .note {
+    margin: 4px 0 2px;
+}
+
+.publicLeading .amount {
+    font-size: clamp(2.8rem, 4vw, 3.7rem);
+    margin: 2px 0;
+    line-height: 1.2;
+}
+
+.publicLeading .leader {
+    margin-bottom: 10px;
+}
+
+.countdownHeading {
+    border-top: 1px solid $ui-border-soft;
+    padding-top: 12px;
+    margin: 12px 0 8px;
+    font-weight: 700;
+    color: $brand-primary;
+}
+
+.publicLeading .countdown {
+    direction: ltr;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.publicLeading .timeBox {
+    background: $ui-surface-warm;
+    min-width: 0;
+    padding: 8px 2px;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.publicLeading .timeNumber {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    line-height: 1.2;
+}
+
+.endDate {
+    margin: 0;
+    color: $brand-primary;
+    font-size: .85rem;
+    line-height: 1.5;
+}
+
+.extensionNote {
+    margin: 4px 0 0;
+    color: $ui-text-muted;
+    font-size: .75rem;
+    line-height: 1.5;
+}
+
+@media (min-width: 1024px) {
+    .endDate {
+        white-space: nowrap;
+    }
+}
+
+.bidCard {
+    padding: 20px;
+    border: 1px solid rgba($brand-secondary, .6);
+    box-shadow: 0 18px 55px $ui-shadow-blue;
+}
+
+.formHeading {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.formHeading .sectionTitle {
+    font-size: clamp(1.35rem, 2vw, 1.65rem);
+    margin: 0;
+}
+
+.formIcon {
+    color: $brand-gold-dark;
+    flex-shrink: 0;
+}
+
+.amountSelection {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid $ui-border-soft;
+}
+
+.contactHeading {
+    color: $brand-primary;
+    font-size: 1rem;
+    margin: 0 0 8px;
+}
+
+.bidCard .form {
+    margin-top: 12px;
+    gap: 10px;
+}
+
+.bidCard .fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.bidCard .checkboxLabel {
+    gap: 8px;
+    margin-top: 12px;
+    cursor: pointer;
+    font-size: .9rem;
+    line-height: 1.5;
+}
+
+.bidCard .checkbox {
+    margin: 1px 0 0;
+}
+
+@media (max-width: 800px) {
+    .bidCard .fields {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .bidCard {
+        padding: 16px;
+    }
+}
+
+.offerChoices {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0 0 10px;
+}
+
+.offerChoice {
+    min-height: 44px;
+    padding: 8px 6px;
+    cursor: pointer;
+    border-radius: $radius-sm;
+    background: $ui-surface-warm;
+    color: $brand-primary;
+    border: 1px solid rgba($brand-secondary, .8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: background .15s, border-color .15s;
+}
+
+.offerChoice:hover {
+    background: $brand-gold-pale;
+}
+
+.offerSelected {
+    background: $brand-primary-deep;
+    color: $color-white;
+    border-color: $brand-primary-deep;
+}
+
+.offerSelected:hover {
+    background: $brand-primary;
+}
+
+.offerChoice:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.offerTotal {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.amountInputWrap {
+    position: relative;
+    display: block;
+}
+
+.currency {
+    position: absolute;
+    inset-inline-end: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $brand-primary;
+    font-size: 1.5rem;
+    pointer-events: none;
+}
+
+.offerInput {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: $brand-primary;
+    padding-block: 8px;
+    padding-inline-end: 44px;
+}
+
+.minimumNote {
+    font-size: .85rem;
+    color: $ui-text-muted;
+    margin: 8px 0 0;
+}
+
+.bidSubmit {
+    background: $brand-secondary;
+    color: $brand-primary-deep;
+    border-color: $brand-secondary;
+    font-size: 1.17rem;
+    min-height: 50px;
+    width: 100%;
+}
+
+.bidSubmit:hover:not(:disabled) {
+    background: $brand-gold-pale;
+}
+
+.paymentReassurance {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: $ui-text-muted;
+    font-size: .85rem;
+    line-height: 1.5;
+    margin: 0;
+    text-align: center;
+}
+
+.reassuranceIcon {
+    flex-shrink: 0;
+    color: $brand-primary;
+}
+
+.recentCard {
+    grid-column: 1 / -1;
+    min-width: 0;
+    padding: 16px;
+    background: $ui-surface-warm;
+    border-inline-start: 3px solid $brand-secondary;
+    border-radius: $radius-md;
+}
+
+.recentCard .sectionTitle {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+}
+
+.recentCard:has(.recentEmpty) {
+    padding-block: 10px;
+}
+
+.recentCard:has(.recentEmpty) .sectionTitle {
+    margin-bottom: 4px;
+}
+
+.recentEmpty {
+    margin: 0;
+    color: $ui-text-muted;
+    font-size: .95rem;
+    line-height: 1.5;
+}
+
+.recentCard .bidList {
+    margin: 0;
+}
+
+.recentCard .bid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    line-height: 1.4;
+}
+
+.recentCard .bid:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.recentName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: $brand-primary;
+    font-size: .95rem;
+}
+
+.recentCard .bidAmount {
+    font-size: 1.05rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.recentTime {
+    color: $ui-text-muted;
+    font-size: .8rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.closingNote {
+    text-align: center;
+    padding: 20px 20px 0;
+}
+
+.closingText {
+    color: $brand-primary;
+    font-size: 1rem;
+    line-height: 1.65;
+    margin: 0;
+}
+
+.mobileBidLink {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .heroInner {
+        grid-template-columns: 1fr;
+        padding: 36px 24px;
+        gap: 28px;
+    }
+
+    .heroArtwork {
+        width: 100%;
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .heroCopy {
+        max-width: 620px;
+        margin: auto;
+        text-align: center;
+    }
+
+    .publicHero {
+        background-image:
+            linear-gradient(180deg, rgba($brand-primary-deep, .94), rgba($brand-primary-deep, .88) 45%, rgba($brand-blue-ink-dark, .96)),
+            url("/maftir-yona/torah-atmosphere.jpg");
+        background-position: 72% center;
+    }
+
+    .publicTitle {
+        font-size: clamp(2.5rem, 9vw, 4rem);
+    }
+
+    .heroDescription {
+        font-size: 1.02rem;
+        line-height: 1.8;
+    }
+
+    .archInner {
+        min-height: 358px;
+        padding-top: 54px;
+    }
+
+    .auctionGrid {
+        grid-template-columns: 1fr;
+        max-width: 620px;
+    }
+
+    .auctionIntro {
+        padding-top: 28px;
+    }
+
+    .publicLeading {
+        padding-block: 18px;
+    }
+
+    .publicLeading .countdown {
+        max-width: 350px;
+    }
+
+    .publicLeading .leader {
+        margin-bottom: 10px;
+    }
+
+    .publicPage {
+        padding-bottom: 24px;
+    }
+
+    .closingNote {
+        padding-top: 16px;
+    }
+
+    .mobileBidLink {
+        position: fixed;
+        bottom: 14px;
+        left: 16px;
+        right: 76px;
+        z-index: 40;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: $brand-secondary;
+        color: $brand-primary-deep;
+        box-shadow: 0 5px 28px $ui-shadow-blue-strong;
+        padding: 14px;
+        border-radius: $radius-pill;
+    }
+
+    .mobileBidText {
+        font-size: .95rem;
+        font-weight: 900;
+    }
+}
+
+@media (max-width: 480px) {
+    .heroInner {
+        padding: 30px 20px;
+    }
+
+    .heroCta {
+        width: 100%;
+        gap: 14px;
+        padding-inline: 14px;
+        font-size: 1.07rem;
+    }
+
+    .auctionGrid {
+        padding-inline: 12px;
+        gap: 12px 18px;
+    }
+
+    .offerChoices {
+        gap: 7px;
+    }
+
+    .offerTotal {
+        font-size: 1.06rem;
+    }
+
+    .publicLeading .note {
+        font-size: .82rem;
+    }
+}
+
+.incrementChoices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.incrementButton {
+    padding: 7px 10px;
+    color: $brand-primary;
+    background: $brand-bg;
+    border: 1px solid $ui-border-strong;
+    border-radius: $radius-pill;
+    font-size: .8rem;
+}
+
+.incrementButton:hover {
+    background: $ui-surface-warm;
+    border-color: $brand-secondary;
+}
+
+.incrementButton:focus-visible {
+    outline: 3px solid $brand-secondary;
+    outline-offset: 2px;
+}
+
+.incrementButton:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.bidCard {
+    scroll-margin-top: 82px;
+}
+
+.meritSection {
+    max-width: 920px;
+    margin: 28px auto 0;
+    padding: 20px 24px;
+    border-inline-start: 3px solid $brand-secondary;
+    background: $ui-surface-warm;
+    border-radius: $radius-md;
+}
+
+.meritHeading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.meritIcon {
+    color: $brand-gold-dark;
+    flex-shrink: 0;
+}
+
+.meritTitle {
+    margin: 0;
+    color: $brand-primary-deep;
+    font-size: $type-section-title-sm;
+}
+
+.meritText {
+    margin: 0;
+    color: $brand-text;
+    font-size: $type-body;
+    line-height: 1.7;
+}
+
+.meritDonation {
+    margin: 8px 0 0;
+    color: $brand-primary;
+    font-weight: 700;
+    line-height: $line-body;
+}
+
+.meritHighlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+}
+
+.meritHighlight {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: $brand-primary;
+    font-size: $type-body-sm;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.meritHighlight::before {
+    content: '';
+    flex: 0 0 5px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: $brand-secondary;
+}
+
+@media (max-width: 960px) {
+    .meritSection {
+        margin-inline: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .meritSection {
+        margin: 20px 12px 0;
+        padding: 16px;
+    }
+
+    .meritHighlights {
+        gap: 6px 18px;
+    }
+}
+
+.fieldError {
+    display: block;
+    color: $ui-error;
+    font-size: .85rem;
+    line-height: 1.4;
+}
