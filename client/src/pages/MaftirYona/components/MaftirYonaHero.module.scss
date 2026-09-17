@@ -7,14 +7,14 @@
     background-color: $brand-primary-deep;
 
     background-image:
-    linear-gradient(90deg,
-            rgba($brand-primary-deep, .90),
-            rgba($brand-primary-deep, .64) 50%,
-            rgba($brand-blue-ink-dark, .68)),
+        linear-gradient(90deg,
+            rgba($brand-primary-deep, .78),
+            rgba($brand-primary-deep, .48) 50%,
+            rgba($brand-blue-ink-dark, .56)),
         url("/maftir-yona/hero.webp");
 
     background-size: cover;
-background-position: 45% 58%;
+    background-position: 45% 58%;
     background-repeat: no-repeat;
 }
 
@@ -80,6 +80,11 @@ background-position: 45% 58%;
     font-size: clamp(1.25rem, 2vw, 1.6rem);
     font-weight: 500;
     line-height: 1.55;
+}
+
+.heroSegulahEmphasis {
+    font-size: 1.12em;
+    font-weight: 800;
 }
 
 .heroCta {
