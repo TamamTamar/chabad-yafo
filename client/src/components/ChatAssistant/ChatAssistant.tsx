@@ -238,7 +238,7 @@ const ChatAssistant: React.FC = () => {
                     <span className={styles.fabBadge}>
                         <Sparkles size={13} />
                     </span>
-                    <span className={styles.fabText}>עוזר חב״ד</span>
+                    <span className={styles.fabText}>שאלו אותנו</span>
                 </button>
             )}
 

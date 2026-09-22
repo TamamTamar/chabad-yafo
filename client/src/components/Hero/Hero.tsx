@@ -78,7 +78,7 @@ const slides: HeroSlide[] = [
             },
         ],
     },
-    {
+   /* {
         id: "maftir-yona",
         eyebrow: "סגולת מפטיר יונה ביום הכיפורים",
         title: "מכירת הזכות למפטיר יונה",
@@ -94,7 +94,7 @@ const slides: HeroSlide[] = [
                 variant: "primary",
             },
         ],
-    },
+    },*/
 ];
 
 const Hero = () => {
