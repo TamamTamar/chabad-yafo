@@ -3,7 +3,6 @@ import { arbaatHaminimAdminRoutes, arbaatHaminimPublicRoutes } from "./routes/ar
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-
 import { healthRoutes } from "./routes/healthRoutes";
 import { shabbatRoutes } from "./routes/shabbatRoutes";
 import { connectDB } from "./config/connectDB";
@@ -11,7 +10,6 @@ import { familyRoutes } from "./routes/familyRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 import { adminAuthRoutes } from "./routes/adminAuth";
 import { paymentRoutes } from "./routes/paymentRoutes";
-import { cardcomRoutes } from "./routes/cardcomRoutes";
 import { logger } from "./utils/logger";
 import { rebbeLetterRoutes } from "./routes/rebbeLetterRoutes";
 import { daycareRegistrationRoutes } from "./routes/daycareRegistrationRoutes";
@@ -98,7 +96,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/admin/projects", projectRoutes);
 app.use("/api/auth", adminAuthRoutes);
 app.use("/api/payment", paymentRoutes);
-app.use("/api/cardcom", cardcomRoutes);
 app.use("/api/rebbe-letters", rebbeLetterRoutes);
 app.use("/api/daycare-registrations", daycareRegistrationRoutes);
 app.use("/api/daycare-enrollments", daycareEnrollmentRoutes);
