@@ -11,6 +11,7 @@ import { familyRoutes } from "./routes/familyRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 import { adminAuthRoutes } from "./routes/adminAuth";
 import { paymentRoutes } from "./routes/paymentRoutes";
+import { cardcomRoutes } from "./routes/cardcomRoutes";
 import { logger } from "./utils/logger";
 import { rebbeLetterRoutes } from "./routes/rebbeLetterRoutes";
 import { daycareRegistrationRoutes } from "./routes/daycareRegistrationRoutes";
@@ -34,6 +35,7 @@ import { daycareDonationRoutes } from "./routes/daycareDonationRoutes";
 import { daycareDonationAdminRoutes } from "./routes/admin/daycareDonationAdminRoutes";
 import { daycarePaymentAdminRoutes, daycarePaymentPublicRoutes } from "./routes/daycarePaymentRoutes";
 import { ensureDaycarePaymentStorage } from "./services/daycarePaymentIndexService";
+import { chatAssistantRoutes } from "./routes/chatAssistantRoutes";
 
 dotenv.config();
 
@@ -96,9 +98,11 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/admin/projects", projectRoutes);
 app.use("/api/auth", adminAuthRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/cardcom", cardcomRoutes);
 app.use("/api/rebbe-letters", rebbeLetterRoutes);
 app.use("/api/daycare-registrations", daycareRegistrationRoutes);
 app.use("/api/daycare-enrollments", daycareEnrollmentRoutes);
+app.use("/api/assistant", chatAssistantRoutes);
 
 const port = Number(process.env.PORT) || 4000;
 

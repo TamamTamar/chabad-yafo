@@ -3,6 +3,7 @@ import { Suspense, useEffect, useRef } from "react";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import FloatingSocials from "../components/FloatingSocials/FloatingSocials";
+import ChatAssistant from "../components/ChatAssistant/ChatAssistant";
 import { trackPageView } from "../services/metaPixelService";
 
 const Root = () => {
@@ -52,6 +53,7 @@ const Root = () => {
             </div>
             {isAdminPath ? null : <Footer />}
             {isAdminPath ? null : <FloatingSocials />}
+            {isAdminPath ? null : <ChatAssistant />}
         </div>
     );
 };
