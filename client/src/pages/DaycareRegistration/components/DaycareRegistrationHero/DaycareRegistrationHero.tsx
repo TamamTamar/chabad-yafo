@@ -7,7 +7,7 @@ import {
 
 const DAYCARE_WHATSAPP_PHONE = "972537700339";
 const DAYCARE_WHATSAPP_TEXT =
-    "שלום, ראיתי את הפרטים על המעון החדש ביפו ואשמח לתאם שיחת היכרות.";
+    "שלום, אשמח לשמוע פרטים על מעון חב״ד יפו ולבדוק אם יש מקום פנוי לילד/ה שלי.";
 const daycareWhatsAppLink = `https://wa.me/${DAYCARE_WHATSAPP_PHONE}?text=${encodeURIComponent(
     DAYCARE_WHATSAPP_TEXT
 )}`;
@@ -23,12 +23,12 @@ const DaycareRegistrationHero = () => (
     <section className={styles.hero}>
         <div className={styles.heroInner}>
             <div className={styles.heroContent}>
-                <p className={styles.eyebrow}>רישום מוקדם נפתח</p>
+                <p className={styles.eyebrow}>נותרו מספר מקומות פנויים</p>
                 <h1 className={styles.title}>
-                    נפתחת ההרשמה למעון ביפו
+                    מצטרפים למעון חב״ד יפו
                 </h1>
                 <p className={styles.valueStatement}>
-                    פתיחה בספטמבר הקרוב באזור שוק הפשפשים
+                    המעון פעיל באזור שוק הפשפשים, והרישום עדיין פתוח
                 </p>
 
                 <p className={styles.trustLine}>
@@ -75,7 +75,7 @@ const DaycareRegistrationHero = () => (
                 </div>
 
                 <p className={styles.scarcityText}>
-                    מספר המקומות מוגבל כדי לשמור על קבוצה קטנה ואווירה רגועה.
+                    נותרו מספר מקומות פנויים, תוך שמירה על קבוצה קטנה ואווירה רגועה.
                 </p>
             </div>
         </div>

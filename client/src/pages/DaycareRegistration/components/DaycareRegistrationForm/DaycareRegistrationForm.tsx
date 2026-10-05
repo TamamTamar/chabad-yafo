@@ -104,7 +104,7 @@ const DaycareRegistrationForm = ({ onSuccess }: Props) => {
                 <div className={styles.formHeader}>
                     <DaycareLogo />
                     <h2 className={styles.formTitle} id="form-title">
-                        השאירו פרטים לרישום מוקדם
+                        השאירו פרטים להצטרפות למעון
                     </h2>
                     <p className={styles.formIntro}>
                         מלאו כמה פרטים בסיסיים ונחזור אליכם לשיחת היכרות

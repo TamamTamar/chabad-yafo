@@ -9,6 +9,8 @@ import "swiper/css";
 
 import mainDesktop from "../../assets/hero-desktop.webp";
 import mainMobile from "../../assets/hero-mobile.webp";
+import familiesDesktop from "../../assets/families-hero.webp";
+import familiesMobile from "../../assets/families-hero-mobile.webp";
 import Container from "../Container/Container";
 import styles from "./Hero.module.scss";
 
@@ -45,6 +47,21 @@ const slides: HeroSlide[] = [
         ],
     },
     {
+        id: "daycare",
+        title: "הרישום למעון חב״ד יפו פתוח",
+        contentPosition: "right",
+        desktopImage: familiesDesktop,
+        mobileImage: familiesMobile,
+        actions: [
+            {
+                label: "לרישום למעון",
+                to: "/daycare-registration",
+                variant: "primary",
+            },
+        ],
+    },
+
+    /*   {
         id: "daycare-donations",
         eyebrow: "מקימים יחד בית קטן עם לב גדול",
         title: "בונים לילדי יפו מקום לגדול בו",
@@ -61,7 +78,7 @@ const slides: HeroSlide[] = [
             },
         ],
     },
-    {
+   {
         id: "arbaat-haminim",
         eyebrow: "ארבעת המינים לחג הסוכות",
         title: "בחרו את הסט שמתאים לכם",
@@ -78,7 +95,7 @@ const slides: HeroSlide[] = [
             },
         ],
     },
-   /* {
+  {
         id: "maftir-yona",
         eyebrow: "סגולת מפטיר יונה ביום הכיפורים",
         title: "מכירת הזכות למפטיר יונה",
