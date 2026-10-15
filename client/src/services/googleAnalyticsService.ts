@@ -8,12 +8,12 @@ declare global {
     }
 }
 
-const trackEvent = (eventName: string, eventData?: GoogleAnalyticsEventData) => {
+export const trackEvent = (eventName: string, eventData?: GoogleAnalyticsEventData) => {
     if (typeof window === "undefined" || !window.gtag) {
         return;
     }
 
-    window.gtag("event", eventName, eventData);
+    return window.gtag("event", eventName, eventData);
 };
 
 export const trackDonationStart = (eventData?: GoogleAnalyticsEventData) => {

@@ -42,7 +42,7 @@ const Root = () => {
 
     return (
         <div className="app-root">
-            <a className="skip-link" href="#main-content">
+            <a className="skip-link" href={isAdminPath && pathname !== "/admin/login" ? "#admin-workspace" : "#main-content"}>
                 דילוג לתוכן המרכזי
             </a>
             {isAdminPath ? null : <Header />}

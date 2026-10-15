@@ -89,16 +89,40 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
         return () => { active = false; };
     }, []);
 
-    const parseRows = (value: string, columns: number) => value.split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => line.split("|").map((part) => part.trim()))
-        .filter((parts) => parts.length === columns && parts.every(Boolean));
+    const parseRows = (value: string, documentLabel: string, fields: string[]) => {
+        const rows: string[][] = [];
+        const errors: string[] = [];
+        value.split(/\r?\n/).forEach((line, index) => {
+            const prefix = `${documentLabel}, שורה ${index + 1}:`;
+            if (!line.trim()) {
+                errors.push(`${prefix} השורה ריקה. יש למלא אותה או להסיר אותה.`);
+                return;
+            }
+            const parts = line.split("|").map((part) => part.trim());
+            if (parts.length !== fields.length) {
+                errors.push(`${prefix} נדרשים ${fields.length} שדות המופרדים ב־|, בפורמט ${fields.join(" | ")}; נמצאו ${parts.length} שדות.`);
+                return;
+            }
+            const missingFields = fields.filter((_, fieldIndex) => !parts[fieldIndex]);
+            if (missingFields.length) {
+                errors.push(`${prefix} חסרים שדות חובה: ${missingFields.join(", ")}.`);
+                return;
+            }
+            rows.push(parts);
+        });
+        return { rows, errors };
+    };
 
     const save = async () => {
         if (!documents || lockedAt) return;
-        const routine = parseRows(routineRows, 2);
-        const holidays = parseRows(holidayRows, 3);
+        const { rows: routine, errors: routineErrors } = parseRows(routineRows, "סדר יום", ["שעה", "פעילות"]);
+        const { rows: holidays, errors: holidayErrors } = parseRows(holidayRows, "לוח חופשות", ["מועד", "תאריך עברי", "תאריכי חופשה"]);
+        const rowErrors = [...routineErrors, ...holidayErrors];
+        if (rowErrors.length) {
+            setError(`השמירה נעצרה. יש לתקן את השורות הבאות: ${rowErrors.join(" ")}`);
+            setNotice("");
+            return;
+        }
         const menu = documents.menu.items.map((item) => ({
             day: item.day.trim(),
             breakfast: item.breakfast.trim(),

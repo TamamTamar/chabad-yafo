@@ -61,6 +61,22 @@ const slides: HeroSlide[] = [
         ],
     },
 
+    {
+        id: "shifra-pua",
+        title: "ילדת לאחרונה? ארוחת בוקר מפנקת בדרך אלייך ❤️",
+        contentPosition: "right",
+        desktopImage: "/shifra-pua/breakfast-hero.webp",
+        mobileImage: "/shifra-pua/breakfast-hero-768.webp",
+        imagePosition: "center",
+        actions: [
+            {
+                label: "לקבלת ארוחת בוקר",
+                to: "/shifra-pua",
+                variant: "primary",
+            },
+        ],
+    },
+
     /*   {
         id: "daycare-donations",
         eyebrow: "מקימים יחד בית קטן עם לב גדול",

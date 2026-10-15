@@ -4,6 +4,8 @@ import ProtectedRouteAdmin from "../components/ProtectedRouteAdmin/ProtectedRout
 import Root from "./Root";
 import RouteErrorPage from "./RouteErrorPage";
 
+const ShifraPua = lazy(() => import("../pages/ShifraPua/ShifraPua"));
+const ShifraPuaAdmin = lazy(() => import("../pages/Admin/ShifraPuaAdmin/ShifraPuaAdmin"));
 const MaftirYonaPage = lazy(() => import("../pages/MaftirYona/MaftirYonaPage"));
 const MaftirYonaAdmin = lazy(() => import("../pages/Admin/MaftirYonaAdmin/MaftirYonaAdmin"));
 const ArbaatHaminimAdmin = lazy(() => import("../pages/Admin/ArbaatHaminimAdmin/ArbaatHaminimAdmin"));
@@ -53,6 +55,8 @@ export const router = createBrowserRouter([
         errorElement: <RouteErrorPage />,
         children: [
             { index: true, element: <Home /> },
+            { path: "shifra-pua", element: <ShifraPua /> },
+            { path: "admin/shifra-pua", element: <ProtectedRouteAdmin><ShifraPuaAdmin /></ProtectedRouteAdmin> },
             { path: "maftir-yona", element: <MaftirYonaPage /> },
             { path: "admin", element: <Navigate to="/admin/dashboard" replace /> },
             { path: "admin/maftir-yona", element: <ProtectedRouteAdmin><MaftirYonaAdmin /></ProtectedRouteAdmin> },

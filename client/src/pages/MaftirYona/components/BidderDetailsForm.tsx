@@ -31,8 +31,17 @@ export default function BidderDetailsForm({ register, errors, pending }: Props) 
                                             {errors[key] && <span className={shared.fieldError} id={`${key}-error`} role="alert">{errors[key]?.message}</span>}
                                         </label>)}
                                     </div>
-                                    <label className={styles.checkboxLabel}><input className={styles.checkbox} type="checkbox" required aria-invalid={Boolean(errors.accepted)} aria-describedby={errors.accepted ? 'accepted-error' : undefined} {...register('accepted', { required: 'יש לאשר את ההתחייבות לפני הגשת ההצעה.' })} /><span className={shared.text}>אני מאשר/ת שההצעה שהגשתי מחייבת אותי אם אזכה במכירה.</span></label>
+                                    <label className={styles.checkboxLabel}>
+                                        <input className={styles.checkbox} type="checkbox" required aria-invalid={Boolean(errors.accepted)} aria-describedby={errors.accepted ? 'accepted-error' : undefined} {...register('accepted', { required: 'יש לאשר את ההתחייבות לפני הגשת ההצעה.' })} />
+                                        <span className={styles.consentText}>
+                                            אני מאשר/ת שההצעה שהגשתי מחייבת אותי במקרה של זכייה.
+                                        </span>
+                                    </label>
                                     {errors.accepted && <span className={shared.fieldError} id="accepted-error" role="alert">{errors.accepted.message}</span>}
+                                    <label className={`${styles.checkboxLabel} ${styles.updatesConsent}`}>
+                                        <input className={styles.checkbox} type="checkbox" {...register('outbidNotificationsConsent')} />
+                                        <span className={styles.consentText}>אני רוצה לקבל עדכונים בנוגע להצעה שלי, כולל במקרה שהצעתי נעקפה.</span>
+                                    </label>
 
         </>
     );

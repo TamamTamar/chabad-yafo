@@ -16,7 +16,7 @@ const DonationOverviewAdminView = ({ model }: Props) => {
         <>
             {activeView === "overview" && (
             <>
-            <section className={styles.panel}>
+            <section className={`${styles.panel} ${styles.overviewPanel}`}>
                 <header>
                     <h2>הגדרות ויעדים</h2>
                     <p>
@@ -77,7 +77,7 @@ const DonationOverviewAdminView = ({ model }: Props) => {
                     ))}
                 </div>
             </section>
-            <section className={styles.panel}>
+            <section className={`${styles.panel} ${styles.overviewPanel}`}>
                 <header>
                     <h2>עבודה שוטפת</h2>
                     <p>הפעולות הנפוצות נמצאות במרחק לחיצה אחת.</p>

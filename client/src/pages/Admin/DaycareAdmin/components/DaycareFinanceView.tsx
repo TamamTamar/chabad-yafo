@@ -11,7 +11,7 @@ const DaycareFinanceView = ({ model }: Props) => {
         selectedAvailableCashflow, selectedAfterRepayment, setSelectedMonth, updateMonthlyCashflow,
         updateMonthlyRenovationCashflow, handleSave, formatCurrency, formatMonth,
         monthlyFixedExpenseFields, monthlyIncomeFields, monthlyRenovationFields, monthlyRepaymentField,
-        monthlyVariableExpenseFields,
+        monthlyVariableExpenseFields, getMonthlyInputValue,
     } = model;
 
     if (loadError) {
@@ -23,19 +23,7 @@ const DaycareFinanceView = ({ model }: Props) => {
     }
 
     return (
-        <section className={styles.section} aria-labelledby="daycare-finance">
-            <div className={styles.sectionHeader}>
-                <div>
-                    <h2 className={styles.sectionTitle} id="daycare-finance">
-                        מצב כספי בפועל
-                    </h2>
-                    <p className={styles.sectionDescription}>
-                        מעקב פשוט אחרי הכנסות והוצאות חודשיות, כולל השקעת
-                        שיפוץ והחזר השקעה משוער.
-                    </p>
-                </div>
-            </div>
-
+        <section className={styles.section} aria-label="מצב כספי בפועל">
             <div className={styles.financeGrid}>
                 <div className={styles.financeFormsStack}>
                     <div className={styles.financeForm}>
@@ -171,11 +159,10 @@ const DaycareFinanceView = ({ model }: Props) => {
                                                             disabled={saving}
                                                             inputMode="numeric"
                                                             type="text"
-                                                            value={
-                                                                selectedCashflow[
-                                                                    field.key
-                                                                ] || ""
-                                                            }
+                                                            value={getMonthlyInputValue(
+                                                                selectedCashflow.month,
+                                                                field.key
+                                                            )}
                                                             onChange={(event) =>
                                                                 updateMonthlyCashflow(
                                                                     selectedCashflow.month,
@@ -217,12 +204,10 @@ const DaycareFinanceView = ({ model }: Props) => {
                                                                 disabled={saving}
                                                                 inputMode="numeric"
                                                                 type="text"
-                                                                value={
-                                                                    selectedCashflow[
-                                                                        field
-                                                                            .key
-                                                                    ] || ""
-                                                                }
+                                                                value={getMonthlyInputValue(
+                                                                    selectedCashflow.month,
+                                                                    field.key
+                                                                )}
                                                                 onChange={(
                                                                     event
                                                                 ) =>
@@ -268,12 +253,10 @@ const DaycareFinanceView = ({ model }: Props) => {
                                                                 disabled={saving}
                                                                 inputMode="numeric"
                                                                 type="text"
-                                                                value={
-                                                                    selectedCashflow[
-                                                                        field
-                                                                            .key
-                                                                    ] || ""
-                                                                }
+                                                                value={getMonthlyInputValue(
+                                                                    selectedCashflow.month,
+                                                                    field.key
+                                                                )}
                                                                 onChange={(
                                                                     event
                                                                 ) =>
@@ -324,11 +307,10 @@ const DaycareFinanceView = ({ model }: Props) => {
                                                                     disabled={saving}
                                                                     inputMode="numeric"
                                                                     type="text"
-                                                                    value={
-                                                                        selectedCashflow[
-                                                                            field.key
-                                                                        ] || ""
-                                                                    }
+                                                                    value={getMonthlyInputValue(
+                                                                        selectedCashflow.month,
+                                                                        field.key
+                                                                    )}
                                                                     onChange={(
                                                                         event
                                                                     ) =>
@@ -370,12 +352,10 @@ const DaycareFinanceView = ({ model }: Props) => {
                                                         disabled={saving}
                                                         inputMode="numeric"
                                                         type="text"
-                                                        value={
-                                                            selectedCashflow[
-                                                                monthlyRepaymentField
-                                                                    .key
-                                                            ] || ""
-                                                        }
+                                                        value={getMonthlyInputValue(
+                                                            selectedCashflow.month,
+                                                            monthlyRepaymentField.key
+                                                        )}
                                                         onChange={(event) =>
                                                             updateMonthlyCashflow(
                                                                 selectedCashflow.month,

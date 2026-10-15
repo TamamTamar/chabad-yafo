@@ -1,3 +1,4 @@
+import AdminPageHeader from "../../../components/AdminShell/AdminPageHeader";
 import { useEffect, useMemo, useState } from "react";
 import {
     useBlocker,
@@ -5,7 +6,6 @@ import {
     useNavigate,
     useParams,
 } from "react-router-dom";
-import Container from "../../../components/Container/Container";
 import {
     deleteAdminDaycareOnboarding,
     getAdminDaycareOnboarding,
@@ -364,11 +364,12 @@ const DaycareOnboardingAdmin = () => {
     if (!id) {
         return (
             <main className={styles.page} dir="rtl">
-                <Container>
+
+                    <AdminPageHeader title="תיק הצטרפות למעון" />
                     <div className={styles.stateMessage} role="alert">
                         מזהה תיק ההרשמה חסר
                     </div>
-                </Container>
+
             </main>
         );
     }
@@ -376,11 +377,12 @@ const DaycareOnboardingAdmin = () => {
     if (loading) {
         return (
             <main className={styles.page} dir="rtl">
-                <Container>
+
+                    <AdminPageHeader title="תיק הצטרפות למעון" />
                     <div className={styles.stateMessage} aria-live="polite">
                         טוען תיק הצטרפות...
                     </div>
-                </Container>
+
             </main>
         );
     }
@@ -388,7 +390,8 @@ const DaycareOnboardingAdmin = () => {
     if (!onboarding) {
         return (
             <main className={styles.page} dir="rtl">
-                <Container>
+
+                    <AdminPageHeader title="תיק הצטרפות למעון" />
                     <div className={styles.stateMessage} role="alert">
                         {error || "תיק ההצטרפות לא נמצא"}
                     </div>
@@ -399,21 +402,13 @@ const DaycareOnboardingAdmin = () => {
                     >
                         חזרה לרשימת ההרשמות
                     </button>
-                </Container>
+
             </main>
         );
     }
 
     return (
         <main className={styles.page} dir="rtl">
-            <Container>
-                <button
-                    className={styles.backButton}
-                    type="button"
-                    onClick={() => navigate("/admin/daycare?tab=registrations")}
-                >
-                    ← חזרה להרשמות
-                </button>
 
                 <OnboardingOverview
                     onboarding={onboarding}
@@ -500,7 +495,7 @@ const DaycareOnboardingAdmin = () => {
                     saveStep={saveStep}
                 />
 
-            </Container>
+
 
             <OnboardingDialogs
                 linkConfirmation={linkConfirmation}

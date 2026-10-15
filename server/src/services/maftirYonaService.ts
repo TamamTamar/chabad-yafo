@@ -3,6 +3,7 @@ import { createHmac } from 'node:crypto';
 import { AUCTION_ID, MaftirYonaAuction } from '../models/MaftirYonaAuction';
 import { MaftirYonaBid, MaftirYonaRateLimit } from '../models/MaftirYonaBid';
 import { AuctionError, integer, israelDate, minimumBid, parseBid, publicBid, validateOffer } from './maftirYonaRules';
+import { notifyOutbid, type PreviousLeader } from './maftirYonaNotificationService';
 
 export function abuseHash(value: string) {
     if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
@@ -64,25 +65,32 @@ export async function getAuction(admin = false) {
 export async function submitBid(body: Record<string, unknown>, ipHash: string) {
     const input = parseBid(body);
     await rateLimit(`phone:${abuseHash(input.phone)}`, 6);
-    return transaction(async session => {
+    const { result, previousLeader } = await transaction(async session => {
         const auction = await lockAuction(session);
         const existing = await MaftirYonaBid.findOne({ auctionId: AUCTION_ID, requestId: input.requestId }).session(session);
         if (existing) {
-            if (existing.phone !== input.phone || existing.amount !== input.amount || existing.firstName !== input.firstName || existing.lastName !== input.lastName) throw new AuctionError(409, 'מזהה הבקשה כבר בשימוש');
+            if (existing.phone !== input.phone || existing.amount !== input.amount || existing.firstName !== input.firstName || existing.lastName !== input.lastName || (existing.outbidNotificationsConsent === true) !== input.outbidNotificationsConsent) throw new AuctionError(409, 'מזהה הבקשה כבר בשימוש');
             auction.revision -= 1;
             await auction.save({ session });
-            return { data: await snapshot(session, false), acceptedBidId: String(existing._id), duplicate: true };
+            return { result: { data: await snapshot(session, false), acceptedBidId: String(existing._id), duplicate: true }, previousLeader: null };
         }
         if (auction.revision - 1 !== input.revision) throw new AuctionError(409, 'פרטי המכירה השתנו. בדקו את הסכום המוביל ואת המינימום החדש ואשרו מחדש.');
         const leading = auction.leadingBidId ? await MaftirYonaBid.findById(auction.leadingBidId).session(session) : null;
+        const previousLeader: PreviousLeader | null = leading?.outbidNotificationsConsent === true ? { firstName: leading.firstName, phone: leading.phone } : null;
         const receivedAt = new Date();
         const endsAt = validateOffer(auction, input.amount, leading?.amount, receivedAt);
-        const [bid] = await MaftirYonaBid.create([{ auctionId: AUCTION_ID, firstName: input.firstName, lastName: input.lastName, phone: input.phone, amount: input.amount, requestId: input.requestId, receivedAt, ipHash, status: 'active' }], { session });
+        const [bid] = await MaftirYonaBid.create([{ auctionId: AUCTION_ID, firstName: input.firstName, lastName: input.lastName, phone: input.phone, outbidNotificationsConsent: input.outbidNotificationsConsent, amount: input.amount, requestId: input.requestId, receivedAt, ipHash, status: 'active' }], { session });
         auction.leadingBidId = bid._id;
         auction.endsAt = endsAt;
         await auction.save({ session });
-        return { data: await snapshot(session, false), acceptedBidId: String(bid._id), duplicate: false };
+        return { result: { data: await snapshot(session, false), acceptedBidId: String(bid._id), duplicate: false }, previousLeader };
     });
+    // Notify only after commit, outside the callback MongoDB may retry.
+    if (previousLeader && previousLeader.phone !== input.phone) {
+        try { await notifyOutbid(previousLeader, input.amount); }
+        catch { /* Notification failure must not reject a committed bid. */ }
+    }
+    return result;
 }
 export async function initializeAuction() {
     // Explicit admin action only; public reads never seed a campaign or auction.

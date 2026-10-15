@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import AdminPageHeader from '../../../components/AdminShell/AdminPageHeader';
 import axios from 'axios';
-import Container from '../../../components/Container/Container';
 import { defaultSaleContent } from '../../ArbaatHaminim/arbaatHaminimData';
 import { ArbaatHaminimContent } from '../../ArbaatHaminim/ArbaatHaminim';
 import { getSaleSettings, saveSaleSettings } from '../../../services/arbaatHaminimService';
@@ -47,10 +46,8 @@ export default function ArbaatHaminimAdmin() {
             setMessage('פרטי המכירה נשמרו ועודכנו באתר.');
         } catch (error) { setError(errorMessage(error)); } finally { setBusy(false); }
     };
-    return <main className={styles.page} dir="rtl"><Container>
-        <Link className={styles.back} to="/admin/dashboard">חזרה לניהול האתר</Link>
-        <h1 className={styles.title}>ניהול מכירת ארבעת המינים</h1>
-        <p className={styles.intro}>מכירת ארבעת המינים מתקיימת פעם בשנה, לקראת סוכות. כאן מעדכנים את השנה, הסטים, המחירים ומועדי המכירה והאיסוף. בשנה הבאה מעדכנים את אותם הפרטים במסך הזה.</p>
+    return <main className={styles.page} dir="rtl">
+        <AdminPageHeader title="ארבעת המינים" description="עדכון פרטי המכירה והאיסוף" />
         <p className={styles.status}>{dirty ? 'יש שינויים שטרם נשמרו' : 'כל השינויים שמורים'}</p>
         {error && <p className={styles.error} role="alert">{error}</p>}
         {message && <p className={styles.status} role="status">{message}</p>}
@@ -78,5 +75,5 @@ export default function ArbaatHaminimAdmin() {
             </form>
             {preview && <section className={styles.preview} aria-label="תצוגה מקדימה"><h2 className={styles.sectionTitle}>תצוגה מקדימה — {content.year}</h2><ArbaatHaminimContent key={JSON.stringify(content)} content={content} preview /></section>}
         </>}
-    </Container></main>;
+    </main>;
 }

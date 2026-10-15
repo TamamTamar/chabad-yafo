@@ -14,6 +14,7 @@ const HeaderMobileNav = ({ open, onClose, onOpenInfo, whatsappLink }: Props) => 
         <>
             <nav className={`${m.drawer} ${open ? m.open : ""}`} aria-label="ניווט ראשי">
                 <div className={m.drawerLinks}>
+            <Link to="/shifra-pua" className={m.drawerItem} onClick={onClose}>שפרה ופועה</Link>
                     {/* כפתור לפעולת UI (פתיחת מידע) */}
                     <button type="button" className={m.drawerItem} onClick={onOpenInfo}>
                         תפילין ומזוזות

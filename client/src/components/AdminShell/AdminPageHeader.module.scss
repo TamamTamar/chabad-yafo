@@ -1,0 +1,8 @@
+@use '../../styles/admin-tokens' as a;
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; margin-bottom: 16px; }
+.copy { min-width: 0; h1 { margin: 0; font-size: 24px; font-weight: 700; line-height: 1.25; color: a.$text; } }
+.description, .breadcrumb { font-size: 14px; line-height: 1.5; color: a.$muted; margin-top: 4px; }
+.breadcrumb { margin: 0 0 4px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; :is(button,a) { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 14px; border-radius: 8px; font-size: 15px; } }
+@media (max-width: 1099px) { .header { padding-right: 44px; } }
+@media (max-width: 600px) { .header { align-items: flex-start; flex-wrap: wrap; min-height: 44px; } .copy h1 { font-size: 20px; } .actions { margin-inline-start: auto; } }

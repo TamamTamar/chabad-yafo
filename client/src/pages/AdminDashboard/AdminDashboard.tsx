@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import Container from "../../components/Container/Container";
-import { logoutAdmin } from "../../services/adminAuthService";
+import { useSearchParams } from "react-router-dom";
+import AdminPageHeader from "../../components/AdminShell/AdminPageHeader";
+import { resolveAdminLocation } from "../../components/AdminNavigation/adminNavigationConfig";
 import AdminDaycareRegistrationsTab from "./components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab";
 import AdminFamiliesTab from "./components/AdminFamiliesTab/AdminFamiliesTab";
 import AdminPaymentsTab from "./components/AdminPaymentsTab/AdminPaymentsTab";
@@ -12,8 +11,8 @@ import styles from "./AdminDashboard.module.scss";
 type AdminTab = "projects" | "families" | "daycareRegistrations" | "rebbeLetters" | "payments";
 
 const AdminDashboard = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const initialTab: AdminTab =
+    const [searchParams] = useSearchParams();
+    const activeTab: AdminTab =
         searchParams.get("tab") === "families"
             ? "families"
             : searchParams.get("tab") === "daycareRegistrations"
@@ -23,97 +22,10 @@ const AdminDashboard = () => {
             : searchParams.get("tab") === "payments"
             ? "payments"
             : "projects";
-    const [activeTab, setActiveTab] = useState<AdminTab>(initialTab);
-    const navigate = useNavigate();
-
-    const selectTab = (tab: AdminTab) => {
-        setActiveTab(tab);
-        setSearchParams(tab === "projects" ? {} : { tab });
-    };
-
-    const handleLogout = async () => {
-        await logoutAdmin();
-        navigate("/admin/login", { replace: true });
-    };
-
     return (
         <main className={styles.page}>
-            <Container>
-                <section className={styles.header}>
-                    <div>
-                        <h1 className={styles.title}>
-                            ניהול האתר
-                        </h1>
 
-                        <p className={styles.description}>
-                            צפייה וניהול פניות מהאתר של בית חב״ד יפו.
-                        </p>
-                    </div>
-
-                    <button
-                        type="button"
-                        className={styles.logoutButton}
-                        onClick={handleLogout}
-                    >
-                        יציאה
-                    </button>
-                </section>
-
-                <nav className={styles.tabs} aria-label="לשוניות ניהול">
-                    <button type="button" className={styles.tab} onClick={() => navigate("/admin/maftir-yona")}>מפטיר יונה</button>
-                    <button type="button" className={styles.tab} onClick={() => navigate("/admin/arbaat-haminim")}>ארבעת המינים</button>
-                    <button
-                        type="button"
-                        className={activeTab === "projects" ? styles.tabActive : styles.tab}
-                        onClick={() => selectTab("projects")}
-                    >
-                        פרויקטים
-                    </button>
-
-                    <button
-                        type="button"
-                        className={styles.tab}
-                        onClick={() => navigate("/admin/daycare")}
-                    >
-                        ניהול המעון
-                    </button>
-
-                    <button
-                        type="button"
-                        className={
-                            activeTab === "daycareRegistrations"
-                                ? styles.tabActive
-                                : styles.tab
-                        }
-                        onClick={() => selectTab("daycareRegistrations")}
-                    >
-                        פניות למעון
-                    </button>
-
-                    <button
-                        type="button"
-                        className={
-                            activeTab === "rebbeLetters"
-                                ? styles.tabActive
-                                : styles.tab
-                        }
-                        onClick={() => selectTab("rebbeLetters")}
-                    >
-                        מכתבים לרבי
-                    </button>
-
-                    <button
-                        type="button"
-                        className={
-                            activeTab === "payments"
-                                ? styles.tabActive
-                                : styles.tab
-                        }
-                        onClick={() => selectTab("payments")}
-                    >
-                        כספים
-                    </button>
-                </nav>
+                {activeTab !== "projects" && <AdminPageHeader title={resolveAdminLocation('/admin/dashboard', `?${searchParams}`).title} />}
 
                 {activeTab === "projects" && <AdminProjectsTab />}
                 {activeTab === "families" && <AdminFamiliesTab />}
@@ -122,7 +34,7 @@ const AdminDashboard = () => {
                 )}
                 {activeTab === "rebbeLetters" && <AdminRebbeLettersTab />}
                 {activeTab === "payments" && <AdminPaymentsTab />}
-            </Container>
+
         </main>
     );
 };

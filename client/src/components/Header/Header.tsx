@@ -1,3 +1,4 @@
+import { contactWhatsAppLink } from '../../config/contact';
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BaseDialog from "../BaseDialog/BaseDialog";
@@ -8,15 +9,14 @@ import styles from "./Header.module.scss";
 import HeaderDesktopNav from "./HeaderDesktopNav";
 import m from "./HeaderMobile.module.scss";
 import HeaderMobileNav from "./HeaderMobileNav";
-const WHATSAPP_PHONE = "972537700339";
-const WHATSAPP_TEXT = "שלום, הגעתי מהאתר של בית חב״ד יפו ורציתי ליצור קשר.";
+
 
 
 const Header = () => {
     const [open, setOpen] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
 
-    const whatsappLink = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_TEXT)}`;
+    const whatsappLink = contactWhatsAppLink();
 
     // lock scroll when menu open (mobile)
     useEffect(() => {

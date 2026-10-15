@@ -3,6 +3,8 @@ import type { DaycareOverview } from "../types";
 
 type DaycareDashboardProps = {
     overview: DaycareOverview | null;
+    compact?: boolean;
+    secondary?: boolean;
 };
 
 const getStatusClassName = (status: DaycareOverview["generalStatus"]) => {
@@ -17,7 +19,7 @@ const getStatusClassName = (status: DaycareOverview["generalStatus"]) => {
     return styles.statusProgress;
 };
 
-const DaycareDashboard = ({ overview }: DaycareDashboardProps) => {
+const DaycareDashboard = ({ overview, compact, secondary }: DaycareDashboardProps) => {
     const cards = [
         {
             label: "יעד פתיחה",
@@ -45,6 +47,12 @@ const DaycareDashboard = ({ overview }: DaycareDashboardProps) => {
         },
     ];
 
+    if (compact) return <div className={styles.openingSummary} aria-label="סיכום פתיחת המעון">
+        <span>יעד פתיחה: {overview ? `${overview.openingTargetChildren} ילדים` : "—"}</span>
+        <span>נרשמים: {overview?.actualRegistrations ?? "—"}</span>
+        {overview && <span className={`${styles.statusBadge} ${getStatusClassName(overview.generalStatus)}`}>{overview.generalStatus}</span>}
+    </div>;
+
     return (
         <section className={styles.section} aria-labelledby="daycare-dashboard">
             <div className={styles.sectionHeader}>
@@ -69,7 +77,7 @@ const DaycareDashboard = ({ overview }: DaycareDashboardProps) => {
             </div>
 
             <div className={styles.metricsGrid}>
-                {cards.map((card) => (
+                {(secondary ? cards.slice(2) : cards).map((card) => (
                     <article className={styles.metricCard} key={card.label}>
                         <span className={styles.metricLabel}>{card.label}</span>
                         <strong className={styles.metricValue}>{card.value}</strong>

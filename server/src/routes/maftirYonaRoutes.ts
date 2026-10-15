@@ -4,15 +4,23 @@ import { requireSecureAdminMutation } from '../middleware/adminMutationSecurity'
 import { abuseHash, getAuction, initializeAuction, manageAuction, rateLimit, submitBid } from '../services/maftirYonaService';
 import { AuctionError } from '../services/maftirYonaRules';
 import { logger } from '../utils/logger';
+import { createFailureLogGate, requestDiagnostics } from '../utils/auctionRequestDiagnostics';
 
 export const maftirYonaPublicRoutes = Router();
 export const maftirYonaAdminRoutes = Router();
+const pollingFailures = createFailureLogGate();
 const handle = (fn: (req: Request, res: Response) => Promise<unknown>) => async (req: Request, res: Response) => {
+    // Route templates only: no query strings, request bodies or user identifiers.
+    const endpoint = `${req.baseUrl}${req.route.path}`;
+    const key = `${req.method} ${endpoint}`;
     res.set('Cache-Control', 'no-store');
-    try { await fn(req, res); }
+    try { await fn(req, res); if (req.method === 'GET') pollingFailures.succeeded(key); }
     catch (error) {
         const status = error instanceof AuctionError ? error.statusCode : 503;
-        if (!(error instanceof AuctionError)) logger.error('Maftir Yona request failed', { code: (error as { code?: number })?.code ?? 'unknown' });
+        if (!(error instanceof AuctionError)) {
+            const details = requestDiagnostics(error, endpoint, req.method, status);
+            if (req.method !== 'GET' || pollingFailures.failed(key, details)) logger.error('Maftir Yona request failed', details);
+        }
         if (status === 429) res.set('Retry-After', '60');
         res.status(status).json({ success: false, message: error instanceof AuctionError ? error.message : 'המכירה אינה זמינה כרגע. נסו שוב בעוד רגע.' });
     }

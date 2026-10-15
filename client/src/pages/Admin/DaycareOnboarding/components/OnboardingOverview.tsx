@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import AdminPageHeader from "../../../../components/AdminShell/AdminPageHeader";
 import type { AdminDaycareOnboarding, AdminOnboardingStep, OnboardingStepStatus } from "../../../../types/daycareOnboarding";
 import { onboardingResponsiblePartyLabels, onboardingStepStatusLabels } from "../../../../types/daycareOnboarding";
 import { stepGuidance } from "../daycareOnboardingAdminUtils";
@@ -31,33 +33,12 @@ const OnboardingOverview = ({
     nextStep, scrollToCaseSection,
 }: Props) => (
     <>
-<section className={styles.headerCard}>
-                    <div className={styles.headerCopy}>
-                        <span className={styles.eyebrow}>תיק הצטרפות למעון</span>
-                        <h1 className={styles.title}>
-                            {onboarding.child.firstName || onboarding.child.lastName
-                                ? `${onboarding.child.firstName ?? ""} ${onboarding.child.lastName ?? ""}`.trim()
-                                : "פרטי הילד טרם הושלמו"}
-                        </h1>
-                        <p className={styles.subtitle}>
-                            שנת לימודים {onboarding.schoolYear}
-                            {onboarding.profileStatus === "incomplete"
-                                ? " · פרופיל התחלתי"
-                                : ""}
-                            {onboarding.guardians[0]
-                                ? ` · ${onboarding.guardians[0].fullName} · ${onboarding.guardians[0].phone}`
-                                : ""}
-                        </p>
-                    </div>
-                    <div className={styles.progressSummary}>
-                        <strong className={styles.progressNumber}>
-                            {adminProgressPercentage}%
-                        </strong>
-                        <span className={styles.progressText}>
-                            {adminCompletedSteps} מתוך {manageableStepCount} שלבים
-                        </span>
-                    </div>
-                </section>
+<AdminPageHeader
+    title={onboarding.child.firstName || onboarding.child.lastName ? `${onboarding.child.firstName ?? ""} ${onboarding.child.lastName ?? ""}`.trim() : "פרטי הילד טרם הושלמו"}
+    breadcrumb={<><Link to="/admin/daycare">מעון / רישום</Link> / תיק הצטרפות</>}
+    description={<>שנת לימודים {onboarding.schoolYear}{onboarding.profileStatus === "incomplete" ? " · פרופיל התחלתי" : ""}{onboarding.guardians[0] ? ` · ${onboarding.guardians[0].fullName} · ${onboarding.guardians[0].phone}` : ""}</>}
+    actions={<div className={styles.compactProgress}><strong>{adminProgressPercentage}%</strong><span>{adminCompletedSteps} מתוך {manageableStepCount} שלבים</span></div>}
+/>
 
                 <div className={styles.feedback} aria-live="polite" aria-atomic="true">
                     {notice && <span className={styles.notice}>{notice}</span>}

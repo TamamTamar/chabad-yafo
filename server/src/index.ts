@@ -1,3 +1,5 @@
+import { shifraPuaPublicRoutes, shifraPuaAdminRoutes } from './routes/shifraPuaRoutes';
+import { ShifraPuaRegistration } from './models/ShifraPuaRegistration';
 import { maftirYonaPublicRoutes, maftirYonaAdminRoutes } from "./routes/maftirYonaRoutes";
 import { arbaatHaminimAdminRoutes, arbaatHaminimPublicRoutes } from "./routes/arbaatHaminimRoutes";
 import express from "express";
@@ -6,6 +8,7 @@ import dotenv from "dotenv";
 import { healthRoutes } from "./routes/healthRoutes";
 import { shabbatRoutes } from "./routes/shabbatRoutes";
 import { connectDB } from "./config/connectDB";
+import { reportStartupFailure } from "./config/mongoConnectionDiagnostics";
 import { familyRoutes } from "./routes/familyRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 import { adminAuthRoutes } from "./routes/adminAuth";
@@ -68,6 +71,8 @@ app.use("/api/maftir-yona", maftirYonaPublicRoutes);
 app.use("/api/admin/maftir-yona", maftirYonaAdminRoutes);
 app.use("/api/arbaat-haminim", arbaatHaminimPublicRoutes);
 app.use("/api/admin/arbaat-haminim", arbaatHaminimAdminRoutes);
+app.use("/api/shifra-pua", shifraPuaPublicRoutes);
+app.use("/api/admin/shifra-pua", shifraPuaAdminRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/shabbat", shabbatRoutes);
 app.use("/api/families", familyRoutes);
@@ -107,6 +112,7 @@ const startServer = async () => {
     try {
         logger.log("Connecting to Mongo...");
         await connectDB();
+        await ShifraPuaRegistration.createIndexes();
         await ensureDaycareOnboardingIndexes();
         await ensureDaycareAgreementIndexes();
         await ensureDaycarePaymentStorage();
@@ -120,8 +126,7 @@ const startServer = async () => {
             logger.log(`✅ Server listening on ${port}`);
         });
     } catch (error) {
-        console.error("❌ Server failed to start");
-        console.error(error);
+        reportStartupFailure(error);
 
         process.exit(1);
     }

@@ -11,6 +11,7 @@ type Props = {
 const HeaderDesktopNav = ({ onOpenInfo, onCloseMenu, whatsappLink }: Props) => {
     return (
         <nav className={styles.navDesktop} aria-label="ניווט ראשי">
+            <Link to="/shifra-pua" className={styles.navLink} onClick={onCloseMenu}>שפרה ופועה</Link>
             {/* כפתור טקסט - תפילין ומזוזות */}
             <button type="button" className={styles.textBtn} onClick={onOpenInfo}>
                 תפילין ומזוזות

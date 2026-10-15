@@ -1182,3 +1182,158 @@
         grid-template-columns: 1fr;
     }
 }
+
+// Outer donation workspace; data views and editors retain their structure.
+.summarySection { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.layout { gap: 16px; }
+.sectionHeader { gap: 12px; flex-wrap: wrap; }
+.sectionHeader a, .summaryActions button { border-radius: 8px; min-height: 40px; padding: 8px 12px; }
+.sectionHeader a { background: transparent; color: $brand-primary; border: 1px solid $ui-border-cool; }
+.summaryActions { flex-wrap: wrap; }
+.adminViewNav { border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; button { border-radius: 6px; box-shadow: none; } }
+
+// Compact shared summary and local navigation only.
+.layout { gap: 12px; }
+.summarySection {
+    display: grid;
+    gap: 12px;
+    .sectionHeader { align-items: center; flex-direction: row; font-size: $type-caption; }
+    .summaryActions { width: auto; flex-direction: row; gap: 8px; }
+    .sectionHeader a, .summaryActions button {
+        width: auto; min-height: 36px; padding: 6px 10px; border-radius: 4px;
+        font-size: $type-caption; font-weight: 700;
+    }
+    .metrics {
+        display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0;
+        padding: 12px 0; border-block: 1px solid $ui-border-soft;
+    }
+    .metrics article {
+        display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;
+        padding: 0; border: 0; border-radius: 0; background: transparent;
+    }
+    .metrics span { margin: 0; font-weight: 600; }
+    .metrics strong { font-size: 1.05rem; white-space: nowrap; }
+    > p[role="status"] {
+        padding: 0; border-radius: 0; background: transparent;
+        font-size: $type-caption; font-weight: 600;
+    }
+}
+.adminViewNav {
+    display: flex; gap: 4px; max-width: 100%; overflow-x: auto;
+    border-bottom: 1px solid $ui-border-soft;
+    button {
+        display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px;
+        min-height: 40px; padding: 8px 12px; border-radius: 0;
+        border-bottom: 2px solid transparent; font: inherit; white-space: nowrap;
+    }
+    button strong { font-size: 0.9rem; font-weight: 600; }
+    button > span {
+        position: static; min-width: 0; padding: 0; border-radius: 0;
+        background: transparent; color: inherit; font-weight: 600;
+    }
+    button:hover { background: rgba($brand-primary, 0.04); }
+    .activeView {
+        border-bottom-color: $brand-primary; background: rgba($brand-primary, 0.07);
+        color: $brand-primary; box-shadow: none;
+    }
+    .activeView > span { background: transparent; color: inherit; }
+}
+.adminViewNav button:focus-visible,
+.adminViewSelect select:focus-visible,
+.mobileExtraNav button:focus-visible {
+    outline: 2px solid $brand-primary; outline-offset: -2px;
+}
+@media (max-width: 600px) {
+    .adminViewNav { display: none; }
+    .adminViewSelect { gap: 4px; }
+    .adminViewSelect select { min-height: 40px; padding: 6px 10px; border-radius: 4px; }
+    .summarySection .metrics { gap: 8px 16px; }
+    .mobileExtraNav { margin-top: 0; }
+}
+
+// Overview presentation; shared navigation and other views remain unchanged.
+.summarySection.overviewSummary {
+    .metrics { align-items: center; gap: 8px 0; padding: 10px 0; }
+    .metrics article { padding-inline: 16px; }
+    .metrics article:first-child { padding-inline-start: 0; }
+    .metrics article + article { border-inline-start: 1px solid $ui-border-soft; }
+    .metrics strong { color: $brand-blue-ink; font-size: 0.95rem; font-weight: 600; }
+    .metrics article:first-child strong { color: $brand-primary; font-size: 1.4rem; font-weight: 800; }
+    .metrics article:first-child span { color: $brand-blue-ink; font-weight: 700; }
+
+    > p[role="status"] {
+        padding: 8px 12px;
+        border-inline-start: 3px solid $ui-success;
+        border-radius: 4px;
+        background: $ui-success-soft;
+        color: $ui-success;
+        line-height: 1.5;
+    }
+    > p.errorMessage[role="status"] {
+        border-inline-start-color: $brand-gold-rich;
+        background: rgba($brand-gold-light, 0.14);
+        color: $brand-blue-ink;
+    }
+}
+
+.panel.overviewPanel {
+    padding: 12px 0;
+    border: 0;
+    border-block-start: 1px solid $ui-border-soft;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+
+    h2 { margin-bottom: 4px; font-size: 1.05rem; }
+    header p { font-size: $type-caption; }
+
+    .campaignForm {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        margin-top: 12px;
+    }
+    .campaignForm > p { margin: 0; color: $ui-text-muted; font-size: $type-caption; }
+    .campaignForm > p strong { color: $brand-blue-ink; }
+    .campaignForm .checkboxLabel { gap: 8px; font-weight: 600; }
+    .campaignForm button { min-height: 36px; padding: 6px 12px; border-radius: 4px; font-weight: 700; }
+
+    .categoryList { gap: 0; margin-top: 12px; }
+    .categoryRow {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 6px 16px;
+        padding: 10px 0;
+        border: 0;
+        border-bottom: 1px solid $ui-border-soft;
+        border-radius: 0;
+        background: transparent;
+    }
+    .categoryRow > div {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 6px 16px;
+    }
+    .categoryRow > div strong { font-size: 0.9rem; font-weight: 700; }
+    .categoryRow > strong { color: $ui-text-muted; font-size: $type-caption; font-weight: 600; }
+
+    .quickActions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .quickActions button {
+        display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px;
+        padding: 8px 10px; border-radius: 4px; background: transparent;
+        font: inherit; font-size: $type-caption;
+    }
+    .recentRecords { margin-top: 16px; }
+}
+
+@media (max-width: 600px) {
+    .summarySection.overviewSummary {
+        .metrics { gap: 8px 16px; }
+        .metrics article { padding-inline: 0; border: 0; }
+        .metrics article:first-child { flex-basis: 100%; }
+    }
+}

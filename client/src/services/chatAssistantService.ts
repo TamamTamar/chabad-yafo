@@ -10,6 +10,20 @@ export class ChatRequestError extends Error {
     }
 }
 
+const failureCodes = new WeakMap<object, ChatDiagnosticCode>();
+const rememberFailure = (error: unknown, code: ChatDiagnosticCode) => {
+    if (typeof error === 'object' && error !== null) failureCodes.set(error, code);
+};
+export function chatAnalyticsErrorCode(error: unknown) {
+    if (error instanceof ChatRequestError) {
+        if (error.code === 'DAILY_QUOTA') return 'daily_limit';
+        if (error.status === 429) return 'rate_limited';
+        return 'frontend_response_not_ok';
+    }
+    return typeof error === 'object' && error !== null
+        ? failureCodes.get(error) ?? 'request_failed' : 'request_failed';
+}
+
 export type ChatDiagnosticCode = 'frontend_fetch_failed' | 'frontend_response_not_ok' | 'frontend_response_parse_failed';
 export const logChatDiagnostic = (code: ChatDiagnosticCode, status?: number) => {
     console.error('Assistant diagnostic', { code, ...(Number.isInteger(status) ? { status } : {}) });
@@ -41,6 +55,7 @@ export async function sendChatMessage(message: string, history: ChatMessage[], s
     } catch (error) {
         if (error instanceof Error && (error.name === 'AbortError' || error.name === 'CanceledError')) throw error;
         logChatDiagnostic('frontend_fetch_failed');
+        rememberFailure(error, 'frontend_fetch_failed');
         throw error;
     }
     if (!response.ok) {
@@ -58,6 +73,7 @@ export async function sendChatMessage(message: string, history: ChatMessage[], s
     try {
         return await response.json();
     } catch (error) {
+        rememberFailure(error, 'frontend_response_parse_failed');
         logChatDiagnostic('frontend_response_parse_failed', response.status);
         throw error;
     }

@@ -1,13 +1,16 @@
+import type { ReactNode } from "react";
+import AdminPageHeader from "../../../../components/AdminShell/AdminPageHeader";
 import { ChevronDown, NotebookPen } from "lucide-react";
 import type { DaycareInterestStatus } from "../../../../types/daycareRegistration";
 import styles from "../DaycareAdmin.module.scss";
 import type { useDaycareRegistrations } from "./useDaycareRegistrations";
 
 type DaycareRegistrationsViewProps = {
+    openingSummary?: ReactNode;
     model: ReturnType<typeof useDaycareRegistrations>;
 };
 
-const DaycareRegistrationsView = ({ model }: DaycareRegistrationsViewProps) => {
+const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistrationsViewProps) => {
     const {
         rows, filteredRows, activeCasesCount, loading, error, updatingKey,
         expandedTreatmentKeys, expandedDetailKeys, workflowDrafts, draft,
@@ -22,23 +25,9 @@ const DaycareRegistrationsView = ({ model }: DaycareRegistrationsViewProps) => {
 
     return (
         <section className={styles.section} aria-labelledby="daycare-leads">
-            <div className={styles.sectionHeader}>
-                <div>
-                    <h2 className={styles.sectionTitle} id="daycare-leads">
-                        רישום ופניות למעון
-                    </h2>
-                    <p className={styles.sectionDescription}>
-                        כל הפניות מגיעות מטופס ההרשמה ומטופלות כאן במקום אחד.
-                    </p>
-                </div>
-            </div>
+            <AdminPageHeader id="daycare-leads" title="רישום למעון" description={loading ? "טוען פניות…" : `${rows.length} פניות · ${activeCasesCount} תיקי הצטרפות פתוחים · ${rows.filter((row) => row.status === "נרשם").length} רשומים`} />
 
-            <div className={styles.registrationSummaryBar}>
-                <div><strong>{rows.length}</strong><span>פניות בסך הכול</span></div>
-                <div><strong>{activeCasesCount}</strong><span>תיקי הצטרפות פתוחים</span></div>
-                <div><strong>{rows.filter((row) => row.status === "נרשם").length}</strong><span>ילדים רשומים</span></div>
-            </div>
-
+            {openingSummary}
             <div className={styles.registrationToolbar}>
                 <label className={styles.compactField}>
                     <span>חיפוש משפחה</span>
@@ -298,6 +287,15 @@ const DaycareRegistrationsView = ({ model }: DaycareRegistrationsViewProps) => {
                                         />
                                         הוספת הערה
                                     </button>
+                                    {!summary && canCreate ? (
+                                        <button
+                                            className={styles.primaryButton}
+                                            type="button"
+                                            onClick={() => openCreateDialog(row)}
+                                        >
+                                            פתיחת תיק הצטרפות
+                                        </button>
+                                    ) : null}
                                 </div>
 
                                 {isTreatmentExpanded
@@ -463,17 +461,7 @@ const DaycareRegistrationsView = ({ model }: DaycareRegistrationsViewProps) => {
                                                         פתיחת התיק
                                                     </button>
                                                 </div>
-                                            ) : canCreate ? (
-                                                <button
-                                                    className={styles.primaryButton}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        openCreateDialog(row)
-                                                    }
-                                                >
-                                                    פתיחת תיק הצטרפות
-                                                </button>
-                                            ) : (
+                                            ) : !canCreate ? (
                                                 <span
                                                     className={
                                                         styles.onboardingUnavailable
@@ -482,7 +470,7 @@ const DaycareRegistrationsView = ({ model }: DaycareRegistrationsViewProps) => {
                                                     תיק הצטרפות יהיה זמין לאחר
                                                     החלטה להתקדם
                                                 </span>
-                                            )}
+                                            ) : null}
                                         </div>
                                     </div>
                                 ) : null}

@@ -16,7 +16,7 @@ export function useBidForm({ data, isOpen, accept, refresh }: Options) {
     const { register, handleSubmit, control, setValue, resetField, formState: { errors } } = useForm<BidFormValues>({
         mode: 'onChange',
         reValidateMode: 'onChange',
-        defaultValues: { firstName: '', lastName: '', phone: '', amount: '', accepted: false },
+        defaultValues: { firstName: '', lastName: '', phone: '', amount: '', accepted: false, outbidNotificationsConsent: false },
     });
     const selectedAmount = useWatch({ control, name: 'amount' });
     const [confirmation, setConfirmation] = useState<BidInput | null>(null);
@@ -47,6 +47,7 @@ export function useBidForm({ data, isOpen, accept, refresh }: Options) {
             accept(result.data); setAcceptedId(result.acceptedBidId); setPending(null); amountRevision.current = null;
             resetField('amount');
             resetField('accepted');
+            resetField('outbidNotificationsConsent');
         } catch (failure) {
             if (axios.isAxiosError(failure) && failure.response && failure.response.status < 500) {
                 setPending(null);

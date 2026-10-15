@@ -1,6 +1,8 @@
 @use "../../../../styles/variables" as *;
+@use "../../../../styles/admin-tokens" as admin;
 
 .section {
+    min-width: 0;
     color: $brand-text;
 }
 
@@ -165,15 +167,15 @@
     margin-top: 15px;
 }
 
+// Local navigation, kept inside the available width even with many projects.
 .projectTabs {
     display: flex;
-    gap: 7px;
-    margin: 0 0 18px;
-    padding: 5px;
+    gap: 4px;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0 0 12px;
+    padding: 0;
     overflow-x: auto;
-    border: 1px solid $ui-border-soft;
-    border-radius: $radius;
-    background: rgba($brand-primary, 0.035);
     scrollbar-width: thin;
 }
 
@@ -185,26 +187,33 @@
     gap: 7px;
     max-width: 210px;
     overflow: hidden;
-    padding: 9px 14px;
+    padding: 8px 12px;
     border: 0;
-    border-radius: $radius-sm;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: admin.$muted;
     font: inherit;
     font-size: $type-body-sm;
-    font-weight: 800;
+    font-weight: 700;
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-}
 
-.projectTab {
-    background: transparent;
-    color: $ui-text-muted;
+    &:hover {
+        background: admin.$hover;
+    }
+
+    &:focus-visible {
+        outline: 2px solid admin.$primary;
+        outline-offset: -2px;
+    }
 }
 
 .projectTabActive {
-    background: $color-white;
-    color: $brand-primary;
-    box-shadow: 0 3px 12px $ui-shadow-blue-soft;
+    border-bottom-color: admin.$primary;
+    background: admin.$active;
+    color: admin.$primary;
 }
 
 .activeDot,
@@ -228,40 +237,53 @@
 }
 
 .summaryCards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-bottom: 12px;
 }
 
 .summaryCard,
 .summaryActive {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-    border: 1px solid $ui-border-soft;
-    border-radius: $radius;
-    background: $color-white;
-    color: $ui-text-muted;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: admin.$muted;
     font: inherit;
+    font-size: $type-body-sm;
     text-align: right;
     cursor: pointer;
 
     strong {
-        color: $brand-primary;
-        font-size: 1.45rem;
+        color: admin.$text;
+        font-size: 1rem;
     }
 
     span {
-        font-weight: 700;
+        font-weight: 600;
+    }
+
+    &:hover {
+        background: admin.$hover;
+    }
+
+    &:focus-visible {
+        outline: 2px solid admin.$primary;
+        outline-offset: 2px;
     }
 }
 
 .summaryActive {
-    border-color: rgba($brand-primary, 0.35);
-    background: rgba($brand-primary, 0.065);
-    color: $brand-primary;
+    background: admin.$active;
+    color: admin.$primary;
+
+    strong {
+        color: inherit;
+    }
 }
 
 .overviewList {
@@ -338,7 +360,9 @@
 }
 
 .projectCard {
-    padding: 22px;
+    padding: 12px 22px 22px;
+    border-radius: 8px;
+    box-shadow: none;
 }
 
 .completedBanner,
@@ -384,80 +408,84 @@
 }
 
 .projectHeader {
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
 
     > div:first-child {
-        flex: 1;
+        display: grid;
+        min-width: 0;
+        gap: 8px;
     }
-}
-
-.inlineLabel {
-    display: block;
-    margin: 0 0 1px;
-    color: $ui-text-muted;
-    font-size: $type-caption;
-    font-weight: 700;
 }
 
 .section .projectName,
 .section .projectGoal {
+    min-width: 0;
     border-color: transparent;
-    padding: 5px 0;
+    padding: 0;
     background: transparent;
     box-shadow: none;
 }
 
 .section .projectName {
-    margin-bottom: 8px;
-    color: $brand-primary;
-    font-size: $type-card-title;
-    font-weight: 900;
+    margin: 0;
+    color: admin.$text;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 24px;
 }
 
 .section .projectGoal {
-    color: $ui-text-muted;
-    line-height: 1.5;
+    display: block;
+    height: 24px;
+    color: admin.$muted;
+    font-size: $type-body-sm;
+    line-height: 22px;
+    resize: vertical;
+
+    &:focus {
+        min-height: 68px;
+    }
 }
 
 .section .projectName:focus,
 .section .projectGoal:focus {
     border-color: $ui-border-strong;
-    padding-right: 9px;
     background: $color-white;
 }
 
 .progressBox {
-    min-width: 145px;
-    text-align: left;
-
-    strong,
-    span {
-        display: block;
-    }
+    display: grid;
+    gap: 8px;
+    text-align: end;
 
     strong {
-        color: $brand-primary;
-        font-size: 1.45rem;
+        color: admin.$primary;
+        font-size: 1.125rem;
+        line-height: 26px;
     }
 
     span {
-        color: $ui-text-muted;
+        color: admin.$muted;
         font-size: $type-caption;
+        line-height: 24px;
     }
 }
 
 .progressTrack {
-    height: 7px;
+    height: 3px;
     overflow: hidden;
-    margin: 8px 0 18px;
+    margin: 8px 0 12px;
     border-radius: $radius-pill;
-    background: rgba($brand-primary, 0.09);
+    background: admin.$active;
 
     span {
         display: block;
         height: 100%;
         border-radius: inherit;
-        background: linear-gradient(90deg, $brand-primary, $brand-gold-rich);
+        background: admin.$primary;
         transition: width 0.25s ease;
     }
 }
@@ -534,20 +562,25 @@
 
 .savedTasks {
     display: grid;
-    gap: 7px;
+    gap: 4px;
 }
 
 .savedTask,
 .savedTaskExpanded {
+    min-width: 0;
     overflow: hidden;
-    border: 1px solid $ui-border-soft;
-    border-radius: $radius;
-    background: $brand-surface-cool;
+    border: 1px solid admin.$border;
+    border-radius: 4px;
+    background: admin.$surface;
+    box-shadow: none;
 }
 
 .savedTaskExpanded {
     border-color: rgba($brand-primary, 0.25);
-    background: $color-white;
+
+    .taskSummaryRow {
+        background: admin.$active;
+    }
 }
 
 .taskDragging {
@@ -556,48 +589,71 @@
 
 .taskDragTarget {
     border-color: $brand-gold-rich;
-    box-shadow: 0 0 0 3px rgba($brand-gold-rich, 0.16);
+    box-shadow: none;
+
+    .taskSummaryRow {
+        background: rgba($brand-gold-rich, 0.08);
+    }
 }
 
 .taskSummaryRow {
     display: grid;
-    grid-template-columns: 34px minmax(0, 1fr) 58px;
+    grid-template-columns: minmax(0, 1fr) 32px 64px;
     align-items: center;
+
+    &:hover {
+        background: admin.$hover;
+    }
 }
 
 .dragHandle {
+    grid-column: 2;
+    grid-row: 1;
     align-self: stretch;
+    min-width: 0;
+    padding: 0;
     border: 0;
-    border-left: 1px solid $ui-border-soft;
     background: transparent;
-    color: $ui-text-muted;
+    color: admin.$muted;
     font: inherit;
-    font-size: 1.15rem;
+    font-size: 1rem;
     cursor: grab;
     touch-action: none;
 
     &:active {
         cursor: grabbing;
     }
+
+    &:disabled {
+        cursor: default;
+        opacity: 0.28;
+    }
 }
 
 .orderButtons {
+    grid-column: 3;
+    grid-row: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2px;
-    padding-left: 8px;
+    padding-inline-end: 6px;
 
     button {
-        width: 25px;
-        height: 27px;
+        width: 28px;
+        height: 32px;
         padding: 0;
-        border: 1px solid $ui-border-soft;
-        border-radius: 7px;
-        background: $color-white;
-        color: $brand-primary;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        color: admin.$muted;
         font: inherit;
-        font-weight: 800;
+        font-weight: 400;
         cursor: pointer;
+
+        &:hover:not(:disabled) {
+            background: admin.$active;
+            color: admin.$primary;
+        }
 
         &:disabled {
             cursor: default;
@@ -607,34 +663,58 @@
 }
 
 .taskSummary {
+    grid-column: 1;
+    grid-row: 1;
     display: grid;
-    grid-template-columns: 24px minmax(170px, 1fr) 105px 130px 130px;
+    grid-template-columns: 18px minmax(0, 1fr) 92px minmax(60px, 110px) 112px;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    min-width: 0;
+    min-height: 44px;
     width: 100%;
-    padding: 12px 14px;
+    padding: 6px 10px;
     border: 0;
     background: transparent;
-    color: $brand-text;
+    color: admin.$text;
     font: inherit;
     text-align: right;
     cursor: pointer;
+
+    > strong {
+        min-width: 0;
+        font-weight: 600;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+}
+
+.taskSummary,
+.dragHandle,
+.orderButtons button {
+    &:focus-visible {
+        outline: 2px solid admin.$primary;
+        outline-offset: -2px;
+    }
 }
 
 .chevron {
-    color: $brand-primary;
-    font-size: 1.25rem;
-    font-weight: 800;
+    color: admin.$muted;
+    font-size: 1rem;
+    font-weight: 400;
 }
 
 .statusPill {
     justify-self: start;
-    padding: 4px 9px;
-    border-radius: $radius-pill;
-    background: rgba($brand-primary, 0.08);
-    color: $brand-primary;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: admin.$active;
+    color: admin.$primary;
     font-size: $type-caption;
-    font-weight: 800;
+    font-weight: 500;
+    line-height: 1.4;
 
     &[data-status="הושלמה"] {
         background: $ui-success-soft;
@@ -649,9 +729,11 @@
 
 .assignee,
 .subtaskCount {
+    min-width: 0;
     overflow: hidden;
-    color: $ui-text-muted;
-    font-size: $type-body-sm;
+    color: admin.$muted;
+    font-size: $type-caption;
+    font-weight: 400;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -836,7 +918,6 @@
 
 @media (max-width: 760px) {
     .sectionHeader,
-    .projectHeader,
     .projectActions {
         align-items: stretch;
         flex-direction: column;
@@ -849,7 +930,8 @@
     .mobileProjectPicker {
         display: grid;
         gap: 5px;
-        margin-bottom: 14px;
+        min-width: 0;
+        margin-bottom: 12px;
 
         span {
             color: $ui-text-muted;
@@ -882,24 +964,6 @@
         gap: 2px;
     }
 
-    .summaryCards {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-    }
-
-    .summaryCard,
-    .summaryActive {
-        display: grid;
-        justify-items: center;
-        gap: 1px;
-        padding: 10px 5px;
-        text-align: center;
-
-        span {
-            font-size: $type-caption;
-        }
-    }
-
     .overviewProject {
         grid-template-columns: minmax(0, 1fr) 75px;
         gap: 8px;
@@ -910,20 +974,19 @@
         display: none;
     }
 
-    .projectCard,
     .createCard {
         padding: 16px;
     }
 
-    .progressBox {
-        text-align: right;
+    .projectCard {
+        padding: 12px 16px 16px;
     }
 
     .taskSummary {
-        grid-template-columns: 22px minmax(0, 1fr) auto;
+        grid-template-columns: 16px minmax(0, 1fr) minmax(0, auto);
         grid-template-rows: auto auto;
         gap: 7px;
-        padding-right: 9px;
+        padding-inline: 8px;
 
         > strong {
             grid-column: 2;
@@ -932,7 +995,7 @@
     }
 
     .taskSummaryRow {
-        grid-template-columns: 32px minmax(0, 1fr) 54px;
+        grid-template-columns: minmax(0, 1fr) 28px 60px;
     }
 
     .taskSummary .chevron {
@@ -1004,3 +1067,7 @@
         text-align: center;
     }
 }
+
+// Compact navigation and overview inside the admin workspace.
+.overviewProject { border-radius: 8px; box-shadow: none; &:hover { box-shadow: none; } }
+.taskFilters { border: 0; border-radius: 0; background: transparent; box-shadow: none; padding-inline: 0; }

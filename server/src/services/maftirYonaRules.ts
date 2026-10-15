@@ -21,9 +21,10 @@ export function parseBid(body: Record<string, unknown>) {
         return value.trim().replace(/\s+/g, ' ');
     };
     if (body.accepted !== true) throw new AuctionError(400, 'יש לאשר את ההתחייבות');
+    if (body.outbidNotificationsConsent !== undefined && typeof body.outbidNotificationsConsent !== 'boolean') throw new AuctionError(400, 'ערך הסכמה לעדכונים אינו תקין');
     if (typeof body.requestId !== 'string' || !/^[a-f0-9-]{36}$/i.test(body.requestId)) throw new AuctionError(400, 'מזהה בקשה לא תקין');
     if (!Number.isSafeInteger(body.revision) || Number(body.revision) < 0) throw new AuctionError(400, 'גרסת מכירה לא תקינה');
-    return { firstName: name(body.firstName), lastName: name(body.lastName), phone: normalizePhone(body.phone), amount: integer(body.amount, 'סכום ההצעה'), requestId: body.requestId, revision: Number(body.revision) };
+    return { outbidNotificationsConsent: body.outbidNotificationsConsent === true, firstName: name(body.firstName), lastName: name(body.lastName), phone: normalizePhone(body.phone), amount: integer(body.amount, 'סכום ההצעה'), requestId: body.requestId, revision: Number(body.revision) };
 }
 export type AuctionRules = { status: string; opensAt: Date; endsAt: Date; openingPrice: number; minimumIncrement: number; extensionMs: number; extensionWindowMs: number };
 export const minimumBid = (auction: AuctionRules, leadingAmount?: number) => leadingAmount === undefined ? auction.openingPrice : Math.max(auction.openingPrice, leadingAmount + auction.minimumIncrement);

@@ -1,3 +1,4 @@
+import AdminPageHeader from "../../../../components/AdminShell/AdminPageHeader";
 import { useEffect, useMemo, useState, type DragEvent } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
@@ -369,19 +370,11 @@ const AdminProjectsTab = () => {
 
     return (
         <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-                <div>
-                    <h2>ניהול פרויקטים</h2>
-                    <p>רואים את התמונה הכללית ונכנסים רק לפרויקט שרוצים לטפל בו.</p>
-                </div>
-                <button
-                    type="button"
-                    className={styles.primaryButton}
-                    onClick={() => setShowForm((current) => !current)}
-                >
+            <AdminPageHeader title="פרויקטים" actions={
+                <button type="button" className={styles.primaryButton} onClick={() => setShowForm((current) => !current)}>
                     {showForm ? "ביטול" : "+ פרויקט חדש"}
                 </button>
-            </div>
+            } />
 
             {error && <div className={styles.error} role="alert">{error}</div>}
             {notice && <div className={styles.notice} role="status">{notice}</div>}
@@ -433,6 +426,7 @@ const AdminProjectsTab = () => {
                             type="button"
                             className={!selectedProject ? styles.projectTabActive : styles.projectTab}
                             onClick={() => showOverview()}
+                            aria-current={!selectedProject ? "page" : undefined}
                         >
                             סקירה כללית
                         </button>
@@ -442,6 +436,8 @@ const AdminProjectsTab = () => {
                                 key={project._id}
                                 className={selectedProjectId === project._id ? styles.projectTabActive : styles.projectTab}
                                 onClick={() => openProject(project._id)}
+                                aria-current={selectedProjectId === project._id ? "page" : undefined}
+                                title={project.name}
                             >
                                 <span className={isCompleted(project) ? styles.doneDot : styles.activeDot} />
                                 {project.name}
@@ -466,13 +462,13 @@ const AdminProjectsTab = () => {
             {!selectedProject ? (
                 <div className={styles.overview}>
                     <div className={styles.summaryCards}>
-                        <button type="button" className={overviewFilter === "active" ? styles.summaryActive : styles.summaryCard} onClick={() => setOverviewFilter("active")}>
-                            <strong>{activeProjects.length}</strong><span>פרויקטים פעילים</span>
+                        <button type="button" className={overviewFilter === "active" ? styles.summaryActive : styles.summaryCard} onClick={() => setOverviewFilter("active")} aria-pressed={overviewFilter === "active"}>
+                            <strong>{activeProjects.length}</strong><span>פעילים</span>
                         </button>
-                        <button type="button" className={overviewFilter === "completed" ? styles.summaryActive : styles.summaryCard} onClick={() => setOverviewFilter("completed")}>
-                            <strong>{completedProjects.length}</strong><span>פרויקטים שהושלמו</span>
+                        <button type="button" className={overviewFilter === "completed" ? styles.summaryActive : styles.summaryCard} onClick={() => setOverviewFilter("completed")} aria-pressed={overviewFilter === "completed"}>
+                            <strong>{completedProjects.length}</strong><span>הושלמו</span>
                         </button>
-                        <button type="button" className={overviewFilter === "archived" ? styles.summaryActive : styles.summaryCard} onClick={() => setOverviewFilter("archived")}>
+                        <button type="button" className={overviewFilter === "archived" ? styles.summaryActive : styles.summaryCard} onClick={() => setOverviewFilter("archived")} aria-pressed={overviewFilter === "archived"}>
                             <strong>{archivedProjects.length}</strong><span>בארכיון</span>
                         </button>
                     </div>
@@ -520,10 +516,8 @@ const AdminProjectsTab = () => {
 
                     <div className={styles.projectHeader}>
                         <div>
-                            <label className={styles.inlineLabel}>שם הפרויקט</label>
-                            <input className={styles.projectName} value={selectedProject.name} onChange={(event) => changeProject({ ...selectedProject, name: event.target.value })} />
-                            <label className={styles.inlineLabel}>היעד</label>
-                            <textarea className={styles.projectGoal} value={selectedProject.goal} rows={2} onChange={(event) => changeProject({ ...selectedProject, goal: event.target.value })} />
+                            <input aria-label="שם הפרויקט" className={styles.projectName} value={selectedProject.name} onChange={(event) => changeProject({ ...selectedProject, name: event.target.value })} />
+                            <textarea aria-label="היעד" className={styles.projectGoal} value={selectedProject.goal} rows={1} onChange={(event) => changeProject({ ...selectedProject, goal: event.target.value })} />
                         </div>
                         <div className={styles.progressBox}>
                             <strong>{selectedProgress?.percent}%</strong>

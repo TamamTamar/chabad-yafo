@@ -5,6 +5,7 @@ const schema = new mongoose.Schema({
     firstName: { type: String, required: true, maxlength: 50 },
     lastName: { type: String, required: true, maxlength: 50 },
     phone: { type: String, required: true },
+    outbidNotificationsConsent: { type: Boolean, default: false, required: true },
     amount: { type: Number, required: true, min: 1, validate: Number.isSafeInteger },
     receivedAt: { type: Date, required: true },
     status: { type: String, enum: ['active', 'invalid'], default: 'active', required: true },

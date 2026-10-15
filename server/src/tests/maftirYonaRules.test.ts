@@ -47,6 +47,12 @@ test('public DTO is an allowlist; consent and request validation', () => {
     assert.equal(publicBid(null), null);
     const input = { ...bid, accepted: true, revision: 0, requestId: '12345678-1234-1234-1234-123456789abc' };
     assert.equal(parseBid(input).phone, bid.phone);
+    assert.equal(parseBid(input).outbidNotificationsConsent, false);
+    assert.equal(parseBid({ ...input, outbidNotificationsConsent: false }).outbidNotificationsConsent, false);
+    assert.equal(parseBid({ ...input, outbidNotificationsConsent: true }).outbidNotificationsConsent, true);
+    for (const value of ['true', 'false', 1, 0, null]) {
+        assert.throws(() => parseBid({ ...input, outbidNotificationsConsent: value }));
+    }
     assert.throws(() => parseBid({ ...input, accepted: false }));
     assert.throws(() => parseBid({ ...input, firstName: '<script>' }));
 });

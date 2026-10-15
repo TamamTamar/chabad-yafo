@@ -12,7 +12,8 @@ import {
     Shield,
 } from "lucide-react";
 import type { ChatMessage, SuggestedAction } from "../../types/chatAssistant";
-import { sendChatMessage, chatErrorMessage } from "../../services/chatAssistantService";
+import { sendChatMessage, chatErrorMessage, chatAnalyticsErrorCode } from "../../services/chatAssistantService";
+import { createChatAnalytics, chatActionType, isChatNoInfo } from "../../services/chatAnalytics";
 import { DEFAULT_SUGGESTIONS } from "./chatAssistantSuggestions";
 import styles from "./ChatAssistant.module.scss";
 
@@ -23,6 +24,12 @@ const INITIAL_GREETING: ChatMessage = {
     timestamp: Date.now(),
     suggestedActions: [],
 };
+
+// Called only by message event handlers, never while rendering.
+function createMessage(prefix: string, content: string, suggestedActions?: SuggestedAction[]): ChatMessage {
+    const timestamp = Date.now();
+    return { id: `${prefix}-${timestamp}`, role: prefix === 'user' ? 'user' : 'assistant', content, timestamp, ...(suggestedActions ? { suggestedActions } : {}) };
+}
 
 const ChatAssistant: React.FC = () => {
     const { pathname } = useLocation();
@@ -37,6 +44,7 @@ const ChatAssistant: React.FC = () => {
     const abortControllerRef = useRef<AbortController | null>(null);
     const wasOpenRef = useRef(false);
     const conversationIdRef = useRef<number>(0);
+    const [analytics] = useState(createChatAnalytics);
 
     // Reserve space for existing fixed mobile action bars.
     const hasBottomCta = pathname.startsWith("/maftir-yona") || pathname === "/daycare-parent-info";
@@ -64,7 +72,7 @@ const ChatAssistant: React.FC = () => {
         if (isOpen) {
             scrollToBottom();
         }
-    }, [messages, isLoading]);
+    }, [messages, isLoading, isOpen]);
 
     // Accessibility: Allow closing with Escape key even when input is disabled or unfocused
     useEffect(() => {
@@ -87,10 +95,12 @@ const ChatAssistant: React.FC = () => {
     }, []);
 
     const handleToggle = () => {
+        if (!isOpen) analytics.open();
         setIsOpen((prev) => !prev);
     };
 
     const handleReset = () => {
+        analytics.reset();
         // Abort any ongoing request
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -108,6 +118,7 @@ const ChatAssistant: React.FC = () => {
     const handleSend = async (textToSend?: string) => {
         const text = (textToSend ?? input).trim();
         if (!text || isLoading) return;
+        analytics.messageSent();
 
         // Abort any previous pending call
         if (abortControllerRef.current) {
@@ -117,12 +128,7 @@ const ChatAssistant: React.FC = () => {
         abortControllerRef.current = currentController;
         const currentConvId = conversationIdRef.current;
 
-        const userMsg: ChatMessage = {
-            id: `user-${Date.now()}`,
-            role: "user",
-            content: text,
-            timestamp: Date.now(),
-        };
+        const userMsg = createMessage('user', text);
 
         // History to pass excludes the current message (avoiding duplicate sending)
         const historyForCall = [...messages];
@@ -139,13 +145,9 @@ const ChatAssistant: React.FC = () => {
                 return;
             }
 
-            const assistantMsg: ChatMessage = {
-                id: `asst-${Date.now()}`,
-                role: "assistant",
-                content: response.reply,
-                timestamp: Date.now(),
-                suggestedActions: response.suggestedActions,
-            };
+            if (isChatNoInfo(response.reply)) analytics.noInfo();
+
+            const assistantMsg = createMessage('asst', response.reply, response.suggestedActions);
 
             setMessages((prev) => [...prev, assistantMsg]);
         } catch (err: unknown) {
@@ -161,13 +163,8 @@ const ChatAssistant: React.FC = () => {
             // Safe client logging: do not log conversation content or full error object
             // sendChatMessage already emits a safe diagnostic event when applicable.
 
-            const errorMsg: ChatMessage = {
-                id: `err-${Date.now()}`,
-                role: "assistant",
-                content: chatErrorMessage(err),
-                timestamp: Date.now(),
-
-            };
+            analytics.error(chatAnalyticsErrorCode(err));
+            const errorMsg = createMessage('err', chatErrorMessage(err));
             setMessages((prev) => [...prev, errorMsg]);
         } finally {
             if (conversationIdRef.current === currentConvId) {
@@ -193,7 +190,7 @@ const ChatAssistant: React.FC = () => {
                     key={`${action.url}-${index}`}
                     to={action.url}
                     className={styles.actionBtn}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => { analytics.actionClicked(chatActionType(action)); setIsOpen(false); }}
                 >
                     <span>{action.label}</span>
                     <ArrowRight size={14} className={styles.actionIcon} />
@@ -205,6 +202,7 @@ const ChatAssistant: React.FC = () => {
             <a
                 key={`${action.url}-${index}`}
                 href={action.url}
+                onClick={() => analytics.actionClicked(chatActionType(action))}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${styles.actionBtn} ${action.type === "whatsapp" ? styles.whatsappAction : ""}`}

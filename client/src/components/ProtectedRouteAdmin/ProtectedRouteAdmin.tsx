@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import AdminShell from "../AdminShell/AdminShell";
 import { getAdminSession } from "../../services/adminAuthService";
 
 type ProtectedRouteAdminProps = {
@@ -43,7 +44,7 @@ const ProtectedRouteAdmin = ({ children }: ProtectedRouteAdminProps) => {
         return <Navigate to="/admin/login" replace />;
     }
 
-    return <>{children}</>;
+    return <AdminShell>{children}</AdminShell>;
 };
 
 export default ProtectedRouteAdmin;

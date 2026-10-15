@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import Container from "../../../components/Container/Container";
+import { useSearchParams } from "react-router-dom";
+import AdminPageHeader from "../../../components/AdminShell/AdminPageHeader";
+import { resolveAdminLocation } from "../../../components/AdminNavigation/adminNavigationConfig";
 import DaycareDashboard from "./components/DaycareDashboard";
 import DaycareExpansion from "./components/DaycareExpansion";
 import DaycareFinance from "./components/DaycareFinance";
@@ -32,24 +33,14 @@ const documentTabs: Array<{ id: DocumentTab; label: string }> = [
     { id: "agreements", label: "הסכם התקשרות" },
 ];
 
-const daycareAdminTabs: Array<{
-    id: DaycareAdminTab;
-    label: string;
-}> = [
-    { id: "tasks", label: "משימות" },
-    { id: "registrations", label: "רישום" },
-    { id: "finance", label: "כספים" },
-    { id: "donations", label: "תרומות" },
-    { id: "documents", label: "מחולל מסמכים" },
-];
-
 const DaycareAdmin = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [overview, setOverview] = useState<DaycareOverview | null>(null);
     const [financeRefreshKey, setFinanceRefreshKey] = useState(0);
     const requestedTab = searchParams.get("tab");
     const requestedParentInfoTab = searchParams.get("section");
-    const [activeTab, setActiveTab] = useState<DaycareAdminTab>(
+    const activeTab: DaycareAdminTab =
+        requestedTab === "tasks" ||
         requestedTab === "registrations" ||
         requestedTab === "finance" ||
         requestedTab === "donations" ||
@@ -57,23 +48,15 @@ const DaycareAdmin = () => {
             ? requestedTab
             : requestedTab === "agreements"
                 ? "documents"
-            : "registrations"
-    );
-    const [documentTab, setDocumentTab] = useState<DocumentTab>(
+            : "registrations";
+    const documentTab: DocumentTab =
         requestedTab === "agreements" || requestedParentInfoTab === "agreements"
             ? "agreements"
             : requestedParentInfoTab === "welcome" || requestedParentInfoTab === "routine" || requestedParentInfoTab === "holidays" || requestedParentInfoTab === "menu" || requestedParentInfoTab === "equipment" || requestedParentInfoTab === "annual-plan"
                 ? requestedParentInfoTab
-                : "annual-plan"
-    );
-
-    const selectTab = (tab: DaycareAdminTab) => {
-        setActiveTab(tab);
-        setSearchParams(tab === "registrations" ? {} : tab === "documents" ? { tab, section: documentTab } : { tab });
-    };
+                : "annual-plan";
 
     const selectDocumentTab = (tab: DocumentTab) => {
-        setDocumentTab(tab);
         setSearchParams({ tab: "documents", section: tab });
     };
 
@@ -105,54 +88,8 @@ const DaycareAdmin = () => {
 
     return (
         <main className={styles.page}>
-            <Container>
-                <header className={styles.hero}>
-                    <div>
-                        <span className={styles.eyebrow}>Admin</span>
-                        <h1 className={styles.title}>ניהול מעון</h1>
-                        <p className={styles.description}>
-                            רישום משפחות, תיקי הצטרפות, תשלומים ומחולל מסמכים במקום אחד.
-                        </p>
-                    </div>
 
-                    <Link className={styles.secondaryLink} to="/admin/dashboard">
-                        חזרה לניהול האתר
-                    </Link>
-                </header>
-
-                <nav className={styles.tabBar} aria-label="ניווט ניהול מעון">
-                    {daycareAdminTabs.map((tab) => (
-                        <button
-                            aria-pressed={activeTab === tab.id}
-                            className={
-                                activeTab === tab.id
-                                    ? styles.tabButtonActive
-                                    : styles.tabButton
-                            }
-                            key={tab.id}
-                            type="button"
-                            onClick={() => selectTab(tab.id)}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </nav>
-
-                <label className={styles.tabSelect}>
-                    אזור ניהול במעון
-                    <select
-                        value={activeTab}
-                        onChange={(event) =>
-                            selectTab(event.target.value as DaycareAdminTab)
-                        }
-                    >
-                        {daycareAdminTabs.map((tab) => (
-                            <option key={tab.id} value={tab.id}>
-                                {tab.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                {activeTab !== "registrations" && activeTab !== "tasks" && <AdminPageHeader title={resolveAdminLocation('/admin/daycare', `?${searchParams}`).title} />}
 
                 {activeTab === "tasks" && (
                     <div className={styles.tabPanel}>
@@ -166,8 +103,8 @@ const DaycareAdmin = () => {
 
                 {activeTab === "registrations" && (
                     <div className={styles.tabPanel}>
-                        <DaycareDashboard overview={overview} />
-                        <DaycareRegistrations onChanged={handleDataChanged} />
+                        <DaycareRegistrations onChanged={handleDataChanged} openingSummary={<DaycareDashboard overview={overview} compact />} />
+                        <DaycareDashboard overview={overview} secondary />
                     </div>
                 )}
 
@@ -208,7 +145,7 @@ const DaycareAdmin = () => {
                                 : <DaycareParentDocuments visibleDocument={documentTab} />}
                     </div>
                 )}
-            </Container>
+
         </main>
     );
 };

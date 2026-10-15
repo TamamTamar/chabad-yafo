@@ -43,10 +43,9 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
 
     return (
         <div className={styles.layout}>
-            <section className={styles.summarySection}>
+            <section className={`${styles.summarySection} ${activeView === "overview" ? styles.overviewSummary : ""}`}>
                 <header className={styles.sectionHeader}>
                     <div>
-                        <h2>קמפיין התרומות למעון</h2>
                         <p>
                             הסכומים בדף הציבורי מחושבים מרשומות מאושרות בלבד.
                         </p>
@@ -132,6 +131,7 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                             activeView === view.id ? styles.activeView : ""
                         }
                         aria-pressed={activeView === view.id}
+                        title={view.description}
                         onClick={() => {
                             setActiveView(view.id);
                             setError("");
@@ -139,7 +139,6 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                         }}
                     >
                         <strong>{view.label}</strong>
-                        <small>{view.description}</small>
                         {view.id === "records" && records.length > 0 && (
                             <span>{records.length}</span>
                         )}

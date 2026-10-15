@@ -1,3 +1,5 @@
+import AdminPageHeader from "../../../components/AdminShell/AdminPageHeader";
+import adminStyles from "./MaftirYonaAdmin.module.scss";
 import ConfirmDialog from '../../../components/ConfirmDialog/ConfirmDialog';
 import { useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
@@ -47,10 +49,8 @@ export default function MaftirYonaAdmin() {
             setMessage('פרטי הזוכה והסכום הועתקו.');
         } catch { setMessage('ההעתקה נכשלה. אפשר להעתיק ידנית את הפרטים המוצגים.'); }
     }
-    return <main className={`${styles.page} ${styles.adminPage}`} dir="rtl" lang="he">
-        <Link className={styles.secondary} to="/admin/dashboard">חזרה לניהול האתר</Link>
-        <h1 className={styles.title}>ניהול מכירת מפטיר יונה</h1>
-        <Link className={styles.secondary} to="/maftir-yona">צפייה בעמוד הציבורי</Link>
+    return <main className={`${styles.page} ${adminStyles.page}`} dir="rtl" lang="he">
+        <AdminPageHeader title="מפטיר יונה" actions={<Link className={styles.secondary} to="/maftir-yona">צפייה בעמוד הציבורי</Link>} />
         {(message || error) && <p className={styles.note} role="status">{message || error}</p>}
         {!data ? <p className={styles.note}>טוען…</p> : !data.initialized ? <section className={styles.card}><h2 className={styles.sectionTitle}>יצירת המכירה</h2><p className={styles.note}>מחיר פתיחה: 1,800 ₪. תוספת מינימלית: 180 ₪. סיום: {auctionDate(data.endsAt)} לפי שעון ישראל. לאחר היצירה יש לפתוח את המכירה בנפרד.</p><button className={styles.primary} disabled={busy} onClick={() => void initialize()}>יצירת מכירה נפרדת</button></section> : <>
             <section className={styles.card}>

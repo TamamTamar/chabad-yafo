@@ -6,7 +6,7 @@
 - `server`: Express, Mongoose 9, חיבור MongoDB הקיים ב־`config/connectDB.ts` באמצעות `MONGO_URI`. הראוטים החדשים נרשמים ב־`index.ts`; לא נוסף שרת נוסף.
 - המודלים הקיימים כוללים משפחות, תשלומים, רישומים, פרויקטים, מסמכי מעון וקמפיין תרומות למעון. המכירה משתמשת באוספים משלה בלבד: `maftiryonaauctions`, `maftiryonabids`, `maftiryonaratelimits`.
 - ההזדהות הקיימת: `adminAuth.ts`, JWT ב־cookie או bearer, `ProtectedRouteAdmin`, `http.ts` עם credentials; הפעולות החדשות משתמשות גם ב־`requireSecureAdminMutation` לבדיקת origin ו־JSON. לא נוצר מנגנון הזדהות נוסף.
-- קיימים שירותי Twilio WhatsApp ו־SMTP (`whatsapp.ts`, `mail.ts`) להודעות רישום. המכירה אינה שולחת הודעות אוטומטיות ולא מפעילה אותם.
+- קיימים שירותי Twilio WhatsApp ו־SMTP (`whatsapp.ts`, `mail.ts`) להודעות רישום. התראת העקיפה נשלחת ל־Make webhook בלבד; קוד Meta הקיים (`whatsappService.ts`) נשמר אך אינו מופעל במכירה.
 - נבדקו `DonationCampaignPage`, כל רכיבי הקמפיין והמודאל, טיפוסי הקונפיגורציה, סגנונות הכרטיסים והטפסים, מעקב האירועים, `buildNedarimPayload`, `useNedarimIframe`, מסגרת התשלום ו־`paymentRoutes`.
 - דף הקמפיין מקבל קונפיגורציה מהעמודים העוטפים אותו; הוא אינו API ליצירת מכירה או קישור אישי. הסליקה שבו נעשית ב־iframe של נדרים פלוס, עם `FinishTransaction2` ו־callback קיים לשמירת תשלום. מסמך קמפיין המעון אינו משמש למכירה.
 - העמוד החדש משתמש ב־`_variables.scss` וב־`_base.scss` שכבר נטען באתר, בכרטיסים לבנים, כחול המותג, זהב, טפסים וכפתורים תואמים. חלונות אישור משתמשים ב־`ConfirmDialog` הקיים. לא שונו רכיבי קמפיין התרומות, ולא נוספו תמונות או צבעי מותג משוכפלים.
@@ -37,7 +37,35 @@ Polling כל 4 שניות, ללא בקשות קריאה חופפות מתוך א
 
 ## דרישות סביבה וסליקה
 
-אין משתני סביבה חדשים להפעלה. נדרשים `MONGO_URI`, `JWT_SECRET`, `ADMIN_PASSWORD` ו־`CLIENT_ORIGIN` הקיימים; הלקוח משתמש ב־`VITE_API_URL` הקיים.
+להפעלת המכירה נדרשים `MONGO_URI`, `JWT_SECRET`, `ADMIN_PASSWORD` ו־`CLIENT_ORIGIN` הקיימים; הלקוח משתמש ב־`VITE_API_URL` הקיים. משתנה ה־webhook שלהלן נדרש רק למשלוח התראות.
+
+### התראת עקיפה דרך Make
+
+`notifyOutbid(previousLeader, newLeadingAmount)` שולח POST ל־Make אחרי שמירת ההצעה. זיהוי העקיפה ללא שינוי: אין שליחה בהצעה ראשונה או כאשר אותו מציע מעלה את הצעתו. Make יהיה אחראי לשליחת SMS; אין שימוש ב־Meta WhatsApp במסלול זה.
+
+יש להגדיר בסביבת השרת בלבד משתנה אופציונלי:
+
+```dotenv
+MAFTIR_YONA_OUTBID_WEBHOOK_URL=https://hook.eu1.make.com/YOUR_WEBHOOK_ID
+```
+
+הבקשה נשלחת כ־`application/json` ומכילה רק:
+
+```json
+{
+  "event": "maftir_yona_outbid",
+  "firstName": "ישראל",
+  "phone": "+447700900123",
+  "newLeadingAmount": 2160,
+  "auctionUrl": "https://chabadyafo.org/maftir-yona"
+}
+```
+
+השם והטלפון שייכים למציע שנעקף. מספר הטלפון מועבר כפי שנשמר, ללא normalization נוסף או הנחה שהוא ישראלי. שם משפחה ופרטי המציע החדש אינם נשלחים.
+
+משתנה חסר או ריק מדלג על השליחה. שגיאת HTTP, שגיאת רשת או timeout נרשמים ללא פרטי נמען או כתובת ה־webhook ואינם מכשילים את ההצעה שכבר נשמרה. ה־timeout הוא 3 שניות, ללא retry או מעקב אחרי redirects. אין הבטחת מסירה; הצלחת HTTP מציינת קבלה ב־Make בלבד.
+
+הבדיקות ב־`maftirYonaNotification.test.ts` מדמות את הרשת ואת מסד הנתונים ומכסות עקיפה, הצעה ראשונה, העלאה עצמית, הגדרה חסרה, שגיאות, timeout ו־payload מדויק. הן אינן שולחות הודעות אמיתיות.
 
 **MongoDB חייב לתמוך בטרנזקציות: replica set או Atlas/sharded cluster.** מסד standalone אינו מתאים למימוש האטומי הזה. הבדיקות נעשו ב־replica set מקומי; לא בוצעה בדיקה או שינוי של מסד production. חיבור שלא תומך בטרנזקציות נכשל עם הודעת זמינות ואינו שומר הצעה חלקית. אם אינדקסים אוטומטיים כבויים בסביבת האירוח, יש ליצור את האינדקסים המוגדרים במודלים לפני הפתיחה.
 

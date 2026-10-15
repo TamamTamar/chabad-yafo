@@ -1,3 +1,4 @@
+import AdminPageHeader from "../../../../components/AdminShell/AdminPageHeader";
 import { ChevronDown, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import styles from "../DaycareAdmin.module.scss";
 import type { DaycarePriority, DaycareTaskCategory } from "../types";
@@ -20,25 +21,11 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
 
     return (
         <section className={styles.section} aria-labelledby="daycare-tasks">
-            <div className={styles.sectionHeader}>
-                <div>
-                    <h2 className={styles.sectionTitle} id="daycare-tasks">
-                        צ׳ק־ליסט פתיחת מעון
-                    </h2>
-                    <p className={styles.sectionDescription}>
-                        משימות עבודה לפי קטגוריה, עדיפות ותאריך יעד.
-                    </p>
-                </div>
-
-                <button
-                    className={styles.primaryButton}
-                    type="button"
-                    onClick={handleAddClick}
-                >
-                    <Plus aria-hidden="true" size={18} />
-                    משימה חדשה
+            <AdminPageHeader id="daycare-tasks" title="משימות המעון" description="משימות עבודה לפי קטגוריה, עדיפות ותאריך יעד" actions={
+                <button className={styles.primaryButton} type="button" onClick={handleAddClick}>
+                    <Plus aria-hidden="true" size={18} /> משימה חדשה
                 </button>
-            </div>
+            } />
 
             {showTaskForm && (
             <div

@@ -8,7 +8,9 @@ const { outputFiles } = await build({
     contents: `
       import assert from 'node:assert/strict';
       import { createElement as h } from 'react';
-      import { renderToStaticMarkup as render } from 'react-dom/server';
+      import { renderToStaticMarkup as renderMarkup } from 'react-dom/server';
+      import { MemoryRouter } from 'react-router-dom';
+      const render = (node) => renderMarkup(h(MemoryRouter, null, node));
       import { useDaycareDonationsAdmin } from './src/pages/Admin/DaycareAdmin/components/useDaycareDonationsAdmin';
       import { getInactiveRecommendedItems } from './src/pages/Admin/DaycareAdmin/components/donationRecommendations';
       import Items from './src/pages/Admin/DaycareAdmin/components/DonationItemsAdminView';

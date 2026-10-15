@@ -1,0 +1,12 @@
+@use '../../styles/admin-tokens' as a;
+.navigation { display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 20px 12px 12px; background: a.$surface; color: a.$text; }
+.brand { display: grid; gap: 2px; padding: 0 12px 20px; strong { font-size: 17px; font-weight: 700; } span { font-size: 13px; color: a.$muted; } }
+.groups { flex: 1; overflow-y: auto; section + section { margin-top: 16px; } }
+.group { width: 100%; display: flex; align-items: center; justify-content: space-between; border: 0; background: transparent; color: a.$muted; padding: 8px 12px; font-size: 13px; font-weight: 600; }
+.collapsed { transform: rotate(90deg); }
+.link, .active { display: flex; width: 100%; align-items: center; gap: 10px; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 6px; color: a.$text; font-size: 15px; font-weight: 600; background: transparent; text-align: right; text-decoration: none; transition: background-color 140ms; svg { flex-shrink: 0; color: a.$muted; } &:hover { background: a.$hover; } }
+.active { background: a.$active; color: a.$primary; font-weight: 700; svg { color: inherit; } &:hover { background: a.$active; } }
+.bottom { border-top: 1px solid a.$border; padding-top: 8px; margin-top: 16px; p { font-size: 13px; color: #b00020; } }
+.navigation :is(button, a):focus-visible { outline: 2px solid a.$primary; outline-offset: -2px; }
+@media (max-width: 1099px) { .link, .active, .group { min-height: 44px; } }
+.groupActive { color: a.$primary; }

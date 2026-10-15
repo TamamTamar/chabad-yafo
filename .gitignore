@@ -46,3 +46,11 @@ tmp/
 server/tmp/
 server/assets/logo-maon.jpeg
 output/
+
+# Local experiments, excluded from the current production release
+/server/src/routes/cardcomRoutes.ts
+/server/src/services/cardcomService.ts
+/server/src/tests/cardcomService.test.ts
+/server/src/services/whatsappService.ts
+/server/scripts/test-whatsapp-once.mjs
+/server/scripts/test-maftir-yona-webhook-once.mjs

@@ -30,10 +30,23 @@ import {
     type MonthlyCashflowEditKey,
     type MonthlyCashflowNumberKey,
 } from "./daycareFinanceUtils";
+const parseFinanceInput = (value: string): number | null => {
+    if (value === "") return 0;
+
+    // Keep commas as thousands separators; never strip arbitrary characters.
+    if (!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d*)?$/.test(value)) {
+        return null;
+    }
+
+    const amount = Number(value.replace(/,/g, ""));
+    return Number.isFinite(amount) ? amount : null;
+};
+
 export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceProps) => {
     const [settings, setSettings] = useState<DaycareFinanceSettings | null>(
         null
     );
+    const [inputValues, setInputValues] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [financeDirty, setFinanceDirty] = useState(false);
@@ -51,6 +64,7 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
 
                 const normalized = ensureCurrentYearCashflows(financeSettings);
                 setSettings(normalized.settings);
+                setInputValues({});
                 setFinanceDirty(normalized.changed);
                 setLoadError("");
                 setSaveMessage(
@@ -149,6 +163,27 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
         };
     }, [settings]);
 
+    const getMonthlyInputValue = (
+        cashflowMonth: string,
+        key: MonthlyCashflowNumberKey
+    ) => inputValues[`${cashflowMonth}:${key}`] ??
+        (settings?.monthlyCashflows?.find((cashflow) =>
+            cashflow.month === cashflowMonth)?.[key] || "");
+
+    const readMonthlyInput = (
+        cashflowMonth: string,
+        key: MonthlyCashflowNumberKey,
+        value: string
+    ) => {
+        setInputValues((current) => ({ ...current, [`${cashflowMonth}:${key}`]: value }));
+        const amount = parseFinanceInput(value);
+        if (amount === null) {
+            setSaveError("יש לתקן סכום לא תקין לפני השמירה.");
+            setSaveMessage("");
+        }
+        return amount;
+    };
+
     const updateMonthlyCashflow = (
         cashflowMonth: string,
         key: MonthlyCashflowEditKey,
@@ -168,7 +203,8 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
             return;
         }
 
-        const nextValue = Number(value.replace(/[^\d]/g, "")) || 0;
+        const nextValue = readMonthlyInput(cashflowMonth, key, value);
+        if (nextValue === null) return;
         const nextCashflow = {
             ...currentCashflow,
             [key]: nextValue,
@@ -183,6 +219,11 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
                     : nextCashflow.pricePerChild;
 
             nextCashflow.income = nextChildren * nextPrice;
+            // Replace an earlier manual income draft with the recalculated value.
+            setInputValues((current) => ({
+                ...current,
+                [`${cashflowMonth}:income`]: String(nextCashflow.income),
+            }));
         }
 
         nextCashflows[cashflowIndex] = nextCashflow;
@@ -215,9 +256,12 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
             return;
         }
 
+        const nextValue = readMonthlyInput(cashflowMonth, key, value);
+        if (nextValue === null) return;
+
         nextCashflows[cashflowIndex] = {
             ...currentCashflow,
-            [key]: Number(value.replace(/[^\d]/g, "")) || 0,
+            [key]: nextValue,
         };
 
         setSettings({
@@ -231,6 +275,11 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
 
     const handleSave = async () => {
         if (!settings || !financeDirty || saving) return;
+        if (Object.values(inputValues).some((value) => parseFinanceInput(value) === null)) {
+            setSaveError("יש לתקן סכום לא תקין לפני השמירה.");
+            setSaveMessage("");
+            return;
+        }
 
         setSaving(true);
         setSaveError("");
@@ -238,6 +287,7 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
         try {
             const updatedSettings = await updateDaycareFinance(settings);
             setSettings(updatedSettings);
+            setInputValues({});
             setFinanceDirty(false);
             setSaveMessage("הנתונים הכספיים נשמרו בהצלחה.");
             onChanged();
@@ -276,7 +326,7 @@ export const useDaycareFinance = ({ onChanged, refreshKey = 0 }: DaycareFinanceP
         saveMessage, selectedMonth, summary, selectedCashflow,
         selectedSetupMonth, selectedOngoingExpenses, selectedRenovationExpenses,
         selectedAvailableCashflow, selectedAfterRepayment, setSelectedMonth,
-        updateMonthlyCashflow, updateMonthlyRenovationCashflow, handleSave,
+        getMonthlyInputValue, updateMonthlyCashflow, updateMonthlyRenovationCashflow, handleSave,
         formatCurrency, formatMonth, getDefaultMonthlyCashflow,
         monthlyFixedExpenseFields, monthlyIncomeFields, monthlyRenovationFields,
         monthlyRepaymentField, monthlyVariableExpenseFields,
