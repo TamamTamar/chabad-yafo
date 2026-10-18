@@ -1,3 +1,5 @@
+import { ShifraPuaRecipe, ShifraPuaSavedMenu } from './models/ShifraPuaRecipe';
+import { ShifraPuaWeek } from './models/ShifraPuaWeek';
 import { shifraPuaPublicRoutes, shifraPuaAdminRoutes } from './routes/shifraPuaRoutes';
 import { ShifraPuaRegistration } from './models/ShifraPuaRegistration';
 import { maftirYonaPublicRoutes, maftirYonaAdminRoutes } from "./routes/maftirYonaRoutes";
@@ -113,6 +115,9 @@ const startServer = async () => {
         logger.log("Connecting to Mongo...");
         await connectDB();
         await ShifraPuaRegistration.createIndexes();
+        await ShifraPuaWeek.createIndexes();
+        await ShifraPuaRecipe.createIndexes();
+        await ShifraPuaSavedMenu.createIndexes();
         await ensureDaycareOnboardingIndexes();
         await ensureDaycareAgreementIndexes();
         await ensureDaycarePaymentStorage();

@@ -1,0 +1,12 @@
+export const mealCategories = ['main', 'salad', 'dressing', 'bread', 'spread', 'dessert'] as const;
+export type MealCategory = typeof mealCategories[number];
+export const categoryLabels: Record<MealCategory, string> = { main: 'מנה עיקרית חמה', salad: 'סלט טרי', dressing: 'רוטב נפרד', bread: 'לחם קנוי', spread: 'גבינה או ממרח', dessert: 'קינוח אישי' };
+export type Ingredient = { name: string; quantity: number; unit: string };
+export type Recipe = { id: string; revision: number; name: string; category: MealCategory; ingredients: Ingredient[]; instructions: string; tasks: string[]; purchased: boolean; batchFriendly: boolean; dressingIds: string[] };
+export type WeeklyEntry = { id: string; name: string; quantity: string; unit: string; done: boolean };
+export type ApprovedMenu = { recipes: Recipe[]; mealCount: number; approvedAt: string; approvedBy: string };
+export type MealWeek = { date: string; revision: number; shopping: WeeklyEntry[]; tasks: WeeklyEntry[]; mealCount: number; menu?: ApprovedMenu | null; menuHistory?: ApprovedMenu[] };
+export type SavedMenu = { _id: string; name: string; recipes: Recipe[] };
+export type PlanningData = { recipes: Recipe[]; suggestion: Recipe[]; favorites: SavedMenu[]; history: { date: string; menu: ApprovedMenu }[] };
+export type PlanChange = { list: 'shopping' | 'tasks'; action: 'add' | 'update' | 'remove' | 'keep'; before?: WeeklyEntry; after?: WeeklyEntry; reason?: string };
+export type MenuPreview = { recipes: Recipe[]; mealCount: number; revision: number; token: string; shopping: WeeklyEntry[]; tasks: WeeklyEntry[]; changes: PlanChange[]; warnings: string[] };

@@ -1,3 +1,5 @@
+import { ShifraPuaWeek } from '../models/ShifraPuaWeek';
+import { parseWeek, weekDate } from '../services/shifraWeekValidation';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
@@ -48,6 +50,10 @@ test('private API enforces admin role, mutation origin and input validation befo
     const request = (path: string, method = 'GET', body?: object, token?: string, origin = 'http://127.0.0.1:5173') => fetch(base + path, { method, headers: { 'Content-Type': 'application/json', Origin: origin, ...(token ? { Authorization: `Bearer ${token}` } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) });
     try {
         assert.equal((await request('/api/admin/shifra-pua')).status, 401);
+        assert.equal((await request('/api/admin/shifra-pua/weeks/2026-10-21')).status, 401);
+        assert.equal((await request('/api/admin/shifra-pua/weeks/2026-10-21', 'PUT', {}, admin, 'https://other.example')).status, 403);
+        assert.equal((await request('/api/admin/shifra-pua/weeks/2026-10-22', 'GET', undefined, admin)).status, 400);
+        assert.equal((await request('/api/admin/shifra-pua/weeks/2026-10-21', 'PUT', {}, admin)).status, 400);
         assert.equal((await request('/api/admin/shifra-pua/507f1f77bcf86cd799439011/history')).status, 401);
         assert.equal((await request('/api/admin/shifra-pua/507f1f77bcf86cd799439011', 'PATCH', payload)).status, 401);
         assert.equal((await request('/api/admin/shifra-pua', 'GET', undefined, jwt.sign({ role: 'other' }, process.env.JWT_SECRET))).status, 403);
@@ -72,7 +78,7 @@ test('database: concurrent duplicates, new births, history, admin corrections an
     assert.match(uri, /^mongodb:\/\/127\.0\.0\.1:27029\/shifra_qa_[a-z0-9_]+$/);
     const previous = process.env.JWT_SECRET;
     process.env.JWT_SECRET = 'shifra-db-tests-only';
-    await mongoose.connect(uri); await Registration.createIndexes();
+    await mongoose.connect(uri); await Registration.createIndexes(); await ShifraPuaWeek.createIndexes();
     const app = express(); app.use(express.json());
     app.use('/public', shifraPuaPublicRoutes); app.use('/admin', shifraPuaAdminRoutes);
     const server = app.listen(0, '127.0.0.1');
@@ -84,6 +90,33 @@ test('database: concurrent duplicates, new births, history, admin corrections an
         return { status: response.status, body: await response.json() as any };
     };
     try {
+        const weekPath = '/admin/weeks/2026-10-21';
+        let week = (await request(weekPath)).body.data;
+        assert.deepEqual(week.shopping, []);
+        const entry = { id: 'test-entry', name: 'בדיקה', quantity: '2', unit: 'יחידות', done: false };
+        let saved = await request(weekPath, 'PUT', { ...week, shopping: [entry], tasks: [{ ...entry, id: 'task' }] });
+        assert.equal(saved.status, 200);
+        week = (await request(weekPath)).body.data;
+        assert.equal(week.shopping[0].quantity, '2');
+        assert.equal(week.tasks.length, 1);
+        const concurrent = await Promise.all([
+            request(weekPath, 'PUT', { ...week, shopping: [{ ...entry, name: 'עודכן', done: true }] }),
+            request(weekPath, 'PUT', { ...week, tasks: [] }),
+        ]);
+        assert.deepEqual(concurrent.map(result => result.status).sort(), [200, 409]);
+        week = (await request(weekPath)).body.data;
+        saved = await request(weekPath, 'PUT', { ...week, shopping: [{ ...entry, name: 'ערוך', quantity: '3', done: true }], tasks: [{ ...entry, id: 'task', done: true }] });
+        assert.equal(saved.status, 200);
+        week = (await request(weekPath)).body.data;
+        assert.equal(week.shopping[0].done, true);
+        assert.equal(week.shopping[0].name, 'ערוך');
+        assert.equal(week.tasks[0].done, true);
+        assert.equal((await request('/admin/weeks/2026-10-28')).body.data.shopping.length, 0);
+        assert.equal((await request(weekPath, 'PUT', { ...week, shopping: [], tasks: [] })).status, 200);
+        assert.equal((await request(weekPath)).body.data.shopping.length, 0);
+        assert.equal((await request(weekPath)).body.data.tasks.length, 0);
+        const first = await Promise.all(Array.from({ length: 2 }, () => request('/admin/weeks/2026-11-04', 'PUT', { revision: 0, shopping: [entry], tasks: [] })));
+        assert.deepEqual(first.map(result => result.status).sort(), [200, 409]);
         const results = await Promise.all(Array.from({ length: 4 }, () => request('/public', 'POST', payload)));
         assert.ok(results.every(result => result.status === 200 && JSON.stringify(result.body) === '{"success":true}'));
         assert.equal(await Registration.countDocuments(), 1);
@@ -123,4 +156,13 @@ test('database: concurrent duplicates, new births, history, admin corrections an
         await mongoose.connection.dropDatabase(); await mongoose.disconnect();
         if (previous === undefined) delete process.env.JWT_SECRET; else process.env.JWT_SECRET = previous;
     }
+});
+
+test('weekly list validation preserves manual quantities and rejects malformed edits', () => {
+    assert.equal(weekDate('2026-10-21'), '2026-10-21');
+    assert.throws(() => weekDate('2026-10-22'));
+    const entry = { id: 'one', name: 'פריט', quantity: '1.5', unit: 'ק״ג', done: true };
+    const value = { revision: 2, shopping: [entry], tasks: [] };
+    assert.deepEqual(parseWeek(value), value);
+    for (const invalid of [null, { ...value, revision: -1 }, { ...value, shopping: [entry, entry] }, { ...value, tasks: [{ ...entry, done: 'true' }] }, { ...value, shopping: [{ ...entry, name: '' }] }, { ...value, shopping: Array(301).fill(entry) }]) assert.throws(() => parseWeek(invalid));
 });

@@ -65,7 +65,7 @@ try {
     delete env.MAFTIR_YONA_OUTBID_WEBHOOK_URL;
     const files = process.argv.includes('--all')
         ? (await readdir('dist/tests')).filter(name => name.endsWith('.test.js')).map(name => `dist/tests/${name}`)
-        : ['shifraPua', 'arbaatHaminimRoutes', 'maftirYonaRoutes', 'databaseResilience'].map(name => `dist/tests/${name}.test.js`);
+        : ['shifraPua', 'shifraPlanning', 'arbaatHaminimRoutes', 'maftirYonaRoutes', 'databaseResilience'].map(name => `dist/tests/${name}.test.js`);
     const tests = spawn(process.execPath, ['--test', ...files], { env, stdio: 'inherit' });
     const [code] = await once(tests, 'exit');
     process.exitCode = code ?? 1;

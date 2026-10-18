@@ -1,5 +1,6 @@
+import WeeklyLists from './WeeklyLists';
 import { useEffect, useState } from 'react';
-import AdminPageHeader from '../../../components/AdminShell/AdminPageHeader';
+import { ClipboardList, RefreshCw, Search } from 'lucide-react';
 import { getShifraHistory, listShifraPua, shifraError, updateShifraPua } from '../../../services/shifraPuaService';
 import { defaultDeliveryDate, formatDate, shifraStatuses, validPhone, type BirthHistory, type RegistrationList, type ShifraRegistration, type ShifraStatus } from '../../../types/shifraPua';
 import styles from './ShifraPuaAdmin.module.scss';
@@ -23,7 +24,7 @@ function RegistrationCard({ item, onSaved }: { item: ShifraRegistration; onSaved
         try { setHistory(await getShifraHistory(item._id)); } catch (error) { setError(shifraError(error)); } finally { setHistoryBusy(false); }
     };
     return <article className={styles.card} aria-busy={busy}>
-        <div className={styles.cardHeader}><h2>{item.motherName}</h2><span className={styles.badge}>{shifraStatuses[item.status]}</span></div>
+        <div className={styles.cardHeader}><h2>{item.motherName}</h2><span className={styles.badge} data-status={item.status}>{shifraStatuses[item.status]}</span></div>
         {(item.previousMeals > 0 || item.mealHistory.length > 0) && <p className={styles.returning}>כבר קיבלה מאיתנו ארוחה · {item.previousMeals + item.mealHistory.length} מסירות מתועדות</p>}
         <p className={styles.address}>{item.address}</p>
         <div className={styles.actions}><a className={styles.secondary} href={`tel:${item.phone}`} aria-label={`חיוג ליולדת ${item.motherName}`}><bdi>{item.phone}</bdi> · חיוג ליולדת</a>{item.filledBy === 'other' && <a className={styles.secondary} href={`tel:${item.contactPhone}`}>חיוג לפונה: {item.contactName}</a>}</div>
@@ -56,7 +57,7 @@ function RegistrationCard({ item, onSaved }: { item: ShifraRegistration; onSaved
     </article>;
 }
 
-export default function ShifraPuaAdmin() {
+function RegistrationsAdmin() {
     const [view, setView] = useState<'registrations' | 'preparation'>('registrations');
     const [query, setQuery] = useState('');
     const [search, setSearch] = useState('');
@@ -80,20 +81,43 @@ export default function ShifraPuaAdmin() {
         return () => abort.abort();
     }, [view, search, status, from, to, deliveryDate, page, refresh, requestKey]);
     const saved = () => { setNotice('העדכון נשמר'); setRefresh(value => value + 1); };
-    return <main className={styles.page} dir="rtl">
-        <AdminPageHeader title="שפרה ופועה" description="הרשמות, תיאום וחלוקת ארוחות בוקר ליולדות ביפו" />
-        <div className={styles.toolbar}><div className={styles.views} role="group" aria-label="תצוגת ניהול"><button type="button" className={view === 'registrations' ? styles.primary : styles.secondary} aria-pressed={view === 'registrations'} onClick={() => { setView('registrations'); setPage(1); }}>כל ההרשמות</button><button type="button" className={view === 'preparation' ? styles.primary : styles.secondary} aria-pressed={view === 'preparation'} onClick={() => { setView('preparation'); setPage(1); }}>הכנות וחלוקה</button></div><p className={styles.counter}>ממתינות לטיפול: <strong>{data?.pending ?? '…'}</strong></p></div>
+    return <section aria-label="הרשמות וחלוקה">
+        <div className={styles.summary} aria-label="סיכום הרשמות" aria-busy={busy}>
+            <div className={styles.summaryCard} data-tone="blue"><span>הרשמות בתצוגה</span><strong>{data?.total ?? '…'}</strong><small>בהתאם לחיפוש ולסינון הנוכחיים</small></div>
+            <div className={styles.summaryCard} data-tone="peach"><span>ממתינות לטיפול</span><strong>{data?.pending ?? '…'}</strong><small>כל ההרשמות בסטטוס ״חדשה״</small></div>
+            {view === 'preparation' && <div className={styles.summaryCard} data-tone="mint"><span>ארוחות להכנה</span><strong>{data?.mealCount ?? '…'}</strong><small>תואמו לתאריך החלוקה הנבחר</small></div>}
+        </div>
+        <div className={styles.toolbar}><div className={styles.views} role="group" aria-label="תצוגת ניהול"><button type="button" className={view === 'registrations' ? styles.primary : styles.secondary} aria-pressed={view === 'registrations'} onClick={() => { setView('registrations'); setPage(1); }}>כל ההרשמות</button><button type="button" className={view === 'preparation' ? styles.primary : styles.secondary} aria-pressed={view === 'preparation'} onClick={() => { setView('preparation'); setPage(1); }}>הכנות וחלוקה</button></div></div>
         <section className={styles.filters} aria-label="חיפוש וסינון">
-            <label>חיפוש שם, טלפון או כתובת<input type="search" maxLength={120} value={query} onChange={event => setQuery(event.target.value)} /></label>
+            <label className={styles.searchField}>חיפוש שם, טלפון או כתובת<span className={styles.searchInput}><Search size={17} aria-hidden="true" /><input type="search" placeholder="חיפוש הרשמות…" maxLength={120} value={query} onChange={event => setQuery(event.target.value)} /></span></label>
             {view === 'registrations' ? <><label>סטטוס<select value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}><option value="">כל הסטטוסים</option>{Object.entries(shifraStatuses).map(([key, value]) => <option key={key} value={key}>{value}</option>)}</select></label><label>נרשמה מתאריך<input type="date" value={from} onChange={event => { setFrom(event.target.value); setPage(1); }} /></label><label>נרשמה עד תאריך<input type="date" value={to} onChange={event => { setTo(event.target.value); setPage(1); }} /></label></> : <label>תאריך חלוקה<input type="date" required value={deliveryDate} onChange={event => { setDeliveryDate(event.target.value); setPage(1); }} /></label>}
-            <button type="button" className={styles.secondary} onClick={() => { setNotice(''); setRefresh(value => value + 1); }} disabled={busy}>רענון</button>
+            <button type="button" className={styles.secondary} onClick={() => { setNotice(''); setRefresh(value => value + 1); }} disabled={busy}><RefreshCw size={16} aria-hidden="true" />רענון</button>
         </section>
-        {view === 'preparation' && <section className={styles.preparation}><h2>{deliveryDate ? `הכנות ל־${formatDate(deliveryDate)}` : 'בחרו תאריך חלוקה'}</h2><p><strong>{data?.mealCount ?? '…'} ארוחות להכנה</strong> · הספירה כוללת הרשמות בסטטוס ״תואמה״ לתאריך הנבחר.</p><p className={styles.hint}>הכתובות והרגישויות מופיעות בכרטיסים למטה. חיפוש מצמצם את הכרטיסים, ללא שינוי בסך הארוחות לתאריך.</p></section>}
-        {notice && <p role="status">{notice}</p>}
+        {view === 'preparation' && <section className={styles.preparation}><h2>{deliveryDate ? `הכנות ל־${formatDate(deliveryDate)}` : 'בחרו תאריך חלוקה'}</h2><p>הספירה כוללת הרשמות בסטטוס ״תואמה״ לתאריך הנבחר.</p><p className={styles.hint}>הכתובות והרגישויות מופיעות בכרטיסים למטה. חיפוש מצמצם את הכרטיסים, ללא שינוי בסך הארוחות לתאריך.</p></section>}
+        {notice && <p className={styles.notice} role="status">{notice}</p>}
         {error && <p className={styles.error} role="alert">{error}</p>}
-        {busy && <p role="status">טוען הרשמות…</p>}
-        {data && <><p aria-live="polite">{data.total} הרשמות בתצוגה</p>{data.total === 0 && <p className={styles.empty}>לא נמצאו הרשמות המתאימות לבחירה.</p>}<div className={styles.cards}>{data.items.map(item => <RegistrationCard key={`${item._id}-${item.revision}`} item={item} onSaved={saved} />)}</div>
+        {busy && <p className={styles.loading} role="status">טוען הרשמות…</p>}
+        {data && <><div className={styles.resultsHeader}><h2>{view === 'registrations' ? 'רשימת הרשמות' : 'הרשמות לחלוקה'}</h2><span aria-live="polite">{data.total} הרשמות בתצוגה</span></div>{data.total === 0 && <div className={styles.empty}><span className={styles.emptyIcon}><ClipboardList size={30} aria-hidden="true" /></span><h3>אין הרשמות להצגה</h3><p>לא נמצאו הרשמות המתאימות לבחירה.</p><p className={styles.hint}>אפשר לשנות את החיפוש או הסינון כדי להציג הרשמות נוספות.</p></div>}<div className={styles.cards}>{data.items.map(item => <RegistrationCard key={`${item._id}-${item.revision}`} item={item} onSaved={saved} />)}</div>
             {data.total > data.pageSize && <nav className={styles.pagination} aria-label="עמודי הרשמות"><button type="button" className={styles.secondary} disabled={page <= 1} onClick={() => setPage(value => value - 1)}>הקודם</button><span>עמוד {page} מתוך {Math.ceil(data.total / data.pageSize)}</span><button type="button" className={styles.secondary} disabled={page * data.pageSize >= data.total} onClick={() => setPage(value => value + 1)}>הבא</button></nav>}
         </>}
+    </section>;
+}
+
+export default function ShifraPuaAdmin() {
+    const [lists, setLists] = useState(false);
+    return <main className={styles.page} dir="rtl">
+        <header className={styles.pageHeader}>
+            <span className={styles.headerIcon}><ClipboardList size={30} strokeWidth={1.6} aria-hidden="true" /></span>
+            <div><span className={styles.eyebrow}>ניהול הפעילות · יפו</span>
+                <h1>שפרה ופועה</h1>
+                <p>הרשמות, תיאום וחלוקת ארוחות בוקר ליולדות ביפו</p>
+            </div>
+        </header>
+        <div className={styles.sectionNav} role="group" aria-label="אזור ניהול שפרה ופועה">
+            <button type="button" aria-pressed={!lists} onClick={() => setLists(false)}>הרשמות וחלוקה</button>
+            <button type="button" aria-pressed={lists} onClick={() => setLists(true)}>קניות והכנות</button>
+        </div>
+        <section hidden={!lists} aria-label="קניות והכנות"><div className={styles.sectionHeading}><h2>קניות והכנות</h2><p>ניהול שבועי · תפריט, קניות ומשימות הכנה</p></div><WeeklyLists /></section>
+        <div hidden={lists}><RegistrationsAdmin /></div>
     </main>;
 }

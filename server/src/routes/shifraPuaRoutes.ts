@@ -1,3 +1,6 @@
+import { shifraPlanningRoutes } from './shifraPlanningRoutes';
+import { ShifraPuaWeek } from '../models/ShifraPuaWeek';
+import { parseWeek, weekDate } from '../services/shifraWeekValidation';
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { ShifraPuaRegistration as Registration } from '../models/ShifraPuaRegistration';
@@ -23,6 +26,7 @@ shifraPuaPublicRoutes.post('/', handle(async (req, res) => {
     return res.status(200).json({ success: true });
 }));
 shifraPuaAdminRoutes.use(requireAdmin, requireSecureAdminMutation, setPublicOnboardingSecurityHeaders);
+shifraPuaAdminRoutes.use(shifraPlanningRoutes);
 const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 shifraPuaAdminRoutes.get('/', handle(async (req, res) => {
     const filter: Record<string, unknown> = {};
@@ -65,6 +69,30 @@ shifraPuaAdminRoutes.get('/', handle(async (req, res) => {
     ]);
     const counts = new Map(history.map(item => [item._id, item.count]));
     return res.json({ success: true, data: { items: items.map(item => ({ ...item, previousMeals: (counts.get(item.phone) ?? 0) - item.mealHistory.length })), total, pending, mealCount, page, pageSize } });
+}));
+shifraPuaAdminRoutes.get('/weeks/:date', handle(async (req, res) => {
+    let date;
+    try { date = weekDate(req.params.date); } catch (error) { return invalid(res, error); }
+    const [week, mealCount] = await Promise.all([
+        ShifraPuaWeek.findOne({ date }).lean(),
+        Registration.countDocuments({ deliveryDate: date, status: 'coordinated' }),
+    ]);
+    return res.json({ success: true, data: { ...(week ?? { date, revision: 0, shopping: [], tasks: [] }), mealCount } });
+}));
+shifraPuaAdminRoutes.put('/weeks/:date', handle(async (req, res) => {
+    let date, payload;
+    try { date = weekDate(req.params.date); payload = parseWeek(req.body); } catch (error) { return invalid(res, error); }
+    const { revision, ...fields } = payload;
+    try {
+        const saved = await ShifraPuaWeek.findOneAndUpdate({ date, revision }, {
+            $set: fields, $inc: { revision: 1 },
+        }, { upsert: revision === 0, returnDocument: 'after', runValidators: true });
+        if (!saved) return res.status(409).json({ message: 'הרשימה עודכנה במכשיר אחר. טענו מחדש לפני המשך עריכה.' });
+        return res.json({ success: true, data: saved });
+    } catch (error) {
+        if ((error as { code?: number }).code === 11000) return res.status(409).json({ message: 'הרשימה עודכנה במכשיר אחר. טענו מחדש לפני המשך עריכה.' });
+        throw error;
+    }
 }));
 shifraPuaAdminRoutes.get('/:id/history', handle(async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) return invalid(res, new Error('מזהה אינו תקין'));
