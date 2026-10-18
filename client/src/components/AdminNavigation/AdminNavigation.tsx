@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { ChevronDown, LogOut } from 'lucide-react';
+import { ChevronDown, LogOut, Landmark } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../../services/adminAuthService';
 import { adminGroups, resolveAdminLocation } from './adminNavigationConfig';
 import styles from './AdminNavigation.module.scss';
 
 const storageKey = 'admin.navigation.groups';
-export default function AdminNavigation({ onNavigate }: { onNavigate?: () => void }) {
+export default function AdminNavigation({ onNavigate, modernDark = false }: { onNavigate?: () => void; modernDark?: boolean }) {
     const { pathname, search } = useLocation();
     const navigate = useNavigate();
     const active = resolveAdminLocation(pathname, search);
@@ -29,8 +29,8 @@ export default function AdminNavigation({ onNavigate }: { onNavigate?: () => voi
         try { await logoutAdmin(); onNavigate?.(); navigate('/admin/login', { replace: true }); }
         catch { setError('היציאה נכשלה. נסו שוב.'); setLoggingOut(false); }
     }
-    return <div className={styles.navigation}>
-        <div className={styles.brand}><strong>בית חב״ד יפו</strong><span>מערכת ניהול</span></div>
+    return <div className={`${styles.navigation} ${modernDark ? styles.modernDark : ""}`}>
+        <div className={styles.brand}>{modernDark && <Landmark size={26} strokeWidth={1.3} aria-hidden="true" />}<strong>בית חב״ד יפו</strong><span>מערכת ניהול</span></div>
         <nav aria-label="ניווט מערכת הניהול" className={styles.groups}>
             {adminGroups.map(group => <section key={group.id}>
                 <button className={active.groupId === group.id ? `${styles.group} ${styles.groupActive}` : styles.group} type="button" aria-expanded={open[group.id]} aria-controls={`admin-group-${group.id}`}

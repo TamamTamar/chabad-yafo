@@ -1,8 +1,9 @@
-import styles from "../DaycareAdmin.module.scss";
+import { AdminButton, AdminInput, AdminSelect, AdminCard, AdminBadge } from "../../../../components/AdminUI";
+import styles from "./DaycareFinance.module.scss";
 import type { useDaycareFinance } from "./useDaycareFinance";
+import type { MonthlyField, MonthlyCashflowEditKey } from "./daycareFinanceUtils";
 
 type Props = { model: ReturnType<typeof useDaycareFinance> };
-
 const DaycareFinanceView = ({ model }: Props) => {
     const {
         settings, loading, saving, financeDirty,
@@ -14,494 +15,76 @@ const DaycareFinanceView = ({ model }: Props) => {
         monthlyVariableExpenseFields, getMonthlyInputValue,
     } = model;
 
-    if (loadError) {
-        return <div className={styles.loading}>{loadError}</div>;
-    }
+    if (loadError) return <AdminCard role="alert">{loadError}</AdminCard>;
+    if (loading || !settings || !summary) return <AdminCard role="status">טוען תחזית כלכלית...</AdminCard>;
 
-    if (loading || !settings || !summary) {
-        return <div className={styles.loading}>טוען תחזית כלכלית...</div>;
-    }
-
-    return (
-        <section className={styles.section} aria-label="מצב כספי בפועל">
-            <div className={styles.financeGrid}>
-                <div className={styles.financeFormsStack}>
-                    <div className={styles.financeForm}>
-                        <div className={styles.financeMonthHeader}>
-                            <div>
-                                <h3 className={styles.formGroupTitle}>
-                                    מילוי חודש
-                                </h3>
-                                <p className={styles.formGroupNote}>
-                                    בוחרים חודש וממלאים סכומים בפועל. הנתונים
-                                    הבסיסיים מגיעים אוטומטית, ואפשר לשנות אותם
-                                    לכל חודש בנפרד.
-                                </p>
-                            </div>
-                            <div className={styles.financeSaveActions}>
-                                <button
-                                    className={styles.primaryButton}
-                                    type="button"
-                                    disabled={!financeDirty || saving}
-                                    onClick={() => void handleSave()}
-                                >
-                                    {saving
-                                        ? "שומר..."
-                                        : financeDirty
-                                          ? "שמירת הנתונים הכספיים"
-                                          : "הנתונים שמורים"}
-                                </button>
-                                {(saveError || saveMessage) && (
-                                    <span
-                                        className={
-                                            saveError
-                                                ? styles.financeSaveError
-                                                : styles.financeSaveStatus
-                                        }
-                                    >
-                                        {saveError || saveMessage}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className={styles.financeMonthPicker}>
-                            <label className={styles.financeMonthSelectField}>
-                                <span className={styles.fieldLabel}>
-                                    בחירת חודש
-                                </span>
-                                <select
-                                    className={styles.financeMonthSelect}
-                                    disabled={saving}
-                                    value={selectedCashflow?.month || ""}
-                                    onChange={(event) =>
-                                        setSelectedMonth(event.target.value)
-                                    }
-                                >
-                                    {summary.cashflows.map((cashflow) => (
-                                        <option
-                                            key={cashflow.month}
-                                            value={cashflow.month}
-                                        >
-                                            {formatMonth(cashflow.month)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                        </div>
-
-                        <div className={styles.financeMonthList}>
-                            {!selectedCashflow && (
-                                <div className={styles.financeEmptyState}>
-                                    טוען את חודשי השנה...
-                                </div>
-                            )}
-
-                            {selectedCashflow && (
-                                <div
-                                    className={styles.financeMonthRow}
-                                    key={selectedCashflow.month}
-                                >
-                                            <div className={styles.financeMonthTitle}>
-                                                <div>
-                                                    <span
-                                                        className={
-                                                            styles.fieldLabel
-                                                        }
-                                                    >
-                                                        חודש נבחר
-                                                    </span>
-                                                    <strong
-                                                        className={
-                                                            styles.financeMonthName
-                                                        }
-                                                    >
-                                                        {formatMonth(
-                                                            selectedCashflow.month
-                                                        )}
-                                                    </strong>
-                                                </div>
-                                                <span
-                                                    className={
-                                                        selectedSetupMonth
-                                                            ? styles.financeSetupBadge
-                                                            : styles.financeOngoingBadge
-                                                    }
-                                                >
-                                                    {selectedSetupMonth
-                                                        ? "שוטף + שיפוץ"
-                                                        : "שוטף בלבד"}
-                                                </span>
-                                            </div>
-
-                                            <div className={styles.financeMonthGroup}>
-                                                <h4
-                                                    className={
-                                                        styles.financeMonthGroupTitle
-                                                    }
-                                                >
-                                                    הכנסות
-                                                </h4>
-                                                {monthlyIncomeFields.map((field) => (
-                                                    <label
-                                                        className={styles.field}
-                                                        key={field.key}
-                                                    >
-                                                        <span
-                                                            className={
-                                                                styles.fieldLabel
-                                                            }
-                                                        >
-                                                            {field.label}
-                                                        </span>
-                                                        <input
-                                                            className={`${styles.input} ${styles.numberInput}`}
-                                                            disabled={saving}
-                                                            inputMode="numeric"
-                                                            type="text"
-                                                            value={getMonthlyInputValue(
-                                                                selectedCashflow.month,
-                                                                field.key
-                                                            )}
-                                                            onChange={(event) =>
-                                                                updateMonthlyCashflow(
-                                                                    selectedCashflow.month,
-                                                                    field.key,
-                                                                    event.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </label>
-                                                ))}
-                                            </div>
-
-                                            <div className={styles.financeMonthGroup}>
-                                                <h4
-                                                    className={
-                                                        styles.financeMonthGroupTitle
-                                                    }
-                                                >
-                                                    הוצאות קבועות
-                                                </h4>
-                                                {monthlyFixedExpenseFields.map(
-                                                    (field) => (
-                                                        <label
-                                                            className={
-                                                                styles.field
-                                                            }
-                                                            key={field.key}
-                                                        >
-                                                            <span
-                                                                className={
-                                                                    styles.fieldLabel
-                                                                }
-                                                            >
-                                                                {field.label}
-                                                            </span>
-                                                            <input
-                                                                className={`${styles.input} ${styles.numberInput}`}
-                                                                disabled={saving}
-                                                                inputMode="numeric"
-                                                                type="text"
-                                                                value={getMonthlyInputValue(
-                                                                    selectedCashflow.month,
-                                                                    field.key
-                                                                )}
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    updateMonthlyCashflow(
-                                                                        selectedCashflow.month,
-                                                                        field.key,
-                                                                        event
-                                                                            .target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            />
-                                                        </label>
-                                                    )
-                                                )}
-                                            </div>
-
-                                            <div className={styles.financeMonthGroup}>
-                                                <h4
-                                                    className={
-                                                        styles.financeMonthGroupTitle
-                                                    }
-                                                >
-                                                    הוצאות משתנות
-                                                </h4>
-                                                {monthlyVariableExpenseFields.map(
-                                                    (field) => (
-                                                        <label
-                                                            className={
-                                                                styles.field
-                                                            }
-                                                            key={field.key}
-                                                        >
-                                                            <span
-                                                                className={
-                                                                    styles.fieldLabel
-                                                                }
-                                                            >
-                                                                {field.label}
-                                                            </span>
-                                                            <input
-                                                                className={`${styles.input} ${styles.numberInput}`}
-                                                                disabled={saving}
-                                                                inputMode="numeric"
-                                                                type="text"
-                                                                value={getMonthlyInputValue(
-                                                                    selectedCashflow.month,
-                                                                    field.key
-                                                                )}
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    updateMonthlyCashflow(
-                                                                        selectedCashflow.month,
-                                                                        field.key,
-                                                                        event
-                                                                            .target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            />
-                                                        </label>
-                                                    )
-                                                )}
-                                            </div>
-
-                                            {selectedSetupMonth && (
-                                                <div
-                                                    className={
-                                                        styles.financeMonthGroup
-                                                    }
-                                                >
-                                                    <h4
-                                                        className={
-                                                            styles.financeMonthGroupTitle
-                                                        }
-                                                    >
-                                                        שיפוץ והקמה
-                                                    </h4>
-                                                    {monthlyRenovationFields.map(
-                                                        (field) => (
-                                                            <label
-                                                                className={
-                                                                    styles.field
-                                                                }
-                                                                key={field.key}
-                                                            >
-                                                                <span
-                                                                    className={
-                                                                        styles.fieldLabel
-                                                                    }
-                                                                >
-                                                                    {field.label}
-                                                                </span>
-                                                                <input
-                                                                    className={`${styles.input} ${styles.numberInput}`}
-                                                                    disabled={saving}
-                                                                    inputMode="numeric"
-                                                                    type="text"
-                                                                    value={getMonthlyInputValue(
-                                                                        selectedCashflow.month,
-                                                                        field.key
-                                                                    )}
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        updateMonthlyRenovationCashflow(
-                                                                            selectedCashflow.month,
-                                                                            field.key,
-                                                                            event
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </label>
-                                                        )
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            <div className={styles.financeMonthGroup}>
-                                                <h4
-                                                    className={
-                                                        styles.financeMonthGroupTitle
-                                                    }
-                                                >
-                                                    החזר השקעה
-                                                </h4>
-                                                <label className={styles.field}>
-                                                    <span
-                                                        className={
-                                                            styles.fieldLabel
-                                                        }
-                                                    >
-                                                        {
-                                                            monthlyRepaymentField.label
-                                                        }
-                                                    </span>
-                                                    <input
-                                                        className={`${styles.input} ${styles.numberInput}`}
-                                                        disabled={saving}
-                                                        inputMode="numeric"
-                                                        type="text"
-                                                        value={getMonthlyInputValue(
-                                                            selectedCashflow.month,
-                                                            monthlyRepaymentField.key
-                                                        )}
-                                                        onChange={(event) =>
-                                                            updateMonthlyCashflow(
-                                                                selectedCashflow.month,
-                                                                monthlyRepaymentField.key,
-                                                                event.target
-                                                                    .value
-                                                            )
-                                                        }
-                                                    />
-                                                </label>
-                                            </div>
-
-                                            <div className={styles.financeMonthTotals}>
-                                                <div className={styles.financeMonthMeta}>
-                                                    <span>הוצאות שוטפות</span>
-                                                    <strong>
-                                                        {formatCurrency(
-                                                            selectedOngoingExpenses
-                                                        )}
-                                                    </strong>
-                                                </div>
-                                                {selectedSetupMonth && (
-                                                    <div
-                                                        className={
-                                                            styles.financeMonthMeta
-                                                        }
-                                                    >
-                                                        <span>שיפוץ החודש</span>
-                                                        <strong>
-                                                            {formatCurrency(
-                                                                selectedRenovationExpenses
-                                                            )}
-                                                        </strong>
-                                                    </div>
-                                                )}
-                                                <div className={styles.financeMonthMeta}>
-                                                    <span>תזרים פנוי</span>
-                                                    <strong>
-                                                        {formatCurrency(
-                                                            selectedAvailableCashflow
-                                                        )}
-                                                    </strong>
-                                                </div>
-                                                <div className={styles.financeMonthMeta}>
-                                                    <span>אחרי כיסוי שיפוץ</span>
-                                                    <strong>
-                                                        {formatCurrency(
-                                                            selectedAfterRepayment
-                                                        )}
-                                                    </strong>
-                                                </div>
-                                            </div>
-                                        </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <aside className={styles.financeSummaryPanel}>
-                    <article className={styles.financeMainMetric}>
-                        <span className={styles.financeMetricKicker}>
-                            מצב חודש נבחר
-                        </span>
-                        <strong
-                            className={`${styles.financeMainValue} ${
-                                selectedAvailableCashflow >= 0
-                                    ? styles.financeValuePositive
-                                    : styles.financeValueNegative
-                            }`}
-                        >
-                            {formatCurrency(selectedAvailableCashflow)}
-                        </strong>
-                    </article>
-
-                    <div className={styles.financeDetailList}>
-                        <div className={styles.financeDetailItem}>
-                            <span>הכנסות חודש נבחר</span>
-                            <strong>
-                                {formatCurrency(
-                                    selectedCashflow
-                                        ? selectedCashflow.income +
-                                              selectedCashflow.extraIncome
-                                        : 0
-                                )}
-                            </strong>
-                        </div>
-                        <div className={styles.financeDetailItem}>
-                            <span>הוצאות שוטפות חודש נבחר</span>
-                            <strong>
-                                {formatCurrency(selectedOngoingExpenses)}
-                            </strong>
-                        </div>
-                    </div>
-
-                    <article className={styles.financeInvestCard}>
-                        <h3 className={styles.financeInvestTitle}>
-                            השקעת פתיחה
-                        </h3>
-                        <div className={styles.financeDetailItem}>
-                            <span>מתתי־משימות</span>
-                            <strong>
-                                {formatCurrency(summary.taskActualCosts)}
-                            </strong>
-                        </div>
-                        <div className={styles.financeDetailItem}>
-                            <span>מטבלת חודשים</span>
-                            <strong>
-                                {formatCurrency(
-                                    summary.monthlyRenovationInvestment +
-                                        summary.legacyRenovationInvestment
-                                )}
-                            </strong>
-                        </div>
-                        <div
-                            className={`${styles.financeDetailItem} ${styles.financeInvestTotal}`}
-                        >
-                            <span>סה״כ השקעה</span>
-                            <strong>
-                                {formatCurrency(summary.renovationInvestment)}
-                            </strong>
-                        </div>
-                        <div className={styles.financePaybackRow}>
-                            <span>כוסה בפועל</span>
-                            <strong>
-                                {formatCurrency(summary.totalRepayment)}
-                            </strong>
-                        </div>
-                        <div className={styles.financePaybackRow}>
-                            <span>נותר לכיסוי</span>
-                            <strong>
-                                {formatCurrency(summary.remainingInvestment)}
-                            </strong>
-                        </div>
-                        <div className={styles.financePaybackRow}>
-                            <span>חודש כיסוי מלא</span>
-                            <strong>
-                                {summary.coveredMonth
-                                    ? formatMonth(summary.coveredMonth)
-                                    : "עדיין לא כוסה"}
-                            </strong>
-                        </div>
-                    </article>
-                </aside>
+    const amount = (value: number) => <bdi className={styles.amount} dir="ltr">{formatCurrency(value)}</bdi>;
+    const group = (title: string, fields: MonthlyField[], renovation = false) => selectedCashflow && (
+        <fieldset className={styles.group}>
+            <legend>{title}</legend>
+            <div className={styles.fields}>
+                {fields.map(field => <label className={styles.field} key={field.key}>
+                    <span>{field.label}{field.key !== "children" && <span className={styles.unit}> · ₪</span>}</span>
+                    <AdminInput aria-label={field.label} disabled={saving} inputMode="decimal" type="text" dir="ltr"
+                        value={getMonthlyInputValue(selectedCashflow.month, field.key)}
+                        aria-describedby={saveError ? "finance-feedback" : undefined}
+                        onChange={event => renovation
+                            ? updateMonthlyRenovationCashflow(selectedCashflow.month, field.key, event.target.value)
+                            : updateMonthlyCashflow(selectedCashflow.month, field.key as MonthlyCashflowEditKey, event.target.value)} />
+                </label>)}
             </div>
-        </section>
+        </fieldset>
     );
+    const row = (label: string, value: number) => <div className={styles.row}><span>{label}</span><strong>{amount(value)}</strong></div>;
+    return <section className={styles.layout} aria-label="מצב כספי בפועל" aria-busy={saving}>
+        <AdminCard className={styles.form}>
+            <header className={styles.header}>
+                <div><h2>מילוי חודש</h2><p>בוחרים חודש וממלאים סכומים בפועל. הנתונים הבסיסיים מגיעים אוטומטית, ואפשר לשנות אותם לכל חודש בנפרד.</p></div>
+                <div className={styles.actions}>
+                    <AdminButton variant="primary" disabled={!financeDirty || saving} onClick={() => void handleSave()}>
+                        {saving ? "שומר..." : financeDirty ? "שמירת הנתונים הכספיים" : "הנתונים שמורים"}
+                    </AdminButton>
+                    <span id="finance-feedback" role={saveError ? "alert" : "status"} className={saveError ? styles.error : styles.feedback}>{saveError || saveMessage}</span>
+                </div>
+            </header>
+            <label className={styles.picker}><span>בחירת חודש</span>
+                <AdminSelect disabled={saving} value={selectedCashflow?.month || ""} onChange={event => setSelectedMonth(event.target.value)}>
+                    {summary.cashflows.map(flow => <option key={flow.month} value={flow.month}>{formatMonth(flow.month)}</option>)}
+                </AdminSelect>
+            </label>
+            {!selectedCashflow ? <p role="status">טוען את חודשי השנה...</p> : <>
+                <div className={styles.month}><h3>{formatMonth(selectedCashflow.month)}</h3><AdminBadge tone={selectedSetupMonth ? "warning" : "info"}>{selectedSetupMonth ? "שוטף + שיפוץ" : "שוטף בלבד"}</AdminBadge></div>
+                {group("הכנסות", monthlyIncomeFields)}
+                {group("הוצאות קבועות", monthlyFixedExpenseFields)}
+                {group("הוצאות משתנות", monthlyVariableExpenseFields)}
+                {selectedSetupMonth && group("שיפוץ והקמה", monthlyRenovationFields, true)}
+                {group("כיסוי שיפוץ", [monthlyRepaymentField])}
+                <div className={styles.totals}>
+                    {row("הוצאות שוטפות", selectedOngoingExpenses)}
+                    {selectedSetupMonth && row("שיפוץ החודש", selectedRenovationExpenses)}
+                    {row("תזרים פנוי", selectedAvailableCashflow)}
+                    {row("אחרי כיסוי שיפוץ", selectedAfterRepayment)}
+                </div>
+            </>}
+        </AdminCard>
+        <aside className={styles.summary} aria-label="סיכום כספי">
+            <AdminCard>
+                <h2>מצב חודש נבחר</h2>
+                <strong className={`${styles.balance} ${selectedAvailableCashflow < 0 ? styles.negative : styles.positive}`}>{amount(selectedAvailableCashflow)}</strong>
+                <p className={styles.feedback}>תזרים פנוי לפני כיסוי שיפוץ</p>
+                {row("הכנסות חודש נבחר", selectedCashflow ? selectedCashflow.income + selectedCashflow.extraIncome : 0)}
+                {row("הוצאות שוטפות חודש נבחר", selectedOngoingExpenses)}
+            </AdminCard>
+            <AdminCard>
+                <h2>השקעת פתיחה</h2>
+                {row("מתתי־משימות", summary.taskActualCosts)}
+                {row("מטבלת חודשים", summary.monthlyRenovationInvestment + summary.legacyRenovationInvestment)}
+                {row("סה״כ השקעה", summary.renovationInvestment)}
+                {row("כוסה בפועל", summary.totalRepayment)}
+                {row("נותר לכיסוי", summary.remainingInvestment)}
+                <div className={styles.row}><span>חודש כיסוי מלא</span><strong>{summary.coveredMonth ? formatMonth(summary.coveredMonth) : "עדיין לא כוסה"}</strong></div>
+            </AdminCard>
+        </aside>
+    </section>;
 };
-
 export default DaycareFinanceView;

@@ -1,46 +1,59 @@
-import AdminPageHeader from "../../../../components/AdminShell/AdminPageHeader";
+import { AdminButton } from "../../../../components/AdminUI";
+import { useRef, useState } from "react";
+import TaskActionsPopover from "./TaskActionsPopover";
+import AdminDialog from "../../../../components/AdminUI/AdminDialog";
 import { ChevronDown, Pencil, Plus, Search, Trash2, X } from "lucide-react";
-import styles from "../DaycareAdmin.module.scss";
-import type { DaycarePriority, DaycareTaskCategory } from "../types";
+import styles from "./DaycareTasks.styles";
+import type { DaycarePriority, DaycareTaskCategory, DaycareTask } from "../types";
 import type { CategoryFilter, useDaycareTasks } from "./useDaycareTasks";
 
 type DaycareTasksViewProps = { model: ReturnType<typeof useDaycareTasks> };
 
 const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
+    const addButton = useRef<HTMLButtonElement>(null);
+    const [deleteTarget, setDeleteTarget] = useState<DaycareTask | null>(null);
+    const [deleting, setDeleting] = useState(false);
     const {
         draft, editingId, selectedCategory, searchQuery, showTaskForm,
-        updatingTaskId, expandedTaskIds, loading, taskTitleInputRef, visibleTasks,
+        updatingTaskId, expandedTaskIds, loading, saving, error, taskTitleInputRef, visibleTasks,
         setDraft, setSelectedCategory, setSearchQuery, resetDraft, handleAddClick,
         handleEdit, updateDraftSubtaskTitle, addDraftSubtask, removeDraftSubtask,
         handleSave, handleSubtaskToggle, handleSubtaskUpdate,
         handleSubtaskCostSave, toggleTaskDetails, handleDelete, getFilterCount,
-        quickTaskFilters, getCategoryClassName, hasSubtasks,
+        quickTaskFilters, hasSubtasks,
         shouldShowProcurementFields, getSubtaskProgressLabel,
         daycarePriorities, daycareTaskCategories,
     } = model;
 
     return (
-        <section className={styles.section} aria-labelledby="daycare-tasks">
-            <AdminPageHeader id="daycare-tasks" title="משימות המעון" description="משימות עבודה לפי קטגוריה, עדיפות ותאריך יעד" actions={
-                <button className={styles.primaryButton} type="button" onClick={handleAddClick}>
+        <section className={styles.section} aria-labelledby="admin-page-title">
+            {deleteTarget && <AdminDialog labelledBy="task-delete-title" onClose={() => { if (!deleting) setDeleteTarget(null); }} className={styles.deleteDialog}>
+                <h2 id="task-delete-title">מחיקת משימה</h2>
+                <p>למחוק את המשימה ״{deleteTarget.title}״? לא ניתן לבטל את המחיקה.</p>
+                <div className={styles.formActions}>
+                    <AdminButton type="button" className={styles.secondaryButton} data-dialog-initial-focus disabled={deleting} onClick={() => setDeleteTarget(null)}>ביטול</AdminButton>
+                    <button type="button" className={styles.dangerButton} disabled={deleting} aria-busy={deleting} onClick={async () => {
+                        setDeleting(true);
+                        try {
+                            await handleDelete(deleteTarget._id);
+                            setDeleteTarget(null);
+                            requestAnimationFrame(() => {
+                                if (document.activeElement === document.body) addButton.current?.focus();
+                            });
+                        }
+                        finally { setDeleting(false); }
+                    }}>{deleting ? "מוחק..." : "אישור מחיקה"}</button>
+                </div>
+            </AdminDialog>}
+            <header className={styles.sectionHeader}>
+                <p className={styles.sectionDescription}>ניהול העבודה לפי קטגוריה, עדיפות והתקדמות תתי־המשימות</p>
+                <AdminButton variant="primary" ref={addButton} className={styles.primaryButton} type="button" onClick={handleAddClick}>
                     <Plus aria-hidden="true" size={18} /> משימה חדשה
-                </button>
-            } />
-
+                </AdminButton>
+            </header>
+            {error && !showTaskForm && <p className={styles.error} role="alert">{error}</p>}
             {showTaskForm && (
-            <div
-                className={styles.taskModalBackdrop}
-                role="presentation"
-                onMouseDown={(event) => {
-                    if (event.currentTarget === event.target) resetDraft();
-                }}
-            >
-            <div
-                aria-labelledby="task-editor-title"
-                aria-modal="true"
-                className={`${styles.inlineForm} ${styles.taskEditor}`}
-                role="dialog"
-            >
+            <AdminDialog labelledBy="task-editor-title" onClose={resetDraft} className={styles.taskEditor}>
                 <div className={styles.taskEditorHeader}>
                     <div>
                         <h3 id="task-editor-title">
@@ -58,10 +71,10 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                     </button>
                 </div>
                 <label className={styles.field}>
-                    <span className={styles.fieldLabel}>כותרת משימה</span>
+                    <span>כותרת משימה</span>
                     <input
-                        className={styles.input}
                         ref={taskTitleInputRef}
+                        data-dialog-initial-focus
                         value={draft.title}
                         onChange={(event) =>
                             setDraft({ ...draft, title: event.target.value })
@@ -70,9 +83,8 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                 </label>
 
                 <label className={styles.field}>
-                    <span className={styles.fieldLabel}>קטגוריה</span>
+                    <span>קטגוריה</span>
                     <select
-                        className={styles.input}
                         value={draft.category}
                         onChange={(event) =>
                             setDraft({
@@ -90,9 +102,8 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                 </label>
 
                 <label className={styles.field}>
-                    <span className={styles.fieldLabel}>עדיפות</span>
+                    <span>עדיפות</span>
                     <select
-                        className={styles.input}
                         value={draft.priority}
                         onChange={(event) =>
                             setDraft({
@@ -111,14 +122,14 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
 
                 <div className={styles.subtaskEditPanel}>
                     <div className={styles.subtaskEditHeader}>
-                        <span className={styles.fieldLabel}>תתי־משימות</span>
-                        <button
+                        <span>תתי־משימות</span>
+                        <AdminButton
                             className={styles.secondaryButton}
                             type="button"
                             onClick={addDraftSubtask}
                         >
                             הוספת תת־משימה
-                        </button>
+                        </AdminButton>
                     </div>
                     {(draft.subtasks?.length
                         ? draft.subtasks
@@ -129,7 +140,7 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                             key={index}
                         >
                             <input
-                                className={styles.input}
+                                aria-label={`שם תת־משימה ${index + 1}`}
                                 placeholder="שם תת־משימה"
                                 value={subtask.title}
                                 onChange={(event) =>
@@ -142,6 +153,7 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                             <button
                                 className={styles.dangerButton}
                                 type="button"
+                                aria-label={`מחיקת תת־משימה ${index + 1}`}
                                 onClick={() => removeDraftSubtask(index)}
                             >
                                 מחיקה
@@ -150,25 +162,26 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                     ))}
                 </div>
 
+                {error && <p className={styles.error} role="alert">{error}</p>}
                 <div className={styles.formActions}>
-                    <button
+                    <AdminButton variant="primary"
                         className={styles.primaryButton}
-                        disabled={!draft.title.trim()}
+                        disabled={!draft.title.trim() || saving}
+                        aria-busy={saving}
                         type="button"
                         onClick={handleSave}
                     >
-                        {editingId ? "שמירה" : "הוספת משימה"}
-                    </button>
-                    <button
+                        {saving ? "שומר..." : editingId ? "שמירה" : "הוספת משימה"}
+                    </AdminButton>
+                    <AdminButton
                         className={styles.secondaryButton}
                         type="button"
                         onClick={resetDraft}
                     >
                         ביטול
-                    </button>
+                    </AdminButton>
                 </div>
-            </div>
-            </div>
+            </AdminDialog>
             )}
 
             <div className={styles.categoryFilterBar} aria-label="סינון משימות">
@@ -181,6 +194,7 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                     : styles.quickFilterButton
                             }
                             key={filter}
+                            aria-pressed={selectedCategory === filter}
                             type="button"
                             onClick={() => setSelectedCategory(filter)}
                         >
@@ -191,7 +205,7 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                 </div>
 
                 <label className={styles.taskSearchField}>
-                    <Search aria-hidden="true" size={18} />
+                    <span>חיפוש משימה</span><span className={styles.searchControl}><Search aria-hidden="true" size={18} />
                     <input
                         aria-label="חיפוש משימה"
                         placeholder="חיפוש משימה או פריט..."
@@ -199,12 +213,12 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                         value={searchQuery}
                         onChange={(event) => setSearchQuery(event.target.value)}
                     />
+                    </span>
                 </label>
 
                 <label className={styles.categorySelectField}>
-                    <span className={styles.visuallyHidden}>קטגוריה</span>
+                    <span>קטגוריה</span>
                     <select
-                        className={styles.categorySelect}
                         value={
                             daycareTaskCategories.includes(
                                 selectedCategory as DaycareTaskCategory
@@ -236,7 +250,7 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
             </div>
 
             {loading ? (
-                <div className={styles.loading}>טוען משימות...</div>
+                <div className={styles.loading} role="status">טוען משימות...</div>
             ) : (
                 <div className={styles.taskCards}>
                     {visibleTasks.map((task) => {
@@ -249,13 +263,12 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                 className={
                                     [
                                         styles.taskCard,
-                                        task.status === "הושלם"
-                                            ? styles.taskCardCompleted
-                                            : "",
                                         isExpanded ? styles.taskCardExpanded : "",
                                     ].filter(Boolean).join(" ")
                                 }
                                 key={task._id}
+                                data-task-id={task._id}
+                                aria-busy={updatingTaskId === task._id}
                             >
                                 <div className={styles.taskCardTop}>
                                     <button
@@ -264,20 +277,13 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                                 ? isExpanded
                                                 : undefined
                                         }
+                                        aria-controls={hasSubtasks(task) && isExpanded ? `task-details-${task._id}` : undefined}
                                         className={styles.taskCardHeader}
-                                        disabled={!hasSubtasks(task)}
+                                        aria-disabled={!hasSubtasks(task)}
                                         type="button"
-                                        onClick={() => toggleTaskDetails(task._id)}
+                                        onClick={() => { if (hasSubtasks(task)) toggleTaskDetails(task._id); }}
                                     >
                                         <span className={styles.taskCheckLabel}>
-                                            <span
-                                                aria-hidden="true"
-                                                className={
-                                                    task.status === "הושלם"
-                                                        ? `${styles.taskCheckboxVisual} ${styles.taskCheckboxVisualChecked}`
-                                                        : styles.taskCheckboxVisual
-                                                }
-                                            />
                                             <span className={styles.taskTitleText}>
                                                 {task.title}
                                             </span>
@@ -313,31 +319,31 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                     </button>
                                     <button
                                         aria-label={`מחיקת ${task.title}`}
-                                        className={`${styles.dangerButton} ${styles.iconActionButton}`}
+                                        className={`${styles.dangerButton} ${styles.iconActionButton} ${styles.desktopDelete}`}
                                         title="מחיקה"
                                         type="button"
-                                        onClick={() => handleDelete(task._id)}
+                                        onClick={() => setDeleteTarget(task)}
                                     >
                                         <Trash2 aria-hidden="true" size={17} />
                                     </button>
+                                    <TaskActionsPopover title={task.title} onDelete={() => setDeleteTarget(task)} />
                                     </div>
                                 </div>
 
                                 <div className={styles.taskCardMeta}>
                                     <span
-                                        className={`${styles.categoryBadge} ${getCategoryClassName(
-                                            task.category
-                                        )}`}
+                                        className={styles.categoryBadge}
                                     >
                                         {task.category}
                                     </span>
                                     <span
-                                        className={`${styles.statusSelect} ${styles.lockedStatus}`}
+                                        className={styles.lockedStatus}
+                                        data-tone={task.status === "הושלם" ? "success" : task.status === "בטיפול" ? "info" : "neutral"}
                                         title="הסטטוס נקבע אוטומטית לפי תתי־המשימות"
                                     >
                                         סטטוס: {task.status}
                                     </span>
-                                    <span className={styles.priorityPill}>
+                                    <span className={styles.priorityPill} data-tone={task.priority === "דחופה" ? "warning" : "neutral"}>
                                         {task.priority}
                                     </span>
                                 </div>
@@ -346,11 +352,8 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                     task.subtasks.length > 0 &&
                                     isExpanded && (
                                         <div
-                                            className={`${styles.subtaskList} ${
-                                                showProcurementFields
-                                                    ? styles.subtaskListDetailed
-                                                    : styles.subtaskListSimple
-                                            }`}
+                                            id={`task-details-${task._id}`}
+                                            className={styles.subtaskList}
                                         >
                                             <div
                                                 className={`${styles.subtaskHeader} ${
@@ -399,6 +402,7 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                                                     checked={
                                                                         subtask.completed
                                                                     }
+                                                                    aria-label={`בוצע - ${subtask.title}`}
                                                                     className={
                                                                         styles.subtaskCheckbox
                                                                     }
@@ -561,10 +565,11 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                             </article>
                         );
                     })}
-                    {visibleTasks.length === 0 && (
+                    {visibleTasks.length === 0 && !error && (
                         <div className={styles.emptyState}>
-                            לא נמצאו משימות שמתאימות לסינון. אפשר לנקות את
-                            החיפוש או לבחור “הכל”.
+                            {getFilterCount("הכל") === 0
+                                ? "עדיין אין משימות. אפשר להתחיל ביצירת משימה חדשה."
+                                : "לא נמצאו משימות שמתאימות לסינון. אפשר לנקות את החיפוש או לבחור ״הכל״."}
                         </div>
                     )}
                 </div>

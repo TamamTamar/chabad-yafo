@@ -1,3 +1,5 @@
+import { UsersRound, Clock3, CircleCheck, CalendarDays } from "lucide-react";
+import referenceStyles from "./DaycareDashboard.module.scss";
 import styles from "../DaycareAdmin.module.scss";
 import type { DaycareOverview } from "../types";
 
@@ -5,6 +7,7 @@ type DaycareDashboardProps = {
     overview: DaycareOverview | null;
     compact?: boolean;
     secondary?: boolean;
+    reference?: boolean;
 };
 
 const getStatusClassName = (status: DaycareOverview["generalStatus"]) => {
@@ -19,7 +22,7 @@ const getStatusClassName = (status: DaycareOverview["generalStatus"]) => {
     return styles.statusProgress;
 };
 
-const DaycareDashboard = ({ overview, compact, secondary }: DaycareDashboardProps) => {
+const DaycareDashboard = ({ overview, compact, secondary, reference }: DaycareDashboardProps) => {
     const cards = [
         {
             label: "יעד פתיחה",
@@ -46,6 +49,25 @@ const DaycareDashboard = ({ overview, compact, secondary }: DaycareDashboardProp
             value: overview?.targetOpeningDate ?? "ספטמבר הקרוב",
         },
     ];
+
+    if (reference) {
+        const unavailable = "המידע אינו זמין";
+        if (compact) return <div className={referenceStyles.summary} aria-label="סיכום פתיחת המעון">
+            <span>יעד פתיחה: <strong>{overview?.openingTargetChildren == null ? unavailable : `${overview.openingTargetChildren} ילדים`}</strong></span>
+            <span>נרשמים: <strong>{overview?.actualRegistrations ?? unavailable}</strong></span>
+            {overview && <span className={referenceStyles.status}>{overview.generalStatus}</span>}
+        </div>;
+        const metrics = [
+            {label: "מתעניינים", value: overview?.interestedCount, icon: UsersRound, tone: "info"},
+            {label: "משימות פתוחות", value: overview?.openTasks, icon: Clock3, tone: "warning"},
+            {label: "משימות שהושלמו", value: overview?.completedTasks, icon: CircleCheck, tone: "success"},
+            {label: "תאריך יעד לפתיחה", value: overview?.targetOpeningDate || undefined, icon: CalendarDays, tone: "warning"},
+        ];
+        return <section className={referenceStyles.dashboard} aria-labelledby="daycare-dashboard">
+            <h2 id="daycare-dashboard">תמונת מצב לקראת פתיחה</h2>
+            <dl className={referenceStyles.metrics}>{metrics.map(metric => <div key={metric.label} data-tone={metric.tone}><dt><span className={referenceStyles.metricIcon} aria-hidden="true"><metric.icon size={22} strokeWidth={1.6} /></span>{metric.label}</dt><dd className={metric.value == null ? referenceStyles.unavailable : undefined}>{metric.value ?? unavailable}</dd></div>)}</dl>
+        </section>;
+    }
 
     if (compact) return <div className={styles.openingSummary} aria-label="סיכום פתיחת המעון">
         <span>יעד פתיחה: {overview ? `${overview.openingTargetChildren} ילדים` : "—"}</span>

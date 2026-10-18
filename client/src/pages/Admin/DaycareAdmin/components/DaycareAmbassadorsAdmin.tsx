@@ -1,3 +1,4 @@
+import { AdminButton, AdminInput, AdminTextarea, AdminTable, AdminCard, AdminBadge } from "../../../../components/AdminUI";
 import { Fragment, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
@@ -7,7 +8,7 @@ import {
     PowerOff,
     Trash2,
 } from "lucide-react";
-import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
+import ConfirmDialog from "../../../../components/AdminUI/AdminConfirmDialog";
 import {
     createDaycareDonationAmbassador,
     deleteDaycareDonationAmbassador,
@@ -99,13 +100,13 @@ const AmbassadorEditForm = ({
             noValidate
         >
             <label className={styles.editField}>
-                <input {...nameField} autoFocus aria-invalid={Boolean(errors.name)} />
+                <AdminInput aria-label={`שם השגריר ${ambassador.name}`} {...nameField} autoFocus aria-invalid={Boolean(errors.name)} />
                 <span className={styles.fieldError} role="alert">
                     {errors.name?.message || ""}
                 </span>
             </label>
             <label className={styles.editField}>
-                <input
+                <AdminInput
                     {...linkSlugField}
                     placeholder="שם בלינק באנגלית"
                     aria-label={`השם באנגלית בלינק של ${ambassador.name}`}
@@ -117,7 +118,7 @@ const AmbassadorEditForm = ({
                 </span>
             </label>
             <label className={styles.editField}>
-                <input
+                <AdminInput
                     {...register("goal", {
                         required: "יש להזין יעד",
                         valueAsNumber: true,
@@ -135,20 +136,20 @@ const AmbassadorEditForm = ({
                 </span>
             </label>
             <label className={styles.editField}>
-                <textarea
+                <AdminTextarea
                     {...register("notes", {
                         maxLength: { value: 800, message: "ההערה ארוכה מדי" },
                     })}
                     maxLength={800}
                     rows={2}
-                    placeholder="הערה פנימית"
+                    aria-label={`הערות לשגריר ${ambassador.name}`} placeholder="הערה פנימית"
                     aria-invalid={Boolean(errors.notes)}
                 />
                 <span className={styles.fieldError} role="alert">
                     {errors.notes?.message || ""}
                 </span>
             </label>
-            <button disabled={saving || isSubmitting}>שמירה</button>
+            <AdminButton variant="primary" type="submit" disabled={saving || isSubmitting}>שמירה</AdminButton>
         </form>
     );
 };
@@ -352,7 +353,7 @@ const DaycareAmbassadorsAdmin = ({
     };
 
     return (
-        <section className={styles.panel}>
+        <section className={styles.panel}><AdminCard>
             <header className={styles.header}>
                 <div>
                     <h2>שגרירים</h2>
@@ -360,9 +361,9 @@ const DaycareAmbassadorsAdmin = ({
                         לינקים אישיים למעקב פנימי. דף התרומה נשאר זהה לכל הגולשים.
                     </p>
                 </div>
-                <button type="button" onClick={() => setAdding((value) => !value)}>
+                <AdminButton type="button" onClick={() => setAdding((value) => !value)}>
                     {adding ? "ביטול" : "+ הוספת שגריר"}
-                </button>
+                </AdminButton>
             </header>
 
             {(message || error) && (
@@ -379,7 +380,7 @@ const DaycareAmbassadorsAdmin = ({
                 >
                     <label>
                         שם השגריר
-                        <input
+                        <AdminInput
                             {...createNameField}
                             type="text"
                             maxLength={160}
@@ -392,7 +393,7 @@ const DaycareAmbassadorsAdmin = ({
                     </label>
                     <label>
                         שם בלינק באנגלית
-                        <input
+                        <AdminInput
                             {...createLinkSlugField}
                             type="text"
                             maxLength={60}
@@ -418,7 +419,7 @@ const DaycareAmbassadorsAdmin = ({
                     </label>
                     <label>
                         יעד כספי
-                        <input
+                        <AdminInput
                             {...registerCreate("goal", {
                                 required: "יש להזין יעד",
                                 valueAsNumber: true,
@@ -441,7 +442,7 @@ const DaycareAmbassadorsAdmin = ({
                     </label>
                     <label className={styles.wideField}>
                         הערה פנימית
-                        <textarea
+                        <AdminTextarea
                             {...registerCreate("notes", {
                                 maxLength: {
                                     value: 800,
@@ -456,9 +457,9 @@ const DaycareAmbassadorsAdmin = ({
                             {createErrors.notes?.message || ""}
                         </span>
                     </label>
-                    <button type="submit" disabled={saving || createSubmitting}>
+                    <AdminButton variant="primary" type="submit" disabled={saving || createSubmitting}>
                         יצירת לינק אישי
-                    </button>
+                    </AdminButton>
                 </form>
             )}
 
@@ -466,7 +467,7 @@ const DaycareAmbassadorsAdmin = ({
                 <p className={styles.empty}>עדיין לא נוספו שגרירים.</p>
             ) : (
                 <div className={styles.tableWrap}>
-                    <table className={styles.table}>
+                    <AdminTable className={styles.table}>
                         <thead>
                             <tr>
                                 <th>שם</th>
@@ -514,7 +515,7 @@ const DaycareAmbassadorsAdmin = ({
                                                         }
                                                     />
                                                 ) : (
-                                                    <button
+                                                    <AdminButton
                                                         type="button"
                                                         className={styles.nameButton}
                                                         onClick={() =>
@@ -526,19 +527,11 @@ const DaycareAmbassadorsAdmin = ({
                                                         }
                                                     >
                                                         {ambassador.name}
-                                                    </button>
+                                                    </AdminButton>
                                                 )}
                                             </td>
                                             <td data-label="סטטוס">
-                                                <span
-                                                    className={
-                                                        ambassador.active
-                                                            ? styles.active
-                                                            : styles.inactive
-                                                    }
-                                                >
-                                                    {ambassador.active ? "פעיל" : "לא פעיל"}
-                                                </span>
+                                                <AdminBadge tone={ambassador.active ? "success" : "neutral"}>{ambassador.active ? "פעיל" : "לא פעיל"}</AdminBadge>
                                             </td>
                                             <td data-label="התקדמות מול היעד">
                                                 {ambassador.goal > 0 ? (
@@ -585,7 +578,7 @@ const DaycareAmbassadorsAdmin = ({
                                             </td>
                                             <td data-label="תרומות">{ambassador.donationCount}</td>
                                             <td data-label="לינק אישי">
-                                                <input
+                                                <AdminInput
                                                     className={styles.linkInput}
                                                     aria-label={`הלינק האישי של ${ambassador.name}`}
                                                     value={getAmbassadorLink(ambassador)}
@@ -595,7 +588,7 @@ const DaycareAmbassadorsAdmin = ({
                                             </td>
                                             <td data-label="פעולות">
                                                 <div className={styles.actions}>
-                                                    <button
+                                                    <AdminButton
                                                         type="button"
                                                         aria-label={`העתקת הלינק של ${ambassador.name}`}
                                                         title="העתקת לינק"
@@ -607,8 +600,8 @@ const DaycareAmbassadorsAdmin = ({
                                                             size={19}
                                                         />
                                                         <span className={styles.actionText}>העתקה</span>
-                                                    </button>
-                                                    <button
+                                                    </AdminButton>
+                                                    <AdminButton
                                                         type="button"
                                                         aria-label={`עריכת השגריר ${ambassador.name}`}
                                                         title="עריכה"
@@ -620,8 +613,8 @@ const DaycareAmbassadorsAdmin = ({
                                                             size={19}
                                                         />
                                                         <span className={styles.actionText}>עריכה</span>
-                                                    </button>
-                                                    <button
+                                                    </AdminButton>
+                                                    <AdminButton
                                                         type="button"
                                                         aria-label={`${ambassador.active ? "השבתת" : "הפעלת"} השגריר ${ambassador.name}`}
                                                         title={ambassador.active ? "השבתה" : "הפעלה"}
@@ -655,8 +648,8 @@ const DaycareAmbassadorsAdmin = ({
                                                         <span className={styles.actionText}>
                                                             {ambassador.active ? "השבתה" : "הפעלה"}
                                                         </span>
-                                                    </button>
-                                                    <button
+                                                    </AdminButton>
+                                                    <AdminButton
                                                         type="button"
                                                         className={styles.deleteAction}
                                                         aria-label={`מחיקת השגריר ${ambassador.name}`}
@@ -670,7 +663,7 @@ const DaycareAmbassadorsAdmin = ({
                                                             size={19}
                                                         />
                                                         <span className={styles.actionText}>מחיקה</span>
-                                                    </button>
+                                                    </AdminButton>
                                                 </div>
                                             </td>
                                         </tr>
@@ -703,7 +696,7 @@ const DaycareAmbassadorsAdmin = ({
                                 );
                             })}
                         </tbody>
-                    </table>
+                    </AdminTable>
                 </div>
             )}
             <ConfirmDialog
@@ -722,7 +715,7 @@ const DaycareAmbassadorsAdmin = ({
                 onConfirm={() => void handleDelete()}
                 onClose={() => setPendingDelete(null)}
             />
-        </section>
+        </AdminCard></section>
     );
 };
 

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { AdminButton } from "../../../components/AdminUI";
+import editor from "../../../components/AdminUI/AdminEditor.module.scss";
 import AdminPageHeader from "../../../components/AdminShell/AdminPageHeader";
 import { resolveAdminLocation } from "../../../components/AdminNavigation/adminNavigationConfig";
 import DaycareDashboard from "./components/DaycareDashboard";
@@ -13,6 +15,7 @@ import DaycareAnnualPlanEditor from "./components/DaycareAnnualPlan";
 import DaycareDonationsAdmin from "./components/DaycareDonationsAdmin";
 import { getDaycareOverview } from "./daycareAdminService";
 import styles from "./DaycareAdmin.module.scss";
+import registrationStyles from "./components/DaycareRegistrations.module.scss";
 import type { DaycareOverview } from "./types";
 
 type DaycareAdminTab =
@@ -89,7 +92,7 @@ const DaycareAdmin = () => {
     return (
         <main className={styles.page}>
 
-                {activeTab !== "registrations" && activeTab !== "tasks" && <AdminPageHeader title={resolveAdminLocation('/admin/daycare', `?${searchParams}`).title} />}
+                {activeTab !== "registrations" && activeTab !== "tasks" && activeTab !== "documents" && activeTab !== "finance" && activeTab !== "donations" && <AdminPageHeader title={resolveAdminLocation('/admin/daycare', `?${searchParams}`).title} />}
 
                 {activeTab === "tasks" && (
                     <div className={styles.tabPanel}>
@@ -102,9 +105,9 @@ const DaycareAdmin = () => {
                 )}
 
                 {activeTab === "registrations" && (
-                    <div className={styles.tabPanel}>
-                        <DaycareRegistrations onChanged={handleDataChanged} openingSummary={<DaycareDashboard overview={overview} compact />} />
-                        <DaycareDashboard overview={overview} secondary />
+                    <div className={registrationStyles.layout}>
+                        <DaycareDashboard overview={overview} secondary reference />
+                        <DaycareRegistrations onChanged={handleDataChanged} openingSummary={<DaycareDashboard overview={overview} compact reference />} />
                     </div>
                 )}
 
@@ -125,17 +128,17 @@ const DaycareAdmin = () => {
 
                 {activeTab === "documents" && (
                     <div className={styles.tabPanel}>
-                        <nav className={styles.innerTabBar} aria-label="בחירת מסמך לעריכה">
+                        <nav className={editor.documentNav} aria-label="בחירת מסמך לעריכה">
                             {documentTabs.map((tab) => (
-                                <button
+                                <AdminButton
                                     aria-pressed={documentTab === tab.id}
-                                    className={documentTab === tab.id ? styles.innerTabButtonActive : styles.innerTabButton}
+                                    variant="navigation"
                                     key={tab.id}
                                     type="button"
                                     onClick={() => selectDocumentTab(tab.id)}
                                 >
                                     {tab.label}
-                                </button>
+                                </AdminButton>
                             ))}
                         </nav>
                         {documentTab === "agreements"

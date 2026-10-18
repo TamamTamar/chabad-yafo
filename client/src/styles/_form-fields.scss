@@ -1,0 +1,150 @@
+@use 'sass:map';
+@use './variables' as brand;
+
+// Opt-in only: importing this partial emits no CSS. Include system() on a local
+// form/page class, or use the individual mixins on existing CSS Module classes.
+$variants: (
+    admin: (padding: 10px, label-gap: 6px, label-color: brand.$brand-blue-ink-soft),
+    public: (padding: 12px, label-gap: 8px, label-color: brand.$brand-primary)
+);
+$border: #d7dee7;
+$muted: #637187;
+$error: brand.$ui-error;
+$success: #24704b;
+$mobile: 640px;
+
+@mixin tokens($variant: admin) {
+    @if not map.has-key($variants, $variant) { @error 'Unknown field variant: #{$variant}'; }
+    $settings: map.get($variants, $variant);
+    --field-height: 40px;
+    --field-padding: #{map.get($settings, padding)};
+    --field-label-gap: #{map.get($settings, label-gap)};
+    --field-label-color: #{map.get($settings, label-color)};
+    --field-border: #{$border};
+    --field-radius: 8px;
+    --field-focus: #{brand.$brand-primary};
+}
+
+@mixin label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--field-label-gap, 6px);
+    min-inline-size: 0;
+    color: var(--field-label-color, #{brand.$brand-blue-ink-soft});
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: right;
+}
+
+@mixin states {
+    &:focus-visible {
+        border-color: var(--field-focus, #{brand.$brand-primary});
+        outline: 2px solid var(--field-focus, #{brand.$brand-primary});
+        outline-offset: 2px;
+    }
+    &[readonly] { background-color: var(--field-readonly-bg, #f7f9fc); color: var(--field-readonly-text, #475569); border-style: var(--field-readonly-style, dashed); }
+    &[data-field-state='success']:not(:disabled) { border-color: $success; }
+    &[aria-invalid='true']:not(:disabled), &:user-invalid:not(:disabled) { border-color: $error; }
+    &:disabled {
+        background-color: var(--field-disabled-bg, #f0f3f7);
+        color: var(--field-disabled-text, #68778a);
+        border-color: var(--field-disabled-border, #dce3eb);
+        opacity: 1;
+        cursor: not-allowed;
+        -webkit-text-fill-color: var(--field-disabled-text, #68778a);
+    }
+    @media (forced-colors: active) {
+        &[aria-invalid='true'], &:user-invalid { outline: 2px dashed CanvasText; outline-offset: 2px; }
+    }
+}
+
+@mixin control {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    min-block-size: var(--field-height, 40px);
+    padding: 8px var(--field-padding, 10px);
+    border: 1px solid var(--field-border, #{$border});
+    border-radius: var(--field-radius, 8px);
+    background: white;
+    box-shadow: none;
+    color: brand.$brand-text;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.4;
+    appearance: auto;
+    &::placeholder { color: var(--field-placeholder, #{$muted}); opacity: 1; }
+    &:hover:not(:focus-visible):not(:disabled):not([readonly]):not([aria-invalid='true']):not(:user-invalid):not([data-field-state='success']) { border-color: var(--field-hover, #a9bacb); }
+    @include states;
+    @media (max-width: $mobile) { min-block-size: 44px; font-size: 16px; }
+}
+
+@mixin choice {
+    box-sizing: border-box;
+    inline-size: 18px;
+    block-size: 18px;
+    min-inline-size: 18px;
+    min-block-size: 18px;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+    accent-color: brand.$brand-primary;
+    appearance: auto;
+    box-shadow: none;
+    @include states;
+    &[aria-invalid='true']:not(:disabled), &:user-invalid:not(:disabled) { outline: 2px solid $error; outline-offset: 2px; }
+    @media (max-width: $mobile) { inline-size: 20px; block-size: 20px; }
+}
+
+@mixin message($tone: help) {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    @if $tone == error { color: $error; }
+    @else if $tone == success { color: $success; }
+    @else { color: $muted; }
+}
+
+@mixin icon-wrapper {
+    position: relative;
+    display: block;
+    min-inline-size: 0;
+    > svg {
+        position: absolute;
+        inset-inline-start: 12px;
+        inset-block-start: 50%;
+        transform: translateY(-50%);
+        inline-size: 18px;
+        block-size: 18px;
+        color: $muted;
+        pointer-events: none;
+    }
+    > input { padding-inline-start: 38px; }
+}
+
+@mixin system($variant: admin) {
+    @include tokens($variant);
+    label { @include label; }
+    // Keep specialised controls native; never apply text-field dimensions to them.
+    :where(input:not([type='checkbox'], [type='radio'], [type='hidden'], [type='range'], [type='color'], [type='file'], [type='button'], [type='submit'], [type='reset'], [type='image']), select, textarea) {
+        @include control;
+    }
+    :where(input:not([type='checkbox'], [type='radio'], [type='hidden'], [type='range'], [type='color'], [type='file'], [type='button'], [type='submit'], [type='reset'], [type='image']), select:not([multiple]):not([size]), select[size='1']:not([multiple])) { block-size: var(--field-height); }
+    textarea { block-size: auto; min-block-size: 88px; resize: vertical; }
+    select { text-overflow: ellipsis; }
+    select[multiple], select[size]:not([size='1']) { block-size: auto; min-block-size: 104px; padding-block: 6px; }
+    input:is([type='tel'], [type='email'], [type='url'], [type='date'], [type='datetime-local'], [type='month'], [type='time'], [type='week']):not([dir]) { direction: ltr; text-align: start; }
+    input:is([type='checkbox'], [type='radio']) { @include choice; }
+    label:has(> input:is([type='checkbox'], [type='radio'])) {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        @media (max-width: $mobile) { min-block-size: 44px; }
+    }
+}

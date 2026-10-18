@@ -1,0 +1,189 @@
+@use './form-fields' as fields;
+
+// Separate family preserves existing font rendering on other admin screens.
+@each $weight in (400, 500, 600, 700) {
+/* assistant-hebrew-#{$weight}-normal */
+@font-face {
+  font-family: 'Assistant Admin';
+  font-style: normal;
+  font-display: swap;
+  font-weight: #{$weight};
+  src: url(../../node_modules/@fontsource/assistant/files/assistant-hebrew-#{$weight}-normal.woff2) format('woff2'), url(../../node_modules/@fontsource/assistant/files/assistant-hebrew-#{$weight}-normal.woff) format('woff');
+  unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F;
+}
+
+/* assistant-latin-ext-#{$weight}-normal */
+@font-face {
+  font-family: 'Assistant Admin';
+  font-style: normal;
+  font-display: swap;
+  font-weight: #{$weight};
+  src: url(../../node_modules/@fontsource/assistant/files/assistant-latin-ext-#{$weight}-normal.woff2) format('woff2'), url(../../node_modules/@fontsource/assistant/files/assistant-latin-ext-#{$weight}-normal.woff) format('woff');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* assistant-latin-#{$weight}-normal */
+@font-face {
+  font-family: 'Assistant Admin';
+  font-style: normal;
+  font-display: swap;
+  font-weight: #{$weight};
+  src: url(../../node_modules/@fontsource/assistant/files/assistant-latin-#{$weight}-normal.woff2) format('woff2'), url(../../node_modules/@fontsource/assistant/files/assistant-latin-#{$weight}-normal.woff) format('woff');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+}
+
+// Opt-in adapters; only the private Assistant Admin font faces are emitted on import.
+@mixin field-label {
+    @include fields.label;
+    color: var(--admin-text);
+    font-size: var(--admin-small-size);
+    font-weight: var(--admin-label-weight);
+    text-align: start;
+}
+
+@mixin fields($refined: false) {
+    --field-height: var(--admin-control-height);
+    --field-radius: var(--admin-radius);
+    --field-border: var(--admin-border);
+    --field-focus: var(--admin-primary);
+    --field-padding: var(--admin-space-3);
+    --field-label-gap: var(--admin-space-2);
+    --field-label-color: var(--admin-text);
+    @if $refined {
+        --field-height: var(--admin-input-height);
+        --field-radius: var(--admin-input-radius);
+        --field-border: var(--admin-input-border);
+        --field-hover: var(--admin-input-hover);
+        --field-focus: var(--admin-input-focus);
+        --field-ring: var(--admin-input-ring);
+        --field-placeholder: var(--admin-input-placeholder);
+        --field-padding: var(--admin-space-4);
+        --field-disabled-bg: var(--admin-input-disabled-bg);
+        --field-disabled-text: var(--admin-input-disabled-text);
+        --field-disabled-border: var(--admin-input-disabled-border);
+        --field-readonly-bg: var(--admin-input-readonly-bg);
+        --field-readonly-text: var(--admin-input-readonly-text);
+        --field-readonly-style: solid;
+    }
+    label { @include field-label; }
+    input:not([type='checkbox'], [type='radio']), select, textarea {
+        @include fields.control;
+        min-height: var(--field-height);
+        font-size: var(--admin-body-size);
+        font-weight: var(--admin-value-weight);
+        border-radius: var(--field-radius);
+        @if $refined { @include refined-field; }
+    }
+    input:not([type='checkbox'], [type='radio']), select {
+        height: var(--field-height);
+        padding-block: var(--admin-space-2);
+    }
+    textarea { height: auto; min-height: 96px; resize: vertical; }
+    @if $refined {
+        select:not([multiple]):not([size]), select[size='1']:not([multiple]) { @include select-arrow; }
+    }
+}
+
+// The native select retains its keyboard and popup behaviour; only its arrow is drawn.
+@mixin select-arrow {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a8ea4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left var(--admin-space-4) center;
+    background-size: 16px;
+    padding-inline-end: 44px;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    &:dir(ltr) { background-position: right var(--admin-space-4) center; }
+    @media (forced-colors: active) { appearance: auto; background-image: none; }
+}
+
+@mixin refined-field {
+    appearance: none;
+    background-color: var(--admin-surface);
+    color: var(--admin-text);
+    padding-inline-start: var(--field-leading-padding, var(--field-padding));
+    transition: border-color 140ms ease, box-shadow 140ms ease;
+    &[aria-invalid='true'], &:user-invalid {
+        --field-focus: var(--admin-error);
+        --field-hover: var(--admin-error);
+        --field-ring: var(--admin-input-error-ring);
+    }
+    &:focus:not(:disabled), &:focus-visible:not(:disabled) {
+        --field-hover: var(--field-focus);
+        border-color: var(--field-focus);
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 3px var(--field-ring);
+    }
+    &::-webkit-search-decoration { -webkit-appearance: none; }
+    @media (prefers-reduced-motion: reduce) { transition: none; }
+    @media (forced-colors: active) {
+        &:focus:not(:disabled), &:focus-visible:not(:disabled) { outline-color: Highlight; box-shadow: none; }
+    }
+}
+
+@mixin search-field {
+    position: relative;
+    display: block;
+    min-inline-size: 0;
+    > svg {
+        position: absolute;
+        inset-inline-start: var(--admin-space-4);
+        top: 50%;
+        transform: translateY(-50%);
+        width: var(--admin-input-icon-size);
+        height: var(--admin-input-icon-size);
+        color: var(--admin-input-icon);
+        pointer-events: none;
+    }
+    --field-leading-padding: calc(var(--admin-space-4) + var(--admin-input-icon-size) + var(--admin-space-3));
+    &:focus-within > svg { color: var(--admin-input-focus); }
+}
+
+@mixin button($variant: secondary) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--admin-space-2);
+    min-height: var(--admin-control-height);
+    height: auto;
+    padding: var(--admin-space-2) var(--admin-space-3);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius);
+    background: var(--admin-surface);
+    color: var(--admin-text);
+    font: inherit;
+    font-weight: var(--admin-action-weight);
+    line-height: 1.4;
+    text-decoration: none;
+    box-shadow: none;
+    cursor: pointer;
+    @if $variant == primary {
+        background: var(--admin-primary);
+        border-color: var(--admin-primary);
+        color: var(--admin-surface);
+    }
+    @if $variant == navigation { border-color: transparent; background: transparent; color: var(--admin-muted); }
+    &:hover:not(:disabled) {
+        @if $variant == primary {
+            background: var(--admin-primary-hover);
+            color: var(--admin-surface);
+        } @else {
+            background: var(--admin-subtle);
+            color: var(--admin-text);
+        }
+        box-shadow: none;
+        transform: none;
+    }
+    @if $variant == navigation {
+        &[aria-pressed='true'], &[aria-pressed='true']:hover:not(:disabled) {
+            background: var(--admin-info-bg);
+            color: var(--admin-info-text);
+        }
+    }
+    &:focus-visible { outline: 2px solid var(--admin-primary); outline-offset: 2px; }
+    &:disabled { opacity: .55; cursor: not-allowed; }
+    &[aria-busy='true'] { cursor: wait; }
+}

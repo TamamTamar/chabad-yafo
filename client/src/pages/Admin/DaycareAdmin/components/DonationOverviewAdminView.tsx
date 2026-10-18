@@ -1,3 +1,4 @@
+import { AdminButton, AdminCard } from "../../../../components/AdminUI";
 import styles from "./DaycareDonationsAdmin.module.scss";
 import type { useDaycareDonationsAdmin } from "./useDaycareDonationsAdmin";
 
@@ -16,7 +17,7 @@ const DonationOverviewAdminView = ({ model }: Props) => {
         <>
             {activeView === "overview" && (
             <>
-            <section className={`${styles.panel} ${styles.overviewPanel}`}>
+            <section className={styles.panel}><AdminCard>
                 <header>
                     <h2>הגדרות ויעדים</h2>
                     <p>
@@ -40,9 +41,9 @@ const DonationOverviewAdminView = ({ model }: Props) => {
                         />
                         הקמפיין פתוח לתרומות
                     </label>
-                    <button type="submit" disabled={saving}>
+                    <AdminButton variant="primary" type="submit" disabled={saving}>
                         שמירת מצב הקמפיין
-                    </button>
+                    </AdminButton>
                 </form>
                 <div className={styles.categoryList}>
                     {campaign.categories.map((category) => (
@@ -76,45 +77,45 @@ const DonationOverviewAdminView = ({ model }: Props) => {
                         </div>
                     ))}
                 </div>
-            </section>
-            <section className={`${styles.panel} ${styles.overviewPanel}`}>
+            </AdminCard></section>
+            <section className={styles.panel}><AdminCard>
                 <header>
                     <h2>עבודה שוטפת</h2>
                     <p>הפעולות הנפוצות נמצאות במרחק לחיצה אחת.</p>
                 </header>
                 <div className={styles.quickActions}>
-                    <button
+                    <AdminButton
                         type="button"
                         onClick={() => setActiveView("records")}
                     >
                         <strong>צפייה בתרומות</strong>
                         <small>{records.length} רשומות</small>
-                    </button>
-                    <button
+                    </AdminButton>
+                    <AdminButton
                         type="button"
                         onClick={() => setActiveView("manual")}
                     >
                         <strong>הוספת תרומה ידנית</strong>
                         <small>מזומן, צ׳ק או העברה</small>
-                    </button>
-                    <button
+                    </AdminButton>
+                    <AdminButton
                         type="button"
                         onClick={() => setActiveView("items")}
                     >
                         <strong>עריכת סעיפים</strong>
                         <small>{campaign.items.length} סעיפים</small>
-                    </button>
+                    </AdminButton>
                 </div>
                 <div className={styles.recentRecords}>
                     <div>
                         <h3>תרומות אחרונות</h3>
                         {records.length > 5 && (
-                            <button
+                            <AdminButton
                                 type="button"
                                 onClick={() => setActiveView("records")}
                             >
                                 לכל התרומות
-                            </button>
+                            </AdminButton>
                         )}
                     </div>
                     {records.length === 0 ? (
@@ -143,7 +144,7 @@ const DonationOverviewAdminView = ({ model }: Props) => {
                         </ul>
                     )}
                 </div>
-            </section>
+            </AdminCard></section>
             </>
             )}
 

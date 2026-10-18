@@ -2,9 +2,9 @@ import axios from "axios";
 import { gematriya, HDate } from "@hebcal/hdate";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
+import { AdminButton, AdminInput, AdminSelect, AdminBadge, AdminCard, AdminConfirmDialog as ConfirmDialog } from "../../../../components/AdminUI";
 import { deleteAdminDaycareAnnualPlan, listAdminDaycareAnnualPlans, previewAdminDaycareAnnualPlan, saveAdminDaycareAnnualPlan, syncAdminDaycareAnnualPlanHolidays, updateAdminDaycareAnnualPlanSharing, type DaycareAnnualPlan } from "../../../../services/daycareAnnualPlanService";
-import styles from "./DaycareParentDocuments.module.scss";
+import styles from "../../../../components/AdminUI/AdminEditor.module.scss";
 
 const nextSchoolYear = (items: DaycareAnnualPlan[]) => {
     const latest = Math.max(...items.map((item) => Number(item.schoolYear.slice(0, 4))), new Date().getFullYear());
@@ -138,6 +138,7 @@ const DaycareAnnualPlanEditor = () => {
     const [sharingBusy, setSharingBusy] = useState(false);
     const [notice, setNotice] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
 
     const apply = (item: DaycareAnnualPlan, creating = false, sourcePlans = plans) => {
         const targetYear = creating ? nextSchoolYear(sourcePlans) : item.schoolYear;
@@ -169,7 +170,7 @@ const DaycareAnnualPlanEditor = () => {
                 setNotice("");
                 setError("");
             }
-        }).catch((loadError) => { if (active) setError(messageFromError(loadError)); });
+        }).catch((loadError) => { if (active) setError(messageFromError(loadError)); }).finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
     }, []);
 
@@ -296,93 +297,93 @@ const DaycareAnnualPlanEditor = () => {
         finally { setPreviewing(false); }
     };
 
-    if (!plan) return <section className={styles.section}><p>{error || "טוען את מחולל המסמכים..."}</p></section>;
+    if (!plan) return <AdminCard className={styles.section}><p role={error ? "alert" : "status"}>{error || (loading ? "טוען את מחולל המסמכים..." : "אין תוכניות שנתיות זמינות.")}</p></AdminCard>;
 
-    return <section className={styles.section} aria-labelledby="annual-plan-title">
+    return <AdminCard role="region" className={styles.section} aria-labelledby="annual-plan-title">
         <header className={styles.header}>
             <div>
                 <span className={styles.eyebrow}>לאדמין בלבד · מחולל מסמכים</span>
                 <h2 className={styles.title} id="annual-plan-title">תוכנית נושאי לימוד שנתית</h2>
                 <p className={styles.intro}>אפשר לשמור ולהוריד את המסמך לשימוש פנימי, או לשתף אותו בנפרד בקישור האישי של ההורים. השיתוף אינו מופעל אוטומטית.</p>
             </div>
-            <button className={styles.secondaryButton} type="button" disabled={!plans.length || isNewYear} onClick={() => apply(plans[0], true)}>יצירת שנה חדשה מהתבנית</button>
+            <AdminButton variant="secondary" type="button" disabled={!plans.length || isNewYear} onClick={() => apply(plans[0], true)}>יצירת שנה חדשה מהתבנית</AdminButton>
         </header>
 
         <div className={styles.yearRow}>
             <label className={styles.label}>שנת לימודים
                 {isNewYear
-                    ? <input className={styles.input} value={selectedYear} onChange={(event) => { setSelectedYear(event.target.value); setDirty(true); }} placeholder="2027-2028" />
-                    : <select className={styles.input} value={selectedYear} onChange={(event) => { const item = plans.find((entry) => entry.schoolYear === event.target.value); if (item) apply(item); }}>{plans.map((entry) => <option key={entry.schoolYear} value={entry.schoolYear}>{entry.schoolYear}</option>)}</select>}
+                    ? <AdminInput value={selectedYear} onChange={(event) => { setSelectedYear(event.target.value); setDirty(true); }} placeholder="2027-2028" />
+                    : <AdminSelect value={selectedYear} onChange={(event) => { const item = plans.find((entry) => entry.schoolYear === event.target.value); if (item) apply(item); }}>{plans.map((entry) => <option key={entry.schoolYear} value={entry.schoolYear}>{entry.schoolYear}</option>)}</AdminSelect>}
             </label>
-            <div className={dirty ? styles.locked : styles.editable}>{dirty ? "יש שינויים שלא נשמרו" : "כל השינויים נשמרו"}</div>
+            <AdminBadge tone={dirty ? "warning" : "success"}>{dirty ? "יש שינויים שלא נשמרו" : "כל השינויים נשמרו"}</AdminBadge>
         </div>
 
-        <article className={styles.card}>
+        <AdminCard className={styles.card}>
             <div className={styles.planHeader}><p>לפני שמירת שנה חדשה, עדכנו את תאריכי החגים והחופשות ושבצו נושאי חג לפני החג או החופשה.</p></div>
             <div className={styles.planMetaGrid}>
-                <label className={styles.label}>שנת הלימודים בכותרת<input className={styles.input} value={plan.schoolYearLabel} onChange={(event) => changePlan({ ...plan, schoolYearLabel: event.target.value })} /></label>
-                <label className={styles.label}>תאריך תחילת השנה<input className={styles.input} type="date" value={plan.startDate} onChange={(event) => changePlan({ ...plan, startDate: event.target.value })} /></label>
-                <label className={styles.label}>תאריך סיום השנה<input className={styles.input} type="date" value={plan.endDate} onChange={(event) => changePlan({ ...plan, endDate: event.target.value })} /></label>
+                <label className={styles.label}>שנת הלימודים בכותרת<AdminInput value={plan.schoolYearLabel} onChange={(event) => changePlan({ ...plan, schoolYearLabel: event.target.value })} /></label>
+                <label className={styles.label}>תאריך תחילת השנה<AdminInput type="date" value={plan.startDate} onChange={(event) => changePlan({ ...plan, startDate: event.target.value })} /></label>
+                <label className={styles.label}>תאריך סיום השנה<AdminInput type="date" value={plan.endDate} onChange={(event) => changePlan({ ...plan, endDate: event.target.value })} /></label>
             </div>
             <div className={styles.calendarEditor}>
                 <div className={styles.menuEditorHeader}>
                     <div><h4>חגים וחופשות</h4><p>הרשימה מתעדכנת אוטומטית בכל שמירה של לוח החופשות. אפשר גם לסנכרן עכשיו או לבצע תיקון נקודתי כאן.</p></div>
                     <div className={styles.inlineButtons}>
-                        <button className={styles.secondaryButton} type="button" disabled={isNewYear || syncing} onClick={() => void syncHolidays()}>{syncing ? "מסנכרן..." : "סנכרון ויצירת תאריכים"}</button>
-                        <button className={styles.addDayButton} type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, vacations: [...plan.calendar.vacations, { name: "", startDate: plan.startDate, endDate: plan.startDate }] } })}><Plus size={18} /> הוספת חופשה</button>
+                        <AdminButton variant="secondary" type="button" disabled={isNewYear || syncing} onClick={() => void syncHolidays()}>{syncing ? "מסנכרן..." : "סנכרון ויצירת תאריכים"}</AdminButton>
+                        <AdminButton variant="primary" type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, vacations: [...plan.calendar.vacations, { name: "", startDate: plan.startDate, endDate: plan.startDate }] } })}><Plus size={18} /> הוספת חופשה</AdminButton>
                     </div>
                 </div>
                 <div className={styles.calendarList}>{plan.calendar.vacations.map((vacation, index) => <div className={styles.calendarRow} key={`${vacation.name}-${index}`}>
-                    <label className={styles.label}>שם החג / החופשה<input className={styles.input} value={vacation.name} onChange={(event) => updateVacation(index, "name", event.target.value)} /></label>
-                    <label className={styles.label}>מתאריך<input className={styles.input} type="date" value={vacation.startDate} onChange={(event) => updateVacation(index, "startDate", event.target.value)} /></label>
-                    <label className={styles.label}>עד תאריך<input className={styles.input} type="date" value={vacation.endDate} onChange={(event) => updateVacation(index, "endDate", event.target.value)} /></label>
-                    <button className={styles.iconDeleteButton} type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, vacations: plan.calendar.vacations.filter((_, itemIndex) => itemIndex !== index), anchors: plan.calendar.anchors.filter((anchor) => anchor.name !== vacation.name) } })} aria-label={`מחיקת ${vacation.name}`}><Trash2 size={18} /></button>
+                    <label className={styles.label}>שם החג / החופשה<AdminInput value={vacation.name} onChange={(event) => updateVacation(index, "name", event.target.value)} /></label>
+                    <label className={styles.label}>מתאריך<AdminInput type="date" value={vacation.startDate} onChange={(event) => updateVacation(index, "startDate", event.target.value)} /></label>
+                    <label className={styles.label}>עד תאריך<AdminInput type="date" value={vacation.endDate} onChange={(event) => updateVacation(index, "endDate", event.target.value)} /></label>
+                    <AdminButton variant="danger" type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, vacations: plan.calendar.vacations.filter((_, itemIndex) => itemIndex !== index), anchors: plan.calendar.anchors.filter((anchor) => anchor.name !== vacation.name) } })} aria-label={`מחיקת ${vacation.name}`}><Trash2 size={18} /></AdminButton>
                 </div>)}</div>
                 <div className={styles.menuEditorHeader}>
                     <div><h4>מועדים מיוחדים</h4><p>המועד יצורף אוטומטית לשורה הקרובה ביותר, בלי להפוך לנושא השבוע.</p></div>
-                    <button className={styles.addDayButton} type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, specialEvents: [...plan.calendar.specialEvents, { name: "", date: plan.startDate }] } })}><Plus size={18} /> הוספת מועד</button>
+                    <AdminButton variant="primary" type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, specialEvents: [...plan.calendar.specialEvents, { name: "", date: plan.startDate }] } })}><Plus size={18} /> הוספת מועד</AdminButton>
                 </div>
                 <div className={styles.calendarList}>{plan.calendar.specialEvents.map((event, index) => <div className={styles.specialEventRow} key={`${event.name}-${index}`}>
-                    <label className={styles.label}>שם המועד<input className={styles.input} value={event.name} onChange={(changeEvent) => updateSpecialEvent(index, "name", changeEvent.target.value)} /></label>
-                    <label className={styles.label}>תאריך<input className={styles.input} type="date" value={event.date} onChange={(changeEvent) => updateSpecialEvent(index, "date", changeEvent.target.value)} /></label>
-                    <button className={styles.iconDeleteButton} type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, specialEvents: plan.calendar.specialEvents.filter((_, itemIndex) => itemIndex !== index) } })} aria-label={`מחיקת ${event.name}`}><Trash2 size={18} /></button>
+                    <label className={styles.label}>שם המועד<AdminInput value={event.name} onChange={(changeEvent) => updateSpecialEvent(index, "name", changeEvent.target.value)} /></label>
+                    <label className={styles.label}>תאריך<AdminInput type="date" value={event.date} onChange={(changeEvent) => updateSpecialEvent(index, "date", changeEvent.target.value)} /></label>
+                    <AdminButton variant="danger" type="button" onClick={() => changePlan({ ...plan, calendar: { ...plan.calendar, specialEvents: plan.calendar.specialEvents.filter((_, itemIndex) => itemIndex !== index) } })} aria-label={`מחיקת ${event.name}`}><Trash2 size={18} /></AdminButton>
                 </div>)}</div>
-                <button className={styles.generateButton} type="button" onClick={autoGenerate}>יצירת כל התאריכים והחודשים מחדש</button>
+                <AdminButton variant="primary" type="button" onClick={autoGenerate}>יצירת כל התאריכים והחודשים מחדש</AdminButton>
             </div>
             <div className={styles.planEditor}>
                 <div className={styles.menuEditorHeader}>
                     <div><h4>שבועות ונושאים</h4><p>החודש משמש לחלוקה ב-PDF. אירוע מיוחד הוא אופציונלי ומוצג בנפרד מנושא השבוע.</p></div>
-                    <button className={styles.addDayButton} type="button" onClick={addItem}><Plus size={18} /> הוספת שורה</button>
+                    <AdminButton variant="primary" type="button" onClick={addItem}><Plus size={18} /> הוספת שורה</AdminButton>
                 </div>
                 <div className={styles.planRowList}>{plan.items.map((item, index) => <section className={styles.planRowEditor} key={index}>
                     <header className={styles.menuDayHeader}>
                         <span className={styles.menuDayNumber}>שורה {index + 1}</span>
                         <div className={styles.menuDayActions}>
-                            <button type="button" disabled={index === 0} onClick={() => moveItem(index, -1)} aria-label={`העברת שורה ${index + 1} למעלה`}><ArrowUp size={17} /></button>
-                            <button type="button" disabled={index === plan.items.length - 1} onClick={() => moveItem(index, 1)} aria-label={`העברת שורה ${index + 1} למטה`}><ArrowDown size={17} /></button>
-                            <button type="button" onClick={() => removeItem(index)} aria-label={`מחיקת שורה ${index + 1}`}><Trash2 size={17} /></button>
+                            <AdminButton type="button" disabled={index === 0} onClick={() => moveItem(index, -1)} aria-label={`העברת שורה ${index + 1} למעלה`}><ArrowUp size={17} /></AdminButton>
+                            <AdminButton type="button" disabled={index === plan.items.length - 1} onClick={() => moveItem(index, 1)} aria-label={`העברת שורה ${index + 1} למטה`}><ArrowDown size={17} /></AdminButton>
+                            <AdminButton type="button" onClick={() => removeItem(index)} aria-label={`מחיקת שורה ${index + 1}`}><Trash2 size={17} /></AdminButton>
                         </div>
                     </header>
                     <div className={styles.planRowFields}>
-                        <label className={styles.label}>חודש<input className={styles.input} value={item.month} onChange={(event) => updateItem(index, "month", event.target.value)} /></label>
-                        <label className={styles.label}>תאריך / טווח תאריכים<input className={styles.input} dir="ltr" value={item.dateRange} onChange={(event) => updateItem(index, "dateRange", event.target.value)} /></label>
-                        <label className={styles.label}>נושא השבוע<input className={styles.input} value={item.topic} onChange={(event) => updateItem(index, "topic", event.target.value)} /></label>
-                        <label className={styles.label}>אירוע / מועד מיוחד - אופציונלי<input className={styles.input} value={item.specialEvent ?? ""} onChange={(event) => updateItem(index, "specialEvent", event.target.value)} /></label>
+                        <label className={styles.label}>חודש<AdminInput value={item.month} onChange={(event) => updateItem(index, "month", event.target.value)} /></label>
+                        <label className={styles.label}>תאריך / טווח תאריכים<AdminInput dir="ltr" value={item.dateRange} onChange={(event) => updateItem(index, "dateRange", event.target.value)} /></label>
+                        <label className={styles.label}>נושא השבוע<AdminInput value={item.topic} onChange={(event) => updateItem(index, "topic", event.target.value)} /></label>
+                        <label className={styles.label}>אירוע / מועד מיוחד - אופציונלי<AdminInput value={item.specialEvent ?? ""} onChange={(event) => updateItem(index, "specialEvent", event.target.value)} /></label>
                     </div>
                 </section>)}</div>
             </div>
-        </article>
+        </AdminCard>
 
         <div className={styles.actions}>
-            <button className={styles.primaryButton} type="button" disabled={busy || !dirty} onClick={() => void save()}>{busy ? "שומר..." : "שמירת התוכנית"}</button>
-            {isNewYear ? <button className={styles.secondaryButton} type="button" onClick={() => apply(plans[0])}>ביטול</button> : null}
-            <button className={styles.secondaryButton} type="button" disabled={previewing} onClick={() => void preview()}>{previewing ? "מפיק PDF..." : "תצוגה מקדימה והפקת PDF"}</button>
-            {!isNewYear ? <button className={plan.sharedWithParents ? styles.sharedButton : styles.secondaryButton} type="button" disabled={sharingBusy || dirty} onClick={() => void toggleSharing()}>{sharingBusy ? "מעדכן שיתוף..." : plan.sharedWithParents ? "משותף להורים · הסרת שיתוף" : "שיתוף להורים"}</button> : null}
-            {!isNewYear ? <button className={styles.dangerButton} type="button" disabled={plans.length <= 1 || busy} onClick={() => setDeleteDialogOpen(true)}>מחיקת שנת התוכנית</button> : null}
+            <AdminButton variant="primary" type="button" disabled={busy || !dirty} onClick={() => void save()}>{busy ? "שומר..." : "שמירת התוכנית"}</AdminButton>
+            {isNewYear ? <AdminButton variant="secondary" type="button" onClick={() => apply(plans[0])}>ביטול</AdminButton> : null}
+            <AdminButton variant="secondary" type="button" disabled={previewing} onClick={() => void preview()}>{previewing ? "מפיק PDF..." : "תצוגה מקדימה והפקת PDF"}</AdminButton>
+            {!isNewYear ? <AdminButton aria-pressed={plan.sharedWithParents} type="button" disabled={sharingBusy || dirty} onClick={() => void toggleSharing()}>{sharingBusy ? "מעדכן שיתוף..." : plan.sharedWithParents ? "משותף להורים · הסרת שיתוף" : "שיתוף להורים"}</AdminButton> : null}
+            {!isNewYear ? <AdminButton variant="danger" type="button" disabled={plans.length <= 1 || busy} onClick={() => setDeleteDialogOpen(true)}>מחיקת שנת התוכנית</AdminButton> : null}
         </div>
-        <div aria-live="polite">{notice ? <p className={styles.success}>{notice}</p> : null}{error ? <p className={styles.error}>{error}</p> : null}</div>
+        <div aria-live="polite">{notice ? <p className={styles.success}>{notice}</p> : null}{error ? <p role="alert" className={styles.error}>{error}</p> : null}</div>
         <ConfirmDialog open={deleteDialogOpen} title="מחיקת תוכנית שנתית" message={`למחוק את תוכנית שנת ${selectedYear}? לא ניתן לשחזר אותה לאחר המחיקה.`} confirmLabel="מחיקה" busy={busy} onConfirm={() => void removePlan()} onClose={() => setDeleteDialogOpen(false)} />
-    </section>;
+    </AdminCard>;
 };
 
 export default DaycareAnnualPlanEditor;

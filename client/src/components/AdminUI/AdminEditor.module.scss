@@ -1,0 +1,35 @@
+// Shared document/editor layouts. Control and surface appearance belongs to AdminUI.
+.section, .cards, .card, .menuEditor, .menuDayList, .menuDayEditor, .planEditor, .planRowList, .planRowEditor, .calendarEditor, .calendarList { display: grid; gap: var(--admin-space-4); min-inline-size: 0; }
+.section { padding: var(--admin-space-4); }
+.header, .menuEditorHeader, .menuDayHeader { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: var(--admin-space-3); }
+.title { margin: var(--admin-space-1) 0; font-size: var(--admin-title-size); font-weight: var(--admin-heading-weight); }
+.eyebrow, .intro, .helperText, .planHeader p, .menuEditorHeader p, .emptyMenu { color: var(--admin-muted); }
+.eyebrow, .helperText { font-size: var(--admin-caption-size); }
+.intro { max-inline-size: 760px; margin: 0; line-height: 1.6; }
+.label { display: grid; gap: var(--admin-space-1); min-inline-size: 0; font-size: var(--admin-small-size); font-weight: var(--admin-label-weight); }
+.yearRow, .actions, .inlineButtons, .menuDayActions { display: flex; flex-wrap: wrap; align-items: end; gap: var(--admin-space-2); }
+.yearRow > label { flex: 0 1 260px; }
+.card h3, .menuEditorHeader h4 { margin: 0; font-size: var(--admin-body-size); }
+.welcomeFieldGrid, .menuDayFields, .planMetaGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--admin-space-3); }
+.menuDayFields > :first-child { grid-column: 1 / -1; }
+.metaGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--admin-space-3); }
+.planRowFields { display: grid; grid-template-columns: .75fr .9fr 1.6fr 1.25fr; gap: var(--admin-space-3); }
+.menuDayEditor, .planRowEditor, .calendarRow, .specialEventRow { padding-block: var(--admin-space-3); border-bottom: 1px solid var(--admin-divider); }
+.calendarRow, .specialEventRow { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; align-items: end; gap: var(--admin-space-3); }
+.specialEventRow { grid-template-columns: 1.5fr 1fr auto; }
+.menuDayNumber { font-size: var(--admin-caption-size); color: var(--admin-muted); }
+.textarea { min-block-size: 230px; }
+.smallTextarea { min-block-size: 86px; }
+.menuMealInput { min-block-size: 74px; }
+.success { color: var(--admin-success-text); margin: 0; }
+.error { color: var(--admin-error); margin: 0; overflow-wrap: anywhere; }
+.confirmLabel { display: flex; align-items: start; gap: var(--admin-space-2); line-height: 1.5; }
+.feedback { min-block-size: var(--admin-space-1); }
+.documentNav { display: flex; flex-wrap: wrap; gap: var(--admin-space-2); }
+@media (max-width: 760px) {
+ .welcomeFieldGrid, .menuDayFields, .planMetaGrid, .planRowFields, .calendarRow, .specialEventRow, .metaGrid { grid-template-columns: minmax(0, 1fr); }
+ .menuDayFields > :first-child { grid-column: auto; }
+ .section { padding: var(--admin-space-3); }
+}
+
+.dialogContent { display: grid; gap: var(--admin-space-4); }

@@ -1,0 +1,11 @@
+.dialog {
+
+    width: min(600px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow: auto;
+    margin: auto;
+    padding: var(--admin-space-6);
+    color: var(--admin-text);
+    &::backdrop { background: var(--admin-dialog-backdrop); }
+    @media(max-width:600px) { padding: var(--admin-space-4); }
+}

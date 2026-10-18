@@ -1,3 +1,4 @@
+import { AdminButton, AdminInput, AdminSelect, AdminTextarea, AdminLink, AdminCard, AdminBadge } from "../../../../components/AdminUI";
 import { useState } from "react";
 import { Check, MessageCircle, Pencil, Phone, UserPlus } from "lucide-react";
 import {
@@ -186,7 +187,7 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
         >
             <label>
                 שם התורם/ת
-                <input
+                <AdminInput
                     name="donorName"
                     defaultValue={lead?.donorName}
                     maxLength={160}
@@ -196,22 +197,22 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
             </label>
             <label>
                 טלפון
-                <input name="phone" defaultValue={lead?.phone} maxLength={40} />
+                <AdminInput name="phone" defaultValue={lead?.phone} maxLength={40} />
             </label>
             <label>
                 שגריר/ה
-                <select name="ambassadorId" defaultValue={lead?.ambassadorId?._id ?? ""}>
+                <AdminSelect aria-label="שגריר/ה" name="ambassadorId" defaultValue={lead?.ambassadorId?._id ?? ""}>
                     <option value="">ללא שיוך</option>
                     {ambassadors.map((ambassador) => (
                         <option key={ambassador._id} value={ambassador._id}>
                             {ambassador.name}
                         </option>
                     ))}
-                </select>
+                </AdminSelect>
             </label>
             <label>
                 סכום יעד לבקשה
-                <input
+                <AdminInput
                     name="targetAmount"
                     type="number"
                     min="0"
@@ -221,7 +222,7 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
             </label>
             <label>
                 סכום שהובטח
-                <input
+                <AdminInput
                     name="pledgedAmount"
                     type="number"
                     min="0"
@@ -231,24 +232,24 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
             </label>
             <label>
                 אמצעי פנייה
-                <select name="contactMethod" defaultValue={lead?.contactMethod ?? ""}>
+                <AdminSelect aria-label="אמצעי פנייה" name="contactMethod" defaultValue={lead?.contactMethod ?? ""}>
                     <option value="">לא נבחר</option>
                     {Object.entries(methodLabels).map(([value, label]) => (
                         <option key={value} value={value}>{label}</option>
                     ))}
-                </select>
+                </AdminSelect>
             </label>
             <label>
                 סטטוס
-                <select name="status" defaultValue={lead?.status ?? "new"}>
+                <AdminSelect aria-label="סטטוס" name="status" defaultValue={lead?.status ?? "new"}>
                     {Object.entries(statusLabels).map(([value, label]) => (
                         <option key={value} value={value}>{label}</option>
                     ))}
-                </select>
+                </AdminSelect>
             </label>
             <label>
                 פנייה אחרונה
-                <input
+                <AdminInput
                     name="lastContactAt"
                     type="date"
                     defaultValue={toDateInput(lead?.lastContactAt)}
@@ -256,7 +257,7 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
             </label>
             <label>
                 מעקב הבא
-                <input
+                <AdminInput
                     name="nextFollowUpAt"
                     type="date"
                     defaultValue={toDateInput(lead?.nextFollowUpAt)}
@@ -264,38 +265,38 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
             </label>
             <label className={styles.wideField}>
                 הערות
-                <textarea name="notes" rows={2} defaultValue={lead?.notes} maxLength={1200} />
+                <AdminTextarea name="notes" rows={2} defaultValue={lead?.notes} maxLength={1200} />
             </label>
             <div className={styles.formActions}>
-                <button type="submit" disabled={saving}>שמירה</button>
+                <AdminButton variant="primary" type="submit" disabled={saving}>שמירה</AdminButton>
                 {lead && (
-                    <button type="button" onClick={() => setEditingId(null)}>
+                    <AdminButton type="button" onClick={() => setEditingId(null)}>
                         ביטול
-                    </button>
+                    </AdminButton>
                 )}
             </div>
         </form>
     );
 
     return (
-        <section className={styles.panel}>
+        <section className={styles.panel}><AdminCard>
             <header className={styles.header}>
                 <div>
                     <h2>פניות והבטחות</h2>
                     <p>מעקב לפני קבלת הכסף. רק תרומה שנרשמה ברשומות נספרת בקמפיין.</p>
                 </div>
-                <button type="button" onClick={() => setAdding((value) => !value)}>
+                <AdminButton type="button" onClick={() => setAdding((value) => !value)}>
                     <UserPlus aria-hidden="true" size={18} />
                     {adding ? "ביטול" : "פנייה חדשה"}
-                </button>
+                </AdminButton>
             </header>
 
             <div className={styles.summary}>
-                <article><span>פניות פתוחות</span><strong>{openCount}</strong></article>
-                <article className={overdueCount ? styles.alertCard : ""}>
+                <AdminCard><span>פניות פתוחות</span><strong>{openCount}</strong></AdminCard>
+                <AdminCard className={overdueCount ? styles.alertCard : ""}>
                     <span>מעקבים באיחור</span><strong>{overdueCount}</strong>
-                </article>
-                <article><span>הבטחות פתוחות</span><strong>₪{formatCurrency(pledgedTotal)}</strong></article>
+                </AdminCard>
+                <AdminCard><span>הבטחות פתוחות</span><strong>₪{formatCurrency(pledgedTotal)}</strong></AdminCard>
             </div>
 
             {(message || error) && (
@@ -306,9 +307,9 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
             {adding && renderForm()}
 
             <div className={styles.filters}>
-                <button className={filter === "open" ? styles.activeFilter : ""} onClick={() => setFilter("open")}>פתוחות</button>
-                <button className={filter === "overdue" ? styles.activeFilter : ""} onClick={() => setFilter("overdue")}>באיחור</button>
-                <button className={filter === "all" ? styles.activeFilter : ""} onClick={() => setFilter("all")}>הכול</button>
+                <AdminButton variant="navigation" aria-pressed={filter === "open"} onClick={() => setFilter("open")}>פתוחות</AdminButton>
+                <AdminButton variant="navigation" aria-pressed={filter === "overdue"} onClick={() => setFilter("overdue")}>באיחור</AdminButton>
+                <AdminButton variant="navigation" aria-pressed={filter === "all"} onClick={() => setFilter("all")}>הכול</AdminButton>
             </div>
 
             {visibleLeads.length === 0 ? (
@@ -321,7 +322,7 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
                             Boolean(lead.nextFollowUpAt) &&
                             new Date(lead.nextFollowUpAt as string) < today;
                         return (
-                            <article className={`${styles.leadCard} ${overdue ? styles.overdue : ""}`} key={lead._id}>
+                            <AdminCard className={`${styles.leadCard} ${overdue ? styles.overdue : ""}`} key={lead._id}>
                                 {editingId === lead._id ? renderForm(lead) : (
                                     <>
                                         <div className={styles.leadHeader}>
@@ -329,7 +330,7 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
                                                 <strong>{lead.donorName}</strong>
                                                 <span>{lead.ambassadorId?.name ?? "ללא שגריר"}</span>
                                             </div>
-                                            <span className={styles.status}>{statusLabels[lead.status]}</span>
+                                            <AdminBadge tone="info">{statusLabels[lead.status]}</AdminBadge>
                                         </div>
                                         <div className={styles.amounts}>
                                             <span>יעד <strong>{lead.targetAmount ? `₪${formatCurrency(lead.targetAmount)}` : "—"}</strong></span>
@@ -344,38 +345,38 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
                                         {lead.notes && <p className={styles.notes}>{lead.notes}</p>}
                                         <div className={styles.actions}>
                                             {lead.phone && (
-                                                <a href={`tel:${lead.phone}`} aria-label={`חיוג אל ${lead.donorName}`} title="חיוג">
-                                                    <Phone aria-hidden="true" size={18} />
-                                                </a>
+                                                <AdminLink href={`tel:${lead.phone}`} aria-label={`חיוג אל ${lead.donorName}`} title="חיוג">
+                                                    <Phone aria-hidden="true" size={18} /><bdi>{lead.phone}</bdi>
+                                                </AdminLink>
                                             )}
                                             {lead.phone && (
-                                                <a href={`https://wa.me/${toWhatsAppPhone(lead.phone)}`} target="_blank" rel="noreferrer" aria-label={`וואטסאפ אל ${lead.donorName}`} title="וואטסאפ">
+                                                <AdminLink href={`https://wa.me/${toWhatsAppPhone(lead.phone)}`} target="_blank" rel="noreferrer" aria-label={`וואטסאפ אל ${lead.donorName}`} title="וואטסאפ">
                                                     <MessageCircle aria-hidden="true" size={18} />
-                                                </a>
+                                                </AdminLink>
                                             )}
-                                            <button type="button" onClick={() => setEditingId(lead._id)} aria-label={`עריכת הפנייה של ${lead.donorName}`} title="עריכה">
+                                            <AdminButton type="button" onClick={() => setEditingId(lead._id)} aria-label={`עריכת הפנייה של ${lead.donorName}`} title="עריכה">
                                                 <Pencil aria-hidden="true" size={18} />
-                                            </button>
+                                            </AdminButton>
                                             {lead.status !== "contacted" && (
-                                                <button type="button" onClick={() => void quickStatus(lead, "contacted")} title="סימון שנוצר קשר">
+                                                <AdminButton type="button" onClick={() => void quickStatus(lead, "contacted")} title="סימון שנוצר קשר">
                                                     נוצר קשר
-                                                </button>
+                                                </AdminButton>
                                             )}
                                             {lead.status !== "completed" && (
-                                                <button type="button" onClick={() => void quickStatus(lead, "completed")} title="לאחר רישום הכסף ברשומות התרומה">
+                                                <AdminButton type="button" onClick={() => void quickStatus(lead, "completed")} title="לאחר רישום הכסף ברשומות התרומה">
                                                     <Check aria-hidden="true" size={18} />
                                                     נרשם בתרומות
-                                                </button>
+                                                </AdminButton>
                                             )}
                                         </div>
                                     </>
                                 )}
-                            </article>
+                            </AdminCard>
                         );
                     })}
                 </div>
             )}
-        </section>
+        </AdminCard></section>
     );
 };
 

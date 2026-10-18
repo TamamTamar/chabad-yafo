@@ -10,3 +10,29 @@
 .navigation :is(button, a):focus-visible { outline: 2px solid a.$primary; outline-offset: -2px; }
 @media (max-width: 1099px) { .link, .active, .group { min-height: 44px; } }
 .groupActive { color: a.$primary; }
+
+.modernDark {
+    padding: 0 12px 12px;
+    background: var(--admin-nav-background);
+    color: var(--admin-nav-text);
+    .brand {
+        padding: 20px 12px;
+        margin-bottom: 8px;
+        min-height: 112px;
+        color: var(--admin-nav-text);
+        align-content: center;
+        justify-items: center;
+        gap: 4px;
+        span { color: var(--admin-nav-muted); }
+        svg { margin-bottom: 4px; }
+    }
+    .groups section + section { margin-top: 12px; }
+    .group { color: var(--admin-nav-muted); font-weight: 500; font-size: 12px; padding-block: 6px; }
+    .link, .active { color: var(--admin-nav-text); font-size: 14px; font-weight: 500; gap: 10px; min-height: 40px; padding: 8px 10px; svg { width: 16px; height: 16px; color: var(--admin-nav-muted); } }
+    .active { background: var(--admin-nav-active); font-weight: 700; svg { color: inherit; } }
+    .link:hover { background: var(--admin-nav-hover); }
+    .active:hover { background: var(--admin-nav-active); }
+    .bottom { border-color: var(--admin-nav-hover); p { color: #ffb9b9; } }
+    :is(button, a):focus-visible { outline-color: var(--admin-nav-text); }
+    @media (max-width: 1099px) { .link, .active, .group { min-height: 44px; } }
+}

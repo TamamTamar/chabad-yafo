@@ -11,7 +11,6 @@ import {
     updateDaycareTask,
     updateDaycareTaskSubtask,
 } from "../daycareAdminService";
-import styles from "../DaycareAdmin.module.scss";
 import type {
     DaycarePriority,
     DaycareTask,
@@ -38,21 +37,6 @@ const quickTaskFilters: CategoryFilter[] = [
     "הכל",
     "הושלמו",
 ];
-
-const getCategoryClassName = (category: DaycareTaskCategory) => {
-    const categoryClassNames: Record<DaycareTaskCategory, string> = {
-        תכנון: styles.categoryPlanning,
-        שיפוץ: styles.categoryRenovation,
-        בטיחות: styles.categorySafety,
-        אישורים: styles.categoryPermits,
-        "כוח אדם": styles.categoryStaff,
-        ציוד: styles.categoryEquipment,
-        שיווק: styles.categoryMarketing,
-        הרשמות: styles.categoryRegistration,
-    };
-
-    return categoryClassNames[category];
-};
 
 const sortTasksByStatus = (tasksToSort: DaycareTask[]) => {
     const priorityWeight: Record<DaycarePriority, number> = {
@@ -142,6 +126,8 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
     const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
     const [expandedTaskIds, setExpandedTaskIds] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [saving, setSaving] = useState(false);
     const taskTitleInputRef = useRef<HTMLInputElement | null>(null);
     const visibleTasks = sortTasksByStatus(
         tasks.filter((task) => {
@@ -204,6 +190,7 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
             })
             .catch((error) => {
                 console.error("Failed to load daycare tasks:", error);
+                if (active) setError("לא הצלחנו לטעון את המשימות. נסו לרענן את העמוד.");
             })
             .finally(() => {
                 if (active) setLoading(false);
@@ -214,24 +201,8 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
         };
     }, []);
 
-    useEffect(() => {
-        if (!showTaskForm) {
-            return;
-        }
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                setDraft(emptyTask);
-                setEditingId(null);
-                setShowTaskForm(false);
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [showTaskForm]);
-
     const resetDraft = () => {
+        setError("");
         setDraft(emptyTask);
         setEditingId(null);
         setShowTaskForm(false);
@@ -244,6 +215,7 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
     };
 
     const handleAddClick = () => {
+        setError("");
         setDraft(emptyTask);
         setEditingId(null);
         setShowTaskForm(true);
@@ -251,6 +223,7 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
     };
 
     const handleEdit = (task: DaycareTask) => {
+        setError("");
         setEditingId(task._id);
         setShowTaskForm(true);
         setDraft({
@@ -299,7 +272,7 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
     };
 
     const handleSave = async () => {
-        if (!draft.title.trim()) {
+        if (!draft.title.trim() || saving) {
             return;
         }
 
@@ -312,15 +285,23 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
             status: getStatusFromSubtasks(cleanSubtasks),
         };
 
-        if (editingId) {
-            await updateDaycareTask(editingId, taskToSave);
-        } else {
-            await createDaycareTask(taskToSave);
-        }
+        let saved = false;
+        setSaving(true);
+        setError("");
+        try {
+            if (editingId) {
+                await updateDaycareTask(editingId, taskToSave);
+            } else {
+                await createDaycareTask(taskToSave);
+            }
 
-        resetDraft();
-        await loadTasks();
-        onChanged();
+            saved = true;
+            resetDraft();
+            await loadTasks();
+            onChanged();
+        } catch {
+            setError(saved ? "המשימה נשמרה, אך לא הצלחנו לרענן את הרשימה. רעננו את העמוד." : "לא הצלחנו לשמור את המשימה. הטיוטה נשמרה בטופס; נסו שוב.");
+        } finally { setSaving(false); }
     };
 
     const handleSubtaskToggle = async (
@@ -334,6 +315,7 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
         }
 
         setUpdatingTaskId(task._id);
+        setError("");
         try {
             const updatedTask = await updateDaycareTaskSubtask(
                 task._id,
@@ -348,6 +330,8 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
                 )
             );
             onChanged();
+        } catch {
+            setError("לא הצלחנו לעדכן את הפריט. נסו שוב.");
         } finally {
             setUpdatingTaskId(null);
         }
@@ -360,6 +344,7 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
         updateScope: "all" | "finance" = "all"
     ) => {
         setUpdatingTaskId(task._id);
+        setError("");
         try {
             const updatedTask = await updateDaycareTaskSubtask(
                 task._id,
@@ -378,6 +363,8 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
             } else {
                 onChanged();
             }
+        } catch {
+            setError("לא הצלחנו לעדכן את הפריט. נסו שוב.");
         } finally {
             setUpdatingTaskId(null);
         }
@@ -412,9 +399,12 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
     };
 
     const handleDelete = async (id: string) => {
-        await deleteDaycareTask(id);
-        await loadTasks();
-        onChanged();
+        setError("");
+        try {
+            await deleteDaycareTask(id);
+            await loadTasks();
+            onChanged();
+        } catch { setError("לא הצלחנו למחוק את המשימה. נסו שוב."); }
     };
 
     const getFilterCount = (filter: CategoryFilter) => {
@@ -426,12 +416,12 @@ export const useDaycareTasks = ({ onChanged, onFinanceChanged }: DaycareTasksPro
 
     return {
         draft, editingId, selectedCategory, searchQuery, showTaskForm,
-        updatingTaskId, expandedTaskIds, loading, taskTitleInputRef, visibleTasks,
+        updatingTaskId, expandedTaskIds, loading, saving, error, taskTitleInputRef, visibleTasks,
         setDraft, setSelectedCategory, setSearchQuery, resetDraft, handleAddClick,
         handleEdit, updateDraftSubtaskTitle, addDraftSubtask, removeDraftSubtask,
         handleSave, handleSubtaskToggle, handleSubtaskUpdate,
         handleSubtaskCostSave, toggleTaskDetails, handleDelete, getFilterCount,
-        quickTaskFilters, getCategoryClassName, hasSubtasks,
+        quickTaskFilters, hasSubtasks,
         shouldShowProcurementFields, getSubtaskProgressLabel,
         daycarePriorities, daycareTaskCategories,
     };

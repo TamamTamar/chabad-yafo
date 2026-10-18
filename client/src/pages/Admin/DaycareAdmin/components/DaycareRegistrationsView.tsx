@@ -1,13 +1,21 @@
+import { AdminButton } from "../../../../components/AdminUI";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import AdminPageHeader from "../../../../components/AdminShell/AdminPageHeader";
-import { ChevronDown, NotebookPen } from "lucide-react";
+import { ChevronDown, NotebookPen, UsersRound, Search } from "lucide-react";
 import type { DaycareInterestStatus } from "../../../../types/daycareRegistration";
-import styles from "../DaycareAdmin.module.scss";
+import styles from "./DaycareRegistrations.styles";
 import type { useDaycareRegistrations } from "./useDaycareRegistrations";
 
 type DaycareRegistrationsViewProps = {
     openingSummary?: ReactNode;
     model: ReturnType<typeof useDaycareRegistrations>;
+};
+
+const statusTone = (status: DaycareInterestStatus) => {
+    if (status === "נרשם" || status === "רוצה להירשם") return "success";
+    if (status === "הגיע לראות") return "warning";
+    if (status === "לא רלוונטי") return "neutral";
+    return "info";
 };
 
 const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistrationsViewProps) => {
@@ -23,30 +31,63 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
         parseWorkflowDraft, familyMatchesPhone, familyOptionLabel, formatDate,
     } = model;
 
-    return (
-        <section className={styles.section} aria-labelledby="daycare-leads">
-            <AdminPageHeader id="daycare-leads" title="רישום למעון" description={loading ? "טוען פניות…" : `${rows.length} פניות · ${activeCasesCount} תיקי הצטרפות פתוחים · ${rows.filter((row) => row.status === "נרשם").length} רשומים`} />
+    const noteTriggers = useRef(new Map<string, HTMLButtonElement>());
+    const previousTreatmentKeys = useRef(expandedTreatmentKeys);
+    useEffect(() => {
+        for (const key of previousTreatmentKeys.current) {
+            if (!expandedTreatmentKeys.includes(key)) noteTriggers.current.get(key)?.focus();
+        }
+        for (const key of expandedTreatmentKeys) {
+            if (!previousTreatmentKeys.current.includes(key)) {
+                const panelId = noteTriggers.current.get(key)?.getAttribute("aria-controls");
+                if (panelId) document.getElementById(panelId)?.querySelector("textarea")?.focus();
+            }
+        }
+        previousTreatmentKeys.current = expandedTreatmentKeys;
+    }, [expandedTreatmentKeys]);
+    const toggleTreatment = (key: string, trigger: HTMLButtonElement) => {
+        noteTriggers.current.set(key, trigger);
+        setExpandedTreatmentKeys(keys => keys.includes(key) ? keys.filter(item => item !== key) : [...keys, key]);
+    };
 
-            {openingSummary}
+    const createDialog = useRef<HTMLDialogElement>(null);
+    useEffect(() => {
+        const dialog = createDialog.current;
+        if (!draft || !dialog) return;
+        const previousFocus = document.activeElement as HTMLElement | null;
+        dialog.showModal();
+        return () => { dialog.close(); previousFocus?.focus(); };
+    }, [draft]);
+
+    return (
+        <section className={styles.registrationDesign} aria-labelledby="admin-page-title">
             <div className={styles.registrationToolbar}>
                 <label className={styles.compactField}>
-                    <span>חיפוש משפחה</span>
+                    <span className={styles.fieldLabel}>חיפוש משפחה</span>
+                    <span className={styles.searchControl}>
+                        <Search data-input-icon aria-hidden="true" size={18} strokeWidth={1.6} />
                     <input
-                        className={styles.compactInput}
+
                         placeholder="שם הורה, ילד או טלפון"
                         type="search"
                         value={searchQuery}
                         onChange={(event) => setSearchQuery(event.target.value)}
                     />
+                    </span>
                 </label>
                 <label className={styles.compactField}>
-                    <span>סינון לפי סטטוס</span>
+                    <span className={styles.fieldLabel}>סינון לפי סטטוס</span>
                     <select className={styles.statusSelect} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as DaycareInterestStatus | "all")}>
                         <option value="all">כל הסטטוסים</option>
                         {daycareRegistrationStatuses.map((status) => <option key={status} value={status}>{status}</option>)}
                     </select>
                 </label>
-                <span className={styles.registrationResultCount}>{filteredRows.length} תוצאות</span>
+                <span className={styles.registrationResultCount} role="status" aria-live="polite">{filteredRows.length} תוצאות</span>
+            </div>
+
+            <div className={styles.registrationMeta}>
+                <p className={styles.registrationCounts}>{loading ? "טוען פניות…" : `${rows.length} פניות · ${activeCasesCount} תיקי הצטרפות פתוחים · ${rows.filter(row => row.status === "נרשם").length} רשומים`}</p>
+                {openingSummary}
             </div>
 
             <details className={styles.workflowHelp}>
@@ -77,17 +118,19 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                 <div className={styles.emptyState}>לא נמצאו פניות שמתאימות לחיפוש.</div>
             ) : (
                 <>
-                <div className={styles.registrationDesktopTable}>
+                <div className={styles.registrationDesktopTable} role="region" aria-label="רשימת פניות לרישום למעון" tabIndex={0}>
                     <table className={styles.tableCompact}>
+                        <caption className={styles.srOnly}>פניות לרישום למעון ופעולות טיפול</caption>
+                        <colgroup>{["19%", "10%", "13%", "16%", "16%", "18%", "8%"].map((width, index) => <col key={index} style={{ width }} />)}</colgroup>
                         <thead>
                             <tr>
-                                <th className={styles.tableHeader}>שם הורה</th>
-                                <th className={styles.tableHeader}>טלפון</th>
-                                <th className={styles.tableHeader}>ילד/ה</th>
-                                <th className={styles.tableHeader}>סטטוס</th>
-                                <th className={styles.tableHeader}>הערה</th>
-                                <th className={styles.tableHeader}>תיק הצטרפות</th>
-                                <th className={styles.tableHeader}>תאריך פנייה</th>
+                                <th scope="col" className={styles.tableHeader}>שם הורה</th>
+                                <th scope="col" className={styles.tableHeader}>טלפון</th>
+                                <th scope="col" className={styles.tableHeader}>ילד/ה</th>
+                                <th scope="col" className={styles.tableHeader}>סטטוס</th>
+                                <th scope="col" className={styles.tableHeader}>הערה</th>
+                                <th scope="col" className={styles.tableHeader}>תיק ופעולות</th>
+                                <th scope="col" className={styles.tableHeader}>תאריך פנייה</th>
                             </tr>
                         </thead>
                         {filteredRows.map((row) => {
@@ -101,10 +144,10 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                 expandedTreatmentKeys.includes(row.key);
 
                             return (
-                                <tbody className={styles.registrationDesktopRowGroup} key={row.key}>
-                                    <tr className={styles.tableRow}>
+                                <tbody key={row.key}>
+                                    <tr>
                                         <td className={styles.tableCell}>
-                                            {row.parentName}
+                                            <div className={styles.familyIdentity}><span className={styles.familyIcon} aria-hidden="true"><UsersRound size={16} /></span><span className={styles.familyName} title={row.parentName}>{row.parentName}</span></div>
                                         </td>
                                         <td className={styles.tableCell}>
                                             <span className={styles.registrationDesktopPhone}>
@@ -113,7 +156,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                         </td>
                                         <td className={styles.tableCell}>
                                             <div className={styles.registrationDesktopChild}>
-                                                <span className={styles.registrationDesktopChildName}>
+                                                <span title={row.childName || "שם טרם נמסר"}>
                                                     {row.childName || "שם טרם נמסר"}
                                                 </span>
                                                 <span className={styles.registrationDesktopChildAge}>
@@ -122,11 +165,13 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                             </div>
                                         </td>
                                         <td className={styles.tableCell}>
+                                            <div className={styles.statusControl} data-tone={statusTone(row.status)}>
                                             <select
                                                 aria-label={`סטטוס רישום עבור ${row.parentName}`}
                                                 className={styles.statusSelect}
                                                 value={row.status}
                                                 disabled={updatingKey === row.key}
+                                                aria-busy={updatingKey === row.key}
                                                 onChange={(event) =>
                                                     void handleStatusChange(
                                                         row,
@@ -140,67 +185,59 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                                     </option>
                                                 ))}
                                             </select>
-                                            {nextStatus ? (
-                                                <button
-                                                    className={styles.nextStatusButton}
-                                                    type="button"
-                                                    disabled={updatingKey === row.key}
-                                                    onClick={() =>
-                                                        void handleStatusChange(row, nextStatus)
-                                                    }
-                                                >
-                                                    הבא: {nextStatus}
-                                                </button>
-                                            ) : null}
+                                            </div>
                                         </td>
                                         <td className={styles.tableCell}>
-                                            <button
-                                                className={styles.callSummaryToggle}
-                                                type="button"
-                                                aria-expanded={isTreatmentExpanded}
-                                                onClick={() =>
-                                                    setExpandedTreatmentKeys((keys) =>
-                                                        keys.includes(row.key)
-                                                            ? keys.filter((key) => key !== row.key)
-                                                            : [...keys, row.key]
-                                                    )
-                                                }
-                                            >
-                                                {isTreatmentExpanded ? "סגירה" : "הערה"}
-                                            </button>
+                                            <div className={styles.noteCellContent}>
                                             {!isTreatmentExpanded && workflowDraft.note ? (
                                                 <p className={styles.callSummaryPreview}>
                                                     {workflowDraft.note}
                                                 </p>
                                             ) : null}
+                                            <button
+                                                className={styles.callSummaryToggle}
+                                                type="button"
+                                                title={isTreatmentExpanded ? "סגירת הערה" : workflowDraft.note ? "צפייה ועריכה" : "הוספת הערה"}
+                                                aria-expanded={isTreatmentExpanded}
+                                                aria-controls={`${row.key}-note-desktop`}
+                                                onClick={event => toggleTreatment(row.key, event.currentTarget)}
+                                            >
+                                                <NotebookPen size={16} aria-hidden="true" /><span className={styles.srOnly}>{isTreatmentExpanded ? "סגירת הערה" : workflowDraft.note ? "צפייה ועריכה" : "הוספת הערה"}</span>
+                                            </button>
+                                            </div>
                                         </td>
                                         <td className={styles.tableCell}>
                                             {summary ? (
                                                 <div className={styles.onboardingSummary}>
-                                                    <span className={styles.onboardingStatusLine}>
+                                                    <span className={styles.onboardingStatusLine} title={onboardingOverallStatusLabels[summary.overallStatus]}>
                                                         {onboardingOverallStatusLabels[summary.overallStatus]}
                                                     </span>
-                                                    <span className={styles.registrationOnboardingMeta}>
-                                                        {summary.progress.percentage}% הושלם · {summary.schoolYear}
+                                                    <span className={styles.registrationOnboardingMeta} title={`${summary.progress.percentage}% הושלם · ${summary.schoolYear}`}>
+                                                        {summary.progress.percentage}% · {summary.schoolYear}
                                                     </span>
-                                                    <button
-                                                        className={styles.primaryButton}
+                                                    <AdminButton
+                                                        className={styles.secondaryButton}
                                                         type="button"
                                                         onClick={() =>
                                                             navigate(`/admin/daycare-onboarding/${summary.id}`)
                                                         }
                                                     >
                                                         פתיחת התיק
-                                                    </button>
+                                                    </AdminButton>
                                                 </div>
                                             ) : canCreate ? (
-                                                <button
+                                                <AdminButton variant="primary"
                                                     className={styles.primaryButton}
                                                     type="button"
                                                     onClick={() => openCreateDialog(row)}
                                                 >
                                                     פתיחת תיק
-                                                </button>
+                                                </AdminButton>
+                                            ) : nextStatus ? (
+                                                <div>
+                                                    <AdminButton className={styles.secondaryButton} type="button" disabled={updatingKey === row.key} aria-busy={updatingKey === row.key} onClick={() => void handleStatusChange(row, nextStatus)}>הבא: {nextStatus}</AdminButton>
+                                                    <span className={styles.srOnly}>תיק הצטרפות זמין לאחר החלטה להתקדם</span>
+                                                </div>
                                             ) : (
                                                 <span className={styles.onboardingUnavailable}>
                                                     זמין לאחר החלטה להתקדם
@@ -212,11 +249,12 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                         </td>
                                     </tr>
                                     {isTreatmentExpanded ? (
-                                        <tr className={styles.registrationDesktopTreatmentRow}>
+                                        <tr>
                                             <td className={styles.registrationDesktopTreatmentCell} colSpan={7}>
                                                 {renderTreatmentPanel(
                                                     row,
-                                                    `${styles.registrationTreatmentPanel} ${styles.registrationDesktopTreatmentPanel}`
+                                                    `${styles.registrationTreatmentPanel} ${styles.registrationDesktopTreatmentPanel}`,
+                                                    `${row.key}-note-desktop`
                                                 )}
                                             </td>
                                         </tr>
@@ -252,56 +290,24 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                             <span className={styles.registrationChildAge}>
                                                 {row.childAge || "גיל טרם נמסר"}
                                             </span>
+                                            <span className={styles.registrationPhone} dir="ltr">{row.phone}</span>
                                         </div>
                                     </div>
 
                                     <div className={styles.registrationMobileMeta}>
-                                        <span className={styles.registrationMobileStatus}>
+                                        <span className={styles.registrationMobileStatus} data-tone={statusTone(row.status)}>
                                             {row.status}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div
-                                    className={styles.registrationQuickActions}
-                                    aria-label={`פעולות מהירות עבור ${row.parentName}`}
-                                >
-                                    <button
-                                        className={styles.registrationQuickButton}
-                                        type="button"
-                                        aria-expanded={isTreatmentExpanded}
-                                        onClick={() =>
-                                            setExpandedTreatmentKeys((keys) =>
-                                                keys.includes(row.key)
-                                                    ? keys.filter(
-                                                        (key) => key !== row.key
-                                                    )
-                                                    : [...keys, row.key]
-                                            )
-                                        }
-                                    >
-                                        <NotebookPen
-                                            aria-hidden="true"
-                                            className={styles.registrationQuickIcon}
-                                            size={18}
-                                        />
-                                        הוספת הערה
+                                <div className={styles.registrationQuickActions} aria-label={`פעולות עבור ${row.parentName}`}>
+                                    {summary ? <AdminButton className={styles.secondaryButton} type="button" onClick={() => navigate(`/admin/daycare-onboarding/${summary.id}`)}>פתיחת התיק</AdminButton>
+                                        : canCreate ? <AdminButton variant="primary" className={styles.primaryButton} type="button" onClick={() => openCreateDialog(row)}>פתיחת תיק</AdminButton>
+                                        : nextStatusByStatus[row.status] ? <AdminButton className={styles.secondaryButton} type="button" disabled={updatingKey === row.key} aria-busy={updatingKey === row.key} onClick={() => void handleStatusChange(row, nextStatusByStatus[row.status]!)}>הבא: {nextStatusByStatus[row.status]}</AdminButton> : null}
+                                    <button className={styles.registrationQuickButton} title={workflowDraft.note ? "עריכת הערה" : "הוספת הערה"} type="button" aria-expanded={isTreatmentExpanded} aria-controls={`${row.key}-note-mobile`} onClick={event => toggleTreatment(row.key, event.currentTarget)}>
+                                        <NotebookPen aria-hidden="true" size={16} /><span className={styles.actionLabel}>{workflowDraft.note ? "עריכת הערה" : "הוספת הערה"}</span>
                                     </button>
-                                    {!summary && canCreate ? (
-                                        <button
-                                            className={styles.primaryButton}
-                                            type="button"
-                                            onClick={() => openCreateDialog(row)}
-                                        >
-                                            פתיחת תיק הצטרפות
-                                        </button>
-                                    ) : null}
-                                </div>
-
-                                {isTreatmentExpanded
-                                    ? renderTreatmentPanel(row)
-                                    : null}
-
                                 <button
                                     className={styles.registrationDetailsToggle}
                                     type="button"
@@ -330,8 +336,14 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                     />
                                 </button>
 
+                                </div>
+                                {isTreatmentExpanded
+                                    ? renderTreatmentPanel(row, undefined, `${row.key}-note-mobile`)
+                                    : null}
+
                                 {isDetailsExpanded ? (
                                     <div className={styles.registrationDetails}>
+                                        <label className={styles.compactField}><span>סטטוס רישום</span><select value={row.status} disabled={updatingKey === row.key} aria-busy={updatingKey === row.key} onChange={event => void handleStatusChange(row, event.target.value as DaycareInterestStatus)}>{daycareRegistrationStatuses.map(status => <option key={status}>{status}</option>)}</select></label>
                                         <dl className={styles.registrationDetailsGrid}>
                                             <div className={styles.registrationDetailItem}>
                                                 <dt
@@ -400,7 +412,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                         </dl>
 
                                         {workflowDraft.note ? (
-                                            <div className={styles.registrationSavedNote}>
+                                            <div>
                                                 <span
                                                     className={
                                                         styles.registrationSavedNoteLabel
@@ -449,17 +461,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                                         {summary.missingStepTitle ??
                                                             "התיק הושלם"}
                                                     </strong>
-                                                    <button
-                                                        className={styles.primaryButton}
-                                                        type="button"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/admin/daycare-onboarding/${summary.id}`
-                                                            )
-                                                        }
-                                                    >
-                                                        פתיחת התיק
-                                                    </button>
+
                                                 </div>
                                             ) : !canCreate ? (
                                                 <span
@@ -482,12 +484,10 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
             )}
 
             {draft ? (
-                <div className={styles.modalBackdrop} role="presentation">
+                <dialog ref={createDialog} className={styles.modalBackdrop} aria-labelledby="create-onboarding-title" onCancel={() => setDraft(null)}>
                     <section
                         aria-labelledby="create-onboarding-title"
-                        aria-modal="true"
                         className={styles.onboardingModal}
-                        role="dialog"
                     >
                         <div className={styles.modalHeader}>
                             <div>
@@ -510,7 +510,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                             <label className={styles.compactField}>
                                 <span>שם ההורה</span>
                                 <input
-                                    className={styles.compactInput}
+
                                     readOnly
                                     value={draft.parentName}
                                 />
@@ -518,7 +518,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                             <label className={styles.compactField}>
                                 <span>טלפון</span>
                                 <input
-                                    className={styles.compactInput}
+
                                     readOnly
                                     value={draft.phone}
                                 />
@@ -526,7 +526,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                             <label className={styles.compactField}>
                                 <span>גיל הילד/ה כפי שנמסר</span>
                                 <input
-                                    className={styles.compactInput}
+
                                     readOnly
                                     value={draft.childAge || "לא צוין"}
                                 />
@@ -534,7 +534,9 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                             <label className={styles.compactField}>
                                 <span>שנת לימודים</span>
                                 <input
-                                    className={styles.compactInput}
+
+                                    aria-invalid={Boolean(createFormErrors.schoolYear)}
+                                    aria-describedby={createFormErrors.schoolYear ? "school-year-error" : undefined}
                                     pattern="[0-9]{4}-[0-9]{4}"
                                     placeholder="2026-2027"
                                     {...register("schoolYear", {
@@ -542,19 +544,19 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                         pattern: { value: /^[0-9]{4}-[0-9]{4}$/, message: "יש להזין שנה בפורמט 2026-2027" },
                                     })}
                                 />
-                                {createFormErrors.schoolYear ? <span className={styles.formErrorMessage}>{createFormErrors.schoolYear.message}</span> : null}
+                                {createFormErrors.schoolYear ? <span id="school-year-error" role="alert" className={styles.formErrorMessage}>{createFormErrors.schoolYear.message}</span> : null}
                             </label>
                             <label className={styles.compactField}>
                                 <span>הערה פנימית - אופציונלית</span>
                                 <textarea
-                                    className={styles.compactTextarea}
+
                                     maxLength={2000}
                                     {...register("internalNote")}
                                 />
                             </label>
                             <label className={styles.compactField}>
                                 <span>קישור למשפחה קיימת - אם זה אח/ות</span>
-                                <select className={styles.compactInput} {...register("existingFamilyId")}>
+                                <select {...register("existingFamilyId")}>
                                     <option value="">ילד/ה ראשון/ה במשפחה</option>
                                     {[...families]
                                         .sort((left, right) => Number(familyMatchesPhone(right, draft.phone)) - Number(familyMatchesPhone(left, draft.phone)))
@@ -575,26 +577,27 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                 </p>
                             ) : null}
                             <div className={styles.modalActions}>
-                                <button
+                                <AdminButton
                                     className={styles.secondaryButton}
                                     type="button"
                                     onClick={() => setDraft(null)}
                                 >
                                     ביטול
-                                </button>
-                                <button
+                                </AdminButton>
+                                <AdminButton variant="primary"
                                     className={styles.primaryButton}
+                                    aria-busy={creating}
                                     disabled={creating}
                                     type="submit"
                                 >
                                     {creating
                                         ? "יוצר תיק וקישור..."
                                         : "יצירת תיק וקישור להורה"}
-                                </button>
+                                </AdminButton>
                             </div>
                         </form>
                     </section>
-                </div>
+                </dialog>
             ) : null}
         </section>
     );

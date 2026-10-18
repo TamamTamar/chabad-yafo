@@ -1,0 +1,27 @@
+@use '../../styles/admin-controls' as controls;
+@use '../../styles/admin-patterns' as patterns;
+@use '../../styles/admin-tokens' as tokens;
+.scope { @include tokens.properties; @include tokens.modernDark; font-family: 'Assistant Admin', 'Assistant', sans-serif; color: var(--admin-text); font-size: var(--admin-body-size); }
+
+.primary { @include controls.button(primary); }
+.secondary { @include controls.button; }
+.navigation { @include controls.button(navigation); }
+.danger { @include controls.button(navigation); color: var(--admin-error); &:hover:not(:disabled) { color: var(--admin-error); } }
+.fields { @include controls.fields($refined: true); }
+.surface { @include patterns.surface; }
+.badge { @include patterns.semanticStatus; }
+// A scope lets native controls keep their semantics, refs and event contracts.
+.controlScope { display: contents; }
+.card { padding: var(--admin-space-4); }
+.tableViewport { max-inline-size: 100%; overflow: auto; }
+.table {
+    inline-size: 100%; min-inline-size: var(--admin-table-min-width); border-collapse: collapse; text-align: start;
+    color: var(--admin-text); background: var(--admin-surface); font: inherit;
+    th, td { padding: var(--admin-row-padding) var(--admin-space-3); border-bottom: 1px solid var(--admin-divider); text-align: start; }
+    th { color: var(--admin-muted); font-weight: var(--admin-label-weight); background: var(--admin-subtle); }
+}
+.stat { @include patterns.tone; padding: var(--admin-space-2) var(--admin-space-3); min-block-size: var(--admin-stat-min-height); display: flex; flex-direction: column; justify-content: center; gap: var(--admin-space-1); }
+.statLabel { color: var(--admin-muted); font-size: var(--admin-caption-size); }
+.statValue { font-size: var(--admin-metric-size); font-weight: var(--admin-heading-weight); overflow-wrap: anywhere; }
+
+.link { text-decoration: none; }

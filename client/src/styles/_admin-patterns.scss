@@ -1,0 +1,88 @@
+// Small opt-in layout patterns. No emitted selectors or changes to other screens.
+@mixin status {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--admin-space-1) var(--admin-space-2);
+    border-radius: var(--admin-radius);
+    background: var(--admin-subtle);
+    color: var(--admin-muted);
+    font-size: var(--admin-small-size);
+    font-weight: var(--admin-label-weight);
+    line-height: 1.3;
+}
+@mixin toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 220px) auto;
+    align-items: end;
+    gap: var(--admin-space-3);
+    @media (max-width: 600px) {
+        grid-template-columns: minmax(0, 1fr) auto;
+        > label:first-child { grid-column: 1 / -1; }
+    }
+}
+@mixin record {
+    min-width: 0;
+    padding-block: var(--admin-space-3);
+    border-bottom: 1px solid var(--admin-divider);
+    overflow-wrap: anywhere;
+}
+@mixin actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--admin-space-1) var(--admin-space-2);
+}
+@mixin metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--admin-space-3) var(--admin-space-6);
+    margin: 0;
+    @media (max-width: 600px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    > div { min-width: 0; }
+    dt { font-size: var(--admin-small-size); color: var(--admin-muted); }
+    dd { margin: var(--admin-space-1) 0 0; color: var(--admin-text); font-size: 20px; font-weight: var(--admin-heading-weight); line-height: 1.3; overflow-wrap: anywhere; }
+}
+
+// Semantic colour is always accompanied by a text label.
+@mixin tone {
+    &[data-tone='info'] { --admin-status-bg: var(--admin-info-bg); --admin-status-text: var(--admin-info-text); }
+    &[data-tone='success'] { --admin-status-bg: var(--admin-success-bg); --admin-status-text: var(--admin-success-text); }
+    &[data-tone='warning'] { --admin-status-bg: var(--admin-warning-bg); --admin-status-text: var(--admin-warning-text); }
+    &[data-tone='neutral'] { --admin-status-bg: var(--admin-subtle); --admin-status-text: var(--admin-muted); }
+}
+
+@mixin clamp($lines: 2) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+@mixin visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+// Opt-in working surface and semantic badges, shared by task list and readiness.
+@mixin surface {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-divider);
+    border-radius: var(--admin-radius);
+    box-shadow: none;
+    min-width: 0;
+}
+@mixin semanticStatus {
+    @include status;
+    @include tone;
+    background: var(--admin-status-bg, var(--admin-subtle));
+    color: var(--admin-status-text, var(--admin-muted));
+    font-size: var(--admin-caption-size);
+    white-space: nowrap;
+}

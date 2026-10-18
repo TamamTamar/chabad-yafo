@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
+import { AdminCard, AdminBadge, AdminButton, AdminInput, AdminSelect, AdminTextarea, AdminConfirmDialog as ConfirmDialog } from "../../../../components/AdminUI";
 import {
     createAdminAgreementDraft,
     downloadAdminAgreementReviewPdf,
@@ -13,7 +13,7 @@ import type {
     DaycareDocumentBlock,
     DaycareStructuredDocument,
 } from "../../../../types/daycareAgreement";
-import styles from "./DaycareAgreements.module.scss";
+import styles from "../../../../components/AdminUI/AdminEditor.module.scss";
 
 const emptyDocument = (): DaycareStructuredDocument => ({
     format: "structured-v1",
@@ -232,11 +232,12 @@ const DaycareAgreements = () => {
     };
 
     return (
-        <section className={styles.section} aria-labelledby="agreements-title">
+        <AdminCard role="region" className={styles.section} aria-labelledby="agreements-title">
             <div className={styles.header}>
                 <div>
                     <span className={styles.eyebrow}>מסמכי הרשמה</span>
                     <h2 id="agreements-title" className={styles.title}>הסכם התקשרות</h2>
+                    {selected && <AdminBadge tone={isEditable ? "warning" : selected.status === "published" ? "success" : "neutral"}>{isEditable ? "טיוטה" : selected.status === "published" ? "פורסם · נעול לעריכה" : "ארכיון"}</AdminBadge>}
                     <p className={styles.intro}>לכל שנת לימודים יש הסכם אחד: עורכים אותו כטיוטה, מפרסמים פעם אחת, ולאחר מכן הוא ננעל.</p>
                 </div>
             </div>
@@ -244,38 +245,38 @@ const DaycareAgreements = () => {
             {versions.length ? (
                 <label className={styles.label}>
                     גרסה קיימת
-                    <select className={styles.input} value={selectedId} onChange={(event) => selectVersion(event.target.value)}>
+                    <AdminSelect value={selectedId} onChange={(event) => selectVersion(event.target.value)}>
                         {versions.map((item) => (
                             <option key={item.id} value={item.id}>
                                 {item.schoolYear} · {item.version} · {item.status === "draft" ? "טיוטה" : item.status === "published" ? "פורסם" : "ארכיון"}
                             </option>
                         ))}
-                    </select>
+                    </AdminSelect>
                 </label>
             ) : null}
 
             <div className={styles.metaGrid}>
                 <label className={styles.label}>
                     שנת לימודים
-                    <input className={styles.input} value={schoolYear} disabled />
+                    <AdminInput value={schoolYear} disabled />
                 </label>
                 <label className={styles.label}>
                     מזהה גרסה
-                    <input className={styles.input} value={version} disabled />
+                    <AdminInput value={version} disabled />
                 </label>
             </div>
 
             <label className={styles.label}>
                 כותרת
-                <input className={styles.input} value={document.title} disabled={!isEditable} onChange={(event) => setDocument((current) => ({ ...current, title: event.target.value }))} />
+                <AdminInput value={document.title} disabled={!isEditable} onChange={(event) => setDocument((current) => ({ ...current, title: event.target.value }))} />
             </label>
             <label className={styles.label}>
                 כותרת משנה
-                <input className={styles.input} value={document.subtitle ?? ""} disabled={!isEditable} onChange={(event) => setDocument((current) => ({ ...current, subtitle: event.target.value }))} />
+                <AdminInput value={document.subtitle ?? ""} disabled={!isEditable} onChange={(event) => setDocument((current) => ({ ...current, subtitle: event.target.value }))} />
             </label>
             <label className={styles.label}>
                 נוסח ההסכם
-                <textarea
+                <AdminTextarea
                     className={styles.textarea}
                     value={agreementText}
                     disabled={!isEditable}
@@ -288,7 +289,7 @@ const DaycareAgreements = () => {
 
             <div className={styles.feedback} aria-live="polite">
                 {notice ? <p className={styles.success}>{notice}</p> : null}
-                {error ? <p className={styles.error}>{error}</p> : null}
+                {error ? <p role="alert" className={styles.error}>{error}</p> : null}
             </div>
             {isEditable ? (
                 <label className={styles.confirmLabel}>
@@ -298,17 +299,17 @@ const DaycareAgreements = () => {
             ) : null}
             <div className={styles.actions}>
                 {nextAgreement ? (
-                    <button className={styles.secondaryButton} type="button" disabled={isBusy} onClick={() => setCreateConfirmationOpen(true)}>
+                    <AdminButton variant="secondary" type="button" disabled={isBusy} onClick={() => setCreateConfirmationOpen(true)}>
                         יצירת הסכם לשנה חדשה
-                    </button>
+                    </AdminButton>
                 ) : null}
-                <button className={styles.secondaryButton} type="button" disabled={isBusy || !selected || (isEditable && !valid)} onClick={() => void downloadReviewCopy()}>
+                <AdminButton variant="secondary" type="button" disabled={isBusy || !selected || (isEditable && !valid)} onClick={() => void downloadReviewCopy()}>
                     {isBusy ? "מפיק..." : "הפקת עותק לעיון"}
-                </button>
+                </AdminButton>
                 {isEditable ? (
-                    <button className={styles.publishButton} type="button" disabled={isBusy || !legalReviewConfirmed || !valid || !version || !schoolYear} onClick={() => setPublishConfirmationOpen(true)}>
+                    <AdminButton variant="primary" type="button" disabled={isBusy || !legalReviewConfirmed || !valid || !version || !schoolYear} onClick={() => setPublishConfirmationOpen(true)}>
                         {isBusy ? "מפרסם..." : "אישור ופרסום להורים"}
-                    </button>
+                    </AdminButton>
                 ) : null}
             </div>
 
@@ -331,7 +332,7 @@ const DaycareAgreements = () => {
                 onConfirm={() => void createNextYearAgreement()}
                 onClose={() => setCreateConfirmationOpen(false)}
             />
-        </section>
+        </AdminCard>
     );
 };
 

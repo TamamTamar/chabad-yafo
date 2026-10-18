@@ -1,12 +1,5 @@
+@use "../../../../styles/admin-controls" as controls;
 @use "../../../../styles/variables" as *;
-
-.panel {
-    padding: 24px;
-    border: 1px solid $ui-border-soft;
-    border-radius: $radius-lg;
-    background: $brand-bg;
-    box-shadow: 0 16px 38px $ui-shadow-blue-soft;
-}
 
 .header {
     display: flex;
@@ -14,19 +7,11 @@
     justify-content: space-between;
     gap: 18px;
 
-    h2 { margin: 0 0 6px; color: $brand-blue-ink; }
-    p { margin: 0; color: $ui-text-muted; }
+    h2 { margin: 0 0 6px; color: var(--admin-text); }
+    p { margin: 0; color: var(--admin-muted); }
     > button {
-        padding: 10px 16px;
-        border: 0;
-        border-radius: $radius-pill;
-        background: $brand-primary;
-        color: $color-white;
-        font: inherit;
-        font-weight: 900;
-        cursor: pointer;
-        white-space: nowrap;
-    }
+    white-space: nowrap;
+}
 }
 
 .success,
@@ -40,7 +25,7 @@
 
 .success { background: $ui-success-soft; color: $ui-success; }
 .error { background: rgba($ui-danger, 0.09); color: $ui-danger; }
-.empty { background: $brand-surface-cool; color: $ui-text-muted; }
+.empty { background: var(--admin-subtle); color: var(--admin-muted); }
 
 .addForm {
     display: grid;
@@ -50,12 +35,12 @@
     margin-top: 20px;
     padding: 16px;
     border-radius: 14px;
-    background: $brand-surface-cool;
+    background: var(--admin-subtle);
 
-    label { display: grid; gap: 7px; color: $brand-blue-ink; font-weight: 900; }
-    input { min-height: 43px; padding: 8px 11px; border: 1px solid $ui-border-soft; border-radius: 11px; font: inherit; }
-    button { min-height: 43px; padding: 8px 16px; border: 0; border-radius: 11px; background: $brand-primary; color: $color-white; font: inherit; font-weight: 900; }
-    textarea { min-height: 70px; padding: 8px 11px; border: 1px solid $ui-border-soft; border-radius: 11px; font: inherit; resize: vertical; }
+    label { @include controls.field-label;  display: grid; gap: 7px;    }
+    textarea {
+    resize: vertical;
+}
 }
 
 .fieldError {
@@ -72,19 +57,16 @@
 }
 
 .wideField { grid-column: 1 / -1; }
-.linkPreview { direction: ltr; color: $ui-text-muted; font-weight: 600; overflow-wrap: anywhere; }
+.linkPreview { direction: ltr; color: var(--admin-muted); font-weight: 600; overflow-wrap: anywhere; }
 .slugSuggestion { color: $brand-primary; font-weight: 800; }
 
 .tableWrap { margin-top: 20px; overflow-x: auto; }
 .table { width: 100%; border-collapse: collapse; }
 .table th,
-.table td { padding: 11px 9px; border-bottom: 1px solid $ui-border-soft; color: $brand-blue-ink; text-align: right; white-space: nowrap; }
-.table th { color: $ui-text-muted; font-size: $type-caption; }
+.table td { padding: 11px 9px; border-bottom: 1px solid $ui-border-soft; color: var(--admin-text); text-align: right; white-space: nowrap; }
+.table th { color: var(--admin-muted); font-size: $type-caption; }
 
-.active,
-.inactive { display: inline-block; padding: 5px 9px; border-radius: $radius-pill; font-size: $type-caption; font-weight: 900; }
-.active { background: $ui-success-soft; color: $ui-success; }
-.inactive { background: $ui-surface-muted; color: $ui-text-muted; }
+
 
 .progressCell {
     display: grid;
@@ -132,16 +114,13 @@
 }
 
 .noGoal {
-    color: $ui-text-muted;
+    color: var(--admin-muted);
     font-size: $type-caption;
 }
 
-.nameButton { border: 0; background: transparent; color: $brand-primary; font: inherit; font-weight: 900; cursor: pointer; }
-.linkInput { width: min(310px, 30vw); min-width: 220px; padding: 8px 10px; border: 1px solid $ui-border-soft; border-radius: 9px; background: $brand-surface-cool; font: inherit; }
+.nameButton {  }
+.linkInput { width: min(310px, 30vw); min-width: 220px; }
 .actions { display: flex; gap: 6px; }
-.actions button,
-.renameForm button { padding: 7px 10px; border: 1px solid rgba($brand-primary, 0.2); border-radius: 9px; background: $color-white; color: $brand-primary; font: inherit; font-size: $type-caption; font-weight: 900; cursor: pointer; }
-.actions button:disabled { opacity: 0.55; }
 .actions .deleteAction { border-color: rgba($ui-danger, 0.25); color: $ui-danger; }
 .actions button {
     display: inline-flex;
@@ -156,37 +135,46 @@
 
 .renameForm { display: flex; align-items: flex-start; gap: 6px; }
 .editField { display: grid; gap: 3px; }
-.renameForm input { width: 110px; min-width: 110px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; }
-.renameForm > .editField:first-child input { width: 150px; min-width: 150px; }
-.renameForm textarea { min-width: 180px; padding: 7px 9px; border: 1px solid $ui-border-soft; border-radius: 9px; font: inherit; resize: vertical; }
-.renameForm > button { margin-top: 0; }
+.renameForm input {
+    width: 110px;
+    min-width: 110px;
+}
+.renameForm > .editField:first-child input {
+    width: 150px;
+    min-width: 150px;
+}
+.renameForm textarea {
+    min-width: 180px;
+    resize: vertical;
+}
+.renameForm > button {
+    margin-top: 0;
+}
 
-.details { padding: 16px !important; background: $brand-surface-cool; white-space: normal !important; }
+.details { padding: 16px !important; background: var(--admin-subtle); white-space: normal !important; }
 .details > strong,
 .details > span { display: block; }
-.details > span { margin-top: 8px; color: $ui-text-muted; }
+.details > span { margin-top: 8px; color: var(--admin-muted); }
 .details ul { display: grid; gap: 7px; margin: 12px 0 0; padding: 0; list-style: none; }
 .details li { display: grid; grid-template-columns: minmax(0, 1fr) auto 90px; gap: 12px; padding: 9px 11px; border-radius: 9px; background: $color-white; }
-.details small { color: $ui-text-muted; }
-.internalMeta { display: grid; gap: 4px; margin-top: 8px; color: $ui-text-muted; font-size: $type-caption; }
+.details small { color: var(--admin-muted); }
+.internalMeta { display: grid; gap: 4px; margin-top: 8px; color: var(--admin-muted); font-size: $type-caption; }
 
 @media (max-width: 600px) {
     .panel {
-        width: 100%;
-        min-width: 0;
-        max-width: 100%;
-        padding: 18px;
-    }
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 18px;
+}
     .header {
         flex-direction: column;
         gap: 14px;
     }
 
     .header > button {
-        width: 100%;
-        min-height: 44px;
-        padding-block: 8px;
-    }
+    width: 100%;
+}
     .addForm { grid-template-columns: 1fr; }
     .wideField { grid-column: auto; }
 
@@ -217,7 +205,7 @@
         padding: 14px;
         border: 1px solid $ui-border-soft;
         border-radius: 13px;
-        background: $brand-bg;
+        background: var(--admin-surface);
         box-shadow: 0 9px 22px rgba($brand-primary, 0.06);
     }
 
@@ -231,13 +219,13 @@
         padding: 10px;
         border: 0;
         border-radius: 10px;
-        background: $brand-surface-cool;
+        background: var(--admin-subtle);
         white-space: normal;
     }
 
     .ambassadorRow td::before {
         content: attr(data-label);
-        color: $ui-text-muted;
+        color: var(--admin-muted);
         font-size: 0.72rem;
         font-weight: 900;
         line-height: 1.2;
@@ -247,33 +235,21 @@
     .ambassadorRow td[data-label="לינק אישי"],
     .ambassadorRow td[data-label="פעולות"] {
         grid-column: 1 / -1;
-    }
+     }
 
     .ambassadorRow td[data-label="פעולות"] {
         padding: 0;
         background: transparent;
-    }
+     }
 
     .ambassadorRowEditing td:first-child {
         grid-column: 1 / -1;
     }
 
-    .nameButton {
-        padding: 0;
-        text-align: right;
-    }
-
-    .active,
-    .inactive {
-        justify-self: start;
-    }
+    .nameButton { text-align: right; }
 
     .progressCell,
-    .linkInput {
-        width: 100%;
-        min-width: 0;
-        max-width: 100%;
-    }
+    .linkInput { width: 100%; min-width: 0; max-width: 100%; }
 
     .progressSummary {
         align-items: center;
@@ -292,10 +268,8 @@
     }
 
     .actions button {
-        min-width: 0;
-        min-height: 40px;
-        padding-inline: 5px;
-    }
+    min-width: 0;
+}
 
     .actionIcon {
         display: block;
@@ -314,9 +288,9 @@
     .renameForm input,
     .renameForm > .editField:first-child input,
     .renameForm textarea {
-        width: 100%;
-        min-width: 0;
-    }
+    width: 100%;
+    min-width: 0;
+}
 
     .detailsRow {
         display: block;
@@ -337,3 +311,10 @@
         gap: 4px;
     }
 }
+
+h2 { font-size: var(--admin-body-size); }
+
+.table { min-inline-size: 0; }
+@media(max-width:600px) { .actions button { min-height: 44px; } }
+.header, .actions { flex-wrap: wrap; }
+.internalMeta, .details { overflow-wrap: anywhere; white-space: pre-wrap; }

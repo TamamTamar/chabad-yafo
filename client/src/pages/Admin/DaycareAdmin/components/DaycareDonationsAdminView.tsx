@@ -1,5 +1,6 @@
-import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
-import ReasonDialog from "../../../../components/ReasonDialog/ReasonDialog";
+import { AdminButton, AdminSelect, AdminLink, AdminCard, AdminBadge } from "../../../../components/AdminUI";
+import ConfirmDialog from "../../../../components/AdminUI/AdminConfirmDialog";
+import ReasonDialog from "../../../../components/AdminUI/AdminReasonDialog";
 import { createAdminDiagnosticDonationIntent } from "../../../../services/daycareDonationService";
 import DonationModalPreview from "../../../DaycareDonations/components/DonationModalPreview";
 import DaycareAmbassadorsAdmin from "./DaycareAmbassadorsAdmin";
@@ -43,7 +44,7 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
 
     return (
         <div className={styles.layout}>
-            <section className={`${styles.summarySection} ${activeView === "overview" ? styles.overviewSummary : ""}`}>
+            <section className={styles.summarySection}><AdminCard>
                 <header className={styles.sectionHeader}>
                     <div>
                         <p>
@@ -51,48 +52,48 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                         </p>
                     </div>
                     <div className={styles.summaryActions}>
-                        <button
+                        <AdminButton
                             type="button"
                             onClick={() => setSuccessPreviewOpen(true)}
                         >
                             תצוגת מסך תודה
-                        </button>
-                        <a
+                        </AdminButton>
+                        <AdminLink
                             href="/daycare-donations"
                             target="_blank"
                             rel="noreferrer"
                         >
                             צפייה בדף הציבורי
-                        </a>
+                        </AdminLink>
                     </div>
                 </header>
 
                 <div className={styles.metrics}>
-                    <article>
+                    <AdminCard>
                         <span>גויסו בפועל</span>
                         <strong>₪{formatCurrency(campaign.raised)}</strong>
-                    </article>
-                    <article>
+                    </AdminCard>
+                    <AdminCard>
                         <span>יעד הקמפיין</span>
                         <strong>₪{formatCurrency(campaign.goal)}</strong>
-                    </article>
-                    <article>
+                    </AdminCard>
+                    <AdminCard>
                         <span>תרומות כלליות שטרם שויכו</span>
                         <strong>
                             ₪{formatCurrency(campaign.generalRaised)}
                         </strong>
-                    </article>
-                    <article>
+                    </AdminCard>
+                    <AdminCard>
                         <span>תרומות מאושרות</span>
                         <strong>{confirmedCount}</strong>
-                    </article>
+                    </AdminCard>
                     {(campaign.overflow ?? 0) > 0 && (
-                        <article>
+                        <AdminCard>
                             <span>חריגה מעל יעד הקמפיין</span>
                             <strong>
                                 ₪{formatCurrency(campaign.overflow ?? 0)}
                             </strong>
-                        </article>
+                        </AdminCard>
                     )}
                 </div>
                 <p
@@ -111,7 +112,7 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                         ? "עמוד הקמפיין גלוי"
                         : "עמוד הקמפיין מוסתר מהציבור"}
                 </p>
-            </section>
+            </AdminCard></section>
 
             {(message || error) && (
                 <p
@@ -124,12 +125,9 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
 
             <nav className={styles.adminViewNav} aria-label="אזורי ניהול התרומות">
                 {adminViews.map((view) => (
-                    <button
+                    <AdminButton variant="navigation"
                         key={view.id}
                         type="button"
-                        className={
-                            activeView === view.id ? styles.activeView : ""
-                        }
                         aria-pressed={activeView === view.id}
                         title={view.description}
                         onClick={() => {
@@ -148,14 +146,13 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                         {view.id === "updates" && campaign.fieldUpdates.length > 0 && (
                             <span>{campaign.fieldUpdates.length}</span>
                         )}
-                    </button>
+                    </AdminButton>
                 ))}
             </nav>
 
             <label className={styles.adminViewSelect}>
                 אזור ניהול
-                <select
-                    value={activeView}
+                <AdminSelect aria-label="אזור ניהול" value={activeView}
                     onChange={(event) => {
                         setActiveView(event.target.value as AdminView);
                         setError("");
@@ -170,12 +167,12 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                     {activeView === "history" && (
                         <option value="history">היסטוריה — שינויים וכלים</option>
                     )}
-                </select>
+                </AdminSelect>
             </label>
 
             <details className={styles.mobileExtraNav}>
                 <summary>אפשרויות נוספות</summary>
-                <button
+                <AdminButton
                     type="button"
                     onClick={() => {
                         setActiveView("history");
@@ -184,7 +181,7 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                     }}
                 >
                     היסטוריה וכלים טכניים
-                </button>
+                </AdminButton>
             </details>
 
             {activeView === "history" && (
@@ -194,17 +191,11 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                         <strong>כלים טכניים ואבחון זמני</strong>
                         <span>לשימוש רק במקרה של תקלה או בדיקת חיבור</span>
                     </div>
-                    <span
-                        className={
-                            diagnostics?.enabled
-                                ? styles.diagnosticEnabled
-                                : styles.diagnosticDisabled
-                        }
-                    >
+                    <AdminBadge tone={diagnostics?.enabled ? "success" : "neutral"}>
                         {diagnostics?.enabled
                             ? "האבחון פעיל"
                             : "האבחון כבוי"}
-                    </span>
+                    </AdminBadge>
                 </summary>
                 <div className={styles.technicalToolsBody}>
                 {!diagnostics?.enabled && (
@@ -215,13 +206,13 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                     </p>
                 )}
                 {diagnostics?.enabled && diagnostics.paymentTestEnabled && (
-                    <button
+                    <AdminButton
                         type="button"
                         className={styles.clearDiagnostics}
                         onClick={() => setDiagnosticPaymentOpen(true)}
                     >
                         פתיחת עסקת ניסיון מאובטחת
-                    </button>
+                    </AdminButton>
                 )}
                 {!diagnostics?.diagnostics.length ? (
                     <p className={styles.emptyState}>
@@ -231,7 +222,7 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                     <>
                         <div className={styles.diagnosticList}>
                             {diagnostics.diagnostics.map((diagnostic) => (
-                                <article key={diagnostic._id}>
+                                <AdminCard key={diagnostic._id}>
                                     <div>
                                         <strong>
                                             Callback
@@ -267,17 +258,17 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                                             )}
                                         </dd>
                                     </dl>
-                                </article>
+                                </AdminCard>
                             ))}
                         </div>
-                        <button
+                        <AdminButton
                             type="button"
                             className={styles.clearDiagnostics}
                             onClick={() => setClearDiagnosticsOpen(true)}
                             disabled={saving}
                         >
                             מחיקת נתוני האבחון הזמניים
-                        </button>
+                        </AdminButton>
                     </>
                 )}
                 </div>
@@ -305,7 +296,7 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
             )}
 
             {activeView === "history" && (
-            <section className={styles.panel}>
+            <section className={styles.panel}><AdminCard>
                 <header>
                     <h2>היסטוריית שינויים</h2>
                     <p>
@@ -342,7 +333,7 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                         ))}
                     </ol>
                 )}
-            </section>
+            </AdminCard></section>
             )}
             <ConfirmDialog
                 open={clearDiagnosticsOpen}

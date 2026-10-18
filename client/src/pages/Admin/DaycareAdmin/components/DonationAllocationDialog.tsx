@@ -1,6 +1,6 @@
+import { AdminInput, AdminButton, AdminSelect, AdminTextarea, AdminDialog } from "../../../../components/AdminUI";
 import { useMemo, useState, type FormEvent } from "react";
-import BaseDialog from "../../../../components/BaseDialog/BaseDialog";
-import dialogStyles from "../../../../components/BaseDialog/BaseDialog.module.scss";
+import dialogStyles from "../../../../components/AdminUI/AdminEditor.module.scss";
 import type {
     DaycareDonationRecord,
     DonationItem,
@@ -119,7 +119,8 @@ const DonationAllocationDialog = ({
     };
 
     return (
-        <BaseDialog open title="חלוקת התרומה ליעדים" maxWidth={620} onClose={onClose}>
+        <AdminDialog labelledBy="donation-allocation-title" onClose={onClose}>
+            <h2 id="donation-allocation-title">חלוקת התרומה ליעדים</h2>
             <form className={styles.form} onSubmit={handleSubmit}>
                 <div className={styles.total}>
                     <span>סכום התרומה של {record.donorName || "תורם ללא שם"}</span>
@@ -129,8 +130,7 @@ const DonationAllocationDialog = ({
                 <div className={styles.allocationGrid}>
                     <label>
                         <span>יעד ראשון</span>
-                        <select
-                            value={firstItemId}
+                        <AdminSelect aria-label="יעד ראשון" value={firstItemId}
                             disabled={busy}
                             onChange={(event) => setFirstItemId(event.target.value)}
                         >
@@ -138,11 +138,11 @@ const DonationAllocationDialog = ({
                             {items.map((item) => (
                                 <option key={item.id} value={item.id}>{getTargetLabel(item)}</option>
                             ))}
-                        </select>
+                        </AdminSelect>
                     </label>
                     <label>
                         <span>סכום</span>
-                        <input
+                        <AdminInput
                             type="number"
                             min="0.01"
                             step="0.01"
@@ -153,8 +153,7 @@ const DonationAllocationDialog = ({
                     </label>
                     <label>
                         <span>יעד שני</span>
-                        <select
-                            value={secondItemId}
+                        <AdminSelect aria-label="יעד שני" value={secondItemId}
                             disabled={busy}
                             onChange={(event) => handleSecondTarget(event.target.value)}
                         >
@@ -162,11 +161,11 @@ const DonationAllocationDialog = ({
                             {items.map((item) => (
                                 <option key={item.id} value={item.id}>{getTargetLabel(item)}</option>
                             ))}
-                        </select>
+                        </AdminSelect>
                     </label>
                     <label>
                         <span>סכום</span>
-                        <input
+                        <AdminInput
                             type="number"
                             min="0.01"
                             step="0.01"
@@ -191,7 +190,7 @@ const DonationAllocationDialog = ({
 
                 <label className={styles.reasonField}>
                     <span>סיבת השינוי</span>
-                    <textarea
+                    <AdminTextarea
                         required
                         rows={2}
                         value={reason}
@@ -202,24 +201,23 @@ const DonationAllocationDialog = ({
                 </label>
 
                 <div className={dialogStyles.actions}>
-                    <button
+                    <AdminButton
                         type="submit"
-                        className={dialogStyles.cta}
+                        variant="primary"
                         disabled={busy || Boolean(validationMessage) || !reason.trim()}
                     >
                         {busy ? "שומר..." : "שמירת החלוקה"}
-                    </button>
-                    <button
+                    </AdminButton>
+                    <AdminButton
                         type="button"
-                        className={dialogStyles.ghost}
                         disabled={busy}
                         onClick={onClose}
                     >
                         ביטול
-                    </button>
+                    </AdminButton>
                 </div>
             </form>
-        </BaseDialog>
+        </AdminDialog>
     );
 };
 

@@ -1,6 +1,7 @@
+import { AdminButton, AdminInput, AdminSelect, AdminTextarea, AdminCard, AdminBadge } from "../../../../components/AdminUI";
 import { useState } from "react";
 import { Eye, EyeOff, ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
-import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
+import ConfirmDialog from "../../../../components/AdminUI/AdminConfirmDialog";
 import {
     createDaycareDonationFieldUpdate,
     deleteDaycareDonationFieldUpdate,
@@ -117,7 +118,7 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
         >
             <label className={styles.wideField}>
                 כותרת
-                <input
+                <AdminInput
                     name="title"
                     required
                     maxLength={180}
@@ -127,7 +128,7 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
             </label>
             <label className={styles.wideField}>
                 תיאור קצר
-                <textarea
+                <AdminTextarea
                     name="description"
                     required
                     rows={4}
@@ -138,18 +139,18 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
             </label>
             <label>
                 סעיף מקושר
-                <select name="itemId" defaultValue={update?.itemId ?? ""}>
+                <AdminSelect aria-label="סעיף מקושר" name="itemId" defaultValue={update?.itemId ?? ""}>
                     <option value="">ללא קישור לסעיף</option>
                     {items.map((item) => (
                         <option key={item.id} value={item.id}>
                             {item.title}
                         </option>
                     ))}
-                </select>
+                </AdminSelect>
             </label>
             <label>
                 תיאור התמונה לנגישות
-                <input
+                <AdminInput
                     name="imageAlt"
                     required
                     maxLength={220}
@@ -177,12 +178,11 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
                 לפרסם באתר מיד לאחר השמירה
             </label>
             <div className={styles.formActions}>
-                <button type="submit" disabled={saving}>
+                <AdminButton variant="primary" type="submit" disabled={saving}>
                     {saving ? "שומר..." : update ? "שמירת שינויים" : "הוספת עדכון"}
-                </button>
-                <button
+                </AdminButton>
+                <AdminButton
                     type="button"
-                    className={styles.secondaryButton}
                     disabled={saving}
                     onClick={() => {
                         setCreating(false);
@@ -191,13 +191,13 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
                     }}
                 >
                     ביטול
-                </button>
+                </AdminButton>
             </div>
         </form>
     );
 
     return (
-        <section className={styles.panel} aria-labelledby="field-updates-title">
+        <section className={styles.panel} aria-labelledby="field-updates-title"><AdminCard>
             <header className={styles.header}>
                 <div>
                     <h2 id="field-updates-title">עדכונים מהשטח</h2>
@@ -206,10 +206,10 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
                     </p>
                 </div>
                 {!creating && (
-                    <button type="button" onClick={() => setCreating(true)}>
+                    <AdminButton type="button" onClick={() => setCreating(true)}>
                         <Plus aria-hidden="true" />
                         עדכון חדש
-                    </button>
+                    </AdminButton>
                 )}
             </header>
 
@@ -221,7 +221,7 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
             ) : (
                 <div className={styles.list}>
                     {updates.map((update) => (
-                        <article className={styles.card} key={update.id}>
+                        <AdminCard className={styles.card} key={update.id}>
                             {editingId === update.id ? (
                                 renderForm(update)
                             ) : (
@@ -229,9 +229,9 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
                                     <img src={update.imageUrl} alt={update.imageAlt} />
                                     <div className={styles.cardContent}>
                                         <div className={styles.statusRow}>
-                                            <span className={update.published ? styles.published : styles.draft}>
+                                            <AdminBadge tone={update.published ? "success" : "neutral"}>
                                                 {update.published ? "מפורסם" : "טיוטה"}
-                                            </span>
+                                            </AdminBadge>
                                             <small>{formatDate(update.publishedAt ?? update.updatedAt)}</small>
                                         </div>
                                         <h3>{update.title}</h3>
@@ -242,21 +242,21 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
                                             </small>
                                         )}
                                         <div className={styles.cardActions}>
-                                            <button type="button" disabled={saving} onClick={() => void togglePublished(update)}>
+                                            <AdminButton type="button" disabled={saving} onClick={() => void togglePublished(update)}>
                                                 {update.published ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
                                                 {update.published ? "הסתרה" : "פרסום"}
-                                            </button>
-                                            <button type="button" disabled={saving} onClick={() => setEditingId(update.id)}>
+                                            </AdminButton>
+                                            <AdminButton type="button" disabled={saving} onClick={() => setEditingId(update.id)}>
                                                 <Pencil aria-hidden="true" /> עריכה
-                                            </button>
-                                            <button type="button" className={styles.deleteButton} disabled={saving} onClick={() => setDeleting(update)}>
+                                            </AdminButton>
+                                            <AdminButton type="button" className={styles.deleteButton} disabled={saving} onClick={() => setDeleting(update)}>
                                                 <Trash2 aria-hidden="true" /> מחיקה
-                                            </button>
+                                            </AdminButton>
                                         </div>
                                     </div>
                                 </>
                             )}
-                        </article>
+                        </AdminCard>
                     ))}
                 </div>
             )}
@@ -271,7 +271,7 @@ const DaycareFieldUpdatesAdmin = ({ updates, items, onChanged }: Props) => {
                 onClose={() => setDeleting(null)}
                 onConfirm={() => void confirmDelete()}
             />
-        </section>
+        </AdminCard></section>
     );
 };
 

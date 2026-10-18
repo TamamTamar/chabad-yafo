@@ -9,3 +9,87 @@ $hover: $ui-surface-muted;
 $border: $ui-border-cool;
 $radius: 8px;
 $sidebar: 248px;
+
+// Emitted only inside AdminShell. Legacy Sass values above remain stable.
+@mixin properties {
+    --admin-primary: #1f4e79;
+    --admin-primary-hover: #193f63;
+    --admin-surface: #fff;
+    --admin-subtle: #f4f6f8;
+    --admin-text: #243447;
+    --admin-muted: #526174;
+    --admin-border: #cbd2da;
+    --admin-divider: #e2e6eb;
+    --admin-small-size: 14px;
+    --admin-row-padding: 12px;
+    --admin-error: #a32525;
+    --admin-space-1: 4px;
+    --admin-space-2: 8px;
+    --admin-space-3: 12px;
+    --admin-space-4: 16px;
+    --admin-space-6: 24px;
+    --admin-space-8: 32px;
+    --admin-radius: 6px;
+    --admin-control-height: 42px;
+    --admin-body-size: 16px;
+    --admin-title-size: 24px;
+    --admin-value-weight: 400;
+    --admin-label-weight: 500;
+    --admin-action-weight: 600;
+    --admin-heading-weight: 700;
+    @media (max-width: 640px) { --admin-control-height: 46px; }
+}
+
+// Modern Dark is selected per screen; legacy admin consumers remain stable.
+@mixin modernDark {
+    --admin-background: #f1f5f9;
+    --admin-primary: #173d60;
+    --admin-primary-hover: #102f4d;
+    --admin-text: #173247;
+    --admin-muted: #61707a;
+    --admin-subtle: #f5f8fb;
+    --admin-border: #d8e1ea;
+    --admin-divider: #e6edf3;
+    --admin-radius: 6px;
+    --admin-row-padding: 8px;
+    --admin-title-size: 23px;
+    --admin-sidebar-width: 216px;
+    --admin-nav-active: #1e4a70;
+    --admin-nav-background: #0d263b;
+    --admin-nav-text: #edf4fb;
+    --admin-nav-muted: #adc1d2;
+    --admin-nav-hover: #163750;
+    --admin-topbar: #1c3b56;
+    --admin-topbar-height: 76px;
+    --admin-dialog-backdrop: #14202e80;
+    --admin-info-bg: #eaf2fa;
+    --admin-info-text: #285b89;
+    --admin-success-bg: #e7f5ee;
+    --admin-success-text: #21684f;
+    --admin-warning-bg: #fff1e3;
+    --admin-warning-text: #91501e;
+    --admin-status-bg: var(--admin-info-bg);
+    --admin-status-text: var(--admin-info-text);
+    --admin-metric-size: 24px;
+    --admin-stat-min-height: 72px;
+    --admin-table-min-width: 640px;
+    --admin-caption-size: 13px;
+    --admin-input-height: 46px;
+    --admin-input-radius: 11px;
+    --admin-input-border: #c5d2e0;
+    --admin-input-hover: #9fb3c9;
+    --admin-input-focus: #2b608e;
+    --admin-input-ring: #1f4e791a;
+    --admin-input-error-ring: #a325251a;
+    --admin-input-placeholder: #7d8da0;
+    --admin-input-icon: #7a8ea4;
+    --admin-input-icon-size: 18px;
+    --admin-input-disabled-bg: #f1f4f8;
+    --admin-input-disabled-text: #7e8d9e;
+    --admin-input-disabled-border: #dce4ed;
+    --admin-input-readonly-bg: #f8fafc;
+    --admin-input-readonly-text: #526174;
+    @media (max-width: 640px) {
+        --admin-title-size: 20px;
+    }
+}

@@ -1,3 +1,4 @@
+import { AdminButton } from "../../../../components/AdminUI";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +19,7 @@ import {
     type CreateOnboardingFromInquiryPayload,
 } from "../../../../types/daycareOnboarding";
 import type { DaycareInterestStatus } from "../../../../types/daycareRegistration";
-import styles from "../DaycareAdmin.module.scss";
+import styles from "./DaycareRegistrations.styles";
 import type { DaycareRegistrationsResponse } from "../types";
 
 type DaycareRegistrationsProps = {
@@ -391,18 +392,19 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
 
     const renderTreatmentPanel = (
         row: UnifiedRegistration,
-        panelClassName = styles.registrationTreatmentPanel
+        panelClassName = styles.registrationTreatmentPanel,
+        panelId?: string
     ) => {
         const workflowDraft =
             workflowDrafts[row.key] ??
             parseWorkflowDraft(row.callNotes, row.status);
 
         return (
-            <div className={panelClassName}>
+            <div id={panelId} className={panelClassName}>
                 <label
-                    className={`${styles.registrationTreatmentField} ${styles.registrationTreatmentNoteField}`}
+                    className={styles.registrationTreatmentNoteField}
                 >
-                    <span className={styles.registrationTreatmentLabel}>
+                    <span>
                         הערה
                     </span>
                     <textarea
@@ -418,15 +420,16 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
                     />
                 </label>
                 <div className={styles.registrationTreatmentActions}>
-                    <button
+                    <AdminButton
                         className={styles.secondaryButton}
                         type="button"
                         onClick={() => cancelTreatmentEdit(row)}
                     >
                         ביטול
-                    </button>
-                    <button
+                    </AdminButton>
+                    <AdminButton variant="primary"
                         className={styles.primaryButton}
+                        aria-busy={savingNoteKey === row.key}
                         disabled={savingNoteKey === row.key}
                         type="button"
                         onClick={() => void handleTreatmentSave(row)}
@@ -434,7 +437,7 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
                         {savingNoteKey === row.key
                             ? "שומר..."
                             : "שמירת הערה"}
-                    </button>
+                    </AdminButton>
                 </div>
             </div>
         );

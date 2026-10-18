@@ -1,3 +1,4 @@
+import { AdminInput, AdminButton, AdminSelect, AdminTable, AdminCard } from "../../../../components/AdminUI";
 import type { DaycareDonationRecord } from "../../../DaycareDonations/types";
 import styles from "./DaycareDonationsAdmin.module.scss";
 import type { useDaycareDonationsAdmin } from "./useDaycareDonationsAdmin";
@@ -17,7 +18,7 @@ const DonationRecordsAdminView = ({ model }: Props) => {
     return (
         <>
             {activeView === "records" && (
-            <section className={styles.panel}>
+            <section className={styles.panel}><AdminCard>
                 <header>
                     <h2>רשומות תרומה</h2>
                     <p>
@@ -28,7 +29,7 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                 <div className={styles.recordFilters}>
                     <label>
                         חיפוש
-                        <input
+                        <AdminInput
                             type="search"
                             value={recordQuery}
                             placeholder="שם, טלפון, דוא״ל או מספר עסקה"
@@ -39,8 +40,7 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                     </label>
                     <label>
                         מצב
-                        <select
-                            value={recordStatus}
+                        <AdminSelect aria-label="מצב" value={recordStatus}
                             onChange={(event) =>
                                 setRecordStatus(
                                     event.target.value as
@@ -57,7 +57,7 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                                     </option>
                                 )
                             )}
-                        </select>
+                        </AdminSelect>
                     </label>
                 </div>
                 {records.length === 0 ? (
@@ -70,7 +70,7 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                     </p>
                 ) : (
                     <div className={styles.recordsTableWrap}>
-                        <table className={styles.recordsTable}>
+                        <AdminTable className={styles.recordsTable}>
                             <thead>
                                 <tr>
                                     <th>תאריך</th>
@@ -136,7 +136,7 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                                             </div>
                                         </td>
                                         <td data-label="שגריר">
-                                            <select
+                                            <AdminSelect
                                                 aria-label={`שגריר לתרומה של ${record.donorName || "תורם"}`}
                                                 value={record.ambassadorId?._id ?? ""}
                                                 disabled={saving}
@@ -181,10 +181,10 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                                                             : ""}
                                                     </option>
                                                 ))}
-                                            </select>
+                                            </AdminSelect>
                                         </td>
                                         <td data-label="פרסום">
-                                            <button
+                                            <AdminButton
                                                 type="button"
                                                 className={`${styles.publicationToggle} ${
                                                     record.displayDonorName !== false
@@ -208,10 +208,10 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                                             >
                                                 <span aria-hidden="true" />
                                                 {record.displayDonorName !== false ? "מוצג באתר" : "פרטי"}
-                                            </button>
+                                            </AdminButton>
                                         </td>
                                         <td data-label="שיוך">
-                                            <button
+                                            <AdminButton
                                                 type="button"
                                                 className={styles.allocationButton}
                                                 aria-label={`שיוך התרומה של ${record.donorName || "תורם"}`}
@@ -221,10 +221,10 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                                                 {record.allocations && record.allocations.length > 1
                                                     ? `${record.allocations.length} יעדים · עריכה`
                                                     : campaign.items.find((item) => item.id === (record.allocations?.[0]?.itemId ?? record.itemId))?.title ?? "תרומה כללית"}
-                                            </button>
+                                            </AdminButton>
                                         </td>
                                         <td data-label="מצב">
-                                            <select
+                                            <AdminSelect
                                                 aria-label={`מצב התרומה של ${record.donorName || "תורם"}`}
                                                 value={record.status}
                                                 disabled={saving}
@@ -250,15 +250,15 @@ const DonationRecordsAdminView = ({ model }: Props) => {
                                                         {label}
                                                     </option>
                                                 ))}
-                                            </select>
+                                            </AdminSelect>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
-                        </table>
+                        </AdminTable>
                     </div>
                 )}
-            </section>
+            </AdminCard></section>
             )}
 
         </>

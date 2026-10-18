@@ -1,3 +1,4 @@
+import { AdminButton, AdminInput, AdminSelect, AdminCard } from "../../../../components/AdminUI";
 import styles from "./DaycareDonationsAdmin.module.scss";
 import type { useDaycareDonationsAdmin } from "./useDaycareDonationsAdmin";
 
@@ -15,7 +16,7 @@ const DonationItemsAdminView = ({ model }: Props) => {
     return (
         <>
             {activeView === "items" && (
-            <section className={styles.panel}>
+            <section className={styles.panel}><AdminCard>
                 <header>
                     <h2>סעיפים ויעדים</h2>
                     <p>
@@ -40,7 +41,7 @@ const DonationItemsAdminView = ({ model }: Props) => {
                     ).map((choiceId, index) => (
                         <label key={`choice-${index + 1}`}>
                             מקום {index + 1}
-                            <select
+                            <AdminSelect aria-label={`מקום ${index + 1}`}
                                 name={`choice${index + 1}`}
                                 defaultValue={choiceId}
                             >
@@ -65,22 +66,21 @@ const DonationItemsAdminView = ({ model }: Props) => {
                                         </option>
                                     );
                                 })}
-                            </select>
+                            </AdminSelect>
                         </label>
                     ))}
                     <div className={styles.recommendationActions}>
-                        <button type="submit" disabled={saving}>
+                        <AdminButton variant="primary" type="submit" disabled={saving}>
                             {saving ? "שומר..." : "שמירת הבחירה"}
-                        </button>
+                        </AdminButton>
                         {campaign.recommendedChoiceIds.length === 3 && (
-                            <button
+                            <AdminButton
                                 type="button"
-                                className={styles.recommendationsReset}
                                 disabled={saving}
                                 onClick={() => void resetRecommendations()}
                             >
                                 חזרה לאוטומטי
-                            </button>
+                            </AdminButton>
                         )}
                     </div>
                     {inactiveRecommendedItems.length > 0 && (
@@ -167,7 +167,7 @@ const DonationItemsAdminView = ({ model }: Props) => {
                                             </div>
                                             <label>
                                                 יעד
-                                                <input
+                                                <AdminInput
                                                     name="goal"
                                                     type="number"
                                                     min="0"
@@ -176,8 +176,7 @@ const DonationItemsAdminView = ({ model }: Props) => {
                                             </label>
                                             <label>
                                                 מצב
-                                                <select
-                                                    name="statusOverride"
+                                                <AdminSelect aria-label="מצב" name="statusOverride"
                                                     defaultValue={
                                                         item.statusOverride ??
                                                         "auto"
@@ -192,29 +191,29 @@ const DonationItemsAdminView = ({ model }: Props) => {
                                                     <option value="closed">
                                                         סגור ידנית
                                                     </option>
-                                                </select>
+                                                </AdminSelect>
                                             </label>
                                             <label>
                                                 סיבת השינוי
-                                                <input
+                                                <AdminInput
                                                     name="reason"
                                                     type="text"
                                                     required
                                                 />
                                             </label>
-                                            <button
+                                            <AdminButton
                                                 type="submit"
                                                 disabled={saving}
                                             >
                                                 שמירה
-                                            </button>
+                                            </AdminButton>
                                         </form>
                                     ))}
                             </div>
                         </details>
                     ))}
                 </div>
-            </section>
+            </AdminCard></section>
             )}
 
         </>

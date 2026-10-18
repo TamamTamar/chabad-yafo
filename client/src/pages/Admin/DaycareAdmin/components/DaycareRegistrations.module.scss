@@ -1,0 +1,138 @@
+@use '../../../../styles/admin-controls' as controls;
+@use '../../../../styles/admin-patterns' as patterns;
+
+.layout { display: grid; gap: var(--admin-space-3); min-width: 0; }
+.registrationDesign {
+    font-family: 'Assistant Admin', 'Assistant', sans-serif;
+    color: var(--admin-text);
+    font-size: var(--admin-body-size);
+    line-height: 1.45;
+    min-width: 0;
+    padding: var(--admin-space-3);
+    border: 1px solid var(--admin-divider);
+    border-radius: 10px;
+    background: var(--admin-surface);
+    button { font-size: var(--admin-small-size); }
+    :is(h1, h2, h3) { color: var(--admin-text); font-weight: var(--admin-heading-weight); }
+    input, select, textarea { color: var(--admin-text); }
+}
+
+.registrationToolbar { @include patterns.toolbar; margin-block: 0 var(--admin-space-2); }
+.registrationMeta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--admin-space-1) var(--admin-space-3); margin-block: var(--admin-space-1); }
+.registrationCounts { margin: 0; color: var(--admin-muted); font-size: var(--admin-caption-size); }
+.compactField { min-width: 0; }
+.searchControl { @include controls.search-field; }
+.registrationResultCount { color: var(--admin-muted); font-size: var(--admin-small-size); padding-bottom: var(--admin-space-3); white-space: nowrap; }
+.workflowHelp { margin-bottom: var(--admin-space-1); font-size: var(--admin-small-size); color: var(--admin-muted); }
+.workflowHelp summary { display: list-item; width: fit-content; cursor: pointer; padding-block: var(--admin-space-2); font-weight: 500; }
+.workflowHelp summary:focus-visible { outline: 2px solid var(--admin-primary); outline-offset: 2px; border-radius: var(--admin-radius); }
+.registrationWorkflow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--admin-space-4); list-style: none; padding: var(--admin-space-3); margin: 0; background: var(--admin-subtle); }
+.registrationWorkflowStep { display: flex; align-items: start; gap: var(--admin-space-2); p { margin: var(--admin-space-1) 0 0; } }
+.registrationWorkflowNumber { font-weight: 700; }
+
+.registrationDesktopTable { width: 100%; max-height: max(320px, calc(100dvh - 380px)); overflow: auto; border: 1px solid var(--admin-divider); border-radius: var(--admin-radius); background: var(--admin-surface); scrollbar-color: var(--admin-border) transparent; }
+.registrationDesktopTable:focus-visible { outline: 2px solid var(--admin-primary); outline-offset: 3px; }
+.tableCompact { width: 100%; table-layout: fixed; border-collapse: collapse; background: var(--admin-surface); text-align: start; }
+.tableHeader { position: sticky; top: 0; z-index: 1; padding: var(--admin-space-2); font-size: var(--admin-small-size); font-weight: 500; background: var(--admin-subtle); color: var(--admin-muted); text-align: start; }
+.tableCell { padding: var(--admin-row-padding) var(--admin-space-2); border-bottom: 1px solid var(--admin-divider); vertical-align: middle; font-size: var(--admin-small-size); overflow-wrap: anywhere; line-height: 1.35; }
+.tableCompact .secondaryButton { min-height: 34px; padding: 4px 10px; font-size: var(--admin-caption-size); font-weight: 500; line-height: 1.3; }
+.tableCompact .onboardingSummary { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; }
+.tableCompact .onboardingStatusLine { font-size: var(--admin-caption-size); }
+.tableCompact .onboardingSummary > span { @include patterns.clamp(1); }
+.tableCompact .onboardingSummary > button { grid-column: 2; grid-row: 1 / 3; margin-top: 0; }
+.tableCell:first-child { font-weight: var(--admin-heading-weight); font-size: 15px; }
+.tableCompact tbody:hover { background: var(--admin-subtle); }
+.tableCell:last-child { color: var(--admin-muted); font-size: var(--admin-caption-size); }
+.registrationDesktopChild { display: grid; gap: 2px; }
+.registrationDesktopPhone { display: inline-block; direction: ltr; color: var(--admin-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.registrationDesktopChild > span:first-child { @include patterns.clamp(1); }
+.registrationDesktopChildAge { color: var(--admin-muted); }
+.statusControl {
+    @include patterns.tone;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    border-radius: var(--admin-radius);
+    color: var(--admin-status-text);
+    background: var(--admin-status-bg);
+    .statusSelect { height: 32px; min-height: 32px; width: 100%; padding: 4px 8px; font-size: var(--admin-caption-size); font-weight: 500; border: 0; border-radius: inherit; background-color: transparent; color: inherit; cursor: pointer; padding-inline-end: 32px; background-position: left 8px center; }
+}
+.familyIdentity { display: flex; align-items: center; gap: var(--admin-space-2); min-width: 0; }
+.familyIcon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 30px; height: 30px; background: var(--admin-subtle); border-radius: var(--admin-radius); color: var(--admin-info-text); }
+.familyName { @include patterns.clamp; }
+.noteCellContent { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--admin-space-1); align-items: center; }
+.noteCellContent:not(:has(p)) { display: flex; justify-content: start; }
+.callSummaryPreview { @include patterns.clamp; max-height: 2.9em; color: var(--admin-muted); font-weight: 400; margin: 0; }
+.callSummaryToggle { padding: 4px; min-height: 32px; min-width: 32px; }
+.registrationDesktopTreatmentCell { padding: 0; border-bottom: 1px solid var(--admin-divider); }
+.registrationDesktopTreatmentPanel { margin: 0; }
+.onboardingSummary { display: grid; gap: var(--admin-space-1); }
+.onboardingStatusLine { font-weight: 500; color: var(--admin-text); }
+.registrationOnboardingMeta, .onboardingUnavailable { color: var(--admin-muted); font-size: var(--admin-caption-size); font-weight: var(--admin-value-weight); }
+.onboardingSummary button { justify-self: start; margin-top: var(--admin-space-1); }
+
+.registrationMobileQueue { display: none; }
+.registrationCard { @include patterns.record; padding: var(--admin-space-3); background: var(--admin-surface); border: 1px solid var(--admin-divider); border-radius: var(--admin-radius); }
+.registrationCardHeader { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--admin-space-2); }
+.registrationIdentity { min-width: 0; }
+.registrationParentName { margin: 0; font-size: 17px; line-height: 1.35; }
+.registrationMobileMeta { padding-top: 2px; }
+.registrationMobileStatus { @include patterns.semanticStatus; }
+.registrationChildSummary { display: flex; flex-wrap: wrap; gap: var(--admin-space-1) var(--admin-space-2); margin-top: var(--admin-space-1); font-size: var(--admin-small-size); color: var(--admin-muted); }
+.registrationChildName, .registrationChildAge { font-weight: 400; }
+.registrationQuickActions { @include patterns.actions; margin-top: var(--admin-space-2); }
+.registrationQuickActions button { padding-inline: var(--admin-space-2); }
+.registrationDetailsToggle { margin-inline-start: auto; }
+.registrationPhone { display: inline-block; font-size: var(--admin-caption-size); color: var(--admin-muted); font-variant-numeric: tabular-nums; margin-top: 0; }
+.registrationDetailsIcon { transition: transform .15s; }
+.registrationDetailsIconOpen { transform: rotate(180deg); }
+.registrationDetails { margin-top: var(--admin-space-2); padding: var(--admin-space-3); background: var(--admin-subtle); border-radius: var(--admin-radius); }
+.registrationDetailsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--admin-space-3); margin-block: var(--admin-space-3); }
+.registrationDetailItem { min-width: 0; }
+.registrationDetailLabel, .registrationSavedNoteLabel { color: var(--admin-muted); font-size: var(--admin-caption-size); font-weight: 500; }
+.registrationDetailValue { margin: var(--admin-space-1) 0 0; font-size: var(--admin-small-size); overflow-wrap: anywhere; }
+.registrationSavedNoteText { margin: var(--admin-space-1) 0 var(--admin-space-3); font-size: var(--admin-small-size); white-space: pre-wrap; overflow-wrap: anywhere; }
+.registrationOnboarding { margin-top: var(--admin-space-3); }
+.onboardingNextAction { font-size: var(--admin-small-size); font-weight: 500; }
+.registrationTreatmentPanel { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--admin-space-3); padding: var(--admin-space-3); background: var(--admin-subtle); }
+.registrationTreatmentNoteField { min-width: 0; }
+.registrationTreatmentTextarea { min-height: 112px; max-height: 320px; }
+.registrationTreatmentActions { @include patterns.actions; justify-content: end; }
+.emptyState, .loading { padding: var(--admin-space-8) var(--admin-space-4); text-align: center; color: var(--admin-muted); background: var(--admin-surface); }
+.formErrorMessage { color: var(--admin-error); font-size: var(--admin-small-size); margin-block: var(--admin-space-2); }
+
+.modalBackdrop { position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: none; box-sizing: border-box; margin: 0; padding: var(--admin-space-4); border: 0; color: inherit; background: transparent; }
+.modalBackdrop[open] { display: grid; place-items: center; }
+.modalBackdrop::backdrop { background: var(--admin-dialog-backdrop); }
+.onboardingModal { box-sizing: border-box; width: min(640px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; background: var(--admin-surface); padding: var(--admin-space-6); border-radius: var(--admin-radius); }
+.modalHeader { display: flex; align-items: start; justify-content: space-between; gap: var(--admin-space-3); margin-bottom: var(--admin-space-4); }
+.modalTitle { font-size: 22px; margin: 0; }
+.eyebrow, .modalHint { color: var(--admin-muted); font-size: var(--admin-small-size); }
+.modalCloseButton { font-size: 24px; min-width: 42px; }
+.onboardingForm { display: grid; gap: var(--admin-space-3); }
+.modalActions { @include patterns.actions; justify-content: end; }
+.srOnly { @include patterns.visuallyHidden; }
+
+@media (min-width: 601px) {
+    .registrationToolbar { grid-template-columns: minmax(240px, 440px) minmax(180px, 220px) max-content; justify-content: start; }
+}
+@media (max-width: 900px) {
+    .registrationDesktopTable { display: none; }
+    .registrationMobileQueue { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--admin-space-3); align-items: start; }
+    .registrationWorkflow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .registrationTreatmentPanel { grid-template-columns: minmax(0, 1fr); }
+    .actionLabel { @include patterns.visuallyHidden; }
+    .registrationQuickButton { min-width: 36px; }
+    .registrationQuickActions { column-gap: var(--admin-space-1); }
+    .registrationQuickActions button { font-size: var(--admin-small-size); padding-inline: var(--admin-space-1); min-height: 44px; }
+}
+@media (max-width: 600px) {
+    .registrationMobileQueue { grid-template-columns: minmax(0, 1fr); gap: var(--admin-space-2); }
+    .registrationResultCount { padding-bottom: var(--admin-space-3); }
+    .onboardingModal { padding: var(--admin-space-4); }
+    .registrationMeta { gap: var(--admin-space-2); margin-block: var(--admin-space-1); }
+    .registrationToolbar .fieldLabel { @include patterns.visuallyHidden; }
+
+}
+
+@media (prefers-reduced-motion: reduce) { .registrationDetailsIcon { transition: none; } }

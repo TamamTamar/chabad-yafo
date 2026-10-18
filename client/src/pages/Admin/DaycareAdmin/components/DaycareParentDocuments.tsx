@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
+import { AdminButton, AdminLink, AdminInput, AdminSelect, AdminTextarea, AdminBadge, AdminCard, AdminConfirmDialog as ConfirmDialog } from "../../../../components/AdminUI";
 import { adminParentDocumentPdfUrl, listAdminDaycareParentDocumentYears, saveAdminDaycareParentDocumentYear, unlockAdminDaycareParentDocumentYear, updateAdminDaycareParentDocumentSharing, type AdminDaycareParentDocumentYear, type DaycareParentDocumentBundle, type DaycareParentDocumentKey } from "../../../../services/daycareParentDocumentService";
-import styles from "./DaycareParentDocuments.module.scss";
+import styles from "../../../../components/AdminUI/AdminEditor.module.scss";
 
 const rowsToText = <T,>(items: T[], fields: Array<keyof T>) =>
     items.map((item) => fields.map((field) => String(item[field])).join(" | ")).join("\n");
@@ -45,6 +45,7 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
     const [unlockDialogOpen, setUnlockDialogOpen] = useState(false);
     const [notice, setNotice] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
 
     const apply = (item: AdminDaycareParentDocumentYear, creating = false) => {
         const nextDocuments = structuredClone(item.documents);
@@ -85,7 +86,7 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
                 setLockedAt(first.lockedAt);
                 setSharedDocumentKeys(first.sharedDocumentKeys ?? []);
             }
-        }).catch((loadError) => { if (active) setError(messageFromError(loadError)); });
+        }).catch((loadError) => { if (active) setError(messageFromError(loadError)); }).finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
     }, []);
 
@@ -215,117 +216,117 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
         setDocuments({ ...documents, menu: { ...documents.menu, items } });
     };
 
-    if (!documents) return <section className={styles.section}><p>{error || "טוען מידע להורים..."}</p></section>;
+    if (!documents) return <AdminCard className={styles.section}><p role={error ? "alert" : "status"}>{error || (loading ? "טוען מידע להורים..." : "אין מסמכי מידע להורים זמינים.")}</p></AdminCard>;
 
     return (
-        <section className={styles.section} aria-labelledby="parent-documents-title">
+        <AdminCard role="region" className={styles.section} aria-labelledby="parent-documents-title">
             <header className={styles.header}>
                 <div>
                     <span className={styles.eyebrow}>מידע שנתי</span>
                     <h2 className={styles.title} id="parent-documents-title">{documentLabels[visibleDocument].title}</h2>
                     <p className={styles.intro}>עריכת המסמך אינה מפרסמת אותו. אפשר לשתף אותו בנפרד בקישור האישי של ההורים או להוריד PDF לשימוש פנימי.</p>
                 </div>
-                <button className={styles.secondaryButton} type="button" disabled={!years.length || isNewYear} onClick={() => apply(years[0], true)}>פתיחת שנת לימודים חדשה</button>
+                <AdminButton variant="secondary" type="button" disabled={!years.length || isNewYear} onClick={() => apply(years[0], true)}>פתיחת שנת לימודים חדשה</AdminButton>
             </header>
 
             <div className={styles.yearRow}>
                 <label className={styles.label}>שנת לימודים
                     {isNewYear ? (
-                        <input className={styles.input} value={selectedYear} onChange={(event) => setSelectedYear(event.target.value)} placeholder="2027-2028" />
+                        <AdminInput value={selectedYear} onChange={(event) => setSelectedYear(event.target.value)} placeholder="2027-2028" />
                     ) : (
-                        <select className={styles.input} value={selectedYear} onChange={(event) => { const item = years.find((year) => year.schoolYear === event.target.value); if (item) apply(item); }}>
+                        <AdminSelect value={selectedYear} onChange={(event) => { const item = years.find((year) => year.schoolYear === event.target.value); if (item) apply(item); }}>
                             {years.map((year) => <option value={year.schoolYear} key={year.schoolYear}>{year.schoolYear}{year.lockedAt ? " · נעול" : " · ניתן לעריכה"}</option>)}
-                        </select>
+                        </AdminSelect>
                     )}
                 </label>
-                <div className={lockedAt ? styles.locked : styles.editable}>{lockedAt ? "נעול לאחר חתימת הורה" : "ניתן לעריכה"}</div>
+                <AdminBadge tone={lockedAt ? "warning" : "success"}>{lockedAt ? "נעול לאחר חתימת הורה" : "ניתן לעריכה"}</AdminBadge>
             </div>
 
             <div className={styles.cards}>
-                {visibleDocument === "welcome" ? <article className={styles.card}>
+                {visibleDocument === "welcome" ? <AdminCard className={styles.card}>
                     <h3>ברוכים הבאים למעון חב״ד יפו</h3>
-                    <label className={styles.label}>כותרת משנה<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.welcome.subtitle} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, subtitle: event.target.value } })} /></label>
-                    <label className={styles.label}>פתיח - פסקה בכל שורה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.intro.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, intro: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
+                    <label className={styles.label}>כותרת משנה<AdminInput disabled={Boolean(lockedAt)} value={documents.welcome.subtitle} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, subtitle: event.target.value } })} /></label>
+                    <label className={styles.label}>פתיח - פסקה בכל שורה<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.intro.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, intro: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
                     <div className={styles.welcomeFieldGrid}>
-                        <label className={styles.label}>שעות ימים א׳-ה׳<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.welcome.hours.weekdays} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, hours: { ...documents.welcome.hours, weekdays: event.target.value } } })} /></label>
-                        <label className={styles.label}>שעות יום שישי<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.welcome.hours.friday} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, hours: { ...documents.welcome.hours, friday: event.target.value } } })} /></label>
-                        <label className={styles.label}>כתובת<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.welcome.hours.address} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, hours: { ...documents.welcome.hours, address: event.target.value } } })} /></label>
+                        <label className={styles.label}>שעות ימים א׳-ה׳<AdminInput disabled={Boolean(lockedAt)} value={documents.welcome.hours.weekdays} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, hours: { ...documents.welcome.hours, weekdays: event.target.value } } })} /></label>
+                        <label className={styles.label}>שעות יום שישי<AdminInput disabled={Boolean(lockedAt)} value={documents.welcome.hours.friday} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, hours: { ...documents.welcome.hours, friday: event.target.value } } })} /></label>
+                        <label className={styles.label}>כתובת<AdminInput disabled={Boolean(lockedAt)} value={documents.welcome.hours.address} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, hours: { ...documents.welcome.hours, address: event.target.value } } })} /></label>
                     </div>
-                    <label className={styles.label}>היום שלנו - פסקה בכל שורה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.day.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, day: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
-                    <label className={styles.label}>קשר עם ההורים - פסקה בכל שורה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.parents.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, parents: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
-                    <label className={styles.label}>רוצים להצטרף - פסקה בכל שורה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.join.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, join: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
+                    <label className={styles.label}>היום שלנו - פסקה בכל שורה<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.day.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, day: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
+                    <label className={styles.label}>קשר עם ההורים - פסקה בכל שורה<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.parents.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, parents: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
+                    <label className={styles.label}>רוצים להצטרף - פסקה בכל שורה<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.welcome.join.join("\n")} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, join: event.target.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) } })} /></label>
                     <div className={styles.welcomeFieldGrid}>
-                        <label className={styles.label}>שם איש הקשר<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.welcome.contactName} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, contactName: event.target.value } })} /></label>
-                        <label className={styles.label}>טלפון ליצירת קשר<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.welcome.contactPhone} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, contactPhone: event.target.value } })} /></label>
+                        <label className={styles.label}>שם איש הקשר<AdminInput disabled={Boolean(lockedAt)} value={documents.welcome.contactName} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, contactName: event.target.value } })} /></label>
+                        <label className={styles.label}>טלפון ליצירת קשר<AdminInput disabled={Boolean(lockedAt)} value={documents.welcome.contactPhone} onChange={(event) => setDocuments({ ...documents, welcome: { ...documents.welcome, contactPhone: event.target.value } })} /></label>
                     </div>
-                </article> : null}
+                </AdminCard> : null}
 
-                {visibleDocument === "routine" ? <article className={styles.card}>
+                {visibleDocument === "routine" ? <AdminCard className={styles.card}>
                     <h3>סדר יום</h3>
-                    <label className={styles.label}>כותרת משנה<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.routine.subtitle} onChange={(event) => setDocuments({ ...documents, routine: { ...documents.routine, subtitle: event.target.value } })} /></label>
-                    <label className={styles.label}>כל פעילות בשורה: שעה | פעילות<textarea className={styles.textarea} disabled={Boolean(lockedAt)} value={routineRows} onChange={(event) => setRoutineRows(event.target.value)} /></label>
-                    <label className={styles.label}>הערה להורים<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.routine.note} onChange={(event) => setDocuments({ ...documents, routine: { ...documents.routine, note: event.target.value } })} /></label>
-                </article> : null}
+                    <label className={styles.label}>כותרת משנה<AdminInput disabled={Boolean(lockedAt)} value={documents.routine.subtitle} onChange={(event) => setDocuments({ ...documents, routine: { ...documents.routine, subtitle: event.target.value } })} /></label>
+                    <label className={styles.label}>כל פעילות בשורה: שעה | פעילות<AdminTextarea className={styles.textarea} disabled={Boolean(lockedAt)} value={routineRows} onChange={(event) => setRoutineRows(event.target.value)} /></label>
+                    <label className={styles.label}>הערה להורים<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.routine.note} onChange={(event) => setDocuments({ ...documents, routine: { ...documents.routine, note: event.target.value } })} /></label>
+                </AdminCard> : null}
 
-                {visibleDocument === "holidays" ? <article className={styles.card}>
+                {visibleDocument === "holidays" ? <AdminCard className={styles.card}>
                     <h3>לוח חופשות</h3>
-                    <label className={styles.label}>כותרת משנה<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.holidays.subtitle} onChange={(event) => setDocuments({ ...documents, holidays: { ...documents.holidays, subtitle: event.target.value } })} /></label>
-                    <label className={styles.label}>כל מועד בשורה: מועד | תאריך עברי | תאריכי חופשה<textarea className={styles.textarea} disabled={Boolean(lockedAt)} value={holidayRows} onChange={(event) => setHolidayRows(event.target.value)} /></label>
-                    <label className={styles.label}>הבהרות - כל הבהרה בשורה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={clarifications} onChange={(event) => setClarifications(event.target.value)} /></label>
-                </article> : null}
+                    <label className={styles.label}>כותרת משנה<AdminInput disabled={Boolean(lockedAt)} value={documents.holidays.subtitle} onChange={(event) => setDocuments({ ...documents, holidays: { ...documents.holidays, subtitle: event.target.value } })} /></label>
+                    <label className={styles.label}>כל מועד בשורה: מועד | תאריך עברי | תאריכי חופשה<AdminTextarea className={styles.textarea} disabled={Boolean(lockedAt)} value={holidayRows} onChange={(event) => setHolidayRows(event.target.value)} /></label>
+                    <label className={styles.label}>הבהרות - כל הבהרה בשורה<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={clarifications} onChange={(event) => setClarifications(event.target.value)} /></label>
+                </AdminCard> : null}
 
-                {visibleDocument === "menu" ? <article className={styles.card}>
+                {visibleDocument === "menu" ? <AdminCard className={styles.card}>
                     <h3>תפריט</h3>
-                    <label className={styles.label}>כותרת משנה<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.menu.subtitle} onChange={(event) => setDocuments({ ...documents, menu: { ...documents.menu, subtitle: event.target.value } })} /></label>
+                    <label className={styles.label}>כותרת משנה<AdminInput disabled={Boolean(lockedAt)} value={documents.menu.subtitle} onChange={(event) => setDocuments({ ...documents, menu: { ...documents.menu, subtitle: event.target.value } })} /></label>
                     <div className={styles.menuEditor} aria-label="עריכת ימי התפריט">
                         <div className={styles.menuEditorHeader}>
                             <div>
                                 <h4>ימי התפריט</h4>
                                 <p>אפשר להוסיף ימים, לערוך אותם ולשנות את הסדר. שדות ריקים של צהריים או מנחה לא יוצגו להורים.</p>
                             </div>
-                            <button className={styles.addDayButton} type="button" disabled={Boolean(lockedAt)} onClick={addMenuItem}>
+                            <AdminButton variant="primary" type="button" disabled={Boolean(lockedAt)} onClick={addMenuItem}>
                                 <Plus size={18} aria-hidden="true" /> הוספת יום
-                            </button>
+                            </AdminButton>
                         </div>
                         {documents.menu.items.length ? <div className={styles.menuDayList}>
                             {documents.menu.items.map((item, index) => <section className={styles.menuDayEditor} key={index}>
                                 <header className={styles.menuDayHeader}>
                                     <span className={styles.menuDayNumber}>יום {index + 1}</span>
                                     <div className={styles.menuDayActions}>
-                                        <button type="button" disabled={Boolean(lockedAt) || index === 0} onClick={() => moveMenuItem(index, -1)} aria-label={`העברת יום ${index + 1} למעלה`}><ArrowUp size={17} /></button>
-                                        <button type="button" disabled={Boolean(lockedAt) || index === documents.menu.items.length - 1} onClick={() => moveMenuItem(index, 1)} aria-label={`העברת יום ${index + 1} למטה`}><ArrowDown size={17} /></button>
-                                        <button type="button" disabled={Boolean(lockedAt)} onClick={() => removeMenuItem(index)} aria-label={`מחיקת יום ${index + 1}`}><Trash2 size={17} /></button>
+                                        <AdminButton type="button" disabled={Boolean(lockedAt) || index === 0} onClick={() => moveMenuItem(index, -1)} aria-label={`העברת יום ${index + 1} למעלה`}><ArrowUp size={17} /></AdminButton>
+                                        <AdminButton type="button" disabled={Boolean(lockedAt) || index === documents.menu.items.length - 1} onClick={() => moveMenuItem(index, 1)} aria-label={`העברת יום ${index + 1} למטה`}><ArrowDown size={17} /></AdminButton>
+                                        <AdminButton type="button" disabled={Boolean(lockedAt)} onClick={() => removeMenuItem(index)} aria-label={`מחיקת יום ${index + 1}`}><Trash2 size={17} /></AdminButton>
                                     </div>
                                 </header>
                                 <div className={styles.menuDayFields}>
-                                    <label className={styles.label}>יום<input className={styles.input} disabled={Boolean(lockedAt)} value={item.day} onChange={(event) => updateMenuItem(index, "day", event.target.value)} placeholder="שם היום" /></label>
-                                    <label className={styles.label}>ארוחת בוקר<textarea className={styles.menuMealInput} disabled={Boolean(lockedAt)} value={item.breakfast} onChange={(event) => updateMenuItem(index, "breakfast", event.target.value)} /></label>
-                                    <label className={styles.label}>ארוחת צהריים<textarea className={styles.menuMealInput} disabled={Boolean(lockedAt)} value={item.lunch ?? ""} onChange={(event) => updateMenuItem(index, "lunch", event.target.value)} /></label>
-                                    <label className={styles.label}>ארוחת מנחה<textarea className={styles.menuMealInput} disabled={Boolean(lockedAt)} value={item.afternoon ?? ""} onChange={(event) => updateMenuItem(index, "afternoon", event.target.value)} /></label>
+                                    <label className={styles.label}>יום<AdminInput disabled={Boolean(lockedAt)} value={item.day} onChange={(event) => updateMenuItem(index, "day", event.target.value)} placeholder="שם היום" /></label>
+                                    <label className={styles.label}>ארוחת בוקר<AdminTextarea className={styles.menuMealInput} disabled={Boolean(lockedAt)} value={item.breakfast} onChange={(event) => updateMenuItem(index, "breakfast", event.target.value)} /></label>
+                                    <label className={styles.label}>ארוחת צהריים<AdminTextarea className={styles.menuMealInput} disabled={Boolean(lockedAt)} value={item.lunch ?? ""} onChange={(event) => updateMenuItem(index, "lunch", event.target.value)} /></label>
+                                    <label className={styles.label}>ארוחת מנחה<AdminTextarea className={styles.menuMealInput} disabled={Boolean(lockedAt)} value={item.afternoon ?? ""} onChange={(event) => updateMenuItem(index, "afternoon", event.target.value)} /></label>
                                 </div>
                             </section>)}
                         </div> : <p className={styles.emptyMenu}>עדיין לא נוספו ימים לתפריט.</p>}
                     </div>
-                    <label className={styles.label}>הערה להורים<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.menu.note ?? ""} onChange={(event) => setDocuments({ ...documents, menu: { ...documents.menu, note: event.target.value } })} /></label>
-                </article> : null}
+                    <label className={styles.label}>הערה להורים<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.menu.note ?? ""} onChange={(event) => setDocuments({ ...documents, menu: { ...documents.menu, note: event.target.value } })} /></label>
+                </AdminCard> : null}
 
-                {visibleDocument === "equipment" ? <article className={styles.card}>
+                {visibleDocument === "equipment" ? <AdminCard className={styles.card}>
                     <h3>ציוד אישי - מה להביא למעון</h3>
-                    <label className={styles.label}>כותרת משנה<input className={styles.input} disabled={Boolean(lockedAt)} value={documents.equipment.subtitle} onChange={(event) => setDocuments({ ...documents, equipment: { ...documents.equipment, subtitle: event.target.value } })} /></label>
-                    <label className={styles.label}>רשימת הציוד - כל פריט בשורה<textarea className={styles.textarea} disabled={Boolean(lockedAt)} value={equipmentRows} onChange={(event) => setEquipmentRows(event.target.value)} /></label>
-                    <label className={styles.label}>תיבת הדגשה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.equipment.important} onChange={(event) => setDocuments({ ...documents, equipment: { ...documents.equipment, important: event.target.value } })} /></label>
-                    <label className={styles.label}>הערה תחתונה<textarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.equipment.note} onChange={(event) => setDocuments({ ...documents, equipment: { ...documents.equipment, note: event.target.value } })} /></label>
-                </article> : null}
+                    <label className={styles.label}>כותרת משנה<AdminInput disabled={Boolean(lockedAt)} value={documents.equipment.subtitle} onChange={(event) => setDocuments({ ...documents, equipment: { ...documents.equipment, subtitle: event.target.value } })} /></label>
+                    <label className={styles.label}>רשימת הציוד - כל פריט בשורה<AdminTextarea className={styles.textarea} disabled={Boolean(lockedAt)} value={equipmentRows} onChange={(event) => setEquipmentRows(event.target.value)} /></label>
+                    <label className={styles.label}>תיבת הדגשה<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.equipment.important} onChange={(event) => setDocuments({ ...documents, equipment: { ...documents.equipment, important: event.target.value } })} /></label>
+                    <label className={styles.label}>הערה תחתונה<AdminTextarea className={styles.smallTextarea} disabled={Boolean(lockedAt)} value={documents.equipment.note} onChange={(event) => setDocuments({ ...documents, equipment: { ...documents.equipment, note: event.target.value } })} /></label>
+                </AdminCard> : null}
             </div>
 
             <div className={styles.actions}>
-                {!lockedAt ? <button className={styles.primaryButton} type="button" disabled={busy} onClick={() => void save()}>{busy ? "שומר..." : documentLabels[visibleDocument].save}</button> : null}
-                {lockedAt ? <button className={styles.secondaryButton} type="button" disabled={busy} onClick={() => setUnlockDialogOpen(true)}>בדיקה ושחרור נעילה</button> : null}
-                {isNewYear ? <button className={styles.secondaryButton} type="button" onClick={() => apply(years[0])}>ביטול</button> : null}
-                {!isNewYear ? <button className={sharedDocumentKeys.includes(visibleDocument) ? styles.sharedButton : styles.secondaryButton} type="button" disabled={sharingBusy} onClick={() => void toggleSharing()}>{sharingBusy ? "מעדכן שיתוף..." : sharedDocumentKeys.includes(visibleDocument) ? "משותף להורים · הסרת שיתוף" : "שיתוף להורים"}</button> : null}
-                {!isNewYear ? <a className={styles.secondaryButton} href={adminParentDocumentPdfUrl(selectedYear, visibleDocument)} target="_blank" rel="noreferrer">הורדת PDF לשימוש פנימי</a> : null}
+                {!lockedAt ? <AdminButton variant="primary" type="button" disabled={busy} onClick={() => void save()}>{busy ? "שומר..." : documentLabels[visibleDocument].save}</AdminButton> : null}
+                {lockedAt ? <AdminButton variant="secondary" type="button" disabled={busy} onClick={() => setUnlockDialogOpen(true)}>בדיקה ושחרור נעילה</AdminButton> : null}
+                {isNewYear ? <AdminButton variant="secondary" type="button" onClick={() => apply(years[0])}>ביטול</AdminButton> : null}
+                {!isNewYear ? <AdminButton aria-pressed={sharedDocumentKeys.includes(visibleDocument)} type="button" disabled={sharingBusy} onClick={() => void toggleSharing()}>{sharingBusy ? "מעדכן שיתוף..." : sharedDocumentKeys.includes(visibleDocument) ? "משותף להורים · הסרת שיתוף" : "שיתוף להורים"}</AdminButton> : null}
+                {!isNewYear ? <AdminLink href={adminParentDocumentPdfUrl(selectedYear, visibleDocument)} target="_blank" rel="noreferrer">הורדת PDF לשימוש פנימי</AdminLink> : null}
             </div>
-            <div aria-live="polite">{notice ? <p className={styles.success}>{notice}</p> : null}{error ? <p className={styles.error}>{error}</p> : null}</div>
+            <div aria-live="polite">{notice ? <p className={styles.success}>{notice}</p> : null}{error ? <p role="alert" className={styles.error}>{error}</p> : null}</div>
             <ConfirmDialog
                 open={unlockDialogOpen}
                 title="בדיקה ושחרור נעילת המסמכים"
@@ -335,7 +336,7 @@ const DaycareParentDocuments = ({ visibleDocument }: DaycareParentDocumentsProps
                 onConfirm={() => void unlock()}
                 onClose={() => setUnlockDialogOpen(false)}
             />
-        </section>
+        </AdminCard>
     );
 };
 

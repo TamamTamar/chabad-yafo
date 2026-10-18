@@ -1,4 +1,4 @@
-import styles from "../DaycareAdmin.module.scss";
+import styles from "./DaycareTasks.styles";
 import type { DaycareOverview } from "../types";
 
 type DaycareExpansionProps = {
@@ -26,11 +26,8 @@ const DaycareExpansion = ({ overview }: DaycareExpansionProps) => {
                 </div>
 
                 <span
-                    className={`${styles.statusBadge} ${
-                        expansion.alertActive
-                            ? styles.statusAttention
-                            : styles.statusProgress
-                    }`}
+                    className={styles.statusBadge}
+                    data-tone={expansion.alertActive ? "warning" : "info"}
                 >
                     {expansion.status}
                 </span>
@@ -71,11 +68,8 @@ const DaycareExpansion = ({ overview }: DaycareExpansionProps) => {
                             {item.label}
                         </span>
                         <span
-                            className={`${styles.statusBadge} ${
-                                item.ready
-                                    ? styles.statusReady
-                                    : styles.statusAttention
-                            }`}
+                            className={styles.statusBadge}
+                            data-tone={item.ready ? "success" : "warning"}
                         >
                             {item.ready ? "מוכן" : "לטיפול"}
                         </span>

@@ -10,14 +10,16 @@ type ProtectedRouteAdminProps = {
 const ProtectedRouteAdmin = ({ children }: ProtectedRouteAdminProps) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [adminLabel, setAdminLabel] = useState<string>();
 
     useEffect(() => {
         let isMounted = true;
 
         getAdminSession()
-            .then(() => {
+            .then((session) => {
                 if (isMounted) {
                     setIsAdmin(true);
+                    setAdminLabel(typeof session?.user?.label === "string" ? session.user.label : undefined);
                 }
             })
             .catch(() => {
@@ -44,7 +46,7 @@ const ProtectedRouteAdmin = ({ children }: ProtectedRouteAdminProps) => {
         return <Navigate to="/admin/login" replace />;
     }
 
-    return <AdminShell>{children}</AdminShell>;
+    return <AdminShell adminLabel={adminLabel}>{children}</AdminShell>;
 };
 
 export default ProtectedRouteAdmin;

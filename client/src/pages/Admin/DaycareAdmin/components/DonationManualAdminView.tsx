@@ -1,3 +1,4 @@
+import { AdminButton, AdminInput, AdminSelect, AdminTextarea, AdminCard } from "../../../../components/AdminUI";
 import type { ManualCurrency } from "./useDaycareDonationsAdmin";
 import styles from "./DaycareDonationsAdmin.module.scss";
 import type { useDaycareDonationsAdmin } from "./useDaycareDonationsAdmin";
@@ -20,7 +21,7 @@ const DonationManualAdminView = ({ model }: Props) => {
     return (
         <>
             {activeView === "manual" && (
-            <section className={styles.panel}>
+            <section className={styles.panel}><AdminCard>
                 <header>
                     <h2>הזנת תרומה ידנית</h2>
                     <p>
@@ -34,8 +35,7 @@ const DonationManualAdminView = ({ model }: Props) => {
                 >
                     <label>
                         מטבע
-                        <select
-                            name="currency"
+                        <AdminSelect aria-label="מטבע" name="currency"
                             value={manualCurrency}
                             onChange={(event) => {
                                 const currency = event.target.value as ManualCurrency;
@@ -51,11 +51,11 @@ const DonationManualAdminView = ({ model }: Props) => {
                             <option value="ILS">שקל חדש (₪)</option>
                             <option value="USD">דולר ארה״ב ($)</option>
                             <option value="EUR">אירו (€)</option>
-                        </select>
+                        </AdminSelect>
                     </label>
                     <label>
                         סכום {currencyAmountLabel[manualCurrency]}
-                        <input
+                        <AdminInput
                             name="amount"
                             type="number"
                             min="1"
@@ -71,7 +71,7 @@ const DonationManualAdminView = ({ model }: Props) => {
                         <>
                             <label>
                                 שער {currencyRateLabel[manualCurrency]} לשקל
-                                <input
+                                <AdminInput
                                     name="exchangeRate"
                                     type="number"
                                     min="0.0001"
@@ -108,20 +108,20 @@ const DonationManualAdminView = ({ model }: Props) => {
                                               ? `שער יציג של בנק ישראל לתאריך ${formatShortDate(manualRateUpdatedAt)}`
                                               : manualRateError || "אפשר לערוך את השער ידנית"}
                                     </span>
-                                    <button
+                                    <AdminButton
                                         type="button"
                                         disabled={manualRateLoading}
                                         onClick={() => void loadAutomaticRate(manualCurrency)}
                                     >
                                         רענון שער
-                                    </button>
+                                    </AdminButton>
                                 </div>
                             </div>
                         </>
                     )}
                     <label>
                         שיוך
-                        <select name="itemId" defaultValue="">
+                        <AdminSelect aria-label="שיוך" name="itemId" defaultValue="">
                             <option value="">
                                 למקום שבו התרומה נדרשת ביותר
                             </option>
@@ -132,11 +132,11 @@ const DonationManualAdminView = ({ model }: Props) => {
                                         : "היעד הושלם"}
                                 </option>
                             ))}
-                        </select>
+                        </AdminSelect>
                     </label>
                     <label>
                         שגריר
-                        <select name="ambassadorId" defaultValue="">
+                        <AdminSelect aria-label="שגריר" name="ambassadorId" defaultValue="">
                             <option value="">ללא שגריר — תרומה כללית</option>
                             {ambassadors
                                 .filter((ambassador) => ambassador.active)
@@ -148,12 +148,11 @@ const DonationManualAdminView = ({ model }: Props) => {
                                         {ambassador.name}
                                     </option>
                                 ))}
-                        </select>
+                        </AdminSelect>
                     </label>
                     <label>
                         מקור התרומה
-                        <select
-                            name="manualSource"
+                        <AdminSelect aria-label="מקור התרומה" name="manualSource"
                             defaultValue="bank_transfer"
                             required
                         >
@@ -163,11 +162,11 @@ const DonationManualAdminView = ({ model }: Props) => {
                             <option value="cash">מזומן</option>
                             <option value="check">צ׳ק</option>
                             <option value="other">אחר</option>
-                        </select>
+                        </AdminSelect>
                     </label>
                     <label>
                         שם התורם
-                        <input name="donorName" type="text" />
+                        <AdminInput name="donorName" type="text" />
                     </label>
                     <label className={`${styles.manualPrivacyChoice} ${styles.fullField}`}>
                         <input
@@ -184,7 +183,7 @@ const DonationManualAdminView = ({ model }: Props) => {
                     </label>
                     <label>
                         תאריך ושעת קבלה
-                        <input
+                        <AdminInput
                             name="receivedAt"
                             type="datetime-local"
                             value={manualReceivedAt}
@@ -202,19 +201,19 @@ const DonationManualAdminView = ({ model }: Props) => {
                     </label>
                     <label>
                         טלפון
-                        <input name="phone" type="tel" />
+                        <AdminInput name="phone" type="tel" />
                     </label>
                     <label>
                         דוא״ל
-                        <input name="email" type="email" />
+                        <AdminInput name="email" type="email" />
                     </label>
                     <label className={styles.fullField}>
                         הקדשה
-                        <input name="dedication" type="text" />
+                        <AdminInput name="dedication" type="text" />
                     </label>
                     <label className={styles.fullField}>
                         אסמכתא
-                        <input
+                        <AdminInput
                             name="reference"
                             type="text"
                             placeholder="מספר העברה / מספר צ׳ק / אסמכתא"
@@ -222,13 +221,13 @@ const DonationManualAdminView = ({ model }: Props) => {
                     </label>
                     <label className={styles.fullField}>
                         הערה פנימית (חובה אם אין אסמכתא)
-                        <textarea name="note" rows={2} />
+                        <AdminTextarea name="note" rows={2} />
                     </label>
-                    <button type="submit" disabled={saving}>
+                    <AdminButton variant="primary" type="submit" disabled={saving}>
                         {saving ? "שומר..." : "שמירת תרומה ועדכון המדדים"}
-                    </button>
+                    </AdminButton>
                 </form>
-            </section>
+            </AdminCard></section>
             )}
 
         </>

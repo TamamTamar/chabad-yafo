@@ -20,6 +20,7 @@ function harness(path, services, extraSource = '') {
     const jsx = (type, props) => ({ type, props });
     const dependencies = {
         react,
+        'lucide-react': { ClipboardList: () => null, RefreshCw: () => null, Search: () => null },
         'react/jsx-runtime': { jsx, jsxs: jsx, Fragment: 'fragment' },
         'react-hook-form': {
             useForm: () => ({ register: () => ({}), control: {}, formState: { errors: {}, isSubmitting: false }, handleSubmit: fn => () => {
@@ -41,6 +42,15 @@ function harness(path, services, extraSource = '') {
         if (name.endsWith('/types/shifraPua')) return { israelToday: () => '2026-10-15', validPhone: () => true,
             shifraStatuses: { new: 'חדשה', coordinated: 'תואמה', delivered: 'נמסרה' }, formatDate: value => value };
         if (name.endsWith('.scss')) return {};
+        if (name.endsWith('/ConfirmDialog')) return () => null;
+        if (name === './WeeklyLists' || name === './RecipeEditor') return () => null;
+        if (name.endsWith('/http')) return services.http;
+        if (name.endsWith('/types/shifraPlanning')) {
+            const constants = {};
+            const compiled = ts.transpileModule(readFileSync(new URL('../src/types/shifraPlanning.ts', import.meta.url), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+            new Function('exports', compiled)(constants);
+            return constants;
+        }
         if (name.endsWith('/Container') || name.endsWith('/AdminPageHeader')) return () => null;
         throw new Error(`Unexpected dependency: ${name}`);
     });
@@ -101,4 +111,66 @@ test('admin save retains draft on failure and calls onSaved only after confirmed
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(saved, 1);
     assert.equal(alerts(render()).length, 0);
+});
+
+
+test('weekly menu requires preview, rejects duplicate approvals, retains preview on failure and updates only after acknowledgement', async () => {
+    let resolve, reject, calls = 0, saved = 0;
+    const recipes = ['main', 'salad', 'dressing', 'bread', 'spread', 'dessert'].map(category => ({ id: category, category, revision: 0, name: category, ingredients: [], tasks: [], instructions: '', purchased: true, batchFriendly: true, dressingIds: [] }));
+    const week = { date: '2026-10-21', revision: 2, shopping: [], tasks: [], mealCount: 4 };
+    const preview = { recipes, revision: 2, mealCount: 4, token: 'preview-only', shopping: [], tasks: [], changes: [], warnings: [] };
+    const model = harness('../src/pages/Admin/ShifraPuaAdmin/WeeklyMenu.tsx', {
+        http: { post: () => { calls++; return new Promise((yes, no) => { resolve = yes; reject = no; }); } },
+        shifraError: () => 'conflict or network failure',
+    });
+    const props = { week, planning: { recipes, suggestion: recipes, favorites: [], history: [] }, disabled: false, onSaved() { saved++; }, onBusy() {}, onCatalog() {} };
+    const render = () => model.render(props);
+    const button = text => nodes(render(), node => node.type === 'button' && node.props.children === text)[0];
+    assert.equal(button('אישור התפריט ומילוי הרשימות'), undefined);
+    button('אישור התפריט · בדיקת הרשימות').props.onClick();
+    button('אישור התפריט · בדיקת הרשימות').props.onClick();
+    assert.equal(calls, 1);
+    assert.equal(saved, 0);
+    resolve({ data: { data: preview } }); await new Promise(resolve => setImmediate(resolve));
+    assert.ok(button('אישור התפריט ומילוי הרשימות'));
+    button('אישור התפריט ומילוי הרשימות').props.onClick();
+    // A stale handler invoked twice must still submit only once.
+    nodes(render(), node => node.type === 'button' && node.props.children === 'שומר…')[0].props.onClick();
+    assert.equal(calls, 2);
+    assert.equal(saved, 0);
+    reject(new Error('conflict')); await new Promise(resolve => setImmediate(resolve));
+    assert.equal(alerts(render()).length, 1);
+    assert.ok(button('אישור התפריט ומילוי הרשימות'));
+    button('אישור התפריט ומילוי הרשימות').props.onClick();
+    resolve({ data: { data: { ...week, revision: 3, menu: { recipes } } } });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(saved, 1);
+    assert.equal(button('אישור התפריט ומילוי הרשימות'), undefined);
+});
+
+test('changing salad also selects a matching dressing and invalidates the current preview', async () => {
+    const recipes = ['main', 'salad', 'dressing', 'bread', 'spread', 'dessert'].map(category => ({ id: category, category, revision: 0, name: category, ingredients: [], tasks: [], instructions: '', purchased: true, batchFriendly: true, dressingIds: [] }));
+    const salad = { ...recipes[1], id: 'new-salad', dressingIds: ['new-dressing'] };
+    const dressing = { ...recipes[2], id: 'new-dressing' };
+    const preview = { recipes, revision: 0, mealCount: 1, shopping: [], tasks: [], changes: [], warnings: [] };
+    const model = harness('../src/pages/Admin/ShifraPuaAdmin/WeeklyMenu.tsx', { http: { post: async () => ({ data: { data: preview } }) }, shifraError: () => 'error' });
+    const props = { week: { date: '2026-10-21', revision: 0, mealCount: 1 }, planning: { recipes: [...recipes, salad, dressing], suggestion: recipes, history: [], favorites: [] }, disabled: false, onBusy() {}, onSaved() {}, onCatalog() {} };
+    const render = () => model.render(props);
+    nodes(render(), node => node.type === 'button' && node.props.children === 'אישור התפריט · בדיקת הרשימות')[0].props.onClick();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(nodes(render(), node => node.props?.['aria-label'] === 'הצעת שינויים לפני החלה').length);
+    nodes(render(), node => node.type === 'select')[1].props.onChange({ target: { value: 'new-salad' } });
+    assert.equal(nodes(render(), node => node.type === 'select')[2].props.value, 'new-dressing');
+    assert.equal(nodes(render(), node => node.props?.['aria-label'] === 'הצעת שינויים לפני החלה').length, 0);
+});
+
+
+test('catalog edits do not change the name or content displayed for an approved weekly snapshot', () => {
+    const recipes = ['main', 'salad', 'dressing', 'bread', 'spread', 'dessert'].map(category => ({ id: category, category, revision: 0, name: 'approved-' + category, ingredients: [], tasks: [], instructions: '', purchased: true, batchFriendly: true, dressingIds: [] }));
+    const catalog = recipes.map(recipe => ({ ...recipe, revision: 1, name: 'new-' + recipe.category }));
+    const model = harness('../src/pages/Admin/ShifraPuaAdmin/WeeklyMenu.tsx', { http: {}, shifraError: () => 'error' });
+    const tree = model.render({ week: { date: '2026-10-21', revision: 1, mealCount: 1, menu: { recipes, mealCount: 1 } }, planning: { recipes: catalog, suggestion: catalog, favorites: [], history: [] }, disabled: false, onBusy() {}, onSaved() {}, onCatalog() {} });
+    const firstSelect = nodes(tree, node => node.type === 'select')[0];
+    const selected = nodes(firstSelect, node => node.type === 'option' && node.props.value === 'main')[0];
+    assert.equal(selected.props.children[0], 'approved-main');
 });
