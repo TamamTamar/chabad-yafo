@@ -4,12 +4,13 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "npm run build && node scripts/run-safe-environment.cjs --development",
     "build": "tsc",
-    "test": "npm run build && node --test dist/tests/*.test.js",
+    "test": "npm run build && node scripts/run-unit-tests.cjs",
     "test:db": "npm run build && node scripts/test-local-database.mjs",
-    "start": "node dist/index.js",
-    "clean": "rm -rf node_modules package-lock.json && npm install"
+    "start": "node dist/index.js --production",
+    "clean": "rm -rf node_modules package-lock.json && npm install",
+    "test:children:integration": "npm run build && node scripts/run-safe-environment.cjs --test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1085.0",

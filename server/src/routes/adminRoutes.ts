@@ -9,7 +9,10 @@ import { generalAdminRoutes } from "./admin/generalAdminRoutes";
 
 import { daycareInitializationRoutes } from "./admin/daycareInitializationRoutes";
 
+import { maintenanceRoutes } from "./admin/maintenanceRoutes";
 const router = Router();
+router.use(maintenanceRoutes);
+
 router.use(daycareInitializationRoutes);
 
 router.use(generalAdminRoutes);

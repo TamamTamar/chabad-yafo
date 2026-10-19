@@ -1,12 +1,11 @@
-import { ShifraPuaRecipe, ShifraPuaSavedMenu } from './models/ShifraPuaRecipe';
-import { ShifraPuaWeek } from './models/ShifraPuaWeek';
 import { shifraPuaPublicRoutes, shifraPuaAdminRoutes } from './routes/shifraPuaRoutes';
-import { ShifraPuaRegistration } from './models/ShifraPuaRegistration';
 import { maftirYonaPublicRoutes, maftirYonaAdminRoutes } from "./routes/maftirYonaRoutes";
 import { arbaatHaminimAdminRoutes, arbaatHaminimPublicRoutes } from "./routes/arbaatHaminimRoutes";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import { createHash } from "node:crypto";
+import { mongoConnectionPolicy } from "./config/mongoSafety";
+import { loadRuntimeEnvironment } from "./config/runtimeEnvironment";
 import { healthRoutes } from "./routes/healthRoutes";
 import { shabbatRoutes } from "./routes/shabbatRoutes";
 import { connectDB } from "./config/connectDB";
@@ -23,24 +22,18 @@ import {
     daycareOnboardingAdminRoutes,
     daycareOnboardingPublicRoutes,
 } from "./routes/daycareOnboardingRoutes";
-import { ensureDaycareOnboardingIndexes } from "./services/daycareOnboardingIndexService";
 import { daycareAgreementAdminRoutes, daycareAgreementPublicRoutes } from "./routes/daycareAgreementRoutes";
-import { ensureDefaultAgreementDraft, reconcileAgreementOnboardingSteps } from "./services/daycareAgreementService";
 import { projectRoutes } from "./routes/projectRoutes";
 import { daycareParentDocumentAdminRoutes, daycareParentDocumentRoutes } from "./routes/daycareParentDocumentRoutes";
 import { daycareAnnualPlanAdminRoutes } from "./routes/daycareAnnualPlanRoutes";
-import { backfillParentDocumentSnapshots } from "./services/daycareParentDocumentService";
 import { daycareHealthDeclarationAdminRoutes, daycareHealthDeclarationPublicRoutes } from "./routes/daycareHealthDeclarationRoutes";
-import { syncDaycareOnboardingStepTitles } from "./services/daycareOnboardingTitleSyncService";
-import { ensureDaycareAgreementIndexes } from "./services/daycareAgreementIndexService";
 import { daycarePickupAuthorizationAdminRoutes, daycarePickupAuthorizationPublicRoutes } from "./routes/daycarePickupAuthorizationRoutes";
 import { daycareDonationRoutes } from "./routes/daycareDonationRoutes";
 import { daycareDonationAdminRoutes } from "./routes/admin/daycareDonationAdminRoutes";
 import { daycarePaymentAdminRoutes, daycarePaymentPublicRoutes } from "./routes/daycarePaymentRoutes";
-import { ensureDaycarePaymentStorage } from "./services/daycarePaymentIndexService";
 import { chatAssistantRoutes } from "./routes/chatAssistantRoutes";
 
-dotenv.config();
+loadRuntimeEnvironment();
 
 const app = express();
 
@@ -114,20 +107,14 @@ const startServer = async () => {
     try {
         logger.log("Connecting to Mongo...");
         await connectDB();
-        await ShifraPuaRegistration.createIndexes();
-        await ShifraPuaWeek.createIndexes();
-        await ShifraPuaRecipe.createIndexes();
-        await ShifraPuaSavedMenu.createIndexes();
-        await ensureDaycareOnboardingIndexes();
-        await ensureDaycareAgreementIndexes();
-        await ensureDaycarePaymentStorage();
-        await syncDaycareOnboardingStepTitles();
-        await ensureDefaultAgreementDraft();
-        await reconcileAgreementOnboardingSteps();
-        await backfillParentDocumentSnapshots();
+        if (!process.argv.includes('--production')) {
+            const managed = mongoConnectionPolicy().managed!;
+            app.get('/__safe-runtime', (_req, res) => res.json({ proof:createHash('sha256').update(managed.nonce).digest('hex') }));
+        }
+        // Index creation, seeds, reconciliation and backfills are explicit maintenance actions.
         logger.log("Mongo finished");
 
-        app.listen(port, () => {
+        app.listen(port, process.argv.includes('--production') ? "0.0.0.0" : "127.0.0.1", () => {
             logger.log(`✅ Server listening on ${port}`);
         });
     } catch (error) {

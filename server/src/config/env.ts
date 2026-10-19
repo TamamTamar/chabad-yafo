@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
-dotenv.config();
+import { loadRuntimeEnvironment } from "./runtimeEnvironment";
+loadRuntimeEnvironment();
 
 const required = (key: string) => {
     const val = process.env[key];

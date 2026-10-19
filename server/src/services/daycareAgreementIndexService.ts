@@ -1,3 +1,4 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import { DaycareAgreement } from "../models/DaycareAgreement";
 
 const isLegacyUniqueOnboardingIndex = (index: {
@@ -9,6 +10,7 @@ const isLegacyUniqueOnboardingIndex = (index: {
     Object.keys(index.key).length === 1;
 
 export const ensureDaycareAgreementIndexes = async () => {
+    requireMaintenanceAuthorization();
     await DaycareAgreement.collection.updateMany(
         { revision: { $exists: false } },
         { $set: { revision: 1 } }

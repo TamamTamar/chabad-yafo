@@ -40,6 +40,8 @@ async function start(port, replica = false) {
             try { await client.connect(); ready = true; break; } catch { await delay(100); }
         }
         assert.ok(ready, 'Disposable mongod startup timed out');
+        const identity = await client.db('admin').command({serverStatus:1});
+        assert.equal(identity.pid, child.pid, 'Refuse a MongoDB process not owned by this runner');
         if (replica) {
             await client.db('admin').command({ replSetInitiate: { _id: 'maftirqa', members: [{ _id: 0, host: '127.0.0.1:27039' }] } });
             let primary = false;
@@ -55,7 +57,7 @@ try {
     await start(27029);
     await start(27039, true);
     const suffix = `run_${Date.now()}`;
-    const env = { ...process.env,
+    const env = { PATH:process.env.PATH, NODE_ENV:'test', JWT_SECRET:'isolated-legacy-tests-only', TWILIO_ACCOUNT_SID:'AC'+'0'.repeat(32),TWILIO_AUTH_TOKEN:'test-only',TWILIO_WHATSAPP_FROM:'whatsapp:+10000000000',ADMIN_WHATSAPP_TO:'whatsapp:+10000000001',
         SHIFRA_TEST_MONGO_URI: `mongodb://127.0.0.1:27029/shifra_qa_${suffix}`,
         ARBAAT_TEST_MONGO_URI: `mongodb://127.0.0.1:27029/arbaat_qa_${suffix}`,
         MAFTIR_TEST_MONGO_URI: `mongodb://127.0.0.1:27039/maftir_qa_${suffix}?replicaSet=maftirqa`,

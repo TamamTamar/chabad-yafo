@@ -1,3 +1,4 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import { createHash, randomUUID } from "node:crypto";
 import { Types } from "mongoose";
 import { DaycareAgreement } from "../models/DaycareAgreement";
@@ -86,6 +87,7 @@ export const buildDefaultAgreementDraft = () => ({
 });
 
 export const ensureDefaultAgreementDraft = async () => {
+    requireMaintenanceAuthorization();
     const seed = buildDefaultAgreementDraft();
     const existingSchoolYearAgreement = await DaycareAgreementVersion.exists({
         documentKey: seed.documentKey,
@@ -95,12 +97,9 @@ export const ensureDefaultAgreementDraft = async () => {
 
     const hasStructuredVersion = await DaycareAgreementVersion.exists({ documentKey: "daycareAgreement", format: "structured-v1" });
     if (!hasStructuredVersion) {
-        // The structured-v1 rollout was approved before any real signatures existed.
-        // Refuse destructive cleanup if that assumption is ever no longer true.
-        if (await DaycareAgreement.exists({ signedAt: { $exists: true } })) {
-            throw new Error("Cannot replace legacy agreement versions after signatures exist");
+        if (await DaycareAgreementVersion.exists({documentKey:"daycareAgreement",format:{$ne:"structured-v1"}})) {
+            throw new Error("Legacy agreement data requires a separately reviewed migration");
         }
-        await DaycareAgreementVersion.deleteMany({ documentKey: "daycareAgreement", format: { $ne: "structured-v1" } });
     }
 
     const result = await DaycareAgreementVersion.updateOne(
@@ -115,7 +114,6 @@ export const ensureDefaultAgreementDraft = async () => {
 };
 
 export const listAgreementVersions = async () => {
-    await ensureDefaultAgreementDraft();
     return (await DaycareAgreementVersion.find().sort({ schoolYear: -1, createdAt: -1 })).map(versionDto);
 };
 
@@ -504,6 +502,7 @@ export const reviewAgreement = async (agreementId: string, input: { status: "com
 };
 
 export const reconcileAgreementOnboardingSteps = async (now = new Date()) => {
+    requireMaintenanceAuthorization();
     const agreements = await DaycareAgreement.find({
         status: { $in: ["pendingReview", "completed", "requiresCorrection"] },
     }).sort({ onboardingId: 1, revision: -1 }).select("onboardingId revision status parentMessage signedAt reviewedAt");

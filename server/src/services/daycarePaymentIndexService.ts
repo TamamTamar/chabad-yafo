@@ -1,7 +1,9 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
 import { DaycarePayment } from "../models/DaycarePayment";
 
 export const ensureDaycarePaymentStorage = async () => {
+    requireMaintenanceAuthorization();
     await DaycarePayment.createIndexes();
 
     // Existing personal links predate tuition fields. A pipeline keeps any

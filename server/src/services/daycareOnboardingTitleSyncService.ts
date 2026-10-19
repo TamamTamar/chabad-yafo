@@ -1,7 +1,9 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import { DAYCARE_ONBOARDING_STEP_DEFINITIONS } from "../config/daycareOnboardingDefaults";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
 
 export const syncDaycareOnboardingStepTitles = async () => {
+    requireMaintenanceAuthorization();
     const canonicalKeys = DAYCARE_ONBOARDING_STEP_DEFINITIONS.map(
         (definition) => definition.key
     );

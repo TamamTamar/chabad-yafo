@@ -1,3 +1,4 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import { createHash } from "node:crypto";
 import { DAYCARE_EQUIPMENT_DOCUMENT, DAYCARE_PARENT_DOCUMENTS_2026_2027, DAYCARE_WELCOME_DOCUMENT, type DaycareParentDocumentBundle, type DaycareParentDocumentKey } from "../config/daycareParentDocuments";
 import { DaycareAgreement } from "../models/DaycareAgreement";
@@ -77,7 +78,6 @@ const adminDto = (record: InstanceType<typeof DaycareParentDocumentYear>) => ({
 });
 
 export const getSharedParentDocumentKeys = async (schoolYear: string) => {
-    await ensureDefaultParentDocumentYear();
     const record = await DaycareParentDocumentYear.findOne({ schoolYear }).select("sharedDocumentKeys");
     if (!record) throw new DaycareOnboardingServiceError("מסמכי ההורים לשנת הלימודים לא הוגדרו.", 404, "PARENT_DOCUMENTS_NOT_PUBLISHED");
     return record.sharedDocumentKeys ?? [];
@@ -94,21 +94,17 @@ export const hashParentDocumentBundle = (bundle: DaycareParentDocumentBundle) =>
     createHash("sha256").update(JSON.stringify(bundle), "utf8").digest("hex");
 
 export const ensureDefaultParentDocumentYear = async () => {
+    requireMaintenanceAuthorization();
     const seed = cloneBundle(DAYCARE_PARENT_DOCUMENTS_2026_2027);
     const result = await DaycareParentDocumentYear.updateOne(
         { schoolYear: seed.schoolYear },
         { $setOnInsert: seed },
         { upsert: true }
     );
-    await DaycareParentDocumentYear.updateMany(
-        { sharedDocumentKeys: { $exists: false } },
-        { $set: { sharedDocumentKeys: ["routine", "holidays", "menu"] } }
-    );
     return result.upsertedCount === 1;
 };
 
 export const getPublishedParentDocumentBundle = async (schoolYear: string) => {
-    await ensureDefaultParentDocumentYear();
     const record = await DaycareParentDocumentYear.findOne({ schoolYear });
     if (!record) {
         throw new DaycareOnboardingServiceError("מסמכי ההורים לשנת הלימודים לא הוגדרו.", 404, "PARENT_DOCUMENTS_NOT_PUBLISHED");
@@ -117,7 +113,6 @@ export const getPublishedParentDocumentBundle = async (schoolYear: string) => {
 };
 
 export const getCurrentParentDocumentBundle = async () => {
-    await ensureDefaultParentDocumentYear();
     const record = await DaycareParentDocumentYear.findOne().sort({ schoolYear: -1 });
     if (!record) throw new Error("No daycare parent document year is configured");
     return bundleFromRecord(record);
@@ -133,7 +128,6 @@ export const getParentDocumentBundleForToken = async (token: string, now = new D
 };
 
 export const lockParentDocumentYear = async (schoolYear: string, now = new Date()) => {
-    await ensureDefaultParentDocumentYear();
     await DaycareParentDocumentYear.updateOne(
         { schoolYear, lockedAt: { $exists: false } },
         { $set: { lockedAt: now } }
@@ -144,7 +138,6 @@ export const lockParentDocumentYear = async (schoolYear: string, now = new Date(
 };
 
 export const listParentDocumentYearsForAdmin = async () => {
-    await ensureDefaultParentDocumentYear();
     return (await DaycareParentDocumentYear.find().sort({ schoolYear: -1 })).map(adminDto);
 };
 
@@ -157,7 +150,6 @@ const hasSignedAgreementsForSchoolYear = async (schoolYear: string) => {
 };
 
 export const unlockParentDocumentYearForAdmin = async (schoolYear: string) => {
-    await ensureDefaultParentDocumentYear();
     const existing = await DaycareParentDocumentYear.findOne({ schoolYear });
     if (!existing) {
         throw new DaycareOnboardingServiceError("מסמכי ההורים לשנת הלימודים לא הוגדרו.", 404, "PARENT_DOCUMENTS_NOT_PUBLISHED");
@@ -223,6 +215,7 @@ export const createParentDocumentDownload = async (bundle: DaycareParentDocument
 };
 
 export const backfillParentDocumentSnapshots = async () => {
+    requireMaintenanceAuthorization();
     const agreements = await DaycareAgreement.find({ parentDocumentsSnapshot: { $exists: false } }).select("_id onboardingId");
     let updated = 0;
     for (const agreement of agreements) {

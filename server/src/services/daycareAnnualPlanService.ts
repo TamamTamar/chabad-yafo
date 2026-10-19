@@ -1,3 +1,4 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import { DAYCARE_ANNUAL_PLAN_2026_2027, type DaycareAnnualPlanDocument } from "../config/daycareAnnualPlan";
 import type { DaycareHolidaysDocument } from "../config/daycareParentDocuments";
 import { DaycareAnnualPlan } from "../models/DaycareAnnualPlan";
@@ -26,18 +27,17 @@ const dto = (record: InstanceType<typeof DaycareAnnualPlan>) => ({
 });
 
 export const ensureDefaultDaycareAnnualPlan = async () => {
+    requireMaintenanceAuthorization();
     const seed = { schoolYear: "2026-2027", ...clone(DAYCARE_ANNUAL_PLAN_2026_2027) };
     const result = await DaycareAnnualPlan.updateOne({ schoolYear: seed.schoolYear }, { $setOnInsert: seed }, { upsert: true });
     return result.upsertedCount === 1;
 };
 
 export const listDaycareAnnualPlans = async () => {
-    await ensureDefaultDaycareAnnualPlan();
     return (await DaycareAnnualPlan.find().sort({ schoolYear: -1 })).map(dto);
 };
 
 export const getDaycareAnnualPlan = async (schoolYear: string) => {
-    await ensureDefaultDaycareAnnualPlan();
     const record = await DaycareAnnualPlan.findOne({ schoolYear });
     if (!record) throw new DaycareOnboardingServiceError("תוכנית הלימודים לשנה המבוקשת לא נמצאה.", 404, "ANNUAL_PLAN_NOT_FOUND");
     return dto(record);

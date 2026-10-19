@@ -1,3 +1,4 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import { DaycareOnboarding } from "../models/DaycareOnboarding";
 
 const isLegacyChildYearIndex = (index: {
@@ -10,6 +11,7 @@ const isLegacyChildYearIndex = (index: {
     !index.partialFilterExpression;
 
 export const ensureDaycareOnboardingIndexes = async () => {
+    requireMaintenanceAuthorization();
     let indexes: Awaited<
         ReturnType<typeof DaycareOnboarding.collection.indexes>
     > = [];

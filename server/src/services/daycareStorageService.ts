@@ -100,7 +100,7 @@ const createRailwayProvider = (): StorageProvider | null => {
     };
 };
 
-const localRoot = path.resolve(process.cwd(), "private-uploads");
+const localRoot = path.resolve(process.env.SAFE_UPLOAD_ROOT || path.join(process.cwd(), "private-uploads"));
 const createLocalProvider = (): StorageProvider => ({
     provider: "local",
     async upload(input) {

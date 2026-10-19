@@ -1,3 +1,4 @@
+import { requireMaintenanceAuthorization } from "../config/maintenanceAuthorization";
 import {
     DAYCARE_DONATION_CAMPAIGN_SLUG,
     defaultDaycareDonationCampaign,
@@ -182,6 +183,9 @@ export const normalizeDaycareDonationAllocations = (
 };
 
 export const ensureDefaultDaycareDonationCampaign = async () => {
+    const existing = await DaycareDonationCampaign.findOne({slug:DAYCARE_DONATION_CAMPAIGN_SLUG});
+    if (existing) return existing;
+    requireMaintenanceAuthorization();
     await DaycareDonationCampaign.updateOne(
         { slug: DAYCARE_DONATION_CAMPAIGN_SLUG },
         { $setOnInsert: defaultDaycareDonationCampaign },

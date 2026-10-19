@@ -1,3 +1,4 @@
+import * as mongoSafety from '../config/mongoSafety';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import test from 'node:test';
@@ -87,11 +88,12 @@ test('startup preserves connection rejection and auction models reuse the defaul
     const oldUri = process.env.MONGO_URI;
     process.env.MONGO_URI = 'mongodb://local-test.invalid/db';
     t.after(() => { if (oldUri === undefined) delete process.env.MONGO_URI; else process.env.MONGO_URI = oldUri; });
+    t.mock.method(mongoSafety, 'mongoConnectionPolicy', () => ({uri:'mongodb://local-test.invalid/db'}));
     const error = new Error('initial connection failed');
     const connect = t.mock.method(mongoose, 'connect', async () => { throw error; });
     await assert.rejects(connectDB(), value => value === error);
     assert.equal(connect.mock.callCount(), 1);
-    assert.equal(connect.mock.calls[0].arguments.length, 1); // No timeout/retry overrides.
+    assert.deepEqual(connect.mock.calls[0].arguments[1],{autoIndex:false,autoCreate:false});
     assert.equal(MaftirYonaAuction.db, mongoose.connection);
     assert.equal(MaftirYonaBid.db, mongoose.connection);
 });
