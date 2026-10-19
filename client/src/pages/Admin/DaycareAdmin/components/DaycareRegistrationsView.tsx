@@ -20,9 +20,9 @@ const statusTone = (status: DaycareInterestStatus) => {
 
 const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistrationsViewProps) => {
     const {
-        rows, filteredRows, activeCasesCount, loading, error, updatingKey,
+        rows, filteredRows, activeCasesCount, loading, error, mutationNotice, updatingKey,
         expandedTreatmentKeys, expandedDetailKeys, workflowDrafts, draft,
-        createError, searchQuery, statusFilter, families, register, handleSubmit,
+        createError, searchQuery, statusFilter, families, familiesLoading, familiesError, loadFamilies, register, handleSubmit,
         createFormErrors, creating, setDraft, setSearchQuery, setStatusFilter,
         setExpandedTreatmentKeys, setExpandedDetailKeys, handleStatusChange,
         openCreateDialog, handleCreate, renderTreatmentPanel, navigate,
@@ -107,6 +107,8 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                     {error}
                 </p>
             ) : null}
+
+            {mutationNotice && <p role="status" aria-live="polite">{mutationNotice}</p>}
 
             {loading ? (
                 <div className={styles.loading} aria-live="polite">
@@ -556,7 +558,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                             </label>
                             <label className={styles.compactField}>
                                 <span>קישור למשפחה קיימת - אם זה אח/ות</span>
-                                <select {...register("existingFamilyId")}>
+                                <select disabled={creating || familiesLoading || !!familiesError} {...register("existingFamilyId")}>
                                     <option value="">ילד/ה ראשון/ה במשפחה</option>
                                     {[...families]
                                         .sort((left, right) => Number(familyMatchesPhone(right, draft.phone)) - Number(familyMatchesPhone(left, draft.phone)))
@@ -571,6 +573,8 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                 פרטי הילד וההורים יושלמו בהמשך. אם נבחרה משפחה קיימת,
                                 הילד/ה החדש/ה יקושר/תקושר אליה כאח/ות לאחר שמירת הפרטים.
                             </p>
+                            {familiesLoading && <p role="status">טוען משפחות קיימות…</p>}
+                            {familiesError && <div role="alert"><p>{familiesError}</p><AdminButton onClick={() => void loadFamilies()}>טעינה מחדש של המשפחות</AdminButton></div>}
                             {createError ? (
                                 <p className={styles.formErrorMessage} role="alert">
                                     {createError}
@@ -587,7 +591,7 @@ const DaycareRegistrationsView = ({ model, openingSummary }: DaycareRegistration
                                 <AdminButton variant="primary"
                                     className={styles.primaryButton}
                                     aria-busy={creating}
-                                    disabled={creating}
+                                    disabled={creating || familiesLoading || !!familiesError}
                                     type="submit"
                                 >
                                     {creating

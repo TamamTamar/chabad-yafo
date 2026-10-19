@@ -1,6 +1,6 @@
 import { AdminButton } from "../../../../components/AdminUI";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { daycareRegistrationStatuses } from "../daycareAdminConfig";
@@ -221,9 +221,12 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
     const [data, setData] = useState<DaycareRegistrationsResponse>({
         registrations: [],
     });
+    const [familiesLoading, setFamiliesLoading] = useState(true);
+    const [familiesError, setFamiliesError] = useState("");
     const [families, setFamilies] = useState<AdminDaycareFamilyOption[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [mutationNotice, setMutationNotice] = useState("");
     const [updatingKey, setUpdatingKey] = useState<string | null>(null);
     const [savingNoteKey, setSavingNoteKey] = useState<string | null>(null);
     const [expandedTreatmentKeys, setExpandedTreatmentKeys] = useState<string[]>([]);
@@ -257,6 +260,13 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
         });
     }, [rows, searchQuery, statusFilter]);
     const activeCasesCount = rows.filter((row) => Boolean(row.onboardingSummary)).length;
+    const loadFamilies = useCallback(async () => {
+        setFamiliesLoading(true);
+        setFamiliesError("");
+        try { setFamilies(await getAdminDaycareFamilies()); }
+        catch { setFamilies([]); setFamiliesError("לא ניתן לטעון משפחות קיימות. יש לטעון מחדש לפני פתיחת תיק."); }
+        finally { setFamiliesLoading(false); }
+    }, []);
     useEffect(() => {
         void getDaycareRegistrations()
             .then((registrations) => {
@@ -277,7 +287,8 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
             .finally(() => setLoading(false));
         void getAdminDaycareFamilies()
             .then(setFamilies)
-            .catch(() => setFamilies([]));
+            .catch(() => { setFamilies([]); setFamiliesError("לא ניתן לטעון משפחות קיימות. יש לטעון מחדש לפני פתיחת תיק."); })
+            .finally(() => setFamiliesLoading(false));
     }, []);
 
     const updateRow = (
@@ -299,9 +310,12 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
         status: DaycareInterestStatus
     ) => {
         setUpdatingKey(row.key);
+        setError("");
+        setMutationNotice("");
 
         try {
             await updateDaycarePublicRegistration(row.sourceId, { status });
+            setMutationNotice("סטטוס הפנייה נשמר");
 
             updateRow(row.sourceId, { status });
             setWorkflowDrafts((current) => {
@@ -368,6 +382,7 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
 
     const handleTreatmentSave = async (row: UnifiedRegistration) => {
         setSavingNoteKey(row.key);
+        setMutationNotice("");
         setError("");
 
         try {
@@ -376,9 +391,11 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
                 parseWorkflowDraft(row.callNotes, row.status);
             const callNotes = serializeWorkflowDraft(currentDraft);
 
-            await updateDaycarePublicRegistration(row.sourceId, { callNotes });
+            const saved = await updateDaycarePublicRegistration(row.sourceId, { callNotes });
 
-            updateRow(row.sourceId, { callNotes });
+            updateRow(row.sourceId, { callNotes: saved.callNotes });
+            setWorkflowDrafts(current => ({ ...current, [row.key]: parseWorkflowDraft(saved.callNotes, row.status) }));
+            setMutationNotice("ההערה נשמרה");
             setExpandedTreatmentKeys((keys) =>
                 keys.filter((key) => key !== row.key)
             );
@@ -444,7 +461,7 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
     };
 
     const handleCreate: SubmitHandler<CreateOnboardingFromInquiryPayload> = async (form) => {
-        if (!draft) {
+        if (!draft || creating || familiesLoading || familiesError) {
             return;
         }
 
@@ -469,12 +486,13 @@ export const useDaycareRegistrations = ({ onChanged }: DaycareRegistrationsProps
     };
 
     return {
-        rows, filteredRows, activeCasesCount, loading, error, updatingKey,
+        rows, filteredRows, activeCasesCount, loading, error, mutationNotice, updatingKey,
         savingNoteKey, expandedTreatmentKeys, expandedDetailKeys, workflowDrafts,
-        draft, createError, searchQuery, statusFilter, families, register,
+        draft, createError, searchQuery, statusFilter, families, familiesLoading, familiesError, register,
         handleSubmit, createFormErrors, creating, setDraft, setSearchQuery,
         setStatusFilter, setExpandedTreatmentKeys, setExpandedDetailKeys,
         handleStatusChange, openCreateDialog, handleCreate, renderTreatmentPanel,
+        loadFamilies,
         navigate, daycareRegistrationStatuses, onboardingOverallStatusLabels,
         eligibleStatuses, nextStatusByStatus, registrationWorkflow,
         parseWorkflowDraft, familyMatchesPhone, familyOptionLabel, formatDate,

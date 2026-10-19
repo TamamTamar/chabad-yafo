@@ -91,7 +91,12 @@ export const updateDaycarePublicRegistration = async (
 ) => {
     const response = await http.patch<ApiResponse<DaycareRegistrationAdmin>>(
         `/admin/daycare/public-registrations/${id}`,
-        cleanPayload(registration)
+        {
+            ...cleanPayload(registration),
+            // An explicitly cleared note must reach the existing API as an empty
+            // string; undefined is omitted by JSON and leaves the old note intact.
+            ...("callNotes" in registration ? { callNotes: registration.callNotes ?? "" } : {}),
+        }
     );
 
     return response.data.data;
