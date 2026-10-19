@@ -1,74 +1,15 @@
-import { DaycareDocument } from "../../models/DaycareDocument";
 import { DaycareFinanceSettings } from "../../models/DaycareFinanceSettings";
 import { DaycareTask } from "../../models/DaycareTask";
-import type { IDaycareFinanceSettings, IDaycareTask } from "../../types/daycareAdmin";
+import type { IDaycareFinanceSettings } from "../../types/daycareAdmin";
 import {
-    defaultDaycareDocuments,
-    defaultDaycareTasks,
     defaultFinanceSettings,
     openingTargetChildren,
 } from "./daycareDefaults";
 
-export const ensureDefaultTasks = async () => {
-    const financeSettings = await getFinanceSettings();
-
-    if (financeSettings.taskDefaultsInitialized) {
-        return;
-    }
-
-    const existingTask = await DaycareTask.exists({});
-
-    if (!existingTask) {
-        await DaycareTask.insertMany(defaultDaycareTasks);
-    }
-
-    financeSettings.taskDefaultsInitialized = true;
-    await financeSettings.save();
-};
-
-export const ensureDefaultDocuments = async () => {
-    const existingDocuments = await DaycareDocument.find().select("name");
-    const existingNames = new Set(
-        existingDocuments.map((document) => document.name)
-    );
-    const missingDocuments = defaultDaycareDocuments.filter(
-        (document) => !existingNames.has(document.name)
-    );
-
-    if (missingDocuments.length > 0) {
-        await DaycareDocument.insertMany(missingDocuments);
-    }
-
-    await Promise.all(
-        defaultDaycareDocuments
-            .filter((document) => document.fileUrl)
-            .map((document) =>
-                DaycareDocument.updateOne(
-                    {
-                        name: document.name,
-                        $or: [
-                            { fileUrl: { $exists: false } },
-                            { fileUrl: "" },
-                        ],
-                    },
-                    {
-                        $set: {
-                            fileUrl: document.fileUrl,
-                        },
-                    }
-                )
-            )
-    );
-};
-
+// Read-only: missing settings are represented by an in-memory default, never saved.
 export const getFinanceSettings = async () => {
     const existingSettings = await DaycareFinanceSettings.findOne();
-
-    if (existingSettings) {
-        return existingSettings;
-    }
-
-    return DaycareFinanceSettings.create(defaultFinanceSettings);
+    return existingSettings ? existingSettings.toObject() : structuredClone(defaultFinanceSettings);
 };
 
 export const getUpcomingSeptemberLabel = () => {

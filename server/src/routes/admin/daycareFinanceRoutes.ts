@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getOrCreateFinanceSettingsForMutation } from "./daycareInitializationService";
 import { requireAdmin } from "../../middleware/adminAuth";
 import { DaycareFinanceSettings } from "../../models/DaycareFinanceSettings";
 import {
@@ -19,7 +20,7 @@ router.get("/daycare/finance", requireAdmin, async (_req, res) => {
         return res.json({
             success: true,
             data: {
-                ...settings.toObject(),
+                ...settings,
                 taskActualCosts,
             },
         });
@@ -33,7 +34,7 @@ router.get("/daycare/finance", requireAdmin, async (_req, res) => {
 
 router.patch("/daycare/finance", requireAdmin, async (req, res) => {
     try {
-        const currentSettings = await getFinanceSettings();
+        const currentSettings = await getOrCreateFinanceSettingsForMutation();
         const [settings, taskActualCosts] = await Promise.all([
             DaycareFinanceSettings.findByIdAndUpdate(
                 currentSettings._id,

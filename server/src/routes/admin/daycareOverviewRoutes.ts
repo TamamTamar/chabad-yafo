@@ -5,8 +5,6 @@ import { DaycareRegistration } from "../../models/DaycareRegistration";
 import { DaycareTask } from "../../models/DaycareTask";
 import { openingTargetChildren } from "./daycareDefaults";
 import {
-    ensureDefaultDocuments,
-    ensureDefaultTasks,
     getDocumentReady,
     getFinanceSettings,
     getGeneralStatus,
@@ -18,8 +16,6 @@ const router = Router();
 
 router.get("/daycare/overview", requireAdmin, async (_req, res) => {
     try {
-        await Promise.all([ensureDefaultTasks(), ensureDefaultDocuments()]);
-
         const [
             registeredCount,
             interestedCount,

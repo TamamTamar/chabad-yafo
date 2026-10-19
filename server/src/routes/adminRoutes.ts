@@ -7,7 +7,10 @@ import { daycareTaskRoutes } from "./admin/daycareTaskRoutes";
 import { financeAdminRoutes } from "./admin/financeAdminRoutes";
 import { generalAdminRoutes } from "./admin/generalAdminRoutes";
 
+import { daycareInitializationRoutes } from "./admin/daycareInitializationRoutes";
+
 const router = Router();
+router.use(daycareInitializationRoutes);
 
 router.use(generalAdminRoutes);
 router.use(daycareOverviewRoutes);

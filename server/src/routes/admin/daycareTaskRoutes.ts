@@ -1,14 +1,12 @@
 import { Router } from "express";
 import { requireAdmin } from "../../middleware/adminAuth";
 import { DaycareTask } from "../../models/DaycareTask";
-import { ensureDefaultTasks } from "./daycareAdminService";
 import { getTaskStatusFromSubtasks, normalizeTaskStatusBySubtasks } from "./daycareTaskStatus";
 
 const router = Router();
 
 router.get("/daycare/tasks", requireAdmin, async (_req, res) => {
     try {
-        await ensureDefaultTasks();
         const tasks = await DaycareTask.find().sort({ createdAt: 1 });
 
         return res.json({

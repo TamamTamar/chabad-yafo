@@ -1,13 +1,11 @@
 import { Router } from "express";
 import { requireAdmin } from "../../middleware/adminAuth";
 import { DaycareDocument } from "../../models/DaycareDocument";
-import { ensureDefaultDocuments } from "./daycareAdminService";
 
 const router = Router();
 
 router.get("/daycare/documents", requireAdmin, async (_req, res) => {
     try {
-        await ensureDefaultDocuments();
         const documents = await DaycareDocument.find().sort({ createdAt: 1 });
 
         return res.json({
