@@ -26,7 +26,15 @@ export const mergeGuardiansForSibling = (
     existing: SubmitPublicDaycareProfileDto["guardians"],
     submitted: SubmitPublicDaycareProfileDto["guardians"]
 ) => {
-    const merged = existing.map((guardian) => ({ ...guardian }));
+    // Mongoose subdocuments expose fields through getters; spreading the document
+    // copies its internals instead of the guardian values.
+    const merged: SubmitPublicDaycareProfileDto["guardians"] = existing.map((guardian) => ({
+        fullName: guardian.fullName,
+        role: guardian.role,
+        roleDetails: guardian.roleDetails,
+        phone: guardian.phone,
+        email: guardian.email,
+    }));
     for (const guardian of submitted) {
         const matchingIndex = merged.findIndex(
             (candidate) =>

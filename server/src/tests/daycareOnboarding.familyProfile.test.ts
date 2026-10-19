@@ -227,3 +227,20 @@ test("new onboardings configure identity and agreement actions without broken fu
     assert.equal(agreementStep?.requiresAdminApproval, true);
     assert.equal(otherAvailableSteps.length, 0);
 });
+
+
+test("sibling guardian merge preserves fields from hydrated family subdocuments", () => {
+    const family = new DaycareFamily({ guardians: [
+        { fullName: "אבא בדיקה", role: "father", phone: "0500000001" },
+        { fullName: "אמא בדיקה", role: "mother", phone: "0500000002" },
+    ] });
+    const merged = mergeGuardiansForSibling(family.guardians, [
+        { fullName: "אמא מעודכנת", role: "mother", phone: "0500000002" },
+    ]);
+    assert.equal(merged.length, 2);
+    assert.equal(merged[0].phone, "0500000001");
+    assert.equal(merged[0].fullName, "אבא בדיקה");
+    assert.equal(merged[1].fullName, "אמא מעודכנת");
+    assert.equal(merged[1].phone, "0500000002");
+    assert.equal("$__" in merged[0], false);
+});
