@@ -55,6 +55,13 @@ test('production needs a separate explicit invocation, approval and named databa
  assert.equal(spawnSync(process.execPath,['-e',code,'--','--production'],{env,encoding:'utf8'}).stdout.trim(),'BLOCKED');
  assert.equal(spawnSync(process.execPath,['-e',code,'--','--production'],{env:{...env,PRODUCTION_DATABASE_APPROVAL:'ALLOW_PRODUCTION_CONNECTION',PRODUCTION_MONGO_DATABASE:'different'},encoding:'utf8'}).stdout.trim(),'BLOCKED');
  assert.equal(spawnSync(process.execPath,['-e',code,'--','--production'],{env:{...env,PRODUCTION_DATABASE_APPROVAL:'ALLOW_PRODUCTION_CONNECTION',PRODUCTION_MONGO_DATABASE:'explicit_db'},encoding:'utf8'}).stdout.trim(),'ALLOWED');
+ // Existing production deployments may use the driver's default database.
+ const legacyEnv={...env,MONGO_URI:'mongodb+srv://example.invalid/',PRODUCTION_DATABASE_APPROVAL:'ALLOW_PRODUCTION_CONNECTION',PRODUCTION_MONGO_DATABASE:'test'};
+ const policyCode="const p=require('./dist/config/mongoSafety').mongoConnectionPolicy();console.log(p.database)";
+ assert.equal(spawnSync(process.execPath,['-e',policyCode,'--','--production'],{env:legacyEnv,encoding:'utf8'}).stdout.trim(),'test');
+ for(const database of ['admin','local','config','chabad_test_existing']) {
+  assert.equal(spawnSync(process.execPath,['-e',code,'--','--production'],{env:{...legacyEnv,PRODUCTION_MONGO_DATABASE:database},encoding:'utf8'}).stdout.trim(),'BLOCKED');
+ }
  const loader="require('./dist/config/runtimeEnvironment').loadRuntimeEnvironment();console.log(process.env.MONGO_URI?'LOADED':'EMPTY')";
  assert.equal(spawnSync(process.execPath,['-e',loader],{env:{PATH:process.env.PATH,NODE_ENV:'production'},encoding:'utf8'}).stdout.trim(),'EMPTY');
 });

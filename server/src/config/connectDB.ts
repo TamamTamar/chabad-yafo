@@ -5,7 +5,7 @@ import { mongoConnectionPolicy } from "./mongoSafety";
 export const connectDB = async () => {
     const policy = mongoConnectionPolicy(); // Validate before opening any socket.
     monitorMongoConnection(mongoose.connection);
-    await mongoose.connect(policy.uri, { autoIndex:false, autoCreate:false });
+    await mongoose.connect(policy.uri, { autoIndex:false, autoCreate:false, ...(policy.database ? { dbName: policy.database } : {}) });
     if (policy.managed) {
         const marker = await mongoose.connection.db!.collection('__runtime_identity').findOne({ _id:'managed-runtime' as any });
         if (!marker || marker.nonce !== policy.managed.nonce || marker.mode !== policy.managed.mode || mongoose.connection.name !== policy.managed.database) {

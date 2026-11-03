@@ -53,6 +53,6 @@ MONGOD_BINARY=/path/to/mongod PLAYWRIGHT_MODULE=/path/to/playwright npm --prefix
 
 ## השלכות על פריסה עתידית
 
-שמירה ב־Git אינה אישור לפריסה. בייצור נדרשים יחד `--production`, ‏`NODE_ENV=production`, ‏`MONGO_URI`, ‏`PRODUCTION_DATABASE_APPROVAL=ALLOW_PRODUCTION_CONNECTION` ו־`PRODUCTION_MONGO_DATABASE` התואם לשם המסד בכתובת; manifest של פיתוח אסור בייצור.
+שמירה ב־Git אינה אישור לפריסה. בייצור נדרשים יחד `--production`, ‏`NODE_ENV=production`, ‏`MONGO_URI`, ‏`PRODUCTION_DATABASE_APPROVAL=ALLOW_PRODUCTION_CONNECTION` ו־`PRODUCTION_MONGO_DATABASE` המגדיר במפורש את המסד הקיים. אם הכתובת כוללת שם מסד, הוא חייב להתאים. בפריסה ותיקה ללא שם מסד בכתובת יש להגדיר במפורש את ברירת המחדל הקיימת `test`; manifest של פיתוח אסור בייצור.
 
 לפני פריסה נדרשת בדיקה נפרדת של תצורת ההפעלה, האינדקסים הקיימים ונתוני הבסיס הנדרשים. מסד חסר תצורה עלול להחזיר שגיאה או רשימה ריקה במקום להיווצר אוטומטית. אין להריץ אתחול או תחזוקה ללא אישור מתאים. אתחול המעון אינו transaction או נעילה בין כמה מופעי שרת, ולכן דורש חלון תפעולי מבוקר עם כותב יחיד.

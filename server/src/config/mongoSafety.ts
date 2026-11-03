@@ -13,14 +13,14 @@ export function validateManagedMongo(value: ManagedMongo) {
         !value.database.startsWith(value.mode==='test'?'chabad_test_':'chabad_dev_')) throw new Error('UNSAFE_MONGO_TARGET');
     return value;
 }
-export function mongoConnectionPolicy(): { uri: string; managed?: ManagedMongo } {
+export function mongoConnectionPolicy(): { uri: string; database?: string; managed?: ManagedMongo } {
     if (productionInvocation) {
         if (process.env.NODE_ENV !== 'production' || !process.env.MONGO_URI || process.env.SAFE_MONGO_MANIFEST || process.env.PRODUCTION_DATABASE_APPROVAL !== 'ALLOW_PRODUCTION_CONNECTION') throw new Error('INVALID_PRODUCTION_INVOCATION');
         let url: URL;
         try { url = new URL(process.env.MONGO_URI); } catch { throw new Error('INVALID_PRODUCTION_TARGET'); }
         const database = process.env.PRODUCTION_MONGO_DATABASE;
-        if (!database || url.pathname !== '/'+database || ['admin','local','config','test'].includes(database) || /^chabad_(dev|test)_/.test(database)) throw new Error('EXPLICIT_PRODUCTION_DATABASE_REQUIRED');
-        return { uri: process.env.MONGO_URI };
+        if (!database || !/^[A-Za-z0-9_-]+$/.test(database) || (url.pathname !== '/' && url.pathname !== '' && url.pathname !== '/'+database) || ['admin','local','config'].includes(database) || /^chabad_(dev|test)_/.test(database)) throw new Error('EXPLICIT_PRODUCTION_DATABASE_REQUIRED');
+        return { uri: process.env.MONGO_URI, database };
     }
     if (process.env.NODE_ENV === 'production' || process.env.MONGO_URI) throw new Error('DEVELOPMENT_MONGO_ENV_REJECTED');
     const path=process.env.SAFE_MONGO_MANIFEST;
