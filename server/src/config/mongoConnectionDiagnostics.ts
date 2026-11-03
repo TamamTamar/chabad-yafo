@@ -121,8 +121,17 @@ function monitorClient(client: ReturnType<Connection['getClient']>) {
 /** Startup errors may contain duplicate index values, credentials and model data. */
 export function reportStartupFailure(error: unknown) {
     const err = object(error);
-    const reason = err.code === 11000 ? 'index_conflict'
+    const configurationReasons: Record<string, string> = {
+        INVALID_PRODUCTION_INVOCATION: 'invalid_production_invocation',
+        INVALID_PRODUCTION_TARGET: 'invalid_production_target',
+        EXPLICIT_PRODUCTION_DATABASE_REQUIRED: 'explicit_production_database_required',
+        DEVELOPMENT_MONGO_ENV_REJECTED: 'development_mongo_env_rejected',
+        MANAGED_MONGO_REQUIRED: 'managed_mongo_required',
+    };
+    const configurationReason = typeof err.message === 'string' && Object.prototype.hasOwnProperty.call(configurationReasons, err.message)
+        ? configurationReasons[err.message] : undefined;
+    const reason = configurationReason ?? (err.code === 11000 ? 'index_conflict'
         : err.name === 'MongoServerSelectionError' ? 'database_unavailable'
-        : 'startup_failed';
+        : 'startup_failed');
     console.error('Server failed to start', { reason });
 }

@@ -107,9 +107,15 @@ test('startup logs never include duplicate phone values, credentials, stack or a
     }));
     reportStartupFailure({ name: 'MongoServerSelectionError', message: 'private secret' });
     reportStartupFailure({ name: 'PrivateMother', code: 501234567, message: 'secret' });
+    reportStartupFailure(new Error('INVALID_PRODUCTION_INVOCATION'));
+    reportStartupFailure(new Error('EXPLICIT_PRODUCTION_DATABASE_REQUIRED'));
+    reportStartupFailure(new Error('INVALID_PRODUCTION_INVOCATION mongodb://private:secret@host'));
     assert.deepEqual(logs, [
         ['Server failed to start', { reason: 'index_conflict' }],
         ['Server failed to start', { reason: 'database_unavailable' }],
+        ['Server failed to start', { reason: 'startup_failed' }],
+        ['Server failed to start', { reason: 'invalid_production_invocation' }],
+        ['Server failed to start', { reason: 'explicit_production_database_required' }],
         ['Server failed to start', { reason: 'startup_failed' }],
     ]);
     assert.doesNotMatch(JSON.stringify(logs), /0501234567|private|secret|mongodb|keyValue|stack/i);
