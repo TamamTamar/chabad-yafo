@@ -4,39 +4,22 @@ const RebbeLetterInfo = () => {
     return (
         <aside className={styles.card}>
             <h2 className={styles.title}>
-                למה כותבים לרבי?
+                תפילה וברכה בציון הרבי
             </h2>
 
             <p className={styles.description}>
-                במשך עשרות שנים יהודים מכל העולם כתבו לרבי
-                מליובאוויטש וביקשו ברכה, עצה ותפילה.
+                במסגרת כינוס השלוחים העולמי אעביר את בקשותיכם לציון
+                הקדוש של הרבי, ואתפלל עבורכם ועבור יקיריכם לרפואה,
+                לפרנסה, להצלחה ולבשורות טובות.
             </p>
 
-            <ul className={styles.list}>
-                <li className={styles.listItem}>
-                    בקשה אישית
-                </li>
-
-                <li className={styles.listItem}>
-                    שם לברכה
-                </li>
-
-                <li className={styles.listItem}>
-                    הודיה
-                </li>
-
-                <li className={styles.listItem}>
-                    תפילה לרפואה, פרנסה או הצלחה
-                </li>
-            </ul>
-
             <p className={styles.note}>
+                אנא ציינו שם מלא ושם האם של כל אדם שעבורו אתם מבקשים ברכה.
                 ניתן לכתוב בכל שפה.
             </p>
 
             <p className={styles.footerText}>
-                בעזרת ה׳ המכתבים נאספים ומועברים
-                לאוהל הקדוש.
+                הרב לוי תמם — בית חב״ד יפו
             </p>
         </aside>
     );
