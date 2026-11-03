@@ -33,11 +33,11 @@ const RebbeLetterSuccessModal = ({
                 </div>
 
                 <h2 className={styles.title}>
-                    המכתב נשלח בהצלחה
+                    הבקשה נשלחה בהצלחה
                 </h2>
 
                 <p className={styles.text}>
-                    בעזרת ה׳ המכתב יועבר לאוהל הקדוש.
+                    בעזרת ה׳ הבקשה תועבר לציונו הקדוש של הרבי במסגרת כינוס השלוחים העולמי.
                 </p>
 
                 <p className={styles.blessingText}>

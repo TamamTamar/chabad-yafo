@@ -62,10 +62,10 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className={styles.header}>
-                <h2 className={styles.title}>המכתב שלכם</h2>
+                <h2 className={styles.title}>הבקשה שלכם לתפילה וברכה</h2>
 
                 <p className={styles.subtitle}>
-                    כתבו את אשר על ליבכם - בקשה, תפילה, הודיה או שם לברכה.
+                    כתבו את בקשתכם לתפילה וברכה. אנא ציינו שם מלא ושם האם של כל אדם שעבורו אתם מבקשים ברכה.
                 </p>
             </div>
 
@@ -173,7 +173,7 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
 
             <div className={styles.field}>
                 <label className={styles.labelText} htmlFor="letter">
-                    תוכן המכתב
+                    תוכן הבקשה
                 </label>
 
                 <textarea
@@ -210,7 +210,7 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
                 type="submit"
                 disabled={isSubmitting}
             >
-                {isSubmitting ? "שולח..." : "שליחת המכתב"}
+                {isSubmitting ? "שולח..." : "לשליחת הבקשה"}
             </button>
         </form>
     );
