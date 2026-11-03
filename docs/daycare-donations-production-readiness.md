@@ -1,4 +1,4 @@
-# Daycare donations — production readiness
+# Daycare donations - production readiness
 
 ## Release state
 

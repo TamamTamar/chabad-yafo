@@ -20,7 +20,7 @@ export default function MaftirYonaBidSection({ data, isOpen, offerSection, bidFo
         <section className={`${shared.card} ${styles.bidCard}`} id="maftir-offer" ref={offerSection} aria-labelledby="bid-title">
             <div className={styles.formHeading}><Sparkles className={styles.formIcon} size={24} aria-hidden="true" /><h2 className={shared.sectionTitle} id="bid-title">בחרו את סכום ההצעה</h2></div>
             <p className={shared.note}>אפשר לבחור סכום מוצע או להזין סכום אחר.</p>
-            {acceptedId && <p className={styles.success} role="status">{data.leadingBid?.id === acceptedId ? (data.status === 'ended' ? 'המכירה הסתיימה וההצעה שלכם זכתה. ניצור קשר בנפרד.' : 'ההצעה התקבלה בהצלחה והיא כרגע ההצעה המובילה.') : 'ההצעה התקבלה. מאז השתנתה ההצעה המובילה — הפרטים המעודכנים מוצגים למעלה.'}</p>}
+            {acceptedId && <p className={styles.success} role="status">{data.leadingBid?.id === acceptedId ? (data.status === 'ended' ? 'המכירה הסתיימה וההצעה שלכם זכתה. ניצור קשר בנפרד.' : 'ההצעה התקבלה בהצלחה והיא כרגע ההצעה המובילה.') : 'ההצעה התקבלה. מאז השתנתה ההצעה המובילה - הפרטים המעודכנים מוצגים למעלה.'}</p>}
             {notice && <p className={shared.error} role="alert">{notice}</p>}
             <form className={shared.form} onSubmit={event => void handleSubmit(submit)(event)} noValidate>
                 <fieldset className={styles.fieldset} disabled={!isOpen || busy || Boolean(pending)}>

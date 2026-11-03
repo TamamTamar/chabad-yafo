@@ -1,4 +1,4 @@
-# מיפוי תשתית האדמין — 18.10.2026
+# מיפוי תשתית האדמין - 18.10.2026
 
 מיפוי סטטי מלא של קובצי התצוגה. המספרים הם מופעים בקוד, כולל ענפים מותנים; אינם מספר רכיבים שמוצגים יחד. נבדקו גם הטוקנים, controls, form-fields, המעטפת והתיעוד.
 
@@ -116,17 +116,17 @@
 
 להלן בלוקים זהים בשני קבצים או יותר (כולל פריסה; אין להסיק שהם בעלי אותה התנהגות). כפילויות כפתורים/שדות בין הרישום למשימות הועברו למחלקות משותפות. וריאציות שאינן זהות נשארו מקומיות.
 
-- `display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;` — `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
-- `border: 1px solid $brand-primary; background: $brand-primary; color: $color-white;` — `pages/Admin/DaycareOnboarding/DaycareOnboardingAdmin.module.scss`
-- `border: 1px solid $ui-border-strong; background: $brand-bg; color: $brand-primary;` — `pages/Admin/DaycareOnboarding/DaycareOnboardingAdmin.module.scss`
-- `white-space: nowrap; background: rgba($brand-primary, 0.06); color: $brand-primary; font-size: $type-body-sm; font-weight: 900;` — `pages/Admin/DaycareEnrollments/DaycareEnrollmentsAdmin.module.scss`, `pages/AdminDashboard/components/AdminRebbeLettersTab/AdminRebbeLettersTab.module.scss`
-- `overflow: hidden; border: 1px solid $ui-border-soft; border-radius: $radius; background: $brand-bg; box-shadow: 0 16px 40px $ui-shadow-card;` — `pages/AdminDashboard/components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab.module.scss`, `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
-- `white-space: nowrap; background: rgba($brand-primary, 0.06); color: $brand-primary; font-weight: 800;` — `pages/AdminDashboard/components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab.module.scss`, `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
-- `content: attr(data-label); color: $brand-primary; font-size: $type-caption; font-weight: 900;` — `pages/AdminDashboard/components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab.module.scss`, `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`, `pages/AdminDashboard/components/AdminRebbeLettersTab/AdminRebbeLettersTab.module.scss`
-- `padding: 16px 18px; text-align: right; vertical-align: top; border-bottom: 1px solid $ui-border-soft;` — `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
-- `margin-bottom: 12px; overflow: hidden; border: 1px solid $ui-border-soft; border-radius: $radius-md; background: $brand-bg; box-shadow: 0 10px 24px $ui-shadow-card;` — `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`, `pages/AdminDashboard/components/AdminRebbeLettersTab/AdminRebbeLettersTab.module.scss`
+- `display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;` - `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
+- `border: 1px solid $brand-primary; background: $brand-primary; color: $color-white;` - `pages/Admin/DaycareOnboarding/DaycareOnboardingAdmin.module.scss`
+- `border: 1px solid $ui-border-strong; background: $brand-bg; color: $brand-primary;` - `pages/Admin/DaycareOnboarding/DaycareOnboardingAdmin.module.scss`
+- `white-space: nowrap; background: rgba($brand-primary, 0.06); color: $brand-primary; font-size: $type-body-sm; font-weight: 900;` - `pages/Admin/DaycareEnrollments/DaycareEnrollmentsAdmin.module.scss`, `pages/AdminDashboard/components/AdminRebbeLettersTab/AdminRebbeLettersTab.module.scss`
+- `overflow: hidden; border: 1px solid $ui-border-soft; border-radius: $radius; background: $brand-bg; box-shadow: 0 16px 40px $ui-shadow-card;` - `pages/AdminDashboard/components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab.module.scss`, `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
+- `white-space: nowrap; background: rgba($brand-primary, 0.06); color: $brand-primary; font-weight: 800;` - `pages/AdminDashboard/components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab.module.scss`, `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
+- `content: attr(data-label); color: $brand-primary; font-size: $type-caption; font-weight: 900;` - `pages/AdminDashboard/components/AdminDaycareRegistrationsTab/AdminDaycareRegistrationsTab.module.scss`, `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`, `pages/AdminDashboard/components/AdminRebbeLettersTab/AdminRebbeLettersTab.module.scss`
+- `padding: 16px 18px; text-align: right; vertical-align: top; border-bottom: 1px solid $ui-border-soft;` - `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`
+- `margin-bottom: 12px; overflow: hidden; border: 1px solid $ui-border-soft; border-radius: $radius-md; background: $brand-bg; box-shadow: 0 10px 24px $ui-shadow-card;` - `pages/AdminDashboard/components/AdminFamiliesTab/AdminFamiliesTab.module.scss`, `pages/AdminDashboard/components/AdminPaymentsTab/AdminPaymentsTab.module.scss`, `pages/AdminDashboard/components/AdminRebbeLettersTab/AdminRebbeLettersTab.module.scss`
 
-## מסמכי המעון — הסבה בפועל (18.10.2026)
+## מסמכי המעון - הסבה בפועל (18.10.2026)
 
 - הנתיב הפעיל `?tab=documents` מכיל welcome/routine/holidays/menu/equipment/annual-plan/agreements. כולם הוסבו; גם alias `?tab=agreements` ממשיך לעבוד.
 - `DaycareDocuments.tsx` הוא רכיב ישן שאינו מחובר לנתב. מצבי חסר/בטיפול/קיים שבו אינם מצבי מסמכי ההורים הפעילים; הרכיב לא שונה ולא חובר מחדש. אין העלאת קובץ במסך הפעיל.
@@ -141,7 +141,7 @@
 | `components/AdminUI/AdminEditor.module.scss` | פריסת עורכים, רשומות, ניווט מסמכים ומשוב; טוקנים קיימים בלבד |
 | `AdminLink` בתוך `AdminPrimitives.tsx` | קישור native באותו בסיס של כפתור משני |
 
-## כספי המעון — הסבה בפועל (18.10.2026)
+## כספי המעון - הסבה בפועל (18.10.2026)
 
 - לפני ההסבה: DaycareFinanceView השתמש בפקדי native ובמחלקות finance של DaycareAdmin.module.scss, ללא AdminUI. DaycareFinance מחבר את hook הנתונים לתצוגה בלבד.
 - אחרי: AdminButton לשמירה מפורשת, AdminSelect לחודש, AdminInput לכל שדות הסכום ומספר הילדים, AdminBadge לסוג החודש ו־AdminCard לטופס ולסיכומים. אין במסך הפעיל טבלה, דיאלוג או תהליך סליקה ולכן אין שימוש מלאכותי ב־AdminTable/AdminDialog.
@@ -149,7 +149,7 @@
 - DaycareFinance.module.scss מכיל רק פריסה ייחודית, צפיפות שורות כספיות, fieldset, טיפוגרפיית סכומים וארגון מובייל. מחלקות finance הישנות הוסרו מקובץ ההורה, תוך שמירת סלקטורים משותפים. אין CSS מקומי לבסיס כפתורים, שדות, כרטיסים או תגים.
 - פורמט הסכומים הקיים נשמר עם ₪ והפרדת אלפים; bdi מבודד סכומים ומינוס מה־RTL. ערכי קלט נשארים טיוטות כפי שהוזנו כדי לשמר את חוזה העריכה והוולידציה הקיים. שדות כספיים מסומנים ב־₪; מספר הילדים אינו סכום.
 
-## תרומות ולידים — מיפוי ההסבה (18.10.2026)
+## תרומות ולידים - מיפוי ההסבה (18.10.2026)
 
 | אזור פעיל | רכיב | תהליכים ומגבלות |
 |---|---|---|
@@ -160,7 +160,7 @@
 | הזנה ידנית | DonationManualAdminView | מטבע ושער, סכום/תאריך, מקור, תורם, פרטיות, יעד ושגריר |
 | סעיפים ויעדים | DonationItemsAdminView | מסלולים מומלצים, יעדי פריטים, מצב וסיבת שינוי |
 | היסטוריה | DaycareDonationsAdminView | audit ואבחון; ההיסטוריה נפתחת במובייל דרך ״אפשרויות נוספות״ |
-| לידים — לא מחובר | DaycareDonationLeadsAdmin | חיפוש שימושים לפני ההסבה אישר שאין import/route/הורה פעיל. הוסב ונבדק ברתמת דמה בלבד; לא נוסף חיבור למערכת |
+| לידים - לא מחובר | DaycareDonationLeadsAdmin | חיפוש שימושים לפני ההסבה אישר שאין import/route/הורה פעיל. הוסב ונבדק ברתמת דמה בלבד; לא נוסף חיבור למערכת |
 
 - החיבור הפעיל היחיד הוא DaycareAdmin → DaycareDonationsAdmin → DaycareDonationsAdminView. השגרירים ועדכוני השטח מיובאים רק בתצוגה זו; ארבע תצוגות Donation*AdminView משתמשות באותו SCSS מקומי. DonationAllocationDialog מיובא רק מכאן.
 - AdminShell מפעיל Modern Dark גם עבור itemId=donations. יתר הנתיבים לא הורחבו. בדיקת תחולת הרישום עודכנה לצפות להסבה המאושרת.

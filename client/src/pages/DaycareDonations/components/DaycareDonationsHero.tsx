@@ -45,7 +45,7 @@ const DaycareDonationsHero = ({
 
             <h1>בונים לילדי יפו מקום לגדול בו</h1>
             <p className={styles.heroLead}>
-                מעון בטוח, חם ושמח — שנבנה יחד, חלק אחר חלק.
+                מעון בטוח, חם ושמח - שנבנה יחד, חלק אחר חלק.
             </p>
 
             <OverallProgress

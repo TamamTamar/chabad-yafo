@@ -17,7 +17,7 @@ export function getAssistantFacts(): Record<string, string> {
         facts[`${branch.id}.rabbi`] = `השליח ב${branch.title} הוא ${branch.shaliach}.`;
         facts[`${branch.id}.phone`] = `הטלפון של ${branch.shaliach}: ${branch.phone}.`;
     }
-    for (const service of knowledge.services) facts[`service.${service.id}`] = `${service.title} — לפרטים ולתיאום אפשר לפנות אלינו בוואטסאפ.`;
+    for (const service of knowledge.services) facts[`service.${service.id}`] = `${service.title} - לפרטים ולתיאום אפשר לפנות אלינו בוואטסאפ.`;
     for (const page of knowledge.pagesAndFeatures) facts[`page.${page.path}`] = `${page.description}`;
     return facts;
 }

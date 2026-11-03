@@ -15,7 +15,7 @@ const DaycareRegistration = () => {
         const previousTitle = document.title;
         const description = document.querySelector('meta[name="description"]');
         const previousDescription = description?.getAttribute("content");
-        document.title = "מעון חב״ד יפו — הרישום פתוח";
+        document.title = "מעון חב״ד יפו - הרישום פתוח";
         description?.setAttribute(
             "content",
             "מעון חב״ד יפו באזור שוק הפשפשים מציע מסגרת קטנה וחמה לגיל הרך. נותרו מספר מקומות פנויים. השאירו פרטים לשיחת היכרות ולבירור הצטרפות."

@@ -114,7 +114,7 @@ export const donationItems: DonationItem[] = [
         categoryId: "renovation",
         title: "עבודות גבס, תקרה וחיפויים",
         description:
-            "יוצרים חלל שלם ונעים — מהתקרה ועד הפרט האחרון.",
+            "יוצרים חלל שלם ונעים - מהתקרה ועד הפרט האחרון.",
         goal: 12_500,
         raised: 2_500,
         acceptingDonations: true,
@@ -366,7 +366,7 @@ export const fieldGalleryItems: FieldGalleryItem[] = [
     {
         id: "gallery-render",
         title: "העבודה כבר בעיצומה",
-        caption: "ארון אחר ארון, פרט אחר פרט — החלל החדש מתחיל לקבל צורה.",
+        caption: "ארון אחר ארון, פרט אחר פרט - החלל החדש מתחיל לקבל צורה.",
         visual: {
             src: "/daycare-donations/renovation-work.webp",
             alt: "עובדים מרכיבים את ארונות המעון",
@@ -377,7 +377,7 @@ export const fieldGalleryItems: FieldGalleryItem[] = [
     {
         id: "gallery-details",
         title: "כל פרט נבחר באהבה",
-        caption: "מהתאורה ועד הריהוט — כל בחירה נעשית מתוך מחשבה על הילדים.",
+        caption: "מהתאורה ועד הריהוט - כל בחירה נעשית מתוך מחשבה על הילדים.",
         visual: {
             src: "/daycare-donations/bathroom.webp",
             alt: "פרטים מתהליך תכנון המעון",

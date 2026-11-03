@@ -39,7 +39,7 @@ export function localAssistant(message: string): { reply: string; suggestedActio
     const service = knowledge.services.find(s => servicePatterns[s.id]?.test(q));
     if (service) {
         if (/כמה|מחיר|עלות|שעות|מתי|פתוח/.test(q)) return unknown(`על המחיר או המועד המבוקש עבור ${service.title}`);
-        return answer(`${service.title} — לפרטים ולתיאום אפשר לפנות אלינו בוואטסאפ.`,
+        return answer(`${service.title} - לפרטים ולתיאום אפשר לפנות אלינו בוואטסאפ.`,
             [{ ...contact, url: service.actionUrl }]);
     }
     const pagePatterns: [string, RegExp][] = [

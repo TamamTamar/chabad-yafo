@@ -48,10 +48,10 @@ const formatCurrency = (value: number) =>
 const formatDate = (value?: string) =>
     value
         ? new Intl.DateTimeFormat("he-IL", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-          }).format(new Date(value))
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        }).format(new Date(value))
         : "לא נקבע";
 
 const toDateInput = (value?: string) =>
@@ -333,8 +333,8 @@ const DaycareDonationLeadsAdmin = ({ leads, ambassadors, onChanged }: Props) => 
                                             <AdminBadge tone="info">{statusLabels[lead.status]}</AdminBadge>
                                         </div>
                                         <div className={styles.amounts}>
-                                            <span>יעד <strong>{lead.targetAmount ? `₪${formatCurrency(lead.targetAmount)}` : "—"}</strong></span>
-                                            <span>הובטח <strong>{lead.pledgedAmount ? `₪${formatCurrency(lead.pledgedAmount)}` : "—"}</strong></span>
+                                            <span>יעד <strong>{lead.targetAmount ? `₪${formatCurrency(lead.targetAmount)}` : "-"}</strong></span>
+                                            <span>הובטח <strong>{lead.pledgedAmount ? `₪${formatCurrency(lead.pledgedAmount)}` : "-"}</strong></span>
                                         </div>
                                         <div className={styles.followUp}>
                                             <span className={overdue ? styles.overdueText : ""}>

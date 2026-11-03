@@ -161,11 +161,11 @@ const DaycareDonationsAdminView = ({ model }: DaycareDonationsAdminViewProps) =>
                 >
                     {primaryAdminViews.map((view) => (
                         <option key={view.id} value={view.id}>
-                            {view.label} — {view.description}
+                            {view.label} - {view.description}
                         </option>
                     ))}
                     {activeView === "history" && (
-                        <option value="history">היסטוריה — שינויים וכלים</option>
+                        <option value="history">היסטוריה - שינויים וכלים</option>
                     )}
                 </AdminSelect>
             </label>

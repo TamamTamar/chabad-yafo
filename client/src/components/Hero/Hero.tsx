@@ -81,7 +81,7 @@ const slides: HeroSlide[] = [
         id: "daycare-donations",
         eyebrow: "מקימים יחד בית קטן עם לב גדול",
         title: "בונים לילדי יפו מקום לגדול בו",
-        description: "מעון בטוח, חם ושמח — שנבנה יחד, חלק אחר חלק.",
+        description: "מעון בטוח, חם ושמח - שנבנה יחד, חלק אחר חלק.",
         contentPosition: "right",
         desktopImage: "/daycare-donations/hero.webp",
         mobileImage: "/daycare-donations/hero.webp",
@@ -175,8 +175,8 @@ const Hero = () => {
                         <Container className={styles.inner}>
                             <div
                                 className={`${styles.card} ${slide.contentPosition === "right"
-                                        ? styles.cardRight
-                                        : ""
+                                    ? styles.cardRight
+                                    : ""
                                     }`}
                             >
                                 {slide.eyebrow && (

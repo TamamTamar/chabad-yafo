@@ -24,7 +24,7 @@ const getRemaining = (item: DonationItem) =>
 
 const getTargetLabel = (item: DonationItem) => {
     const remaining = getRemaining(item);
-    return `${item.title} — ${remaining > 0 ? `חסרים ₪${remaining.toLocaleString("he-IL")}` : "היעד הושלם"}`;
+    return `${item.title} - ${remaining > 0 ? `חסרים ₪${remaining.toLocaleString("he-IL")}` : "היעד הושלם"}`;
 };
 
 const DonationAllocationDialog = ({
@@ -37,8 +37,8 @@ const DonationAllocationDialog = ({
     const initialAllocations = record.allocations?.length
         ? record.allocations
         : record.itemId
-          ? [{ itemId: record.itemId, amount: record.amount }]
-          : [];
+            ? [{ itemId: record.itemId, amount: record.amount }]
+            : [];
     const [firstItemId, setFirstItemId] = useState(
         initialAllocations[0]?.itemId ?? ""
     );
@@ -109,12 +109,12 @@ const DonationAllocationDialog = ({
 
         const allocations = splitActive
             ? [
-                  { itemId: firstItemId, amount: firstValue },
-                  { itemId: secondItemId, amount: secondValue },
-              ]
+                { itemId: firstItemId, amount: firstValue },
+                { itemId: secondItemId, amount: secondValue },
+            ]
             : firstItemId
-              ? [{ itemId: firstItemId, amount: record.amount }]
-              : [];
+                ? [{ itemId: firstItemId, amount: record.amount }]
+                : [];
         onConfirm(allocations, trimmedReason);
     };
 

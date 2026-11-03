@@ -51,14 +51,14 @@ const TuitionPaymentSection = ({ token, payment, onConfirmed }: Props) => {
                 Amount: intent.amount,
                 Tashlumim: 12,
                 Currency: "1",
-                Description: `הוראת קבע למעון חב״ד יפו — ${intent.childName}`,
+                Description: `הוראת קבע למעון חב״ד יפו - ${intent.childName}`,
                 Groupe: "תשלומי מעון",
                 firstName,
                 lastName: lastNameParts.join(" "),
                 phone: intent.payer.phone,
                 email: intent.payer.email,
                 PaymentType: "HK",
-                Comment: `שכר לימוד חודשי עבור ${intent.childName} — 12 תשלומים`,
+                Comment: `שכר לימוד חודשי עבור ${intent.childName} - 12 תשלומים`,
                 CallBack: intent.callbackUrl,
                 Param1: intent.param1,
                 Param2: intent.param2,
@@ -113,7 +113,7 @@ const TuitionPaymentSection = ({ token, payment, onConfirmed }: Props) => {
                         onClick={() => payload && iframePayment.startPayment(payload)}
                     >
                         <LockKeyhole size={19} aria-hidden="true" />
-                        {iframePayment.isPaying ? "מקימים הוראת קבע..." : `הקמת הוראת קבע — ₪${amountLabel} לחודש`}
+                        {iframePayment.isPaying ? "מקימים הוראת קבע..." : `הקמת הוראת קבע - ₪${amountLabel} לחודש`}
                     </button>
                 </div>
             ) : null}

@@ -1,4 +1,4 @@
-# Release readiness — 2026-10-15
+# Release readiness - 2026-10-15
 
 ## Scope
 
@@ -101,7 +101,7 @@ and this report. Existing application fixes are verified rather than claimed
 as new changes. Layered SCSS overrides remain maintenance work, not a build
 blocker. The duplicated auction diagnostic utilities retain their parity test.
 
-## Release gates and sequence — only after user approval
+## Release gates and sequence - only after user approval
 
 1. Review the exact tracked/new file set and current remote branch before
    preparing commits. Keep credentials, generated files and ignored experiments

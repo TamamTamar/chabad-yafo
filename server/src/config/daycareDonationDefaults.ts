@@ -11,7 +11,7 @@ export const defaultDaycareDonationCampaign: DaycareDonationCampaignDocument = {
     fieldUpdates: [
         {
             id: "kitchen-installed",
-            title: "המטבח כבר במקום — עכשיו משלימים את התשתיות",
+            title: "המטבח כבר במקום - עכשיו משלימים את התשתיות",
             description:
                 "ארונות המטבח והמשטח כבר הותקנו. השלב הבא הוא להשלים את האינסטלציה והשירותים המותאמים לילדים, כדי שהחלל יהיה מוכן לשימוש יום־יומי.",
             itemId: "plumbing",
@@ -130,7 +130,7 @@ export const defaultDaycareDonationCampaign: DaycareDonationCampaignDocument = {
             categoryId: "renovation",
             title: "עבודות גבס, תקרה וחיפויים",
             description:
-                "יוצרים חלל שלם ונעים — מהתקרה ועד הפרט האחרון.",
+                "יוצרים חלל שלם ונעים - מהתקרה ועד הפרט האחרון.",
             goal: 12_500,
             order: 3,
             openingPriority: 8,

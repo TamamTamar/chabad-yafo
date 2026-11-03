@@ -21,7 +21,7 @@ beforeEach(context => {
     t.mock.method(http, 'request', forbidden);
     t.mock.method(https, 'request', forbidden);
     t.mock.method(net.Socket.prototype, 'connect', forbidden);
-    t.mock.method(logger, 'error', () => {});
+    t.mock.method(logger, 'error', () => { });
 });
 afterEach(() => {
     for (const [key, value] of Object.entries({ CHAT_PROVIDER: saved.provider, OPENAI_API_KEY: saved.key })) {
@@ -32,10 +32,12 @@ const envelope = (value: unknown) => {
     const data = value as Record<string, unknown>;
     const ids = Array.isArray(data.factIds) ? data.factIds as string[] : [];
     const intent = data.intent ?? (ids.length > 1 ? 'details' : ids[0]?.endsWith('.address') ? 'location' : ids[0]?.endsWith('.phone') ? 'phone' : ids[0]?.endsWith('.rabbi') ? 'rabbi' : ids[0]?.startsWith('page.') ? 'gallery' : ids[0]?.startsWith('service.') ? 'service' : 'unknown');
-    return { status: 'completed', output: [
-    { type: 'reasoning', summary: [] },
-    { type: 'message', role: 'assistant', content: [{ type: 'output_text', text: JSON.stringify({ ...data, intent }) }] },
-], usage: { input_tokens: 123, output_tokens: 24, total_tokens: 147 } };
+    return {
+        status: 'completed', output: [
+            { type: 'reasoning', summary: [] },
+            { type: 'message', role: 'assistant', content: [{ type: 'output_text', text: JSON.stringify({ ...data, intent }) }] },
+        ], usage: { input_tokens: 123, output_tokens: 24, total_tokens: 147 }
+    };
 };
 function mockAnswer(t: TestContext, value: unknown, inspect?: (init: RequestInit) => void) {
     return t.mock.method(globalThis, 'fetch', async (url: unknown, init?: RequestInit) => {
@@ -81,8 +83,8 @@ test('route strips tokens, cookies, database fields and history metadata', async
         assert.deepEqual(JSON.parse(init.body as string).input, [{ role: 'user', content: 'שלום' }, { role: 'user', content: 'בדיקה' }]);
     });
     const req = { body: { message: 'בדיקה', adminToken: 'PRIVATE_SENTINEL', donors: 'PRIVATE_SENTINEL', history: [{ role: 'user', content: 'שלום', token: 'PRIVATE_SENTINEL' }] }, headers: { cookie: 'PRIVATE_SENTINEL', authorization: 'PRIVATE_SENTINEL' }, ip: 'test', socket: {} };
-    const res = { json() { return this; }, status() { return this; }, setHeader() {} };
-    await createChatHandler()(req as unknown as Request, res as unknown as Response, () => {});
+    const res = { json() { return this; }, status() { return this; }, setHeader() { } };
+    await createChatHandler()(req as unknown as Request, res as unknown as Response, () => { });
 });
 
 test('local never calls API, including with a configured key', async t => {
@@ -157,16 +159,18 @@ test('UX: focused answers and only relevant actions for requested scenarios', as
         { message: 'כמה עולה המעון?', kind: 'unknown', factIds: [], expected: 'אין לי כרגע מידע על כך. אפשר לברר איתנו בוואטסאפ.', urls: ['https://wa.me/972537700339'] },
         { message: 'אפשר להדליק אש בשבת?', kind: 'halachic', factIds: [], expected: 'אני לא יכול לפסוק הלכה. אפשר לפנות לרב לוי יצחק תמם בוואטסאפ.', urls: ['https://wa.me/972537700339'] },
         { message: 'איפה רואים תמונות?', kind: 'answer', factIds: ['page./gallery'], expected: 'תמונות מאירועים ופעילויות ביפו.', urls: ['/gallery'] },
-        { message: 'יש לכם חנות יודאיקה?', kind: 'answer', factIds: ['service.judaica'], expected: 'חנות יודאיקה — לפרטים ולתיאום אפשר לפנות אלינו בוואטסאפ.', urls: ['https://wa.me/972537700339'] },
+        { message: 'יש לכם חנות יודאיקה?', kind: 'answer', factIds: ['service.judaica'], expected: 'חנות יודאיקה - לפרטים ולתיאום אפשר לפנות אלינו בוואטסאפ.', urls: ['https://wa.me/972537700339'] },
         { message: 'איך מכשירים מטבח?', kind: 'halachic', factIds: [], expected: 'אני לא יכול לפסוק הלכה. אפשר לפנות לרב לוי יצחק תמם בוואטסאפ.', urls: ['https://wa.me/972537700339'] },
         { message: 'מתי נכנסת שבת?', kind: 'answer', factIds: ['page./'], expected: getAssistantFacts()['page./'], urls: ['/'] },
         { message: 'איך נרשמים למעון?', kind: 'answer', factIds: ['page./daycare-registration'], expected: getAssistantFacts()['page./daycare-registration'], urls: ['/daycare-registration'] },
     ];
     for (const scenario of cases) {
         const mock = mockAnswer(t, { kind: scenario.kind, factIds: scenario.factIds });
-        const result = await generateAssistantReply({ message: scenario.message, history: [
-            { role: 'user', content: cases[0].message }, { role: 'assistant', content: cases[0].expected },
-        ] });
+        const result = await generateAssistantReply({
+            message: scenario.message, history: [
+                { role: 'user', content: cases[0].message }, { role: 'assistant', content: cases[0].expected },
+            ]
+        });
         assert.equal(result.reply, scenario.expected, scenario.message);
         assert.deepEqual(result.suggestedActions.map(action => action.url), scenario.urls, scenario.message);
         assert.ok(result.reply.length < 160);

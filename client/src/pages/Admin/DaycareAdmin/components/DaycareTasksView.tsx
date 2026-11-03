@@ -53,135 +53,135 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
             </header>
             {error && !showTaskForm && <p className={styles.error} role="alert">{error}</p>}
             {showTaskForm && (
-            <AdminDialog labelledBy="task-editor-title" onClose={resetDraft} className={styles.taskEditor}>
-                <div className={styles.taskEditorHeader}>
-                    <div>
-                        <h3 id="task-editor-title">
-                            {editingId ? "עריכת משימה" : "משימה חדשה"}
-                        </h3>
-                        <p>שם, סיווג ורשימת ביצוע — הכול נשמר יחד.</p>
+                <AdminDialog labelledBy="task-editor-title" onClose={resetDraft} className={styles.taskEditor}>
+                    <div className={styles.taskEditorHeader}>
+                        <div>
+                            <h3 id="task-editor-title">
+                                {editingId ? "עריכת משימה" : "משימה חדשה"}
+                            </h3>
+                            <p>שם, סיווג ורשימת ביצוע - הכול נשמר יחד.</p>
+                        </div>
+                        <button
+                            aria-label="סגירת הטופס"
+                            className={styles.taskEditorClose}
+                            type="button"
+                            onClick={resetDraft}
+                        >
+                            <X aria-hidden="true" size={20} />
+                        </button>
                     </div>
-                    <button
-                        aria-label="סגירת הטופס"
-                        className={styles.taskEditorClose}
-                        type="button"
-                        onClick={resetDraft}
-                    >
-                        <X aria-hidden="true" size={20} />
-                    </button>
-                </div>
-                <label className={styles.field}>
-                    <span>כותרת משימה</span>
-                    <input
-                        ref={taskTitleInputRef}
-                        data-dialog-initial-focus
-                        value={draft.title}
-                        onChange={(event) =>
-                            setDraft({ ...draft, title: event.target.value })
-                        }
-                    />
-                </label>
+                    <label className={styles.field}>
+                        <span>כותרת משימה</span>
+                        <input
+                            ref={taskTitleInputRef}
+                            data-dialog-initial-focus
+                            value={draft.title}
+                            onChange={(event) =>
+                                setDraft({ ...draft, title: event.target.value })
+                            }
+                        />
+                    </label>
 
-                <label className={styles.field}>
-                    <span>קטגוריה</span>
-                    <select
-                        value={draft.category}
-                        onChange={(event) =>
-                            setDraft({
-                                ...draft,
-                                category: event.target.value as DaycareTaskCategory,
-                            })
-                        }
-                    >
-                        {daycareTaskCategories.map((category) => (
-                            <option key={category} value={category}>
-                                {category}
-                            </option>
+                    <label className={styles.field}>
+                        <span>קטגוריה</span>
+                        <select
+                            value={draft.category}
+                            onChange={(event) =>
+                                setDraft({
+                                    ...draft,
+                                    category: event.target.value as DaycareTaskCategory,
+                                })
+                            }
+                        >
+                            {daycareTaskCategories.map((category) => (
+                                <option key={category} value={category}>
+                                    {category}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label className={styles.field}>
+                        <span>עדיפות</span>
+                        <select
+                            value={draft.priority}
+                            onChange={(event) =>
+                                setDraft({
+                                    ...draft,
+                                    priority: event.target.value as DaycarePriority,
+                                })
+                            }
+                        >
+                            {daycarePriorities.map((priority) => (
+                                <option key={priority} value={priority}>
+                                    {priority}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <div className={styles.subtaskEditPanel}>
+                        <div className={styles.subtaskEditHeader}>
+                            <span>תתי־משימות</span>
+                            <AdminButton
+                                className={styles.secondaryButton}
+                                type="button"
+                                onClick={addDraftSubtask}
+                            >
+                                הוספת תת־משימה
+                            </AdminButton>
+                        </div>
+                        {(draft.subtasks?.length
+                            ? draft.subtasks
+                            : [{ title: "", completed: false }]
+                        ).map((subtask, index) => (
+                            <div
+                                className={styles.subtaskEditRow}
+                                key={index}
+                            >
+                                <input
+                                    aria-label={`שם תת־משימה ${index + 1}`}
+                                    placeholder="שם תת־משימה"
+                                    value={subtask.title}
+                                    onChange={(event) =>
+                                        updateDraftSubtaskTitle(
+                                            index,
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                                <button
+                                    className={styles.dangerButton}
+                                    type="button"
+                                    aria-label={`מחיקת תת־משימה ${index + 1}`}
+                                    onClick={() => removeDraftSubtask(index)}
+                                >
+                                    מחיקה
+                                </button>
+                            </div>
                         ))}
-                    </select>
-                </label>
+                    </div>
 
-                <label className={styles.field}>
-                    <span>עדיפות</span>
-                    <select
-                        value={draft.priority}
-                        onChange={(event) =>
-                            setDraft({
-                                ...draft,
-                                priority: event.target.value as DaycarePriority,
-                            })
-                        }
-                    >
-                        {daycarePriorities.map((priority) => (
-                            <option key={priority} value={priority}>
-                                {priority}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <div className={styles.subtaskEditPanel}>
-                    <div className={styles.subtaskEditHeader}>
-                        <span>תתי־משימות</span>
+                    {error && <p className={styles.error} role="alert">{error}</p>}
+                    <div className={styles.formActions}>
+                        <AdminButton variant="primary"
+                            className={styles.primaryButton}
+                            disabled={!draft.title.trim() || saving}
+                            aria-busy={saving}
+                            type="button"
+                            onClick={handleSave}
+                        >
+                            {saving ? "שומר..." : editingId ? "שמירה" : "הוספת משימה"}
+                        </AdminButton>
                         <AdminButton
                             className={styles.secondaryButton}
                             type="button"
-                            onClick={addDraftSubtask}
+                            onClick={resetDraft}
                         >
-                            הוספת תת־משימה
+                            ביטול
                         </AdminButton>
                     </div>
-                    {(draft.subtasks?.length
-                        ? draft.subtasks
-                        : [{ title: "", completed: false }]
-                    ).map((subtask, index) => (
-                        <div
-                            className={styles.subtaskEditRow}
-                            key={index}
-                        >
-                            <input
-                                aria-label={`שם תת־משימה ${index + 1}`}
-                                placeholder="שם תת־משימה"
-                                value={subtask.title}
-                                onChange={(event) =>
-                                    updateDraftSubtaskTitle(
-                                        index,
-                                        event.target.value
-                                    )
-                                }
-                            />
-                            <button
-                                className={styles.dangerButton}
-                                type="button"
-                                aria-label={`מחיקת תת־משימה ${index + 1}`}
-                                onClick={() => removeDraftSubtask(index)}
-                            >
-                                מחיקה
-                            </button>
-                        </div>
-                    ))}
-                </div>
-
-                {error && <p className={styles.error} role="alert">{error}</p>}
-                <div className={styles.formActions}>
-                    <AdminButton variant="primary"
-                        className={styles.primaryButton}
-                        disabled={!draft.title.trim() || saving}
-                        aria-busy={saving}
-                        type="button"
-                        onClick={handleSave}
-                    >
-                        {saving ? "שומר..." : editingId ? "שמירה" : "הוספת משימה"}
-                    </AdminButton>
-                    <AdminButton
-                        className={styles.secondaryButton}
-                        type="button"
-                        onClick={resetDraft}
-                    >
-                        ביטול
-                    </AdminButton>
-                </div>
-            </AdminDialog>
+                </AdminDialog>
             )}
 
             <div className={styles.categoryFilterBar} aria-label="סינון משימות">
@@ -206,13 +206,13 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
 
                 <label className={styles.taskSearchField}>
                     <span>חיפוש משימה</span><span className={styles.searchControl}><Search aria-hidden="true" size={18} />
-                    <input
-                        aria-label="חיפוש משימה"
-                        placeholder="חיפוש משימה או פריט..."
-                        type="search"
-                        value={searchQuery}
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                    />
+                        <input
+                            aria-label="חיפוש משימה"
+                            placeholder="חיפוש משימה או פריט..."
+                            type="search"
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                        />
                     </span>
                 </label>
 
@@ -308,25 +308,25 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                     </button>
 
                                     <div className={styles.rowActions}>
-                                    <button
-                                        aria-label={`עריכת ${task.title}`}
-                                        className={`${styles.linkButton} ${styles.iconActionButton}`}
-                                        title="עריכה"
-                                        type="button"
-                                        onClick={() => handleEdit(task)}
-                                    >
-                                        <Pencil aria-hidden="true" size={17} />
-                                    </button>
-                                    <button
-                                        aria-label={`מחיקת ${task.title}`}
-                                        className={`${styles.dangerButton} ${styles.iconActionButton} ${styles.desktopDelete}`}
-                                        title="מחיקה"
-                                        type="button"
-                                        onClick={() => setDeleteTarget(task)}
-                                    >
-                                        <Trash2 aria-hidden="true" size={17} />
-                                    </button>
-                                    <TaskActionsPopover title={task.title} onDelete={() => setDeleteTarget(task)} />
+                                        <button
+                                            aria-label={`עריכת ${task.title}`}
+                                            className={`${styles.linkButton} ${styles.iconActionButton}`}
+                                            title="עריכה"
+                                            type="button"
+                                            onClick={() => handleEdit(task)}
+                                        >
+                                            <Pencil aria-hidden="true" size={17} />
+                                        </button>
+                                        <button
+                                            aria-label={`מחיקת ${task.title}`}
+                                            className={`${styles.dangerButton} ${styles.iconActionButton} ${styles.desktopDelete}`}
+                                            title="מחיקה"
+                                            type="button"
+                                            onClick={() => setDeleteTarget(task)}
+                                        >
+                                            <Trash2 aria-hidden="true" size={17} />
+                                        </button>
+                                        <TaskActionsPopover title={task.title} onDelete={() => setDeleteTarget(task)} />
                                     </div>
                                 </div>
 
@@ -356,11 +356,10 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                             className={styles.subtaskList}
                                         >
                                             <div
-                                                className={`${styles.subtaskHeader} ${
-                                                    showProcurementFields
+                                                className={`${styles.subtaskHeader} ${showProcurementFields
                                                         ? styles.subtaskHeaderDetailed
                                                         : styles.subtaskHeaderSimple
-                                                }`}
+                                                    }`}
                                             >
                                                 <span>פריט</span>
                                                 {showProcurementFields && (
@@ -377,11 +376,10 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                             {task.subtasks.map(
                                                 (subtask, index) => (
                                                     <div
-                                                        className={`${styles.subtaskItem} ${
-                                                            showProcurementFields
+                                                        className={`${styles.subtaskItem} ${showProcurementFields
                                                                 ? styles.subtaskItemDetailed
                                                                 : styles.subtaskItemSimple
-                                                        }`}
+                                                            }`}
                                                         key={`${task._id}-${subtask.title}`}
                                                     >
                                                         <span>{subtask.title}</span>
@@ -442,8 +440,8 @@ const DaycareTasksView = ({ model }: DaycareTasksViewProps) => {
                                                                         defaultValue={
                                                                             subtask.actualCost
                                                                                 ? String(
-                                                                                      subtask.actualCost
-                                                                                  )
+                                                                                    subtask.actualCost
+                                                                                )
                                                                                 : ""
                                                                         }
                                                                         disabled={

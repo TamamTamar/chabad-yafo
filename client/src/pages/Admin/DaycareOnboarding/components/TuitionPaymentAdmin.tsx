@@ -56,7 +56,7 @@ const TuitionPaymentAdmin = ({ onboarding, onUpdated, onNotice, onError }: Props
                 <div className={styles.identityDetailItem}><dt className={styles.identityDetailLabel}>סטטוס</dt><dd className={styles.identityDetailValue}>{payment.status === "active" ? "הוראת קבע פעילה" : "ממתין להקמת הוראת קבע"}</dd></div>
                 <div className={styles.identityDetailItem}><dt className={styles.identityDetailLabel}>סכום חודשי</dt><dd className={styles.identityDetailValue}>₪{payment.monthlyTuitionAmount.toLocaleString("he-IL")}</dd></div>
                 <div className={styles.identityDetailItem}><dt className={styles.identityDetailLabel}>מועד הקמה</dt><dd className={styles.identityDetailValue}>{formatDate(payment.establishedAt)}</dd></div>
-                <div className={styles.identityDetailItem}><dt className={styles.identityDetailLabel}>מזהה עסקה</dt><dd className={styles.identityDetailValue}>{payment.transactionId ?? "—"}</dd></div>
+                <div className={styles.identityDetailItem}><dt className={styles.identityDetailLabel}>מזהה עסקה</dt><dd className={styles.identityDetailValue}>{payment.transactionId ?? "-"}</dd></div>
             </dl>
             <div className={styles.linkActions}>
                 <button className={styles.primaryButton} type="button" disabled={busy || payment.status === "active"} onClick={() => void save()}>שמירת שכר הלימוד</button>
@@ -68,11 +68,11 @@ const TuitionPaymentAdmin = ({ onboarding, onUpdated, onNotice, onError }: Props
                     <div className={styles.paymentHistoryList}>
                         {history.map((item) => (
                             <div className={styles.paymentHistoryItem} key={item._id}>
-                                <strong>הוראת קבע — 12 חודשים</strong>
+                                <strong>הוראת קבע - 12 חודשים</strong>
                                 <span>סכום חודשי: ₪{item.requestedAmount.toLocaleString("he-IL")}</span>
                                 <span>סטטוס: {item.status === "confirmed" ? "פעילה" : item.status === "failed" ? "נכשלה" : "ממתינה"}</span>
                                 <span>תאריך: {formatDate(item.paidAt ?? item.createdAt)}</span>
-                                <span>עסקה: {item.externalTransactionId ?? "—"}</span>
+                                <span>עסקה: {item.externalTransactionId ?? "-"}</span>
                             </div>
                         ))}
                     </div>

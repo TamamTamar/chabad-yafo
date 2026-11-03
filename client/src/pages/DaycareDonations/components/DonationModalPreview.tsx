@@ -116,8 +116,8 @@ const DonationModalPreview = ({
         amountChoice === "custom"
             ? Number(customAmount.replace(/[^\d]/g, "")) || 0
             : amountChoice === "complete"
-              ? remaining ?? 0
-              : amountChoice;
+                ? remaining ?? 0
+                : amountChoice;
     const isMonthly = paymentMode === "monthly";
     const campaignAmount = isMonthly ? amount * 12 : amount;
     const donorFirstName = fullName.trim().split(/\s+/)[0];
@@ -129,17 +129,17 @@ const DonationModalPreview = ({
     const amountOptions: { value: AmountChoice; label: string }[] =
         diagnosticMode
             ? [
-                  { value: 1, label: "₪1" },
-                  { value: 5, label: "₪5" },
-                  { value: "custom", label: "סכום אחר (עד ₪10)" },
-              ]
+                { value: 1, label: "₪1" },
+                { value: 5, label: "₪5" },
+                { value: "custom", label: "סכום אחר (עד ₪10)" },
+            ]
             : [
-                  { value: 180, label: "₪180" },
-                  { value: 360, label: "₪360" },
-                  { value: 770, label: "₪770" },
-                  { value: "complete", label: "השלמת הסכום" },
-                  { value: "custom", label: "סכום אחר" },
-              ];
+                { value: 180, label: "₪180" },
+                { value: 360, label: "₪360" },
+                { value: 770, label: "₪770" },
+                { value: "complete", label: "השלמת הסכום" },
+                { value: "custom", label: "סכום אחר" },
+            ];
 
     const preparePayment = async () => {
         setFormError("");
@@ -179,16 +179,16 @@ const DonationModalPreview = ({
             const [firstName = "", ...lastNameParts] = fullName.trim().split(/\s+/);
             const lastName = lastNameParts.join(" ") || firstName;
             const campaignLabel = diagnosticMode
-                ? "עסקת ניסיון — קמפיין המעון"
-                : "תרומה — קמפיין המעון";
+                ? "עסקת ניסיון - קמפיין המעון"
+                : "תרומה - קמפיין המעון";
             const providerComment = [
                 campaignLabel,
                 `יעד: ${selectedTitle}`,
                 isMonthly
                     ? `הו״ק: ₪${formatCurrency(amount)} לחודש ל־12 חודשים`
                     : installments > 1
-                      ? `${installments} תשלומים`
-                      : "תשלום אחד",
+                        ? `${installments} תשלומים`
+                        : "תשלום אחד",
                 dedication.trim()
                     ? `הקדשה: ${dedication.trim()}`
                     : "",
@@ -204,8 +204,8 @@ const DonationModalPreview = ({
                     Tashlumim: isMonthly ? 12 : installments,
                     Currency: "1",
                     Description: diagnosticMode
-                        ? `עסקת ניסיון למעון — ${selectedTitle}`
-                        : `תרומה למעון — ${selectedTitle}`,
+                        ? `עסקת ניסיון למעון - ${selectedTitle}`
+                        : `תרומה למעון - ${selectedTitle}`,
                     Groupe: "קמפיין המעון",
                     firstName,
                     lastName,
@@ -233,10 +233,10 @@ const DonationModalPreview = ({
         step === 1
             ? "בוחרים איך לקחת חלק"
             : step === 2
-              ? "הפרטים שלכם"
-              : step === 3
-                ? "תשלום מאובטח"
-                : "התרומה הושלמה";
+                ? "הפרטים שלכם"
+                : step === 3
+                    ? "תשלום מאובטח"
+                    : "התרומה הושלמה";
 
     return (
         <dialog
@@ -253,9 +253,8 @@ const DonationModalPreview = ({
             }}
         >
             <div
-                className={`${styles.donationModal} ${
-                    step === 4 ? styles.donationModalSuccess : ""
-                }`}
+                className={`${styles.donationModal} ${step === 4 ? styles.donationModalSuccess : ""
+                    }`}
             >
                 <header className={styles.modalHeader}>
                     <div>
@@ -421,9 +420,9 @@ const DonationModalPreview = ({
                                                         <option key={count} value={count}>
                                                             {count === 1
                                                                 ? "תשלום אחד"
-                                                                : `${count} תשלומים — כ־₪${formatCurrency(
-                                                                      Math.ceil(amount / count)
-                                                                  )} לתשלום`}
+                                                                : `${count} תשלומים - כ־₪${formatCurrency(
+                                                                    Math.ceil(amount / count)
+                                                                )} לתשלום`}
                                                         </option>
                                                     )
                                                 )}
@@ -480,11 +479,10 @@ const DonationModalPreview = ({
                                 </label>
                                 {!diagnosticMode && (
                                     <label
-                                        className={`${styles.publicNameChoice} ${
-                                            displayDonorName
+                                        className={`${styles.publicNameChoice} ${displayDonorName
                                                 ? styles.publicNameChoiceActive
                                                 : ""
-                                        }`}
+                                            }`}
                                     >
                                         <input
                                             type="checkbox"
@@ -603,8 +601,8 @@ const DonationModalPreview = ({
                                 {diagnosticMode
                                     ? "עסקת הניסיון התקבלה"
                                     : donorFirstName
-                                      ? `תודה רבה, ${donorFirstName}`
-                                      : "תודה שלקחתם חלק"}
+                                        ? `תודה רבה, ${donorFirstName}`
+                                        : "תודה שלקחתם חלק"}
                             </strong>
                             <p>
                                 {diagnosticMode
@@ -650,9 +648,8 @@ const DonationModalPreview = ({
                 </div>
 
                 <footer
-                    className={`${styles.modalFooter} ${
-                        step === 4 ? styles.modalFooterSuccess : ""
-                    }`}
+                    className={`${styles.modalFooter} ${step === 4 ? styles.modalFooterSuccess : ""
+                        }`}
                 >
                     {step < 4 && (
                         <div>
@@ -691,8 +688,8 @@ const DonationModalPreview = ({
                                 {preparing
                                     ? "מכין תשלום..."
                                     : paymentsEnabled
-                                      ? "מעבר לתשלום מאובטח"
-                                      : "התשלום ייפתח לאחר הבדיקה"}
+                                        ? "מעבר לתשלום מאובטח"
+                                        : "התשלום ייפתח לאחר הבדיקה"}
                             </button>
                         </div>
                     )}

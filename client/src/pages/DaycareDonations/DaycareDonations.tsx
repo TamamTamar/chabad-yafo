@@ -61,7 +61,7 @@ const fallbackCampaign: DaycareDonationCampaignData = {
     fieldUpdates: [
         {
             id: "kitchen-installed",
-            title: "המטבח כבר במקום — עכשיו משלימים את התשתיות",
+            title: "המטבח כבר במקום - עכשיו משלימים את התשתיות",
             description:
                 "ארונות המטבח והמשטח כבר הותקנו. השלב הבא הוא להשלים את האינסטלציה והשירותים המותאמים לילדים, כדי שהחלל יהיה מוכן לשימוש יום־יומי.",
             itemId: "plumbing",

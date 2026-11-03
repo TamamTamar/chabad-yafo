@@ -1,6 +1,6 @@
-# עיצוב האדמין — A / Modern Dark
+# עיצוב האדמין - A / Modern Dark
 
-הכיוון הנוכחי הוא A — Modern Dark. עיצוב C הוחלף: הוסרו ייבוא צילום יפו, החיתוך הדקורטיבי, רכיב הכותרת הגדול, צבעי השמנת והחול וה־mixin `editorial`. אין שכבת CSS חדשה שעוקפת את C.
+הכיוון הנוכחי הוא A - Modern Dark. עיצוב C הוחלף: הוסרו ייבוא צילום יפו, החיתוך הדקורטיבי, רכיב הכותרת הגדול, צבעי השמנת והחול וה־mixin `editorial`. אין שכבת CSS חדשה שעוקפת את C.
 
 ההפעלה הנוכחית ב־`/admin/daycare` כוללת רישום, משימות והיערכות, שבע לשוניות מסמכים, כספים ושבע לשוניות ניהול התרומות, וכן את המעטפת המוצגת לצדם. יתר מסכי האדמין והאתר הציבורי נשארו בעיצובם הקודם. הסעיפים בהמשך מתעדים גם סבבים קודמים; הגבלות התחולה שבהם מתייחסות למועד אותו סבב. אין שינוי בנתונים, API, מבני נתונים, הרשאות או תהליכי הרשמה. לא בוצעו commit או deploy.
 
@@ -65,7 +65,7 @@ ADMIN_QA_URL=http://127.0.0.1:5193 PLAYWRIGHT_MODULE=/path/to/playwright node cl
 
 ללא commit או deploy. לא הורחב השינוי לשאר מסכי האדמין.
 
-## סבב ממוקד — שדות קלט
+## סבב ממוקד - שדות קלט
 
 השפה של Modern Dark נשמרה. שונו רק השדות במסך הרישום, כולל חלון פתיחת התיק ועורך ההערה.
 
@@ -93,11 +93,11 @@ ADMIN_QA_URL=http://127.0.0.1:5193 PLAYWRIGHT_MODULE=/path/to/playwright node cl
 
 התיקייה `output/admin-inputs` כוללת לכל רוחב:
 
-- `before-toolbar-{width}.png` ו־`after-toolbar-{width}.png` — השוואה ממוקדת של החיפוש והסינון.
-- `before-search-focus-{width}.png` ו־`after-search-focus-{width}.png` — מיקוד בחיפוש.
-- `before-select-focus-{width}.png` ו־`after-select-focus-{width}.png` — מיקוד בבורר.
-- `before-modal-field-{width}.png` ו־`after-modal-field-{width}.png` — שדה שנת לימודים בחלון.
-- `before-modal-{width}.png` ו־`after-modal-{width}.png` — החלון המלא.
+- `before-toolbar-{width}.png` ו־`after-toolbar-{width}.png` - השוואה ממוקדת של החיפוש והסינון.
+- `before-search-focus-{width}.png` ו־`after-search-focus-{width}.png` - מיקוד בחיפוש.
+- `before-select-focus-{width}.png` ו־`after-select-focus-{width}.png` - מיקוד בבורר.
+- `before-modal-field-{width}.png` ו־`after-modal-field-{width}.png` - שדה שנת לימודים בחלון.
+- `before-modal-{width}.png` ו־`after-modal-{width}.png` - החלון המלא.
 - צילומי hover, disabled ושגיאה לאחר השינוי.
 
 הצילומים ממוקדים עם מרווח סביב השדות כדי להציג את ה־halo במלואו. כל נתוני ה־API מדומים; בקשות כתיבה ושירותים חיצוניים חסומים. בדיקת disabled מפעילה זמנית את מאפיין השדה ב־DOM בלבד, ללא כתיבה לנתוני אמת.
@@ -142,8 +142,8 @@ Assistant ו־RTL נשמרו. לא נוספו פעולות מההדמיה שאי
 
 ## בדיקות בפועל
 
-- `npm --prefix client run build` — עבר, כולל TypeScript.
-- `npm --prefix client test` — כל בדיקות הלקוח עברו, כולל ניווט, רגרסיות אדמין, כספי המעון והרשמה.
+- `npm --prefix client run build` - עבר, כולל TypeScript.
+- `npm --prefix client test` - כל בדיקות הלקוח עברו, כולל ניווט, רגרסיות אדמין, כספי המעון והרשמה.
 - Chrome במצב headless ברוחבי **1440, 768, 390 ו־320px**, בגובה 1000px.
 - חיפוש, סינון, אפס תוצאות, רשימה ריקה, שמות משפחה וילד ארוכים, הערה ארוכה ופנייה ללא הערה.
 - עריכת הערה, ביטול והחזרת הערך המקורי, שמירה ופתיחה חוזרת לאימות הערך, חיווי טעינה, כשל מדומה ושמירת טיוטה לניסיון חוזר.
@@ -161,11 +161,11 @@ Assistant ו־RTL נשמרו. לא נוספו פעולות מההדמיה שאי
 
 בתיקייה `output/admin-modern-dark`:
 
-- `after-viewport-{width}.png` — מסך הרישום.
-- `after-edit-viewport-{width}.png` — עריכת הערה.
-- `after-create-{width}.png` — חלון פתיחת תיק.
-- `after-navigation-{width}.png` — תפריט נפתח.
-- `after-empty-{width}.png` — רשימה ריקה ומדדים ללא נתונים.
+- `after-viewport-{width}.png` - מסך הרישום.
+- `after-edit-viewport-{width}.png` - עריכת הערה.
+- `after-create-{width}.png` - חלון פתיחת תיק.
+- `after-navigation-{width}.png` - תפריט נפתח.
+- `after-empty-{width}.png` - רשימה ריקה ומדדים ללא נתונים.
 - קיימים גם צילומי עמוד מלא. צילומי C הקודמים נשמרו בתיקייתם לצורכי השוואה בלבד.
 
 מפעילים Vite עם `VITE_API_URL=/api`, ואז:
@@ -182,7 +182,7 @@ ADMIN_QA_URL=http://127.0.0.1:5191 PLAYWRIGHT_MODULE=/path/to/playwright node cl
 
 המימוש נעצר במסך הרישום ובמעטפת המותנית שלו לצורך אישור חזותי. אין להרחיב לשאר האדמין לפני אישור המשתמש.
 
-## מערכת הרכיבים המרכזית — 18.10.2026
+## מערכת הרכיבים המרכזית - 18.10.2026
 
 סעיף זה מעדכן את מגבלת ההרחבה ההיסטורית לעיל: המשתמש אישר הקמת תשתית משותפת ומעבר הדרגתי. Modern Dark נשאר הבסיס; בשלב זה לא הופעלה מעטפת חדשה בכל המסכים.
 
@@ -230,7 +230,7 @@ import { AdminDesignScope, AdminButton, AdminInput } from '../../../components/A
 - `check-admin-tasks.cjs`: בורר פתיחת פרטי המשימה הובחן מכפתור popover בעל אותו aria-expanded; נוספה בדיקת נראות מפורשת לפעולות מחשב/מובייל, לאחר שתוקן סדר ייבוא מחלקות הבסיס לפני מחלקות הפריסה.
 - רכיבי Card/Table/StatCard החדשים מוכנים לשימוש אך טרם הוחלפו בהם המבנים הייעודיים במסכים. הם עברו TypeScript/Build; אינם מוצגים כאן כאילו עברו מסך ייצור שלם. לא בוצעה בדיקה בקורא מסך, מכשיר פיזי או מול מסד נתונים אמיתי.
 
-## הרחבה: מסמכי המעון — 18.10.2026
+## הרחבה: מסמכי המעון - 18.10.2026
 
 המסך הפעיל כולל שבע לשוניות מסמכים, ולא את רכיב מעקב האישורים הישן `DaycareDocuments.tsx` שאינו מוצג בנתיב. הותאמו מידע להורים, תוכנית שנתית והסכם התקשרות למעטפת Modern Dark, עם ניווט מסמכים קומפקטי שנשבר לשורות במובייל ו־aria-pressed למסמך הנבחר. אין שינוי בסדר הלשוניות, ברירת המחדל או הקישורים הישנים. סעיף זה מעדכן את מגבלות התחולה ההיסטוריות במסמך: המסמכים הוסבו כעת באישור המשתמש.
 
@@ -250,7 +250,7 @@ AdminConfirmDialog הוא הרכבת AdminDialog הקיים עם כפתורים 
 
 אימות סופי: עברו גם הפקת עותק הסכם כ־download, פתיחת PDF תוכנית כ־popup, רשימה ריקה וכשל טעינה מדומה. סקריפט המסמכים ביצע 51 כתיבות לזיכרון בלבד; לא נשלחה כתיבה לשרת אמת.
 
-## הרחבה: כספי המעון — 18.10.2026
+## הרחבה: כספי המעון - 18.10.2026
 
 Modern Dark הופעל גם ב־`/admin/daycare?tab=finance`, עם כותרת ונתיב מותאמים ב־AdminShell. תחולת שאר המסכים נשמרה. התצוגה משתמשת ב־AdminInput, AdminSelect, AdminButton, AdminCard ו־AdminBadge; לא נדרשה הרחבת רכיב משותף. פריסת הכספים בלבד נשארה ב־DaycareFinance.module.scss, וסגנונות finance הישנים הוסרו מקובץ ההורה.
 
@@ -269,7 +269,7 @@ Build לקוח וכל בדיקות הלקוח עברו; ESLint ממוקד ל־Da
 תמונות דמה לבקרה מקומית: `output/admin-finance/summary-1440.png`, `summary-320.png`, `mobile.png`. הרצה חוזרת: `ADMIN_QA_URL=http://127.0.0.1:5198 PLAYWRIGHT_MODULE=/path/to/playwright node client/scripts/check-admin-finance.cjs`.
 
 
-## בדיקת אחידות רוחבית — 18.10.2026
+## בדיקת אחידות רוחבית - 18.10.2026
 
 הסקירה כללה את רישום המעון והמדדים, משימות והיערכות, welcome/routine/holidays/menu/equipment/annual-plan/agreements וכספי המעון. נבדקו רכיבים, מצבי אינטראקציה, טיפוגרפיה, טוקנים, כפילויות, RTL ופריסה צרה. לא בוצע סבב עיצוב חדש.
 
@@ -294,7 +294,7 @@ Build (`npm run build`) וכל בדיקות הלקוח (`npm test`) עברו. ב
 
 סקריפטים: `check-admin-registration-design.cjs`, `check-admin-tasks.cjs`, `check-admin-tasks-ux.cjs`, `check-admin-documents.cjs`, `check-admin-finance.cjs`, `check-admin-inputs.cjs`. בהרצה המקבילית הראשונית היו timeouts בשלוש סוויטות; הרצות חוזרות עברו ללא שינוי בקוד היישום לצורך פתרונם. אין להסיק מכך בדיקת עומס. API יורט בזיכרון ובקשות מחוץ למקור המקומי נחסמו; לא בוצעה כתיבה לשרת אמת. צילומים נוטרלו בהרצה באמצעות preload מקומי זמני, ללא שינוי מנגנון הבדיקות הקבוע. לא נבדקו מכשיר פיזי, קורא מסך או התמדה במסד נתונים. לא בוצעו commit או deploy.
 
-## תרומות ולידים — Modern Dark (18.10.2026)
+## תרומות ולידים - Modern Dark (18.10.2026)
 
 התחולה הפעילה היא `/admin/daycare?tab=donations`: סקירה, תרומות, שגרירים, עדכונים, הזנה ידנית, סעיפים ויעדים והיסטוריה. המיפוי המקדים ב־admin-design-inventory.md מפרט רכיבים, שימושים וחיבורי הורים. סעיפי ״טרם הוסבו״ הקודמים מתארים את המצב לפני סבב זה.
 

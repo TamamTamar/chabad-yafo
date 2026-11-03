@@ -58,10 +58,10 @@ const DaycareDashboard = ({ overview, compact, secondary, reference }: DaycareDa
             {overview && <span className={referenceStyles.status}>{overview.generalStatus}</span>}
         </div>;
         const metrics = [
-            {label: "מתעניינים", value: overview?.interestedCount, icon: UsersRound, tone: "info"},
-            {label: "משימות פתוחות", value: overview?.openTasks, icon: Clock3, tone: "warning"},
-            {label: "משימות שהושלמו", value: overview?.completedTasks, icon: CircleCheck, tone: "success"},
-            {label: "תאריך יעד לפתיחה", value: overview?.targetOpeningDate || undefined, icon: CalendarDays, tone: "warning"},
+            { label: "מתעניינים", value: overview?.interestedCount, icon: UsersRound, tone: "info" },
+            { label: "משימות פתוחות", value: overview?.openTasks, icon: Clock3, tone: "warning" },
+            { label: "משימות שהושלמו", value: overview?.completedTasks, icon: CircleCheck, tone: "success" },
+            { label: "תאריך יעד לפתיחה", value: overview?.targetOpeningDate || undefined, icon: CalendarDays, tone: "warning" },
         ];
         return <section className={referenceStyles.dashboard} aria-labelledby="daycare-dashboard">
             <h2 id="daycare-dashboard">תמונת מצב לקראת פתיחה</h2>
@@ -70,8 +70,8 @@ const DaycareDashboard = ({ overview, compact, secondary, reference }: DaycareDa
     }
 
     if (compact) return <div className={styles.openingSummary} aria-label="סיכום פתיחת המעון">
-        <span>יעד פתיחה: {overview ? `${overview.openingTargetChildren} ילדים` : "—"}</span>
-        <span>נרשמים: {overview?.actualRegistrations ?? "—"}</span>
+        <span>יעד פתיחה: {overview ? `${overview.openingTargetChildren} ילדים` : "-"}</span>
+        <span>נרשמים: {overview?.actualRegistrations ?? "-"}</span>
         {overview && <span className={`${styles.statusBadge} ${getStatusClassName(overview.generalStatus)}`}>{overview.generalStatus}</span>}
     </div>;
 

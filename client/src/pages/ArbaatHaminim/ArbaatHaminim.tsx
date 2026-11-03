@@ -15,7 +15,7 @@ export default function ArbaatHaminim() {
         return () => { active = false; };
     }, []);
     if (!content) return <Container><p className={styles.notice} role="status">{failed ? 'פרטי המכירה אינם זמינים כרגע. נסו לרענן בהמשך.' : 'טוענים את פרטי המכירה…'}</p></Container>;
-    return <>{failed && <Container><p className={styles.notice}>תצוגת פיתוח מקומית — אין חיבור לנתוני האדמין.</p></Container>}<ArbaatHaminimContent content={content} /></>;
+    return <>{failed && <Container><p className={styles.notice}>תצוגת פיתוח מקומית - אין חיבור לנתוני האדמין.</p></Container>}<ArbaatHaminimContent content={content} /></>;
 }
 
 export function ArbaatHaminimContent({ content, preview = false }: { content: SaleContent; preview?: boolean }) {
