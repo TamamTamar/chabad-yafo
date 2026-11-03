@@ -1,25 +1,34 @@
 import styles from "./RebbeLetterInfo.module.scss";
 
-const RebbeLetterInfo = () => {
+import type { WriteToRebbeConfig } from "../../writeToRebbeConfig";
+
+const RebbeLetterInfo = ({ config }: { config: WriteToRebbeConfig }) => {
     return (
         <aside className={styles.card}>
             <h2 className={styles.title}>
-                תפילה וברכה בציון הרבי
+                מקום למילים שלכם
             </h2>
 
             <p className={styles.description}>
-                במסגרת כינוס השלוחים העולמי אעביר את בקשותיכם לציון
-                הקדוש של הרבי, ואתפלל עבורכם ועבור יקיריכם לרפואה,
-                לפרנסה, להצלחה ולבשורות טובות.
+                אין צורך בנוסח מיוחד. אפשר לספר בכמה מילים על מה שמעסיק
+                אתכם, לבקש ברכה לעצמכם ולבני המשפחה, או לציין שמות
+                לתפילה. כל בקשה היא אישית, וכל אחד ואחת מוזמנים לכתוב.
             </p>
 
+            {config.eventTitle && (
+                <>
+                    <h2 className={styles.title}>{config.eventTitle}</h2>
+                    <p className={styles.description}>{config.eventText}</p>
+                </>
+            )}
+
             <p className={styles.note}>
-                אנא ציינו שם מלא ושם האם של כל אדם שעבורו אתם מבקשים ברכה.
-                ניתן לכתוב בכל שפה.
+                לצד כל שם לתפילה, הוסיפו גם את שם האם.
+                כתבו בשפה הנוחה לכם ובמילים שלכם.
             </p>
 
             <p className={styles.footerText}>
-                הרב לוי תמם — בית חב״ד יפו
+                הרב לוי תמם - בית חב״ד יפו
             </p>
         </aside>
     );

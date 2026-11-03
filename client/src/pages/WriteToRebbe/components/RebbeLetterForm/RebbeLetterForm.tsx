@@ -3,7 +3,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import styles from "./RebbeLetterForm.module.scss";
 import { trackRebbeLetterSubmit } from "../../../../services/googleAnalyticsService";
 import { createRebbeLetter } from "../../../../services/rebbeLetterService";
-import { writeToRebbeConfigs } from "../../writeToRebbeConfig";
+import type { WriteToRebbeConfig } from "../../writeToRebbeConfig";
 
 type RebbeLetterFormValues = {
     fullName: string;
@@ -15,10 +15,11 @@ type RebbeLetterFormValues = {
 };
 
 type RebbeLetterFormProps = {
+    config: WriteToRebbeConfig;
     onSuccess: () => void;
 };
 
-const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
+const RebbeLetterForm = ({ onSuccess, config }: RebbeLetterFormProps) => {
     const {
         register,
         handleSubmit,
@@ -41,12 +42,12 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
         try {
             await createRebbeLetter({
                 ...data,
-                occasion: writeToRebbeConfigs.general.occasion,
+                occasion: config.occasion,
             });
 
             trackRebbeLetterSubmit({
                 content_name: "rebbe_letter",
-                occasion: writeToRebbeConfigs.general.occasion,
+                occasion: config.occasion,
                 wants_updates: data.wantsUpdates,
                 has_phone: Boolean(data.phone?.trim()),
                 has_email: Boolean(data.email?.trim()),
@@ -62,10 +63,10 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className={styles.header}>
-                <h2 className={styles.title}>הבקשה שלכם לתפילה וברכה</h2>
+                <h2 className={styles.title}>מה תרצו להביא לתפילה?</h2>
 
                 <p className={styles.subtitle}>
-                    כתבו את בקשתכם לתפילה וברכה. אנא ציינו שם מלא ושם האם של כל אדם שעבורו אתם מבקשים ברכה.
+                    מלאו את שמכם ואת שם האם, והוסיפו בקשה אם תרצו. להזכרת אנשים נוספים, כתבו בתוכן הבקשה את שמם המלא ואת שם אימם.
                 </p>
             </div>
 
@@ -179,7 +180,7 @@ const RebbeLetterForm = ({ onSuccess }: RebbeLetterFormProps) => {
                 <textarea
                     id="letter"
                     className={styles.textarea}
-                    placeholder="כתבו כאן את אשר על ליבכם..."
+                    placeholder="אפשר לשתף בבקשה, להזכיר אדם יקר או לבקש ברכה לדרך חדשה…"
                     {...register("letter", {
                         maxLength: {
                             value: 1500,

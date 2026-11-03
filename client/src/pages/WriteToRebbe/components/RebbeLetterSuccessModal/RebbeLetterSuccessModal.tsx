@@ -1,12 +1,16 @@
 import { Link } from "react-router-dom";
 import styles from "./RebbeLetterSuccessModal.module.scss";
 
+import type { WriteToRebbeConfig } from "../../writeToRebbeConfig";
+
 type RebbeLetterSuccessModalProps = {
+    config: WriteToRebbeConfig;
     onClose: () => void;
 };
 
 const RebbeLetterSuccessModal = ({
     onClose,
+    config,
 }: RebbeLetterSuccessModalProps) => {
     return (
         <div
@@ -37,7 +41,9 @@ const RebbeLetterSuccessModal = ({
                 </h2>
 
                 <p className={styles.text}>
-                    בעזרת ה׳ הבקשה תועבר לציונו הקדוש של הרבי במסגרת כינוס השלוחים העולמי.
+                    {config.occasion === "kinus-hashluchim"
+                        ? "תודה ששיתפתם. בקשתכם התקבלה בבית חב״ד יפו, ובעזרת ה׳ תובא לאוהל הקדוש של הרבי בנסיעה לכינוס השלוחים."
+                        : `תודה ששיתפתם. בקשתכם התקבלה בבית חב״ד יפו.${config.eventText ? ` ${config.eventText}` : ""}`}
                 </p>
 
                 <p className={styles.blessingText}>

@@ -2,9 +2,9 @@ import Container from "../../../../components/Container/Container";
 import rebbeImage from "../../../../assets/rebbe-writing-letter.webp";
 
 import styles from "./RebbeLetterHero.module.scss";
-import { writeToRebbeConfigs } from "../../writeToRebbeConfig";
+import type { WriteToRebbeConfig } from "../../writeToRebbeConfig";
 
-const RebbeLetterHero = () => {
+const RebbeLetterHero = ({ config }: { config: WriteToRebbeConfig }) => {
     return (
         <section className={styles.hero}>
             <img
@@ -18,15 +18,15 @@ const RebbeLetterHero = () => {
             <Container>
                 <div className={styles.content}>
                     <p className={styles.eyebrow}>
-                        {writeToRebbeConfigs.general.eyebrow}
+                        {config.eyebrow}
                     </p>
 
                     <h1 className={styles.title}>
-                        {writeToRebbeConfigs.general.title}
+                        {config.title}
                     </h1>
 
                     <p className={styles.subtitle}>
-                        {writeToRebbeConfigs.general.subtitle}
+                        {config.subtitle}
                     </p>
                 </div>
             </Container>

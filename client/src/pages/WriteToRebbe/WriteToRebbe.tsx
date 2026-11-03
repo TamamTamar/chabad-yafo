@@ -7,18 +7,22 @@ import RebbeLetterSuccessModal from "./components/RebbeLetterSuccessModal/RebbeL
 import RebbeLetterHero from "./components/RebbeLetterHero/RebbeLetterHero";
 
 
+import { getWriteToRebbeConfig } from "./writeToRebbeConfig";
+
 const WriteToRebbe = () => {
+    const config = getWriteToRebbeConfig();
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
     return (
         <main className={styles.page}>
-            <RebbeLetterHero />
+            <RebbeLetterHero config={config} />
 
             <Container>
                 <section className={styles.section}>
-                    <RebbeLetterInfo />
+                    <RebbeLetterInfo config={config} />
 
                     <RebbeLetterForm
+                        config={config}
                         onSuccess={() => setIsSuccessModalOpen(true)}
                     />
                 </section>
@@ -26,6 +30,7 @@ const WriteToRebbe = () => {
 
             {isSuccessModalOpen && (
                 <RebbeLetterSuccessModal
+                    config={config}
                     onClose={() => setIsSuccessModalOpen(false)}
                 />
             )}
